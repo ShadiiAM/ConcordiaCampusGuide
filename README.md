@@ -9,20 +9,25 @@
 | Name | Student ID |
 |-----|-----------|
 | Shadi Marzouk | 27231466 |
-| Omar Chabti | 40262497 |
-| Samuel Vachon | 40281580 |
-| Abdeljalil Sennaoui | 40117162 |
-| Kevin Ung | 40259218 |
 
 ### Backend Team
 | Name | Student ID |
 |-----|-----------|
+| Kevin Ung | 40259218 |
+| Samuel Vachon | 40281580 |
+| Oscar Mirontsuk | 40191431 |
+
+### Unassigned
+| Name | Student ID |
+|-----|-----------|
+| Loucif Mohamed-Rabah-Ishaq | 40282580 |
 | Anh Vi Mac | 40252504 |
 | Hossam Mostafa | 40245337 |
 | Hossam Khalifa | 40199572 |
 | Adam Oughourlian | 40246313 |
-| Oscar Mirontsuk | 40191431 |
-| Loucif Mohamed-Rabah-Ishaq | 40282580 |
+| Omar Chabti | 40262497 |
+| Abdeljalil Sennaoui | 40117162 |
+| Kevin Ung | 40259218 |
 
 ## Project Overview
 This project is a **Campus Guide application** designed to assist Concordia University students with navigation, scheduling, and points of interest across both **SGW** and **Loyola** campuses.
