@@ -11,11 +11,10 @@ Thank you for contributing to the Campus Guide project! This document outlines t
 
 ## Branch Strategy
 
-We follow a simplified Git Flow strategy:
+We use a trunk-based development strategy with feature branches:
 
-### Main Branches
+### Main Branch
 - `main` - Production-ready code. Protected branch.
-- `develop` - Integration branch for features. Protected branch.
 
 ### Supporting Branches
 - `feature/*` - New features (e.g., `feature/indoor-navigation`)
@@ -66,10 +65,10 @@ test(directions): add unit tests for route service
 
 ## Pull Request Process
 
-1. **Create a branch** from `develop` following the naming convention
+1. **Create a branch** from `main` following the naming convention
 2. **Make your changes** with appropriate commits
 3. **Push your branch** to the remote repository
-4. **Open a Pull Request** to `develop`
+4. **Open a Pull Request** to `main`
 5. **Fill out the PR template** completely
 6. **Request reviews** from at least one team member
 7. **Address feedback** and make necessary changes
