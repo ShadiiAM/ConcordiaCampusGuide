@@ -16,11 +16,11 @@
 | Kevin Ung | 40259218 |
 | Samuel Vachon | 40281580 |
 | Oscar Mirontsuk | 40191431 |
+| Loucif Mohamed-Rabah-Ishaq | 40282580 |
 
 ### Unassigned
 | Name | Student ID |
 |-----|-----------|
-| Loucif Mohamed-Rabah-Ishaq | 40282580 |
 | Anh Vi Mac | 40252504 |
 | Hossam Mostafa | 40245337 |
 | Hossam Khalifa | 40199572 |
