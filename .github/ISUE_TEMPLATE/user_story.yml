@@ -1,0 +1,15 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ** As a** <role> ...
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
