@@ -1,0 +1,40 @@
+@startuml UseCaseExplore
+left to right direction
+actor Student as User
+actor GoogleMapAPI as Gmap <<system>> 
+actor FusedLocationProviderAPI as Location <<system>> 
+
+rectangle "ConcordiaCampusGuide" {
+  usecase "Explore Map" as UC_Map
+  usecase "Select Concordia Buildings" as UC_Build
+  usecase "Select Point Of Interest" as UC_POI
+  usecase "Interact with the Map" as Generate
+  usecase "Show Buildings' Information" as UC_Info
+
+  usecase "Select Campus" as UC_Campus
+
+  usecase "Outdoor Directions" as UC_Directions
+  usecase "Select Start and End Points" as UC_Select
+  usecase "Choose Transportation mode" as UC_Mode
+  usecase "Center to User Position" as UC_Position
+}
+
+
+User --> UC_Campus
+User --> UC_Map
+User --> UC_Directions
+
+UC_Map .> Generate
+UC_Map .> UC_Build
+UC_Map .> UC_POI
+UC_Map .> UC_Position
+UC_Build .> UC_Info
+UC_Directions .> UC_Select
+UC_Select .> UC_Map
+UC_Position --> Location
+UC_Directions .> UC_Mode
+
+Generate --> Gmap
+
+
+@enduml
