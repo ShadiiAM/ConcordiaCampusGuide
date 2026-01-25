@@ -8,7 +8,7 @@ plugins {
 
 sonar {
     properties {
-        property("sonar.projectKey", "ShadiiAM_SOEN390-Project-W26")
+        property("sonar.projectKey", "ShadiiAM_ConcordiaCampusGuide")
         property("sonar.organization", "passable-hardwood-salvage-professor-control-pedicure")
     }
 }
