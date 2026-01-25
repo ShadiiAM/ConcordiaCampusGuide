@@ -9,6 +9,7 @@
 | Name | Student ID |
 |-----|-----------|
 | Shadi Marzouk | 27231466 |
+| Anh Vi Mac | 40252504 |
 
 ### Backend Team
 | Name | Student ID |
@@ -22,7 +23,6 @@
 ### Unassigned
 | Name | Student ID |
 |-----|-----------|
-| Anh Vi Mac | 40252504 |
 | Hossam Mostafa | 40245337 |
 | Hossam Khalifa | 40199572 |
 | Adam Oughourlian | 40246313 |
