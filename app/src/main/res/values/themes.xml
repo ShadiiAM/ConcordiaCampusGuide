@@ -2,4 +2,7 @@
 <resources>
 
     <style name="Theme.ConcordiaCampusGuide" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.ConcordiaCampusGuideSplashScreen" parent = "Theme.ConcordiaCampusGuide" />
+
 </resources>
