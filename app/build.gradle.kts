@@ -24,7 +24,6 @@ android {
     buildTypes {
         debug {
             enableUnitTestCoverage = true
-            testCoverageEnabled = true
         }
         release {
             isMinifyEnabled = false
@@ -88,10 +87,14 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(kotlinTree, javaTree))
-    executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                "jacoco/testDebugUnitTest.exec")
-    })
+
+    val executionDataPath = fileTree(layout.buildDirectory.get().asFile) {
+        include(
+            "jacoco/testDebugUnitTest.exec",
+            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+        )
+    }
+    executionData.setFrom(executionDataPath)
 }
 
 dependencies {
