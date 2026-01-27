@@ -24,6 +24,7 @@ android {
     buildTypes {
         debug {
             enableUnitTestCoverage = true
+            testCoverageEnabled = true
         }
         release {
             isMinifyEnabled = false
@@ -71,19 +72,25 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*"
+        "android/**/*.*",
+        "**/databinding/**/*.*"
     )
 
-    val debugTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+    val javaTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
+        exclude(fileFilter)
+    }
+
+    val kotlinTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
         exclude(fileFilter)
     }
 
     val mainSrc = "${project.projectDir}/src/main/java"
 
     sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
+    classDirectories.setFrom(files(kotlinTree, javaTree))
     executionData.setFrom(fileTree(layout.buildDirectory.get().asFile) {
-        include("jacoco/testDebugUnitTest.exec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                "jacoco/testDebugUnitTest.exec")
     })
 }
 
