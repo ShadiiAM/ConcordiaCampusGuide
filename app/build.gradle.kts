@@ -90,11 +90,11 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/BR.class"
     )
 
-    val javaTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/classes") {
+    val javaTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
         exclude(fileFilter)
     }
 
-    val kotlinTree = fileTree("${layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+    val kotlinTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
         exclude(fileFilter)
     }
 

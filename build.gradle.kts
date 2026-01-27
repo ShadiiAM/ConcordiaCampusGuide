@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    id("org.sonarqube") version "7.2.2.6593"
+    id("org.sonarqube") version "6.0.1.5171"
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) apply false
 }
 
@@ -18,6 +18,10 @@ sonar {
         property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/**/*.xml")
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
         property("sonar.android.lint.report", "app/build/reports/lint-results-debug.xml")
+        // New project - create new code definition
+        property("sonar.newCodeDefinition", "previous_version")
+        // Disable pull request decoration for first analysis
+        property("sonar.scm.disabled", "false")
     }
 }
 
