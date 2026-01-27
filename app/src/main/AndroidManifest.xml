@@ -5,7 +5,9 @@
     <!-- Permissions required for Google Maps -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Required for Google Maps to show user's current location on the map -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Required for Google Maps to provide precise location-based features -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
