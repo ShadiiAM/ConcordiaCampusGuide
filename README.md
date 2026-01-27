@@ -98,4 +98,16 @@ The system provides outdoor and indoor navigation, integrates with academic sche
 ## Technologies
 The full technology stack will be documented as development progresses, including frontend frameworks, backend services, APIs, and mapping tools.
 
+## Setup Instructions
+
+### Google Maps API Key Setup
+1. Create a `local.properties` file in the project root directory (if it doesn't exist)
+2. Add your Google Maps API key:
+   ```properties
+   MAPS_API_KEY=your_api_key_here
+   ```
+3. Save the file and sync Gradle
+
+**Note:** The `local.properties` file is gitignored. Never commit API keys to the repository.
+
 ## Repository Structure
