@@ -38,6 +38,8 @@ jobs:
           echo "MAPS_API_KEY=DUMMY_KEY_FOR_CI" >> local.properties
       - name: Change wrapper permissions
         run: chmod +x gradlew
+      - name: Run tests with coverage
+        run: ./gradlew testDebugUnitTest jacocoTestReport --stacktrace
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

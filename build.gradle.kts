@@ -11,5 +11,10 @@ sonar {
     properties {
         property("sonar.projectKey", "ShadiiAM_ConcordiaCampusGuide")
         property("sonar.organization", "passable-hardwood-salvage-professor-control-pedicure")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.sources", "app/src/main/java")
+        property("sonar.tests", "app/src/test/java")
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
     }
 }
