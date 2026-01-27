@@ -33,7 +33,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
       - name: Generate local.properties
-        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "MAPS_API_KEY=DUMMY_KEY_FOR_CI" >> local.properties
       - name: Change wrapper permissions
         run: chmod +x gradlew
       - name: Build and analyze
