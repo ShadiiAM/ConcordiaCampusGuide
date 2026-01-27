@@ -42,6 +42,11 @@ jobs:
         run: ./gradlew build --stacktrace
       - name: Run tests with coverage
         run: ./gradlew testDebugUnitTest jacocoTestReport --stacktrace
+      - name: Verify JaCoCo report exists
+        run: |
+          echo "Checking for JaCoCo XML report..."
+          find . -name "*.xml" -path "*/jacoco/*" -type f
+          ls -la app/build/reports/jacoco/jacocoTestReport/ || echo "Report directory not found"
       - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

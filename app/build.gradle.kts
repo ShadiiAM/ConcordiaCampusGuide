@@ -106,6 +106,16 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     // Collect all test task execution data
     val testTasks = tasks.withType<Test>()
     executionData.setFrom(testTasks.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile })
+
+    doLast {
+        val xmlReport = file("${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        if (xmlReport.exists()) {
+            println("✓ JaCoCo XML report generated successfully at: ${xmlReport.absolutePath}")
+            println("  Report size: ${xmlReport.length()} bytes")
+        } else {
+            println("✗ WARNING: JaCoCo XML report was NOT generated at expected location: ${xmlReport.absolutePath}")
+        }
+    }
 }
 
 dependencies {
