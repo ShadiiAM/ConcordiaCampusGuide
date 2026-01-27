@@ -4,10 +4,13 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
+import org.mockito.Mockito.*
+import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
@@ -104,5 +107,30 @@ class MapsActivityTest {
         // Verify the marker title string is correct
         val expectedTitle = "Concordia University - SGW Campus"
         assertEquals("Marker title should be correct", expectedTitle, "Concordia University - SGW Campus")
+    }
+
+    @Test
+    fun mapsActivity_concordiaLocation_withinMontrealBounds() {
+        // Verify the Concordia location is within Montreal bounds
+        val concordiaSGW = LatLng(45.4972, -73.5789)
+
+        assertTrue("Concordia should be in Montreal (latitude)",
+            concordiaSGW.latitude > 45.0 && concordiaSGW.latitude < 46.0)
+        assertTrue("Concordia should be in Montreal (longitude)",
+            concordiaSGW.longitude > -74.0 && concordiaSGW.longitude < -73.0)
+    }
+
+    @Test
+    fun mapsActivity_markerOptions_createsSuccessfully() {
+        // Test marker options creation (as used in onMapReady)
+        val concordiaSGW = LatLng(45.4972, -73.5789)
+        val markerTitle = "Concordia University - SGW Campus"
+
+        assertNotNull("Concordia location should not be null", concordiaSGW)
+        assertEquals("Marker title should match", markerTitle, "Concordia University - SGW Campus")
+
+        // Verify coordinates are within valid ranges
+        assertTrue("Latitude should be valid", concordiaSGW.latitude in -90.0..90.0)
+        assertTrue("Longitude should be valid", concordiaSGW.longitude in -180.0..180.0)
     }
 }

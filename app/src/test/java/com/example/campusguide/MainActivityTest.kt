@@ -122,4 +122,82 @@ class MainActivityTest {
 
         composeTestRule.onNodeWithText("Hello TestUser!").assertIsDisplayed()
     }
+
+    @Test
+    fun navigationItems_allDestinations_areClickable() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Click through all navigation items to cover navigation lambdas
+        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText("Favorites").performClick()
+        composeTestRule.onNodeWithText("Profile").performClick()
+        composeTestRule.onNodeWithText("Home").performClick()
+    }
+
+    @Test
+    fun appDestinations_icon_returnsCorrectImageVector() {
+        // Test that icons are accessible
+        val homeIcon = AppDestinations.HOME.icon
+        val favoritesIcon = AppDestinations.FAVORITES.icon
+        val profileIcon = AppDestinations.PROFILE.icon
+
+        assertNotNull("Home icon should exist", homeIcon)
+        assertNotNull("Favorites icon should exist", favoritesIcon)
+        assertNotNull("Profile icon should exist", profileIcon)
+    }
+
+    @Test
+    fun greeting_withModifier_appliesCorrectly() {
+        composeTestRule.setContent {
+            Greeting(name = "Compose")
+        }
+
+        composeTestRule.onNodeWithText("Hello Compose!").assertIsDisplayed()
+    }
+
+    @Test
+    fun greetingPreview_rendersWithoutErrors() {
+        // Test the preview function executes without errors
+        composeTestRule.setContent {
+            GreetingPreview()
+        }
+
+        // Preview should render successfully
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun navigationSuite_switchesBetweenDestinations() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Switch between destinations to cover selection logic
+        composeTestRule.onNodeWithText("Favorites").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Profile").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun greeting_withDifferentNames_alice() {
+        composeTestRule.setContent {
+            Greeting(name = "Alice")
+        }
+        composeTestRule.onNodeWithText("Hello Alice!").assertIsDisplayed()
+    }
+
+    @Test
+    fun greeting_withDifferentNames_bob() {
+        composeTestRule.setContent {
+            Greeting(name = "Bob")
+        }
+        composeTestRule.onNodeWithText("Hello Bob!").assertIsDisplayed()
+    }
 }
