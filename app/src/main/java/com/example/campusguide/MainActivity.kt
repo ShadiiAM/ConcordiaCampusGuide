@@ -5,24 +5,41 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 class MainActivity : ComponentActivity() {
@@ -65,10 +82,11 @@ fun ConcordiaCampusGuideApp() {
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
+        Scaffold{ innerPadding ->
+            Search_button(
+                modifier = Modifier
+                .padding(innerPadding)
+                .padding(all = 16.dp)
             )
         }
     }
@@ -85,17 +103,58 @@ enum class AppDestinations(
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun Search_button(modifier: Modifier = Modifier) {
+    var location by remember{
+        mutableStateOf("")
+    }
+    Row(
         modifier = modifier
-    )
+            .height(56.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.LightGray)
+            .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+
+    ){
+        TextField(
+            value = location,
+            onValueChange = { text ->
+                location = text
+            },
+            modifier = Modifier.fillMaxHeight().fillMaxWidth(0.65f)
+                .border(1.dp, Color.Transparent, RoundedCornerShape(12.dp)),
+            placeholder  = { Text("Search Location") },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.LightGray,
+                focusedContainerColor = Color.LightGray
+            )
+
+
+
+        )
+        IconButton(onClick = { /* action */ }) {
+            
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+            )
+
+        }
+        IconButton(onClick = { /* action */ }) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = "Profile"
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
+
+@Preview
 @Composable
-fun GreetingPreview() {
-    ConcordiaCampusGuideTheme {
-        Greeting("Android")
-    }
+fun PreviewSearch_button() {
+    Search_button(modifier = Modifier
+        .padding(top = 100.dp))
 }
