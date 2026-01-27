@@ -31,6 +31,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Generate local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
       - name: Set up Gradle (with caching)
         uses: gradle/actions/setup-gradle@v4
 
