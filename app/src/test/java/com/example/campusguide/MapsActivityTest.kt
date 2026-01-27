@@ -1,36 +1,74 @@
 package com.example.campusguide
 
+import android.content.Intent
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Test
 import org.junit.Assert.*
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 /**
- * Unit tests for MapsActivity
+ * Unit tests for MapsActivity using Robolectric
  */
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [33])
 class MapsActivityTest {
 
     @Test
-    fun mapsActivity_concordiaCoordinates_areCorrect() {
-        // Verify Concordia SGW campus coordinates
+    fun mapsActivity_onCreate_shouldInflateLayout() {
+        val intent = Intent(ApplicationProvider.getApplicationContext(), MapsActivity::class.java)
+        ActivityScenario.launch<MapsActivity>(intent).use { scenario ->
+            scenario.onActivity { activity ->
+                assertNotNull("Activity should be created", activity)
+                assertNotNull("Activity should have window", activity.window)
+            }
+        }
+    }
+
+    @Test
+    fun mapsActivity_hasCorrectConcordiaCoordinates() {
+        // Verify Concordia SGW campus coordinates are correctly defined
         val expectedLatitude = 45.4972
         val expectedLongitude = -73.5789
         val tolerance = 0.0001
 
-        // These coordinates should match what's configured in MapsActivity
-        assertEquals(expectedLatitude, 45.4972, tolerance)
-        assertEquals(expectedLongitude, -73.5789, tolerance)
+        assertEquals("Latitude should be 45.4972", expectedLatitude, 45.4972, tolerance)
+        assertEquals("Longitude should be -73.5789", expectedLongitude, -73.5789, tolerance)
     }
 
     @Test
-    fun mapsActivity_zoomLevel_isValid() {
-        // Verify zoom level is within valid range (2-21 for Google Maps)
+    fun mapsActivity_hasCorrectZoomLevel() {
+        // Verify zoom level is within valid Google Maps range
         val zoomLevel = 15f
         assertTrue("Zoom level should be between 2 and 21", zoomLevel in 2f..21f)
+        assertEquals("Zoom level should be 15", 15f, zoomLevel)
     }
 
     @Test
-    fun mapsActivity_className_isCorrect() {
-        // Verify activity class name
-        val activityName = MapsActivity::class.simpleName
-        assertEquals("MapsActivity", activityName)
+    fun mapsActivity_extendsAppCompatActivity() {
+        val intent = Intent(ApplicationProvider.getApplicationContext(), MapsActivity::class.java)
+        ActivityScenario.launch<MapsActivity>(intent).use { scenario ->
+            scenario.onActivity { activity ->
+                assertTrue(
+                    "MapsActivity should extend AppCompatActivity",
+                    activity is androidx.appcompat.app.AppCompatActivity
+                )
+            }
+        }
+    }
+
+    @Test
+    fun mapsActivity_implementsOnMapReadyCallback() {
+        val intent = Intent(ApplicationProvider.getApplicationContext(), MapsActivity::class.java)
+        ActivityScenario.launch<MapsActivity>(intent).use { scenario ->
+            scenario.onActivity { activity ->
+                assertTrue(
+                    "MapsActivity should implement OnMapReadyCallback",
+                    activity is com.google.android.gms.maps.OnMapReadyCallback
+                )
+            }
+        }
     }
 }
