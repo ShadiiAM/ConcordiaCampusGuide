@@ -7,11 +7,6 @@ plugins {
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
-secrets {
-    // Configure defaults file for CI/CD
-    defaultsPropertiesFileName = "secrets_defaults.properties"
-}
-
 android {
     namespace = "com.example.campusguide"
     compileSdk = 35
