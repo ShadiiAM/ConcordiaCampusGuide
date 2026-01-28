@@ -30,9 +30,22 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Generate local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "MAPS_API_KEY=DUMMY_KEY_FOR_CI" >> local.properties
       - name: Change wrapper permissions
         run: chmod +x gradlew
-      - name: Build and analyze
+      - name: Build and run tests with coverage
+        run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport --stacktrace
+      - name: Verify JaCoCo report exists
+        run: |
+          echo "Checking for JaCoCo XML report..."
+          find . -name "*.xml" -path "*/jacoco/*" -type f
+          ls -la app/build/reports/jacoco/jacocoTestReport/ || echo "Report directory not found"
+      - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonar --info
+        run: ./gradlew sonar --info

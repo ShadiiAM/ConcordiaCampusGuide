@@ -3,12 +3,29 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    id("org.sonarqube") version "7.1.0.6387"
+    id("org.sonarqube") version "6.0.1.5171"
+    alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) apply false
 }
 
 sonar {
     properties {
         property("sonar.projectKey", "ShadiiAM_ConcordiaCampusGuide")
         property("sonar.organization", "passable-hardwood-salvage-professor-control-pedicure")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.projectName", "ConcordiaCampusGuide")
+        property("sonar.sourceEncoding", "UTF-8")
+        // Use wildcard pattern to find JaCoCo XML reports
+        property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/**/*.xml")
+        property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
+        property("sonar.android.lint.report", "app/build/reports/lint-results-debug.xml")
+        // New project - create new code definition
+        property("sonar.newCodeDefinition", "previous_version")
+        // Disable pull request decoration for first analysis
+        property("sonar.scm.disabled", "false")
     }
+}
+
+// Ensure jacocoTestReport runs before sonar task
+tasks.named("sonar") {
+    dependsOn(":app:jacocoTestReport")
 }
