@@ -1,5 +1,6 @@
 package com.example.campusguide
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -40,9 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -67,6 +67,7 @@ sealed class AppIcon {
 @Composable
 fun ConcordiaCampusGuideApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    val context = LocalContext.current
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -76,6 +77,7 @@ fun ConcordiaCampusGuideApp() {
                         when (val icon = it.icon) {
                             is AppIcon.Vector ->
                                 Icon(icon.imageVector, contentDescription = it.label)
+
                             is AppIcon.Drawable ->
                                 Icon(painterResource(icon.resId), contentDescription = it.label)
                         }
@@ -87,45 +89,28 @@ fun ConcordiaCampusGuideApp() {
             }
         }
     ) {
-        Scaffold{ innerPadding ->
+        Scaffold { innerPadding ->
             Search_button(
                 modifier = Modifier
-                .padding(innerPadding)
-                .padding(all = 16.dp)
+                    .padding(innerPadding)
+                    .padding(all = 16.dp)
             )
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Greeting(
-                    name = "Android",
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Button(onClick = {
-                    val intent = Intent(context, MapsActivity::class.java)
-                    context.startActivity(intent)
-                }) {
-                    Text("Open Campus Map")
-                }
-            }
+            Map_button(
+                    modifier = Modifier.padding(innerPadding),
+                    context
+            )
         }
     }
 }
-
 enum class AppDestinations(
     val label: String,
     val icon: AppIcon,
-) {
-    MAP("Map", AppIcon.Vector(Icons.Default.Place)),
-    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
-    CALENDAR("Calendar", AppIcon.Drawable(R.drawable.calendar_icon)),
-    POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
-}
-
+    ) {
+        MAP("Map", AppIcon.Vector(Icons.Default.Place)),
+        DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
+        CALENDAR("Calendar", AppIcon.Drawable(R.drawable.calendar_icon)),
+        POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
+    }
 @Composable
 fun Search_button(modifier: Modifier = Modifier) {
     var location by remember{
@@ -159,7 +144,7 @@ fun Search_button(modifier: Modifier = Modifier) {
 
         )
         IconButton(onClick = { /* action */ }) {
-            
+
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
@@ -175,10 +160,27 @@ fun Search_button(modifier: Modifier = Modifier) {
     }
 }
 
-
+/*
 @Preview
 @Composable
 fun PreviewSearch_button() {
     Search_button(modifier = Modifier
         .padding(top = 100.dp))
+}
+*/
+@Composable
+fun Map_button(modifier: Modifier, context: Context) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(onClick = {
+            val intent = Intent(context, MapsActivity::class.java)
+            context.startActivity(intent)
+        }) {
+            Text("Open Campus Map")
+        }
+    }
 }
