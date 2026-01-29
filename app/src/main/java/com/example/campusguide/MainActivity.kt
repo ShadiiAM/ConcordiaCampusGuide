@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.components.SearchBarWithProfile
+import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
@@ -51,13 +52,18 @@ class MainActivity : ComponentActivity() {
 fun ConcordiaCampusGuideApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
+    var showAccessibility by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
-    if (showProfile) {
+    if (showAccessibility) {
+        AccessibilityScreen(
+            onBackClick = { showAccessibility = false }
+        )
+    } else if (showProfile) {
         ProfileScreen(
             onBackClick = { showProfile = false },
             onProfileClick = { /* TODO: Navigate to profile details */ },
-            onAccessibilityClick = { /* TODO: Navigate to accessibility settings */ }
+            onAccessibilityClick = { showAccessibility = true }
         )
     } else {
         NavigationSuiteScaffold(
