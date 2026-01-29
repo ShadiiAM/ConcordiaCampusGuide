@@ -1,7 +1,6 @@
 package com.example.campusguide
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -212,38 +211,17 @@ class AccessibilityScreenTest {
     }
 
     @Test
-    fun accessibilityScreen_displaysTtIcon() {
+    fun accessibilityScreen_allSettingsAreDisplayed() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 AccessibilityScreen()
             }
         }
 
-        composeTestRule.onNodeWithText("Tt").assertIsDisplayed()
-    }
-
-    @Test
-    fun accessibilityScreen_displaysTextColourIcon() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
-            }
-        }
-
-        // The "A" icon for text colour
-        composeTestRule.onNodeWithText("A").assertIsDisplayed()
-    }
-
-    @Test
-    fun accessibilityScreen_displaysBoldIcon() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
-            }
-        }
-
-        // The "B" icon for bold
-        composeTestRule.onNodeWithText("B").assertIsDisplayed()
+        // Verify all three settings are displayed
+        composeTestRule.onNodeWithText("Text size").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Text colour").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Bold").assertIsDisplayed()
     }
 
     @Test
