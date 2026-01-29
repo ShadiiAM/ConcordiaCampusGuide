@@ -66,12 +66,13 @@ class MainActivityTest {
     fun appDestinations_enumHasCorrectValues() {
         // Test that AppDestinations enum has the expected values
         val destinations = AppDestinations.entries
-        assertEquals("Should have 3 destinations", 3, destinations.size)
+        assertEquals("Should have 4 destinations", 4, destinations.size)
 
         val labels = destinations.map { it.label }
-        assertTrue("Should contain Home", labels.contains("Home"))
-        assertTrue("Should contain Favorites", labels.contains("Favorites"))
-        assertTrue("Should contain Profile", labels.contains("Profile"))
+        assertTrue("Should contain Map", labels.contains("Map"))
+        assertTrue("Should contain Directions", labels.contains("Directions"))
+        assertTrue("Should contain Calendar", labels.contains("Calendar"))
+        assertTrue("Should contain POI", labels.contains("POI"))
     }
 
     @Test
@@ -130,22 +131,25 @@ class MainActivityTest {
         }
 
         // Click through all navigation items to cover navigation lambdas
-        composeTestRule.onNodeWithText("Home").performClick()
-        composeTestRule.onNodeWithText("Favorites").performClick()
-        composeTestRule.onNodeWithText("Profile").performClick()
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
+        composeTestRule.onNodeWithText("Directions").performClick()
+        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.onNodeWithText("POI").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
     }
 
     @Test
-    fun appDestinations_icon_returnsCorrectImageVector() {
+    fun appDestinations_icon_returnsCorrectAppIcon() {
         // Test that icons are accessible
-        val homeIcon = AppDestinations.HOME.icon
-        val favoritesIcon = AppDestinations.FAVORITES.icon
-        val profileIcon = AppDestinations.PROFILE.icon
+        val mapIcon = AppDestinations.MAP.icon
+        val directionsIcon = AppDestinations.DIRECTIONS.icon
+        val calendarIcon = AppDestinations.CALENDAR.icon
+        val poiIcon = AppDestinations.POI.icon
 
-        assertNotNull("Home icon should exist", homeIcon)
-        assertNotNull("Favorites icon should exist", favoritesIcon)
-        assertNotNull("Profile icon should exist", profileIcon)
+        assertNotNull("Map icon should exist", mapIcon)
+        assertNotNull("Directions icon should exist", directionsIcon)
+        assertNotNull("Calendar icon should exist", calendarIcon)
+        assertNotNull("POI icon should exist", poiIcon)
     }
 
     @Test
@@ -175,13 +179,13 @@ class MainActivityTest {
         }
 
         // Switch between destinations to cover selection logic
-        composeTestRule.onNodeWithText("Favorites").performClick()
+        composeTestRule.onNodeWithText("Directions").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Profile").performClick()
+        composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
         composeTestRule.waitForIdle()
     }
 
