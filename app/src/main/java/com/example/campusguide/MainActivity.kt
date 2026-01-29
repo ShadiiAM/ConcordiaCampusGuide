@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -108,8 +109,9 @@ enum class AppDestinations(
     ) {
         MAP("Map", AppIcon.Vector(Icons.Default.Place)),
         DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
-        CALENDAR("Calendar", AppIcon.Drawable(R.drawable.calendar_icon)),
+
         POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
+        CALENDAR("Calendar", AppIcon.Drawable(R.drawable.calendar_icon)),
     }
 @Composable
 fun Search_button(modifier: Modifier = Modifier) {
@@ -160,14 +162,6 @@ fun Search_button(modifier: Modifier = Modifier) {
     }
 }
 
-/*
-@Preview
-@Composable
-fun PreviewSearch_button() {
-    Search_button(modifier = Modifier
-        .padding(top = 100.dp))
-}
-*/
 @Composable
 fun Map_button(modifier: Modifier, context: Context) {
     Column(
@@ -183,4 +177,34 @@ fun Map_button(modifier: Modifier, context: Context) {
             Text("Open Campus Map")
         }
     }
+}
+
+@Composable
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    ConcordiaCampusGuideTheme {
+        Greeting("Android")
+    }
+}
+
+@Preview
+@Composable
+fun PreviewSearch_button() {
+    Search_button(modifier = Modifier
+        .padding(top = 100.dp))
+}
+
+@Preview
+@Composable
+fun PreviewMap_button() {
+    Map_button(modifier = Modifier
+        .padding(top = 100.dp), LocalContext.current)
 }
