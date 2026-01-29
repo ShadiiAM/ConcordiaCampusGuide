@@ -59,13 +59,16 @@ class ComponentTest {
 
         // Navigate through all destinations multiple times
         repeat(2) {
-            composeTestRule.onNodeWithText("Favorites").performClick()
+            composeTestRule.onNodeWithText("Directions").performClick()
             composeTestRule.waitForIdle()
 
-            composeTestRule.onNodeWithText("Profile").performClick()
+            composeTestRule.onNodeWithText("Calendar").performClick()
             composeTestRule.waitForIdle()
 
-            composeTestRule.onNodeWithText("Home").performClick()
+            composeTestRule.onNodeWithText("POI").performClick()
+            composeTestRule.waitForIdle()
+
+            composeTestRule.onNodeWithText("Map").performClick()
             composeTestRule.waitForIdle()
         }
     }
