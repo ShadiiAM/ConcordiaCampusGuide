@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.screens.ProfileScreen
+import com.example.campusguide.ui.screens.ProfileScreenPreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -145,5 +146,90 @@ class ProfileScreenTest {
 
         composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
         composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun profileScreenPreview_rendersCorrectly() {
+        composeTestRule.setContent {
+            ProfileScreenPreview()
+        }
+
+        composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun profileScreen_lightTheme_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(darkTheme = false) {
+                ProfileScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun profileScreen_withAllDefaultCallbacks_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                ProfileScreen(
+                    onBackClick = {},
+                    onProfileClick = {},
+                    onAccessibilityClick = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Jane Doe").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun profileScreen_displaysAccessibilityIcon() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                ProfileScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithContentDescription("Accessibility").assertIsDisplayed()
+    }
+
+    @Test
+    fun profileScreen_clickOnStudentSubtitle_triggersProfileCallback() {
+        var profileClicked = false
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                ProfileScreen(
+                    onProfileClick = { profileClicked = true }
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Student").performClick()
+        assertTrue("Clicking subtitle should trigger profile callback", profileClicked)
+    }
+
+    @Test
+    fun profileScreen_multipleClicks_triggersCallbacksCorrectly() {
+        var backClickCount = 0
+        var profileClickCount = 0
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                ProfileScreen(
+                    onBackClick = { backClickCount++ },
+                    onProfileClick = { profileClickCount++ }
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Jane Doe").performClick()
+        composeTestRule.onNodeWithText("Jane Doe").performClick()
+
+        assertTrue("Profile should be clicked twice", profileClickCount == 2)
     }
 }

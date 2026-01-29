@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.screens.AccessibilityScreen
+import com.example.campusguide.ui.screens.AccessibilityScreenPreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -172,6 +173,90 @@ class AccessibilityScreenTest {
         }
 
         composeTestRule.onNodeWithText("+").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun accessibilityScreenPreview_rendersCorrectly() {
+        composeTestRule.setContent {
+            AccessibilityScreenPreview()
+        }
+
+        composeTestRule.onNodeWithText("Accessibility").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun accessibilityScreen_lightTheme_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(darkTheme = false) {
+                AccessibilityScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithText("Accessibility").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun accessibilityScreen_withDefaultCallback_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                AccessibilityScreen(
+                    onBackClick = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Display and Text Size").assertIsDisplayed()
+    }
+
+    @Test
+    fun accessibilityScreen_displaysTtIcon() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                AccessibilityScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithText("Tt").assertIsDisplayed()
+    }
+
+    @Test
+    fun accessibilityScreen_displaysTextColourIcon() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                AccessibilityScreen()
+            }
+        }
+
+        // The "A" icon for text colour
+        composeTestRule.onNodeWithText("A").assertIsDisplayed()
+    }
+
+    @Test
+    fun accessibilityScreen_displaysBoldIcon() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                AccessibilityScreen()
+            }
+        }
+
+        // The "B" icon for bold
+        composeTestRule.onNodeWithText("B").assertIsDisplayed()
+    }
+
+    @Test
+    fun accessibilityScreen_multipleButtonClicks() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                AccessibilityScreen()
+            }
+        }
+
+        composeTestRule.onNodeWithText("-").performClick()
+        composeTestRule.onNodeWithText("+").performClick()
+        composeTestRule.onNodeWithText("-").performClick()
         composeTestRule.waitForIdle()
     }
 }

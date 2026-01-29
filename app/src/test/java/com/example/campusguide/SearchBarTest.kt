@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.SearchBarWithProfile
+import com.example.campusguide.ui.components.SearchBarWithProfilePreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -124,6 +125,53 @@ class SearchBarTest {
             }
         }
 
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBarWithProfilePreview_rendersCorrectly() {
+        composeTestRule.setContent {
+            SearchBarWithProfilePreview()
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_withCustomModifier_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    modifier = androidx.compose.ui.Modifier
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchBar_profileAvatarDisplaysInitial() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile()
+            }
+        }
+
+        // Verify the avatar shows the initial "A"
+        composeTestRule.onNodeWithText("A").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchBar_lightTheme_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(darkTheme = false) {
+                SearchBarWithProfile()
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
         composeTestRule.waitForIdle()
     }
 }
