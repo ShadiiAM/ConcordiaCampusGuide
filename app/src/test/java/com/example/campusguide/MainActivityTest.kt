@@ -3,6 +3,7 @@ package com.example.campusguide
 import android.content.Intent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ActivityScenario
@@ -66,12 +67,13 @@ class MainActivityTest {
     fun appDestinations_enumHasCorrectValues() {
         // Test that AppDestinations enum has the expected values
         val destinations = AppDestinations.entries
-        assertEquals("Should have 3 destinations", 3, destinations.size)
+        assertEquals("Should have 4 destinations", 4, destinations.size)
 
         val labels = destinations.map { it.label }
-        assertTrue("Should contain Home", labels.contains("Home"))
-        assertTrue("Should contain Favorites", labels.contains("Favorites"))
-        assertTrue("Should contain Profile", labels.contains("Profile"))
+        assertTrue("Should contain Map", labels.contains("Map"))
+        assertTrue("Should contain Directions", labels.contains("Directions"))
+        assertTrue("Should contain Calendar", labels.contains("Calendar"))
+        assertTrue("Should contain POI", labels.contains("POI"))
     }
 
     @Test
@@ -130,22 +132,25 @@ class MainActivityTest {
         }
 
         // Click through all navigation items to cover navigation lambdas
-        composeTestRule.onNodeWithText("Home").performClick()
-        composeTestRule.onNodeWithText("Favorites").performClick()
-        composeTestRule.onNodeWithText("Profile").performClick()
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
+        composeTestRule.onNodeWithText("Directions").performClick()
+        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.onNodeWithText("POI").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
     }
 
     @Test
-    fun appDestinations_icon_returnsCorrectImageVector() {
+    fun appDestinations_icon_returnsCorrectAppIcon() {
         // Test that icons are accessible
-        val homeIcon = AppDestinations.HOME.icon
-        val favoritesIcon = AppDestinations.FAVORITES.icon
-        val profileIcon = AppDestinations.PROFILE.icon
+        val mapIcon = AppDestinations.MAP.icon
+        val directionsIcon = AppDestinations.DIRECTIONS.icon
+        val calendarIcon = AppDestinations.CALENDAR.icon
+        val poiIcon = AppDestinations.POI.icon
 
-        assertNotNull("Home icon should exist", homeIcon)
-        assertNotNull("Favorites icon should exist", favoritesIcon)
-        assertNotNull("Profile icon should exist", profileIcon)
+        assertNotNull("Map icon should exist", mapIcon)
+        assertNotNull("Directions icon should exist", directionsIcon)
+        assertNotNull("Calendar icon should exist", calendarIcon)
+        assertNotNull("POI icon should exist", poiIcon)
     }
 
     @Test
@@ -175,13 +180,13 @@ class MainActivityTest {
         }
 
         // Switch between destinations to cover selection logic
-        composeTestRule.onNodeWithText("Favorites").performClick()
+        composeTestRule.onNodeWithText("Directions").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Profile").performClick()
+        composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Home").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
         composeTestRule.waitForIdle()
     }
 
@@ -199,5 +204,140 @@ class MainActivityTest {
             Greeting(name = "Bob")
         }
         composeTestRule.onNodeWithText("Hello Bob!").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_profileNavigation_showsProfileScreen() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Click on profile avatar (the "A" in search bar)
+        composeTestRule.onNodeWithText("A").performClick()
+        composeTestRule.waitForIdle()
+
+        // Should now show ProfileScreen
+        composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_profileToAccessibility_showsAccessibilityScreen() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Navigate to profile
+        composeTestRule.onNodeWithText("A").performClick()
+        composeTestRule.waitForIdle()
+
+        // Click on Accessibility item
+        composeTestRule.onNodeWithText("Accessibility").performClick()
+        composeTestRule.waitForIdle()
+
+        // Should now show AccessibilityScreen
+        composeTestRule.onNodeWithText("Display and Text Size").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_accessibilityBackButton_returnsToProfile() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Navigate to profile -> accessibility
+        composeTestRule.onNodeWithText("A").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Accessibility").performClick()
+        composeTestRule.waitForIdle()
+
+        // Click back
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+
+        // Should be back at profile
+        composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_profileBackButton_returnsToMain() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Navigate to profile
+        composeTestRule.onNodeWithText("A").performClick()
+        composeTestRule.waitForIdle()
+
+        // Click back
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+
+        // Should be back at main
+        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
+    }
+
+    @Test
+    fun appIcon_vectorType_hasCorrectImageVector() {
+        val mapIcon = AppDestinations.MAP.icon
+        assertTrue("Map icon should be Vector type", mapIcon is AppIcon.Vector)
+        assertNotNull("Vector icon should have imageVector", (mapIcon as AppIcon.Vector).imageVector)
+    }
+
+    @Test
+    fun appIcon_drawableType_hasCorrectResId() {
+        val directionsIcon = AppDestinations.DIRECTIONS.icon
+        assertTrue("Directions icon should be Drawable type", directionsIcon is AppIcon.Drawable)
+        assertTrue("Drawable icon should have valid resId", (directionsIcon as AppIcon.Drawable).resId > 0)
+    }
+
+    @Test
+    fun appDestinations_allIconsAreValid() {
+        AppDestinations.entries.forEach { destination ->
+            val icon = destination.icon
+            when (icon) {
+                is AppIcon.Vector -> assertNotNull("${destination.label} vector icon should not be null", icon.imageVector)
+                is AppIcon.Drawable -> assertTrue("${destination.label} drawable resId should be positive", icon.resId > 0)
+            }
+        }
+    }
+
+    @Test
+    fun appDestinations_labelsAreNotEmpty() {
+        AppDestinations.entries.forEach { destination ->
+            assertTrue("${destination.name} label should not be empty", destination.label.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun greeting_withEmptyName_displaysCorrectly() {
+        composeTestRule.setContent {
+            Greeting(name = "")
+        }
+        composeTestRule.onNodeWithText("Hello !").assertIsDisplayed()
+    }
+
+    @Test
+    fun greeting_withSpecialCharacters_displaysCorrectly() {
+        composeTestRule.setContent {
+            Greeting(name = "User@123")
+        }
+        composeTestRule.onNodeWithText("Hello User@123!").assertIsDisplayed()
+    }
+
+    @Test
+    fun greeting_withLongName_displaysCorrectly() {
+        composeTestRule.setContent {
+            Greeting(name = "VeryLongUserNameThatMightCauseIssues")
+        }
+        composeTestRule.onNodeWithText("Hello VeryLongUserNameThatMightCauseIssues!").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_displaysSearchBar() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
     }
 }

@@ -94,6 +94,7 @@ ehthumbs.db
 Thumbs.db
 
 # Kotlin
+.kotlin/
 *.kotlin_module
 
 # Secrets and API keys

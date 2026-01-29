@@ -1,6 +1,7 @@
 package com.example.campusguide
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -59,13 +60,16 @@ class ComponentTest {
 
         // Navigate through all destinations multiple times
         repeat(2) {
-            composeTestRule.onNodeWithText("Favorites").performClick()
+            composeTestRule.onNodeWithText("Directions").performClick()
             composeTestRule.waitForIdle()
 
-            composeTestRule.onNodeWithText("Profile").performClick()
+            composeTestRule.onNodeWithText("Calendar").performClick()
             composeTestRule.waitForIdle()
 
-            composeTestRule.onNodeWithText("Home").performClick()
+            composeTestRule.onNodeWithText("POI").performClick()
+            composeTestRule.waitForIdle()
+
+            composeTestRule.onNodeWithText("Map").performClick()
             composeTestRule.waitForIdle()
         }
     }
@@ -91,6 +95,59 @@ class ComponentTest {
         composeTestRule.setContent {
             Greeting("User3")
         }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun greeting_withNumbers_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                Greeting(name = "12345")
+            }
+        }
+        composeTestRule.onNodeWithText("Hello 12345!").assertIsDisplayed()
+    }
+
+    @Test
+    fun greeting_withUnicode_rendersCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                Greeting(name = "Jean-Pierre")
+            }
+        }
+        composeTestRule.onNodeWithText("Hello Jean-Pierre!").assertIsDisplayed()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_rapidNavigationClicks() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        // Rapid clicks on same destination
+        repeat(3) {
+            composeTestRule.onNodeWithText("Map").performClick()
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_poiDestination_isDisplayed() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        composeTestRule.onNodeWithText("POI").performClick()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun concordiaCampusGuideApp_calendarDestination_isDisplayed() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideApp()
+        }
+
+        composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.waitForIdle()
     }
 }
