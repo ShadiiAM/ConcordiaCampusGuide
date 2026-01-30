@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.R
-//import com.example.campusguide.shadows.ShadowBitmapDescriptorFactory
+import com.example.campusguide.shadows.ShadowBitmapDescriptorFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -26,7 +26,7 @@ import org.robolectric.annotation.Config
  * Unit tests for GeoJsonOverlay
  */
 @RunWith(AndroidJUnit4::class)
-//@Config(sdk = [33], shadows = [ShadowBitmapDescriptorFactory::class])
+@Config(sdk = [33], shadows = [ShadowBitmapDescriptorFactory::class])
 class GeoJsonOverlayTest {
 
     private lateinit var context: Context
