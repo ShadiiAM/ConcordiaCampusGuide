@@ -17,7 +17,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
-    private val buildingsOverlay = GeoJsonOverlay(R.raw.sgw_buildings)
+    private val sgwBuildingsOverlay = GeoJsonOverlay(R.raw.sgw_buildings)
+    private val loyBuildingsOverlay = GeoJsonOverlay(R.raw.loy_buildings)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
 
         //Adds The Overlay
-        buildingsOverlay.addToMap(mMap, this, "#b72424", "a04040")
+        sgwBuildingsOverlay.addToMap(mMap, this, "#b72424", "a04040")
+        loyBuildingsOverlay.addToMap(mMap, this, "#b72424", "a04040")
     }
 }

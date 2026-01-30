@@ -15,14 +15,11 @@ class GeoJsonStyleMapper {
         // Colors are strings like "#ff0000".
         feature.getProperty("stroke")?.let { style.strokeColor = safeParseColor(it) }
         feature.getProperty("fill")?.let { style.fillColor = safeParseColor(it) }
-
         // Width/opacities might be numbers in the JSON but arrive as strings.
         feature.getProperty("stroke-width")?.toFloatOrNull()?.let { style.strokeWidth = it }
-
         feature.getProperty("stroke-opacity")?.toFloatOrNull()?.let { opacity ->
             style.strokeColor = withAlpha(style.strokeColor, opacity)
         }
-
         feature.getProperty("fill-opacity")?.toFloatOrNull()?.let { opacity ->
             style.fillColor = withAlpha(style.fillColor, opacity)
         }

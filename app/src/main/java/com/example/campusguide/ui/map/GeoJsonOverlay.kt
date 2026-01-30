@@ -20,10 +20,7 @@ class GeoJsonOverlay(
     private val styleMapper: GeoJsonStyleMapper = GeoJsonStyleMapper(),
 ) {
 
-    // Keep a reference so we can remove it later.
     private var layer: GeoJsonLayer? = null
-
-    // We re-add the layer to force redraws when styles change.
     private var lastMap: GoogleMap? = null
 
     /**
