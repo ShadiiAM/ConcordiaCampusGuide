@@ -48,7 +48,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
 
         //Adds The Overlay
-        sgwBuildingsOverlay.addToMap(mMap, this, "#b72424", "a04040")
-        loyBuildingsOverlay.addToMap(mMap, this, "#b72424", "a04040")
+        sgwBuildingsOverlay.addToMap(mMap, this)
+        loyBuildingsOverlay.addToMap(mMap, this)
+
+        sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+        sgwBuildingsOverlay.changeAllPointColors("#bc4949")
+        //sgwBuildingsOverlay.removeAllPoints()
+
     }
 }
