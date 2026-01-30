@@ -7,9 +7,6 @@ import com.google.maps.android.data.geojson.GeoJsonFeature
 import com.google.maps.android.data.geojson.GeoJsonPointStyle
 import com.google.maps.android.data.geojson.GeoJsonPolygonStyle
 
-/**
- * Allows geojson.io styles to work with Google Maps Android Utils.
- */
 class GeoJsonStyleMapper {
 
 
@@ -78,19 +75,7 @@ class GeoJsonStyleMapper {
         applyMarkerColor(style, parseColor(markerColor))
     }
 
-    /**
-     * Apply explicit opacity to an existing polygon style's fill color.
-     */
-    fun applyFillOpacity(style: GeoJsonPolygonStyle, opacity0to1: Float) {
-        style.fillColor = withAlpha(style.fillColor, opacity0to1)
-    }
 
-    /**
-     * Apply explicit opacity to a point style.
-     */
-    fun applyPointOpacity(style: GeoJsonPointStyle, opacity0to1: Float) {
-        style.alpha = opacity0to1.coerceIn(0f, 1f)
-    }
 
     /**
      * Apply a marker color (including opacity) to a point style.
@@ -133,12 +118,4 @@ class GeoJsonStyleMapper {
         return (positive % 360L).toFloat()
     }
 
-    private fun stableColorForString(input: String): Int {
-        val hsv = floatArrayOf(
-            stableHueForString(input),
-            0.65f, // saturation
-            0.90f  // brightness
-        )
-        return Color.HSVToColor(hsv)
-    }
 }

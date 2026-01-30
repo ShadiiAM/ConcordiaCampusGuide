@@ -53,7 +53,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
         sgwBuildingsOverlay.changeAllPointColors("#bc4949")
-        //sgwBuildingsOverlay.removeAllPoints()
+        loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+        loyBuildingsOverlay.changeAllPointColors("#bc4949")
+
+
+        sgwBuildingsOverlay.removeAllPoints()
+
 
     }
 }

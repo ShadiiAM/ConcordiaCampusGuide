@@ -28,7 +28,6 @@ class GeoJsonOverlay(
      * Add the overlay to the map with default (property-driven) styles.
      */
     fun addToMap(map: GoogleMap, context: Context): GeoJsonLayer {
-        removeFromMap()
         lastMap = map
 
         val newLayer = GeoJsonLayer(map, geoJsonRawRes, context)
@@ -48,9 +47,9 @@ class GeoJsonOverlay(
         lastMap = null
         customPolygonStyles.clear()
         customPointStyles.clear()
+
+
     }
-
-
 
     /**
      * Change the fill color of all polygon (building) features.
@@ -67,9 +66,8 @@ class GeoJsonOverlay(
                 customPolygonStyles[feature] = style
             }
         }
-        redraw()
-    }
 
+    }
 
     /**
      * Change the marker color of all point features.
@@ -86,46 +84,9 @@ class GeoJsonOverlay(
                 customPointStyles[feature] = style
             }
         }
-        redraw()
+
     }
 
-    /**
-     * Hide all polygon (building) features.
-     */
-    fun removeAllBuildings() {
-        val currentLayer = layer ?: return
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPolygon) {
-                // Create a fully transparent style
-                val style = GeoJsonPolygonStyle()
-                style.fillColor = 0x00000000
-                style.strokeColor = 0x00000000
-                style.strokeWidth = 0f
-                feature.polygonStyle = style
-            }
-        }
-        redraw()
-    }
-
-    /**
-     * Restore all polygon (building) features to their previous styles (custom or default).
-     */
-    fun restoreAllBuildings() {
-        val currentLayer = layer ?: return
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPolygon) {
-                // Check if we have a custom style saved
-                val style = customPolygonStyles[feature] ?: GeoJsonPolygonStyle().also {
-                    // Apply default if no custom style exists
-                    styleMapper.applyPolygonStyle(feature, it)
-                }
-                feature.polygonStyle = style
-            }
-        }
-        redraw()
-    }
 
     /**
      * Hide all point features.
@@ -141,7 +102,7 @@ class GeoJsonOverlay(
                 feature.pointStyle = style
             }
         }
-        redraw()
+
     }
 
     /**
@@ -160,7 +121,7 @@ class GeoJsonOverlay(
                 feature.pointStyle = style
             }
         }
-        redraw()
+
     }
 
     /**
@@ -180,9 +141,10 @@ class GeoJsonOverlay(
             }
         }
 
-        if (updated) redraw()
+
         return updated
     }
+
     /**
      * Change the marker color of a specific point by its "building-name" property.
      */
@@ -199,8 +161,6 @@ class GeoJsonOverlay(
                 updated = true
             }
         }
-
-        if (updated) redraw()
         return updated
     }
 
@@ -215,93 +175,6 @@ class GeoJsonOverlay(
         val buildingUpdated = changeSpecificBuildingColor(buildingName, fillColor)
         val pointUpdated = changeSpecificPointColor(buildingName, markerColor)
         return buildingUpdated || pointUpdated
-    }
-
-    /**
-     * Set the fill opacity for all building polygons.
-     */
-    fun setAllBuildingOpacity(opacity0to1: Float) {
-        val currentLayer = layer ?: return
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPolygon) {
-                val style = feature.polygonStyle ?: GeoJsonPolygonStyle().also {
-                    styleMapper.applyPolygonStyle(feature, it)
-                }
-                styleMapper.applyFillOpacity(style, opacity0to1)
-                feature.polygonStyle = style
-                customPolygonStyles[feature] = style
-            }
-        }
-        redraw()
-    }
-
-    /**
-     * Set the fill opacity for a specific building polygon by building-name.
-     *
-     * TOFIX: does not seem to work
-     */
-
-    fun setBuildingOpacity(buildingName: String, opacity0to1: Float): Boolean {
-        val currentLayer = layer ?: return false
-        var updated = false
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPolygon && matchesBuildingName(feature, buildingName)) {
-                val style = feature.polygonStyle ?: GeoJsonPolygonStyle().also {
-                    styleMapper.applyPolygonStyle(feature, it)
-                }
-                styleMapper.applyFillOpacity(style, opacity0to1)
-                feature.polygonStyle = style
-                customPolygonStyles[feature] = style
-                updated = true
-            }
-        }
-
-        if (updated) redraw()
-        return updated
-    }
-
-    /**
-     * Set the opacity for all point markers.
-     */
-    fun setAllPointOpacity(opacity0to1: Float) {
-        val currentLayer = layer ?: return
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPoint) {
-                val style = feature.pointStyle ?: GeoJsonPointStyle().also {
-                    styleMapper.applyPointStyle(feature, it)
-                }
-                styleMapper.applyPointOpacity(style, opacity0to1)
-                feature.pointStyle = style
-                customPointStyles[feature] = style
-            }
-        }
-        redraw()
-    }
-
-    /**
-     * Set the opacity for a specific point by building-name.
-     */
-    fun setPointOpacity(buildingName: String, opacity0to1: Float): Boolean {
-        val currentLayer = layer ?: return false
-        var updated = false
-
-        currentLayer.features.forEach { feature ->
-            if (feature.geometry is GeoJsonPoint && matchesBuildingName(feature, buildingName)) {
-                val style = feature.pointStyle ?: GeoJsonPointStyle().also {
-                    styleMapper.applyPointStyle(feature, it)
-                }
-                styleMapper.applyPointOpacity(style, opacity0to1)
-                feature.pointStyle = style
-                customPointStyles[feature] = style
-                updated = true
-            }
-        }
-
-        if (updated) redraw()
-        return updated
     }
 
     // private helpers
@@ -327,14 +200,4 @@ class GeoJsonOverlay(
         return name.equals(buildingName.trim(), ignoreCase = true)
     }
 
-
-    //this was needed at first, but now it messes things up
-    //i'll keep it for now
-    private fun redraw() {
-//        val currentLayer = layer ?: return
-//        val map = lastMap ?: return
-//
-//        currentLayer.removeLayerFromMap()
-//        currentLayer.addLayerToMap()
-    }
 }
