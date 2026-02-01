@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
@@ -50,7 +47,7 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun ConcordiaCampusGuideApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -66,34 +63,11 @@ fun ConcordiaCampusGuideApp() {
             onAccessibilityClick = { showAccessibility = true }
         )
     } else {
-        NavigationSuiteScaffold(
-            navigationSuiteItems = {
-                AppDestinations.entries.forEach {
-                    item(
-                        icon = {
-                            when (val icon = it.icon) {
-                                is AppIcon.Vector -> Icon(
-                                    icon.imageVector,
-                                    contentDescription = it.label
-                                )
-                                is AppIcon.Drawable -> Icon(
-                                    painter = painterResource(id = icon.resId),
-                                    contentDescription = it.label
-                                )
-                            }
-                        },
-                        label = { Text(it.label) },
-                        selected = it == currentDestination,
-                        onClick = { currentDestination = it }
-                    )
-                }
-            }
-        ) {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        NavigationBar(currentDestination, {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(top =25.dp)
                 ) {
                     SearchBarWithProfile(
                         onSearchQueryChange = { /* TODO: Handle search query */ },
@@ -101,7 +75,8 @@ fun ConcordiaCampusGuideApp() {
                     )
                     Column(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxSize()
+                            .padding(bottom = 100.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -117,8 +92,7 @@ fun ConcordiaCampusGuideApp() {
                         }
                     }
                 }
-            }
-        }
+            })
     }
 }
 
