@@ -47,8 +47,60 @@ class GeoJsonOverlay(
         lastMap = null
         customPolygonStyles.clear()
         customPointStyles.clear()
+    }
 
+    /**
+     * Hide the overlay from the map without removing it.
+     */
+    fun hideFromMap() {
+        val currentLayer = layer ?: return
+        currentLayer.features.forEach { feature ->
+            when (feature.geometry) {
+                is GeoJsonPolygon -> {
+                    val style = feature.polygonStyle
+                    style.fillColor = withAlpha(style.fillColor, 0f)
+                    style.strokeColor = withAlpha(style.strokeColor, 0f)
+                    feature.polygonStyle = style
+                }
+                is GeoJsonPoint -> {
+                    val style = feature.pointStyle
+                    style.alpha = 0f
+                    feature.pointStyle = style
+                }
+            }
+        }
+    }
 
+    /**
+     * Show the overlay on the map (restore visibility).
+     */
+    fun showOnMap() {
+        val currentLayer = layer ?: return
+        currentLayer.features.forEach { feature ->
+            when (feature.geometry) {
+                is GeoJsonPolygon -> {
+                    // Restore from custom styles or apply defaults
+                    val style = customPolygonStyles[feature] ?: GeoJsonPolygonStyle().also {
+                        styleMapper.applyPolygonStyle(feature, it)
+                    }
+                    feature.polygonStyle = style
+                }
+                is GeoJsonPoint -> {
+                    // Restore from custom styles or apply defaults
+                    val style = customPointStyles[feature] ?: GeoJsonPointStyle().also {
+                        styleMapper.applyPointStyle(feature, it)
+                    }
+                    style.alpha = 1f
+                    feature.pointStyle = style
+                }
+            }
+        }
+    }
+
+    private fun withAlpha(color: Int, opacity0to1: Float): Int {
+        val clamped = opacity0to1.coerceIn(0f, 1f)
+        val alpha = (clamped * 255f).toInt()
+        return (color and 0x00FFFFFF) or (alpha shl 24)
     }
 
     /**
