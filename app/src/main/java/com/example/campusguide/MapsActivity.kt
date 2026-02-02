@@ -198,7 +198,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             Campus.SGW -> LatLng(45.4972, -73.5789)
             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 15f))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
 
         sgwOverlay.attachToMap(mMap)
@@ -309,16 +309,26 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private fun switchCampus(campus: Campus) {
         if (!::mMap.isInitialized) return
 
-        when (campus) {
-            Campus.SGW -> {
-                val concordiaSGW = LatLng(45.4972, -73.5789)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
-            }
-            Campus.LOYOLA -> {
-                val concordiaLoyola = LatLng(45.4582, -73.6402)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(concordiaLoyola, 15f))
-            }
+        val (targetLocation, campusName) = when (campus) {
+            Campus.SGW -> Pair(LatLng(45.4972, -73.5789), "SGW Campus")
+            Campus.LOYOLA -> Pair(LatLng(45.4582, -73.6402), "Loyola Campus")
         }
+
+        // Animate camera with controlled duration and callback
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
+            CAMERA_ANIMATION_DURATION_MS,
+            object : GoogleMap.CancelableCallback {
+                override fun onFinish() {
+                    // Animation completed successfully - map is interactive
+                }
+
+                override fun onCancel() {
+                    // Animation was cancelled (e.g., user interacted with map)
+                    // Map remains interactive
+                }
+            }
+        )
     }
 
     private fun showProfileOverlay() {
@@ -388,5 +398,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     companion object {
         private const val PREFS_NAME = "campus_preferences"
         private const val KEY_SELECTED_CAMPUS = "selected_campus"
+        private const val CAMERA_ANIMATION_DURATION_MS = 1500
+        private const val CAMPUS_ZOOM_LEVEL = 15f
     }
 }
