@@ -6,6 +6,7 @@ import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -74,9 +75,6 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
 
 
-    private var showProfile = mutableStateOf(false)
-    private var showAccessibility = mutableStateOf(false)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -91,59 +89,6 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         // Hide the ActionBar
         supportActionBar?.hide()
 
-        // Set up profile/accessibility overlay
-        binding.profileOverlay.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                ConcordiaCampusGuideTheme {
-                    val isShowingProfile by showProfile
-                    val isShowingAccessibility by showAccessibility
-                    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-
-                    // Control visibility - needs to run in composition
-                    androidx.compose.runtime.LaunchedEffect(isShowingProfile, isShowingAccessibility) {
-                        binding.profileOverlay.visibility = if (isShowingProfile || isShowingAccessibility) {
-                            View.VISIBLE
-                        } else {
-                            View.GONE
-                        }
-                    }
-
-                    if (isShowingAccessibility) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background)
-                                .padding(top = statusBarPadding.calculateTopPadding())
-                        ) {
-                            AccessibilityScreen(
-                                onBackClick = {
-                                    showAccessibility.value = false
-                                }
-                            )
-                        }
-                    } else if (isShowingProfile) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background)
-                                .padding(top = statusBarPadding.calculateTopPadding())
-                        ) {
-                            ProfileScreen(
-                                onBackClick = {
-                                    showProfile.value = false
-                                },
-                                onProfileClick = { /* TODO: Navigate to profile details */ },
-                                onAccessibilityClick = {
-                                    showAccessibility.value = true
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
         // Set up the top search bar
         binding.searchBar.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -152,13 +97,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
                     SearchBarWithProfile(
                         onSearchQueryChange = { /* TODO: Handle search */ },
-                        onProfileClick = {
-                            showProfile.value = true
-                        },
+                        onProfileClick = { showProfileOverlay() },
                         modifier = Modifier.padding(top = statusBarPadding.calculateTopPadding())
                     )
                 }
             }
+        }
+
+        // Set up profile/accessibility overlay
+        binding.profileOverlay.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         }
 
         // Set up the campus toggle
@@ -166,12 +114,13 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 ConcordiaCampusGuideTheme {
-                    var selectedCampus by remember { mutableStateOf(Campus.SGW) }
+                    var selectedCampus by remember { mutableStateOf(getSavedCampus()) }
                     MaterialTheme {
                         CampusToggle(
                             selectedCampus = selectedCampus,
                             onCampusSelected = { campus ->
                                 selectedCampus = campus
+                                saveCampus(campus)
                                 switchCampus(campus)
                             },
                             showIcon = true
@@ -239,10 +188,17 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a marker at Concordia University (SGW Campus) and move the camera
         val concordiaSGW = LatLng(45.4972, -73.5789)
-//        mMap.addMarker(MarkerOptions()
-//            .position(concordiaSGW)
-//            .title("Concordia University - SGW Campus"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
+        mMap.addMarker(MarkerOptions()
+            .position(concordiaSGW)
+            .title("Concordia University - SGW Campus"))
+
+        // Move camera to saved campus location
+        val savedCampus = getSavedCampus()
+        val initialLocation = when (savedCampus) {
+            Campus.SGW -> LatLng(45.4972, -73.5789)
+            Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 15f))
 
 
         sgwOverlay.attachToMap(mMap)
@@ -363,5 +319,74 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(concordiaLoyola, 15f))
             }
         }
+    }
+
+    private fun showProfileOverlay() {
+        binding.profileOverlay.visibility = View.VISIBLE
+        binding.profileOverlay.setContent {
+            ConcordiaCampusGuideTheme {
+                var showProfile by remember { mutableStateOf(true) }
+                var showAccessibility by remember { mutableStateOf(false) }
+                val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+
+                if (!showProfile && !showAccessibility) {
+                    binding.profileOverlay.visibility = View.GONE
+                }
+
+                if (showAccessibility) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(top = statusBarPadding.calculateTopPadding())
+                    ) {
+                        AccessibilityScreen(
+                            onBackClick = {
+                                showAccessibility = false
+                                binding.profileOverlay.visibility = View.GONE
+                            }
+                        )
+                    }
+                } else if (showProfile) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(top = statusBarPadding.calculateTopPadding())
+                    ) {
+                        ProfileScreen(
+                            onBackClick = {
+                                showProfile = false
+                                binding.profileOverlay.visibility = View.GONE
+                            },
+                            onProfileClick = { /* TODO: Navigate to profile details */ },
+                            onAccessibilityClick = { showAccessibility = true }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getSavedCampus(): Campus {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val savedCampusName = prefs.getString(KEY_SELECTED_CAMPUS, Campus.SGW.name)
+        return try {
+            Campus.valueOf(savedCampusName ?: Campus.SGW.name)
+        } catch (e: IllegalArgumentException) {
+            Campus.SGW
+        }
+    }
+
+    private fun saveCampus(campus: Campus) {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(KEY_SELECTED_CAMPUS, campus.name)
+            .apply()
+    }
+
+    companion object {
+        private const val PREFS_NAME = "campus_preferences"
+        private const val KEY_SELECTED_CAMPUS = "selected_campus"
     }
 }
