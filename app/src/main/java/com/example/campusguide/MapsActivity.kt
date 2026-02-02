@@ -1,27 +1,21 @@
 package com.example.campusguide
 
 import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
 import android.Manifest
 import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
 import com.example.campusguide.ui.map.GeoJsonOverlay
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
