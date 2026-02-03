@@ -24,6 +24,9 @@ class GeoJsonOverlay(
     private val customPolygonStyles = mutableMapOf<GeoJsonFeature, GeoJsonPolygonStyle>()
     private val customPointStyles = mutableMapOf<GeoJsonFeature, GeoJsonPointStyle>()
 
+    // Track visibility state to avoid redundant operations
+    private var isVisible: Boolean = true
+
     /**
      * Add the overlay to the map with default (property-driven) styles.
      */
@@ -47,61 +50,76 @@ class GeoJsonOverlay(
         lastMap = null
         customPolygonStyles.clear()
         customPointStyles.clear()
+        isVisible = true // Reset to default state
     }
 
     /**
      * Hide the overlay from the map without removing it.
      */
     fun hideFromMap() {
+        // Early return if already hidden to avoid redundant operations
+        if (!isVisible) return
+
         val currentLayer = layer ?: return
         currentLayer.features.forEach { feature ->
             when (feature.geometry) {
                 is GeoJsonPolygon -> {
-                    val style = feature.polygonStyle
-                    style.fillColor = withAlpha(style.fillColor, 0f)
-                    style.strokeColor = withAlpha(style.strokeColor, 0f)
+                    // Save current style before hiding if not already saved
+                    if (!customPolygonStyles.containsKey(feature)) {
+                        customPolygonStyles[feature] = feature.polygonStyle
+                    }
+                    // Make transparent
+                    val style = GeoJsonPolygonStyle()
+                    style.fillColor = 0x00000000 // Fully transparent
+                    style.strokeColor = 0x00000000 // Fully transparent
+                    style.strokeWidth = 0f
                     feature.polygonStyle = style
                 }
                 is GeoJsonPoint -> {
+                    // Save current style before hiding if not already saved
+                    if (!customPointStyles.containsKey(feature)) {
+                        customPointStyles[feature] = feature.pointStyle
+                    }
+                    // Make transparent
                     val style = feature.pointStyle
                     style.alpha = 0f
                     feature.pointStyle = style
                 }
             }
         }
+        isVisible = false
     }
 
     /**
      * Show the overlay on the map (restore visibility).
      */
     fun showOnMap() {
+        // Early return if already visible to avoid redundant operations
+        if (isVisible) return
+
         val currentLayer = layer ?: return
         currentLayer.features.forEach { feature ->
             when (feature.geometry) {
                 is GeoJsonPolygon -> {
-                    // Restore from custom styles or apply defaults
-                    val style = customPolygonStyles[feature] ?: GeoJsonPolygonStyle().also {
-                        styleMapper.applyPolygonStyle(feature, it)
+                    // Simply restore the saved style
+                    val savedStyle = customPolygonStyles[feature]
+                    if (savedStyle != null) {
+                        feature.polygonStyle = savedStyle
                     }
-                    feature.polygonStyle = style
                 }
                 is GeoJsonPoint -> {
-                    // Restore from custom styles or apply defaults
-                    val style = customPointStyles[feature] ?: GeoJsonPointStyle().also {
-                        styleMapper.applyPointStyle(feature, it)
+                    // Simply restore the saved style
+                    val savedStyle = customPointStyles[feature]
+                    if (savedStyle != null) {
+                        savedStyle.alpha = 1f
+                        feature.pointStyle = savedStyle
                     }
-                    style.alpha = 1f
-                    feature.pointStyle = style
                 }
             }
         }
+        isVisible = true
     }
 
-    private fun withAlpha(color: Int, opacity0to1: Float): Int {
-        val clamped = opacity0to1.coerceIn(0f, 1f)
-        val alpha = (clamped * 255f).toInt()
-        return (color and 0x00FFFFFF) or (alpha shl 24)
-    }
 
     /**
      * Change the fill color of all polygon (building) features.
