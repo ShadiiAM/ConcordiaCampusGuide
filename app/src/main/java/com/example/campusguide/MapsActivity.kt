@@ -2,7 +2,9 @@ package com.example.campusguide
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.campusguide.databinding.ActivityMapsBinding
+import com.example.campusguide.ui.map.geoJson.BuildingLocator
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 
@@ -12,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import org.json.JSONObject
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -20,6 +23,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,9 +53,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // Add a marker at Concordia University (SGW Campus) and move the camera
         val concordiaSGW = LatLng(45.4972, -73.5789)
-//        mMap.addMarker(MarkerOptions()
-//            .position(concordiaSGW)
-//            .title("Concordia University - SGW Campus"))
+        mMap.addMarker(MarkerOptions()
+            .position(concordiaSGW)
+            .title("Concordia University - SGW Campus"))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
 
 
@@ -62,7 +66,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             strokeColor = 0xFF4d0000.toInt(),
             strokeWidth = 2f,
             zIndex = 10f,
-            clickable = true,
+            clickable = false,
             visible = true,
              markerColor = 0xFF974949.toInt(),
              markerAlpha = 1f,
@@ -71,6 +75,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
 
+        val sgwBuildingLocator = BuildingLocator(
+            sgwOverlay.getBuildings(),
+            sgwOverlay.getBuildingProps()
+        )
+        val loyBuildingLocator = BuildingLocator(
+            loyOverlay.getBuildings(),
+            loyOverlay.getBuildingProps()
+        )
+
+        mMap.setOnMapClickListener { latLng ->
+            val sgwHit = sgwBuildingLocator.findBuilding(latLng)
+            val loyHit = loyBuildingLocator.findBuilding(latLng)
+
+            val sgwHitb = sgwBuildingLocator.pointInBuilding(latLng)
+            val loyHitb = loyBuildingLocator.pointInBuilding(latLng)
+
+            if (sgwHitb) {
+                val hit = sgwHit
+                Log.d("BUILDING", "SGW Clicked: ${hit?.id.toString()}")
+            }else if (loyHitb) {
+                val hit = loyHit
+                Log.d("BUILDING", "LOY Clicked: ${hit?.id.toString()}")
+            }
+            else {
+                Log.d("BUILDING", "No building here")
+            }
+        }
+
 
     }
+
+
+
 }

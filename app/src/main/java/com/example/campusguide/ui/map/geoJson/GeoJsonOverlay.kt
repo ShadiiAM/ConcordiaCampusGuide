@@ -115,6 +115,13 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
         polygonsById[featureId]?.forEach { it.isVisible = visible }
     }
 
+    //--------- Getters ---------
+
+    fun getBuildings(): Map<String, List<Polygon>> = polygonsById
+    fun getBuildingProps(): Map<String, JSONObject> = featurePropsById
+
+
+
 
     // --------------------
     // Internals
