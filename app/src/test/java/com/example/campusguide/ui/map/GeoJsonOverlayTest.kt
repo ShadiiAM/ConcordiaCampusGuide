@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.maps.android.data.geojson.GeoJsonPoint
 import com.google.maps.android.data.geojson.GeoJsonPolygon
+import com.google.maps.android.data.geojson.GeoJsonPolygonStyle
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
@@ -377,6 +378,234 @@ class GeoJsonOverlayTest {
             if (feature.geometry is GeoJsonPoint) {
                 assertNotNull(feature.pointStyle)
                 assertTrue("Point should be visible", feature.pointStyle.alpha > 0f)
+            }
+        }
+    }
+
+    // ==================== hideFromMap tests ====================
+
+    @Test
+    fun hideFromMap_makesPolygonsTransparent() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+
+        overlay.hideFromMap()
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertEquals(0x00000000, feature.polygonStyle.fillColor)
+                assertEquals(0x00000000, feature.polygonStyle.strokeColor)
+                assertEquals(0f, feature.polygonStyle.strokeWidth, 0.01f)
+            }
+        }
+    }
+
+    @Test
+    fun hideFromMap_makesPointsTransparent() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllPointColors("#bc4949")
+
+        overlay.hideFromMap()
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPoint) {
+                assertEquals(0f, feature.pointStyle.alpha, 0.01f)
+            }
+        }
+    }
+
+    @Test
+    fun hideFromMap_beforeAddingToMap_doesNotCrash() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        overlay.hideFromMap()
+        // no-op, should not crash
+    }
+
+    @Test
+    fun hideFromMap_calledTwice_secondCallIsNoOp() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+
+        overlay.hideFromMap() // sets isVisible = false
+
+        // Manually set a non-transparent color to prove the second call doesn't touch features
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                val style = GeoJsonPolygonStyle()
+                style.fillColor = 0xFFFF0000.toInt()
+                feature.polygonStyle = style
+            }
+        }
+
+        overlay.hideFromMap() // should be no-op
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertEquals(0xFFFF0000.toInt(), feature.polygonStyle.fillColor)
+            }
+        }
+    }
+
+    @Test
+    fun hideFromMap_doesNotOverwriteAlreadySavedCustomStyles() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+
+        // changeAllBuildingColors saves styles into customPolygonStyles
+        overlay.changeAllBuildingColors("#ffaca6")
+        overlay.changeAllPointColors("#bc4949")
+
+        overlay.hideFromMap()
+        overlay.showOnMap()
+
+        // Custom colors should be restored, not default styles
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertNotEquals(0x00000000, feature.polygonStyle.fillColor)
+            }
+        }
+    }
+
+    // ==================== showOnMap tests ====================
+
+    @Test
+    fun showOnMap_afterHide_restoresPolygonStyles() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+
+        overlay.hideFromMap()
+        overlay.showOnMap()
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertNotEquals(0x00000000, feature.polygonStyle.fillColor)
+            }
+        }
+    }
+
+    @Test
+    fun showOnMap_afterHide_restoresPointAlphaToOne() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllPointColors("#bc4949")
+
+        overlay.hideFromMap()
+        overlay.showOnMap()
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPoint) {
+                assertEquals(1f, feature.pointStyle.alpha, 0.01f)
+            }
+        }
+    }
+
+    @Test
+    fun showOnMap_withoutPriorHide_isNoOp() {
+        // isVisible starts as true — showOnMap should not touch any features
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+
+        // Force polygons transparent manually (simulates an external change)
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                val style = GeoJsonPolygonStyle()
+                style.fillColor = 0x00000000
+                feature.polygonStyle = style
+            }
+        }
+
+        overlay.showOnMap() // no-op because isVisible is still true
+
+        // Should still be transparent — showOnMap didn't run
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertEquals(0x00000000, feature.polygonStyle.fillColor)
+            }
+        }
+    }
+
+    @Test
+    fun showOnMap_beforeAddingToMap_doesNotCrash() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        overlay.showOnMap()
+        // isVisible is true by default, so this is an early return — no crash
+    }
+
+    @Test
+    fun hideAndShow_multipleCycles_preservesStyles() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+        overlay.changeAllPointColors("#bc4949")
+
+        repeat(3) {
+            overlay.hideFromMap()
+            overlay.showOnMap()
+        }
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertNotEquals(0x00000000, feature.polygonStyle.fillColor)
+            }
+            if (feature.geometry is GeoJsonPoint) {
+                assertEquals(1f, feature.pointStyle.alpha, 0.01f)
+            }
+        }
+    }
+
+    // ==================== isVisible / removeFromMap reset tests ====================
+
+    @Test
+    fun removeFromMap_resetsVisibilityState() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        overlay.addToMap(mockMap, context)
+        overlay.hideFromMap() // isVisible = false
+
+        overlay.removeFromMap() // resets isVisible = true
+
+        // Re-add and verify showOnMap is a no-op (isVisible is true again)
+        val layer = overlay.addToMap(mockMap, context)
+        overlay.changeAllBuildingColors("#ffaca6")
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                val style = GeoJsonPolygonStyle()
+                style.fillColor = 0x00000000
+                feature.polygonStyle = style
+            }
+        }
+
+        overlay.showOnMap() // should be no-op — isVisible was reset to true
+
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                assertEquals(0x00000000, feature.polygonStyle.fillColor)
+            }
+        }
+    }
+
+    @Test
+    fun hideFromMap_savesDefaultStylesWhenNoCustomStyleExists() {
+        val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
+        val layer = overlay.addToMap(mockMap, context)
+        // Do NOT call changeAllBuildingColors — no custom styles saved
+
+        overlay.hideFromMap() // should save default styles before hiding
+        overlay.showOnMap()   // should restore the default styles
+
+        // Features should be visible (restored from saved default styles)
+        layer.features.forEach { feature ->
+            if (feature.geometry is GeoJsonPolygon) {
+                // Default styles should have been saved and restored
+                assertNotNull(feature.polygonStyle)
+            }
+            if (feature.geometry is GeoJsonPoint) {
+                assertEquals(1f, feature.pointStyle.alpha, 0.01f)
             }
         }
     }

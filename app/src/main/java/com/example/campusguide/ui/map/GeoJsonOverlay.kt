@@ -28,17 +28,33 @@ class GeoJsonOverlay(
     private var isVisible: Boolean = true
 
     /**
-     * Add the overlay to the map with default (property-driven) styles.
+     * Parse the GeoJSON and prepare the layer with default styles.
+     * Safe to call on a background thread — does not touch the GoogleMap.
+     * Must be followed by activateOnMap() on the main thread.
      */
-    fun addToMap(map: GoogleMap, context: Context): GeoJsonLayer {
+    fun parseGeoJson(map: GoogleMap, context: Context) {
         lastMap = map
-
         val newLayer = GeoJsonLayer(map, geoJsonRawRes, context)
         applyDefaultStyles(newLayer)
-        newLayer.addLayerToMap()
-
         layer = newLayer
-        return newLayer
+    }
+
+    /**
+     * Add the prepared layer to the map. Must be called on the main thread.
+     * Requires parseGeoJson() to have been called first.
+     */
+    fun activateOnMap() {
+        layer?.addLayerToMap()
+    }
+
+    /**
+     * Add the overlay to the map with default (property-driven) styles.
+     * Convenience method — parses and activates in one call. Must be on the main thread.
+     */
+    fun addToMap(map: GoogleMap, context: Context): GeoJsonLayer {
+        parseGeoJson(map, context)
+        activateOnMap()
+        return layer!!
     }
 
     /**

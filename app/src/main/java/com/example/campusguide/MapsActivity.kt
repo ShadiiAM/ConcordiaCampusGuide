@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -171,25 +172,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
-        // Add both overlays to the map (must run on main thread — Maps SDK requirement)
-        sgwBuildingsOverlay.addToMap(mMap, this)
-        loyBuildingsOverlay.addToMap(mMap, this)
-
-        // Style all buildings with the same color
-        sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        sgwBuildingsOverlay.changeAllPointColors("#bc4949")
-        loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        loyBuildingsOverlay.changeAllPointColors("#bc4949")
-
-        // Show only the initially selected campus polygons, hide the other
-        when (savedCampus) {
-            Campus.SGW -> {
-                sgwBuildingsOverlay.showOnMap()
-                loyBuildingsOverlay.hideFromMap()
+        // Parse GeoJSON on background thread (heavy I/O + JSON parsing), then
+        // activate layers and apply styles on main thread to avoid ANR
+        activityScope.launch {
+            withContext(Dispatchers.IO) {
+                sgwBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
+                loyBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
             }
-            Campus.LOYOLA -> {
-                loyBuildingsOverlay.showOnMap()
-                sgwBuildingsOverlay.hideFromMap()
+
+            // Back on main thread: add layers to map and style
+            sgwBuildingsOverlay.activateOnMap()
+            loyBuildingsOverlay.activateOnMap()
+
+            sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+            sgwBuildingsOverlay.changeAllPointColors("#bc4949")
+            loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+            loyBuildingsOverlay.changeAllPointColors("#bc4949")
+
+            // Show only the initially selected campus polygons, hide the other
+            when (savedCampus) {
+                Campus.SGW -> {
+                    sgwBuildingsOverlay.showOnMap()
+                    loyBuildingsOverlay.hideFromMap()
+                }
+                Campus.LOYOLA -> {
+                    loyBuildingsOverlay.showOnMap()
+                    sgwBuildingsOverlay.hideFromMap()
+                }
             }
         }
     }
