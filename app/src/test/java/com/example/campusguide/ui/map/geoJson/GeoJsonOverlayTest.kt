@@ -1,6 +1,7 @@
 package com.example.campusguide.ui.map.geoJson
 
 import android.content.Context
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.gms.maps.GoogleMap
@@ -10,25 +11,21 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.MockedConstruction
 import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import org.junit.Assert.*
-import org.mockito.Mockito.mockConstruction
+import org.mockito.Mockito
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import org.mockito.MockedStatic
-import org.mockito.Mockito
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33])
 class GeoJsonOverlayTest {
 
     private lateinit var ctx: Context
-
-
-    private var markerIconFactoryConstruction: MockedConstruction<MarkerIconFactory>? = null
 
     private var bitmapFactoryStatic: MockedStatic<BitmapDescriptorFactory>? = null
 
@@ -397,5 +394,74 @@ class GeoJsonOverlayTest {
 
         verify(map, never()).addPolygon(any())
         verify(map, never()).addMarker(any())
+    }
+
+    @Test
+    fun attachToMap_defaultArgPath_loadsFromRaw_andDoesNotCrash() {
+        // Covers attachToMap(map) default-arg overload + loadFromRawOrThrow() path.
+        val context = mock<Context>()
+        val appContext = mock<Context>()
+        whenever(context.applicationContext).thenReturn(appContext)
+
+        val resources = mock<Resources>()
+        whenever(context.resources).thenReturn(resources)
+
+        val json = "{\"type\":\"FeatureCollection\",\"features\":[]}" // empty features
+        val input = ByteArrayInputStream(json.toByteArray(StandardCharsets.UTF_8))
+        whenever(resources.openRawResource(123)).thenReturn(input)
+
+        val map = mock<GoogleMap>()
+
+        val overlay = GeoJsonOverlay(context, 123, "id")
+        overlay.attachToMap(map) // geoJson omitted => raw load
+
+        // No features => should not add anything
+        verify(map, never()).addPolygon(any())
+        verify(map, never()).addMarker(any())
+        verify(resources, times(1)).openRawResource(123)
+    }
+
+    @Test
+    fun reapplyPropertiesStyles_reappliesUpdatedPropertiesToExistingPolygons() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        // Initial props: stroke-width=2
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        // Clear prior interactions so we can observe re-application
+        clearInvocations(poly)
+
+        // Update stored properties for id "68" by re-attaching with modified stroke width
+        val modified = JSONObject(
+            """{
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{
+                  "stroke":"#555555",
+                  "stroke-width":9,
+                  "stroke-opacity":1,
+                  "fill":"#555555",
+                  "fill-opacity":0.5
+                },
+                "geometry":{
+                  "type":"Polygon",
+                  "coordinates":[[[ -73.0,45.0],[-73.0,45.1],[-73.1,45.1],[-73.1,45.0],[-73.0,45.0 ]]]
+                },
+                "id":68
+              }]}
+            """.trimIndent()
+        )
+
+        overlay.attachToMap(map, modified)
+        clearInvocations(poly)
+
+        // Now reapply styles from stored properties; should set strokeWidth=9f
+        overlay.reapplyPropertiesStyles()
+        verify(poly, atLeastOnce()).strokeWidth = eq(9f)
     }
 }
