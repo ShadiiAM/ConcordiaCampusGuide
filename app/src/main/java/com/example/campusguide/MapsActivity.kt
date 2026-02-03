@@ -58,6 +58,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 
@@ -74,6 +78,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
 
 
+    // Coroutine scope for background operations
+    private val activityScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,19 +209,31 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         sgwOverlay.attachToMap(mMap)
         loyOverlay.attachToMap(mMap)
-         val defaultStyle = GeoJsonStyle(
+        val defaultStyle = GeoJsonStyle(
             fillColor = 0x80ff8a8a.toInt(),
             strokeColor = 0xFF4d0000.toInt(),
             strokeWidth = 2f,
             zIndex = 10f,
             clickable = false,
             visible = true,
-             markerColor = 0xFF974949.toInt(),
-             markerAlpha = 1f,
-             markerScale = 2f
+            markerColor = 0xFF974949.toInt(),
+            markerAlpha = 1f,
+            markerScale = 2f
         )
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
+
+        // Show only the initially selected campus, hide the other
+        when (savedCampus) {
+            Campus.SGW -> {
+                sgwOverlay.setVisibleAll(true)
+                loyOverlay.setVisibleAll(false)
+            }
+            Campus.LOYOLA -> {
+                loyOverlay.setVisibleAll(true)
+                sgwOverlay.setVisibleAll(false)
+            }
+        }
 
         //Add a marker at User Position
 
@@ -314,21 +332,32 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             Campus.LOYOLA -> Pair(LatLng(45.4582, -73.6402), "Loyola Campus")
         }
 
-        // Animate camera with controlled duration and callback
-        mMap.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
-            CAMERA_ANIMATION_DURATION_MS,
-            object : GoogleMap.CancelableCallback {
-                override fun onFinish() {
-                    // Animation completed successfully - map is interactive
+        // Run show/hide operations in coroutine to avoid blocking UI thread
+        activityScope.launch(Dispatchers.Main) {
+            when (campus) {
+                Campus.SGW -> {
+                    sgwOverlay.setVisibleAll(true)
+                    loyOverlay.setVisibleAll(false)
                 }
-
-                override fun onCancel() {
-                    // Animation was cancelled (e.g., user interacted with map)
-                    // Map remains interactive
+                Campus.LOYOLA -> {
+                    loyOverlay.setVisibleAll(true)
+                    sgwOverlay.setVisibleAll(false)
                 }
             }
-        )
+
+            // Animate camera with controlled duration and callback
+            mMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
+                CAMERA_ANIMATION_DURATION_MS,
+                object : GoogleMap.CancelableCallback {
+                    override fun onFinish() {
+                    }
+
+                    override fun onCancel() {
+                    }
+                }
+            )
+        }
     }
 
     private fun showProfileOverlay() {
@@ -393,6 +422,12 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         prefs.edit()
             .putString(KEY_SELECTED_CAMPUS, campus.name)
             .apply()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Cancel all coroutines to prevent memory leaks
+        activityScope.coroutineContext[Job]?.cancel()
     }
 
     companion object {
