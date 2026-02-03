@@ -617,12 +617,9 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        // Try to find a building in the GeoJSON and change its color
-        val result = overlay.changeSpecificBuildingColor("Hall Building", "#FF0000")
+        val result = overlay.changeSpecificBuildingColor("H", "#FF0000")
 
-        // Result depends on whether the building exists in the file
-        // At minimum, should not crash
-        assertNotNull(result)
+        assertTrue("H building polygon exists in SGW GeoJSON", result)
     }
 
     @Test
@@ -639,7 +636,7 @@ class GeoJsonOverlayTest {
     fun changeSpecificBuildingColor_beforeAddingToMap_returnsFalse() {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
 
-        val result = overlay.changeSpecificBuildingColor("Hall Building", "#FF0000")
+        val result = overlay.changeSpecificBuildingColor("H", "#FF0000")
 
         assertFalse(result)
     }
@@ -649,12 +646,11 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        val result1 = overlay.changeSpecificBuildingColor("hall building", "#FF0000")
-        val result2 = overlay.changeSpecificBuildingColor("HALL BUILDING", "#00FF00")
+        val result1 = overlay.changeSpecificBuildingColor("h", "#FF0000")
+        val result2 = overlay.changeSpecificBuildingColor("H", "#00FF00")
 
-        // At least one should work if the building exists
-        assertNotNull(result1)
-        assertNotNull(result2)
+        assertTrue("Lowercase 'h' should match 'H' (case-insensitive)", result1)
+        assertTrue("Uppercase 'H' should match 'H'", result2)
     }
 
     @Test
@@ -662,10 +658,9 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        val result = overlay.changeSpecificBuildingColor("  Hall Building  ", "#FF0000")
+        val result = overlay.changeSpecificBuildingColor("  H  ", "#FF0000")
 
-        // Should handle whitespace correctly
-        assertNotNull(result)
+        assertTrue("Whitespace around 'H' should be trimmed", result)
     }
 
     // ==================== changeSpecificPointColor tests ====================
@@ -675,9 +670,9 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        val result = overlay.changeSpecificPointColor("Hall Building", "#FF0000")
+        val result = overlay.changeSpecificPointColor("H", "#FF0000")
 
-        assertNotNull(result)
+        assertTrue("H building point exists in SGW GeoJSON", result)
     }
 
     @Test
@@ -694,7 +689,7 @@ class GeoJsonOverlayTest {
     fun changeSpecificPointColor_beforeAddingToMap_returnsFalse() {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
 
-        val result = overlay.changeSpecificPointColor("Hall Building", "#FF0000")
+        val result = overlay.changeSpecificPointColor("H", "#FF0000")
 
         assertFalse(result)
     }
@@ -704,11 +699,11 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        val result1 = overlay.changeSpecificPointColor("hall building", "#FF0000")
-        val result2 = overlay.changeSpecificPointColor("HALL BUILDING", "#00FF00")
+        val result1 = overlay.changeSpecificPointColor("h", "#FF0000")
+        val result2 = overlay.changeSpecificPointColor("H", "#00FF00")
 
-        assertNotNull(result1)
-        assertNotNull(result2)
+        assertTrue("Lowercase 'h' should match 'H' (case-insensitive)", result1)
+        assertTrue("Uppercase 'H' should match 'H'", result2)
     }
 
     // ==================== changeSpecificBuildingColors tests ====================
@@ -718,9 +713,9 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        val result = overlay.changeSpecificBuildingColors("Hall Building", "#FF0000", "#00FF00")
+        val result = overlay.changeSpecificBuildingColors("H", "#FF0000", "#00FF00")
 
-        assertNotNull(result)
+        assertTrue("H has both polygon and point in SGW", result)
     }
 
     @Test
@@ -737,7 +732,7 @@ class GeoJsonOverlayTest {
     fun changeSpecificBuildingColors_beforeAddingToMap_returnsFalse() {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
 
-        val result = overlay.changeSpecificBuildingColors("Hall Building", "#FF0000", "#00FF00")
+        val result = overlay.changeSpecificBuildingColors("H", "#FF0000", "#00FF00")
 
         assertFalse(result)
     }
@@ -747,10 +742,9 @@ class GeoJsonOverlayTest {
         val overlay = GeoJsonOverlay(R.raw.sgw_buildings)
         overlay.addToMap(mockMap, context)
 
-        // Even if only polygon or point exists, should return true
-        val result = overlay.changeSpecificBuildingColors("Hall Building", "#FF0000", "#00FF00")
+        val result = overlay.changeSpecificBuildingColors("H", "#FF0000", "#00FF00")
 
-        assertNotNull(result)
+        assertTrue("H exists in SGW — both polygon and point updated", result)
     }
 
     // ==================== Integration and workflow tests ====================
@@ -774,7 +768,7 @@ class GeoJsonOverlayTest {
         overlay.restoreAllPoints()
 
         // Change specific building
-        overlay.changeSpecificBuildingColors("Hall Building", "#FF0000", "#00FF00")
+        overlay.changeSpecificBuildingColors("H", "#FF0000", "#00FF00")
 
         // Remove from map
         overlay.removeFromMap()
@@ -821,7 +815,7 @@ class GeoJsonOverlayTest {
         overlay.removeAllPoints()
         overlay.changeAllPointColors("#bc4949") // Should work but points hidden
         overlay.restoreAllPoints() // Should restore with new color
-        overlay.changeSpecificBuildingColor("Hall Building", "#FFFFFF")
+        overlay.changeSpecificBuildingColor("H", "#FFFFFF")
 
         // Should complete without issues
     }
