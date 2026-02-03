@@ -1,4 +1,4 @@
-package com.example.campusguide.ui.map.geoJson
+package com.example.campusguide.ui.map.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polygon
