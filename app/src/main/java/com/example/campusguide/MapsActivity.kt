@@ -324,43 +324,74 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun switchCampus(campus: Campus) {
-        if (!::mMap.isInitialized) return
+    internal fun initializeOverlays(campus: Campus) {
+        sgwOverlay.setAllStyles(defaultOverlayStyle())
+        loyOverlay.setAllStyles(defaultOverlayStyle())
 
-        val (targetLocation, campusName) = when (campus) {
-            Campus.SGW -> Pair(LatLng(45.4972, -73.5789), "SGW Campus")
-            Campus.LOYOLA -> Pair(LatLng(45.4582, -73.6402), "Loyola Campus")
-        }
-
-        // Run show/hide operations in coroutine to avoid blocking UI thread
-        activityScope.launch(Dispatchers.Main) {
-            when (campus) {
-                Campus.SGW -> {
-                    sgwOverlay.setVisibleAll(true)
-                    loyOverlay.setVisibleAll(false)
-                }
-                Campus.LOYOLA -> {
-                    loyOverlay.setVisibleAll(true)
-                    sgwOverlay.setVisibleAll(false)
-                }
+        when (campus) {
+            Campus.SGW -> {
+                sgwOverlay.setVisibleAll(true)
+                loyOverlay.setVisibleAll(false)
             }
-
-            // Animate camera with controlled duration and callback
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
-                CAMERA_ANIMATION_DURATION_MS,
-                object : GoogleMap.CancelableCallback {
-                    override fun onFinish() {
-                    }
-
-                    override fun onCancel() {
-                    }
-                }
-            )
+            Campus.LOYOLA -> {
+                loyOverlay.setVisibleAll(true)
+                sgwOverlay.setVisibleAll(false)
+            }
         }
     }
 
-    private fun showProfileOverlay() {
+    private fun defaultOverlayStyle(): GeoJsonStyle = GeoJsonStyle(
+        fillColor = 0x80ff8a8a.toInt(),
+        strokeColor = 0xFF4d0000.toInt(),
+        strokeWidth = 2f,
+        zIndex = 10f,
+        clickable = false,
+        visible = true,
+        markerColor = 0xFF974949.toInt(),
+        markerAlpha = 1f,
+        markerScale = 2f
+    )
+
+    private fun switchCampus(campus: Campus) {
+        if (!::mMap.isInitialized) return
+        activityScope.launch(Dispatchers.Main) {
+            executeSwitchCampus(campus)
+        }
+    }
+
+    /**
+     * Show/hide campus overlays and animate the camera to the target campus.
+     */
+    internal fun executeSwitchCampus(campus: Campus) {
+        if (!::mMap.isInitialized) return
+
+        val targetLocation = when (campus) {
+            Campus.SGW -> LatLng(45.4972, -73.5789)
+            Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+
+        when (campus) {
+            Campus.SGW -> {
+                sgwOverlay.setVisibleAll(true)
+                loyOverlay.setVisibleAll(false)
+            }
+            Campus.LOYOLA -> {
+                loyOverlay.setVisibleAll(true)
+                sgwOverlay.setVisibleAll(false)
+            }
+        }
+
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
+            CAMERA_ANIMATION_DURATION_MS,
+            object : GoogleMap.CancelableCallback {
+                override fun onFinish() { }
+                override fun onCancel() { }
+            }
+        )
+    }
+
+    internal fun showProfileOverlay() {
         binding.profileOverlay.visibility = View.VISIBLE
         binding.profileOverlay.setContent {
             ConcordiaCampusGuideTheme {
@@ -407,7 +438,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun getSavedCampus(): Campus {
+    internal fun getSavedCampus(): Campus {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val savedCampusName = prefs.getString(KEY_SELECTED_CAMPUS, Campus.SGW.name)
         return try {
@@ -417,7 +448,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun saveCampus(campus: Campus) {
+    internal fun saveCampus(campus: Campus) {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
             .putString(KEY_SELECTED_CAMPUS, campus.name)
