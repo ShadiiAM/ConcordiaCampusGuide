@@ -179,73 +179,75 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 sgwBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
                 loyBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
             }
+            initializeOverlays(savedCampus)
+        }
+    }
 
-            // Back on main thread: add layers to map and style
-            sgwBuildingsOverlay.activateOnMap()
-            loyBuildingsOverlay.activateOnMap()
+    /**
+     * Activate both overlays on the map, apply default campus colors,
+     * and show/hide based on the selected campus.
+     */
+    internal fun initializeOverlays(campus: Campus) {
+        sgwBuildingsOverlay.activateOnMap()
+        loyBuildingsOverlay.activateOnMap()
 
-            sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-            sgwBuildingsOverlay.changeAllPointColors("#bc4949")
-            loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-            loyBuildingsOverlay.changeAllPointColors("#bc4949")
+        sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+        sgwBuildingsOverlay.changeAllPointColors("#bc4949")
+        loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
+        loyBuildingsOverlay.changeAllPointColors("#bc4949")
 
-            // Show only the initially selected campus polygons, hide the other
-            when (savedCampus) {
-                Campus.SGW -> {
-                    sgwBuildingsOverlay.showOnMap()
-                    loyBuildingsOverlay.hideFromMap()
-                }
-                Campus.LOYOLA -> {
-                    loyBuildingsOverlay.showOnMap()
-                    sgwBuildingsOverlay.hideFromMap()
-                }
+        when (campus) {
+            Campus.SGW -> {
+                sgwBuildingsOverlay.showOnMap()
+                loyBuildingsOverlay.hideFromMap()
+            }
+            Campus.LOYOLA -> {
+                loyBuildingsOverlay.showOnMap()
+                sgwBuildingsOverlay.hideFromMap()
             }
         }
     }
 
     private fun switchCampus(campus: Campus) {
         if (!::mMap.isInitialized) return
-
-        val (targetLocation, campusName) = when (campus) {
-            Campus.SGW -> Pair(LatLng(45.4972, -73.5789), "SGW Campus")
-            Campus.LOYOLA -> Pair(LatLng(45.4582, -73.6402), "Loyola Campus")
-        }
-
-        // Run show/hide operations in coroutine to avoid blocking UI thread
         activityScope.launch(Dispatchers.Main) {
-            // Hide previous campus polygons and show new campus polygons
-            when (campus) {
-                Campus.SGW -> {
-                    // Switching to SGW: show SGW, hide Loyola
-                    sgwBuildingsOverlay.showOnMap()
-                    loyBuildingsOverlay.hideFromMap()
-                }
-                Campus.LOYOLA -> {
-                    // Switching to Loyola: show Loyola, hide SGW
-                    loyBuildingsOverlay.showOnMap()
-                    sgwBuildingsOverlay.hideFromMap()
-                }
-            }
-
-            // Animate camera with controlled duration and callback
-            mMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
-                CAMERA_ANIMATION_DURATION_MS,
-                object : GoogleMap.CancelableCallback {
-                    override fun onFinish() {
-                        // Animation completed successfully - map is interactive
-                    }
-
-                    override fun onCancel() {
-                        // Animation was cancelled (e.g., user interacted with map)
-                        // Map remains interactive
-                    }
-                }
-            )
+            executeSwitchCampus(campus)
         }
     }
 
-    private fun showProfileOverlay() {
+    /**
+     * Show/hide campus overlays and animate the camera to the target campus.
+     */
+    internal fun executeSwitchCampus(campus: Campus) {
+        if (!::mMap.isInitialized) return
+
+        val targetLocation = when (campus) {
+            Campus.SGW -> LatLng(45.4972, -73.5789)
+            Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+
+        when (campus) {
+            Campus.SGW -> {
+                sgwBuildingsOverlay.showOnMap()
+                loyBuildingsOverlay.hideFromMap()
+            }
+            Campus.LOYOLA -> {
+                loyBuildingsOverlay.showOnMap()
+                sgwBuildingsOverlay.hideFromMap()
+            }
+        }
+
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
+            CAMERA_ANIMATION_DURATION_MS,
+            object : GoogleMap.CancelableCallback {
+                override fun onFinish() { }
+                override fun onCancel() { }
+            }
+        )
+    }
+
+    internal fun showProfileOverlay() {
         binding.profileOverlay.visibility = View.VISIBLE
         binding.profileOverlay.setContent {
             ConcordiaCampusGuideTheme {
@@ -292,7 +294,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun getSavedCampus(): Campus {
+    internal fun getSavedCampus(): Campus {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val savedCampusName = prefs.getString(KEY_SELECTED_CAMPUS, Campus.SGW.name)
         return try {
@@ -302,7 +304,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun saveCampus(campus: Campus) {
+    internal fun saveCampus(campus: Campus) {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit()
             .putString(KEY_SELECTED_CAMPUS, campus.name)

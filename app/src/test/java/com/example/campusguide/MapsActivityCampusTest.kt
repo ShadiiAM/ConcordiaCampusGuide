@@ -15,7 +15,12 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.CameraUpdate
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyFloat
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.*
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
@@ -432,5 +437,133 @@ class MapsActivityCampusTest {
         val activity2 = controller2.create().get()
 
         assertNotNull(activity2)
+    }
+
+    // ==================== initializeOverlays tests ====================
+    // onMapReady sets mMap on line 159 before CameraUpdateFactory NPE on line 173.
+    // Wrapping in try/catch lets mMap be set so initializeOverlays (which doesn't
+    // use CameraUpdateFactory) can run directly.
+
+    @Test
+    fun initializeOverlays_SGW_executesWithoutCrash() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        try { activity.onMapReady(mockMap) } catch (_: Exception) { }
+
+        activity.initializeOverlays(Campus.SGW)
+    }
+
+    @Test
+    fun initializeOverlays_LOYOLA_executesWithoutCrash() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        try { activity.onMapReady(mockMap) } catch (_: Exception) { }
+
+        activity.initializeOverlays(Campus.LOYOLA)
+    }
+
+    // ==================== executeSwitchCampus tests ====================
+    // executeSwitchCampus calls CameraUpdateFactory internally, so we mock it statically.
+
+    @Test
+    fun executeSwitchCampus_SGW_animatesCamera() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+            activity.onMapReady(mockMap)
+            activity.executeSwitchCampus(Campus.SGW)
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+        }
+    }
+
+    @Test
+    fun executeSwitchCampus_LOYOLA_animatesCamera() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+            activity.onMapReady(mockMap)
+            activity.executeSwitchCampus(Campus.LOYOLA)
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+        }
+    }
+
+    @Test
+    fun executeSwitchCampus_beforeMapInit_returnsImmediately() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        // mMap is NOT initialized — executeSwitchCampus returns at the guard check
+
+        activity.executeSwitchCampus(Campus.SGW)
+    }
+
+    @Test
+    fun executeSwitchCampus_capturesCallbackAndInvokes() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+            activity.onMapReady(mockMap)
+            activity.executeSwitchCampus(Campus.SGW)
+
+            val callbackCaptor = ArgumentCaptor.forClass(GoogleMap.CancelableCallback::class.java)
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), callbackCaptor.capture())
+
+            val callback = callbackCaptor.value
+            callback.onFinish()
+            callback.onCancel()
+        }
+    }
+
+    // ==================== saveCampus / getSavedCampus direct tests ====================
+
+    @Test
+    fun saveCampus_SGW_thenGetSavedCampus_returnsSGW() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        activity.saveCampus(Campus.SGW)
+        assertEquals(Campus.SGW, activity.getSavedCampus())
+    }
+
+    @Test
+    fun saveCampus_LOYOLA_thenGetSavedCampus_returnsLOYOLA() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        activity.saveCampus(Campus.LOYOLA)
+        assertEquals(Campus.LOYOLA, activity.getSavedCampus())
+    }
+
+    @Test
+    fun saveCampus_overwrite_lastValueWins() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        activity.saveCampus(Campus.SGW)
+        activity.saveCampus(Campus.LOYOLA)
+        assertEquals(Campus.LOYOLA, activity.getSavedCampus())
+    }
+
+    // ==================== showProfileOverlay test ====================
+
+    @Test
+    fun showProfileOverlay_setsOverlayVisible() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+
+        activity.showProfileOverlay()
+
+        val overlay = activity.findViewById<android.view.View>(com.example.campusguide.R.id.profile_overlay)
+        assertEquals(android.view.View.VISIBLE, overlay?.visibility)
     }
 }
