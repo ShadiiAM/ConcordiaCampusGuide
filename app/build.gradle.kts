@@ -132,11 +132,14 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
     testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
@@ -153,6 +156,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
 
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-utils-ktx:5.0.0")
+    implementation(libs.play.services.maps.v1820)
+    implementation(libs.maps.utils.ktx)
+    implementation(libs.play.services.location.v1750)
 }
