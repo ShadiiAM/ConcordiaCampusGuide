@@ -10,6 +10,10 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polygon
+import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -34,10 +38,12 @@ class MapsActivityOnMapReadyTest {
 
         // Create a lenient mock GoogleMap that accepts all calls
         val mockMap = mock(GoogleMap::class.java, withSettings().lenient())
-
-        // Mock methods to avoid NPE
-        `when`(mockMap.addMarker(any(MarkerOptions::class.java))).thenReturn(null)
-        doNothing().`when`(mockMap).moveCamera(any())
+        `when`(mockMap.addMarker(any(MarkerOptions::class.java)))
+            .thenReturn(mock(Marker::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolygon(any(PolygonOptions::class.java)))
+            .thenReturn(mock(Polygon::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolyline(any(PolylineOptions::class.java)))
+            .thenReturn(mock(Polyline::class.java, withSettings().lenient()))
 
         // Execute onMapReady - this is the key to coverage!
         try {
@@ -57,8 +63,12 @@ class MapsActivityOnMapReadyTest {
         val activity = controller.create().get()
 
         val mockMap = mock(GoogleMap::class.java, withSettings().lenient())
-        `when`(mockMap.addMarker(any(MarkerOptions::class.java))).thenReturn(null)
-        doNothing().`when`(mockMap).moveCamera(any())
+        `when`(mockMap.addMarker(any(MarkerOptions::class.java)))
+            .thenReturn(mock(Marker::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolygon(any(PolygonOptions::class.java)))
+            .thenReturn(mock(Polygon::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolyline(any(PolylineOptions::class.java)))
+            .thenReturn(mock(Polyline::class.java, withSettings().lenient()))
 
         // Capture the MarkerOptions that was passed
         val markerCaptor = org.mockito.ArgumentCaptor.forClass(MarkerOptions::class.java)
@@ -83,8 +93,12 @@ class MapsActivityOnMapReadyTest {
         val activity = controller.create().get()
 
         val mockMap = mock(GoogleMap::class.java, withSettings().lenient())
-        `when`(mockMap.addMarker(any(MarkerOptions::class.java))).thenReturn(null)
-        doNothing().`when`(mockMap).moveCamera(any())
+        `when`(mockMap.addMarker(any(MarkerOptions::class.java)))
+            .thenReturn(mock(Marker::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolygon(any(PolygonOptions::class.java)))
+            .thenReturn(mock(Polygon::class.java, withSettings().lenient()))
+        `when`(mockMap.addPolyline(any(PolylineOptions::class.java)))
+            .thenReturn(mock(Polyline::class.java, withSettings().lenient()))
 
         try {
             activity.onMapReady(mockMap)
