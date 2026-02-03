@@ -12,7 +12,6 @@ import android.provider.Settings
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
-import com.example.campusguide.ui.map.GeoJsonOverlay
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -20,12 +19,14 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
+import com.google.android.gms.location.LocationResult
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
 
@@ -39,6 +40,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
+    private var userMarker: Marker? = null
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,31 +101,31 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         //Add a marker at User Position
 
-        callback = object: LocationCallback(){}
+        callback = object: LocationCallback(){
+            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let { location ->
+                    val userLatLng = LatLng(location.latitude, location.longitude)
+                    if (userMarker == null) {
+                        userMarker = mMap.addMarker(MarkerOptions().position(userLatLng).title("You are here"))
+                    } else {
+                        userMarker?.position = userLatLng
+                    }
+                }
 
-        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if(location != null){
-                val userLocation = LatLng(location.latitude,location.longitude)
-                mMap.addMarker(MarkerOptions()
-                    .position(userLocation)
-                    .title("Your Location"))
-            }else{
-                requestLocation()
             }
         }
+
+        requestLocationUpdates(callback)
+
     }
 
 
+    //Turn on location and request permissions
     private fun onGPS(){
-        if(!isLocationEnabled()){
+        if(!isLocationEnabled()) {
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-        }else{
-            fetchLocation()
         }
-    }
-
-    //Request Authorizations for location
-    private fun fetchLocation() {
         if (ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),200)
         }
@@ -131,10 +134,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     //Start the location updates
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun requestLocation(){
+    private fun requestLocationUpdates(callback: LocationCallback){
         val requestLocation = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             TimeUnit.SECONDS.toMillis(10)
@@ -146,9 +148,35 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+     fun requestLocation() : LatLng{
+        var userLocation = LatLng(45.4972, -73.5789)
+        if(isPermissionsGranted()){
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener() { location: Location? ->
+                if(location != null){
+                    userLocation =LatLng(location.latitude,location.longitude)
+                }else{
+                    callback = object: LocationCallback(){}
+                    requestLocationUpdates(callback)
+                    userLocation = requestLocation()
+                }
+            }
+            return userLocation
+        }
+        else{
+            throw Exception("Location permissions not granted")
+        }
+    }
+
+
     //Check if the location and network services are on
     private fun isLocationEnabled() : Boolean{
         val locationManager= applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    private fun isPermissionsGranted(): Boolean{
+        return ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 }
