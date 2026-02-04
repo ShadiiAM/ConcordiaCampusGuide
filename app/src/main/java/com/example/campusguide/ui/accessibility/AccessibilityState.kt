@@ -7,16 +7,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 
 // Small holder for the global text-size offset
 class AccessibilityState(
     initialOffsetSp: Float = 0f,
-    initialBoldEnabled: Boolean = false
+    initialBoldEnabled: Boolean = false,
+    initialTextColor: Color = Color.Unspecified
+
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
         private set
 
     var isBoldEnabled by mutableStateOf(initialBoldEnabled)
+        private set
+
+    var textColor by mutableStateOf(initialTextColor)
         private set
 
     fun increaseTextSize() {
@@ -32,6 +38,8 @@ class AccessibilityState(
     fun setBold(enabled: Boolean) {
         isBoldEnabled = enabled
     }
+
+    fun setTextColor(color: Color) { textColor = color }
 }
 
 // CompositionLocal to access it from any composable
@@ -41,6 +49,10 @@ val LocalAccessibilityState = staticCompositionLocalOf<AccessibilityState> {
 
 // Helper to create it once at the app root
 @Composable
-fun rememberAccessibilityState(initialOffsetSp: Float = 0f): AccessibilityState {
-    return remember { AccessibilityState(initialOffsetSp) }
+fun rememberAccessibilityState(
+    initialOffsetSp: Float = 0f,
+    initialBoldEnabled: Boolean = false,
+    initialTextColor: Color = Color.Unspecified
+): AccessibilityState = remember {
+    AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor)
 }
