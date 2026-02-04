@@ -2,23 +2,28 @@ package com.example.campusguide
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.campusguide.databinding.ActivityMapsBinding
-import com.example.campusguide.ui.map.GeoJsonOverlay
+import com.example.campusguide.ui.map.utils.BuildingLocator
+import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
+import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import org.json.JSONObject
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var sgwOverlay: GeoJsonOverlay
+    private lateinit var loyOverlay: GeoJsonOverlay
 
-    private val sgwBuildingsOverlay = GeoJsonOverlay(R.raw.sgw_buildings)
-    private val loyBuildingsOverlay = GeoJsonOverlay(R.raw.loy_buildings)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,25 +45,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
+        loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
+
+
+
         // Add a marker at Concordia University (SGW Campus) and move the camera
         val concordiaSGW = LatLng(45.4972, -73.5789)
-        mMap.addMarker(MarkerOptions()
-            .position(concordiaSGW)
-            .title("Concordia University - SGW Campus"))
+//        mMap.addMarker(MarkerOptions()
+//            .position(concordiaSGW)
+//            .title("Concordia University - SGW Campus"))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
 
-        //Adds The Overlay
-        sgwBuildingsOverlay.addToMap(mMap, this)
-        loyBuildingsOverlay.addToMap(mMap, this)
 
-        sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        sgwBuildingsOverlay.changeAllPointColors("#bc4949")
-        loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        loyBuildingsOverlay.changeAllPointColors("#bc4949")
-
-
-        sgwBuildingsOverlay.removeAllPoints()
-
+        sgwOverlay.attachToMap(mMap)
+        loyOverlay.attachToMap(mMap)
+         val defaultStyle = GeoJsonStyle(
+            fillColor = 0x80ff8a8a.toInt(),
+            strokeColor = 0xFF4d0000.toInt(),
+            strokeWidth = 2f,
+            zIndex = 10f,
+            clickable = false,
+            visible = true,
+             markerColor = 0xFF974949.toInt(),
+             markerAlpha = 1f,
+             markerScale = 2f
+        )
+        sgwOverlay.setAllStyles(defaultStyle)
+        loyOverlay.setAllStyles(defaultStyle)
 
     }
+
+
+
 }
