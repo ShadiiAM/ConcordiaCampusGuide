@@ -238,12 +238,14 @@ private fun SettingRow(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Text(
-            text = label,
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
-        )
+        Box(modifier = Modifier.weight(1f)){
+            AccessibleText(
+                text = label,
+                baseFontSizeSp = 16f,
+                fallbackColor = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
 
         action()
     }
