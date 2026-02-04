@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -329,7 +330,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         markerScale = 2f
     )
 
-    private fun switchCampus(campus: Campus) {
+    internal fun switchCampus(campus: Campus) {
         if (!::mMap.isInitialized) return
         activityScope.launch(Dispatchers.Main) {
             executeSwitchCampus(campus)
@@ -371,47 +372,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     internal fun showProfileOverlay() {
         binding.profileOverlay.visibility = View.VISIBLE
         binding.profileOverlay.setContent {
-            ConcordiaCampusGuideTheme {
-                var showProfile by remember { mutableStateOf(true) }
-                var showAccessibility by remember { mutableStateOf(false) }
-                val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-
-                if (!showProfile && !showAccessibility) {
-                    binding.profileOverlay.visibility = View.GONE
-                }
-
-                if (showAccessibility) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(top = statusBarPadding.calculateTopPadding())
-                    ) {
-                        AccessibilityScreen(
-                            onBackClick = {
-                                showAccessibility = false
-                                binding.profileOverlay.visibility = View.GONE
-                            }
-                        )
-                    }
-                } else if (showProfile) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(top = statusBarPadding.calculateTopPadding())
-                    ) {
-                        ProfileScreen(
-                            onBackClick = {
-                                showProfile = false
-                                binding.profileOverlay.visibility = View.GONE
-                            },
-                            onProfileClick = { /* TODO: Navigate to profile details */ },
-                            onAccessibilityClick = { showAccessibility = true }
-                        )
-                    }
-                }
-            }
+            ProfileOverlayContent(onDismiss = {
+                binding.profileOverlay.visibility = View.GONE
+            })
         }
     }
 
@@ -443,5 +406,50 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         private const val KEY_SELECTED_CAMPUS = "selected_campus"
         private const val CAMERA_ANIMATION_DURATION_MS = 1500
         private const val CAMPUS_ZOOM_LEVEL = 15f
+    }
+}
+
+@Composable
+internal fun ProfileOverlayContent(onDismiss: () -> Unit) {
+    ConcordiaCampusGuideTheme {
+        var showProfile by remember { mutableStateOf(true) }
+        var showAccessibility by remember { mutableStateOf(false) }
+        val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
+
+        if (!showProfile && !showAccessibility) {
+            onDismiss()
+        }
+
+        if (showAccessibility) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(top = statusBarPadding.calculateTopPadding())
+            ) {
+                AccessibilityScreen(
+                    onBackClick = {
+                        showAccessibility = false
+                        onDismiss()
+                    }
+                )
+            }
+        } else if (showProfile) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(top = statusBarPadding.calculateTopPadding())
+            ) {
+                ProfileScreen(
+                    onBackClick = {
+                        showProfile = false
+                        onDismiss()
+                    },
+                    onProfileClick = { /* TODO: Navigate to profile details */ },
+                    onAccessibilityClick = { showAccessibility = true }
+                )
+            }
+        }
     }
 }

@@ -583,4 +583,80 @@ class MapsActivityCampusTest {
         val overlay = activity.findViewById<android.view.View>(com.example.campusguide.R.id.profile_overlay)
         assertEquals(android.view.View.VISIBLE, overlay?.visibility)
     }
+
+    // ==================== switchCampus tests (now internal) ====================
+
+    @Test
+    fun switchCampus_SGW_beforeMapInit_doesNotCrash() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        // mMap not initialized — guard returns immediately
+        activity.switchCampus(Campus.SGW)
+    }
+
+    @Test
+    fun switchCampus_LOYOLA_beforeMapInit_doesNotCrash() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        activity.switchCampus(Campus.LOYOLA)
+    }
+
+    @Test
+    fun switchCampus_SGW_afterMapReady_launchesCoroutine() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+            activity.onMapReady(mockMap)
+            activity.switchCampus(Campus.SGW)
+            // Idle so the coroutine body (executeSwitchCampus) runs
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+        }
+    }
+
+    @Test
+    fun switchCampus_LOYOLA_afterMapReady_launchesCoroutine() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+            activity.onMapReady(mockMap)
+            activity.switchCampus(Campus.LOYOLA)
+            org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+        }
+    }
+
+    // ==================== getSavedCampus catch block ====================
+
+    @Test
+    fun getSavedCampus_invalidValue_returnsSGW() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        // Write an invalid campus name directly
+        ApplicationProvider.getApplicationContext<Context>()
+            .getSharedPreferences("campus_preferences", Context.MODE_PRIVATE)
+            .edit().putString("selected_campus", "NOT_A_CAMPUS").apply()
+
+        // getSavedCampus catches IllegalArgumentException and returns SGW
+        assertEquals(Campus.SGW, activity.getSavedCampus())
+    }
+
+    @Test
+    fun getSavedCampus_nullValue_returnsSGW() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        ApplicationProvider.getApplicationContext<Context>()
+            .getSharedPreferences("campus_preferences", Context.MODE_PRIVATE)
+            .edit().putString("selected_campus", null).apply()
+
+        assertEquals(Campus.SGW, activity.getSavedCampus())
+    }
 }

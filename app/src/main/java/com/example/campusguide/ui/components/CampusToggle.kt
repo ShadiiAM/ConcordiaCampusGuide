@@ -138,7 +138,7 @@ fun CampusToggle(
 
 @Preview(widthDp = 259, heightDp = 48)
 @Composable
-private fun CampusTogglePreview() {
+internal fun CampusTogglePreview() {
     var selectedCampus by remember { mutableStateOf(Campus.SGW) }
     MaterialTheme {
         CampusToggle(
