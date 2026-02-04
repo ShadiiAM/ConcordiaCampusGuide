@@ -57,7 +57,7 @@ fun AccessibilityScreen(
                     AccessibleText(
                         text = "Accessibility",
                         baseFontSizeSp = 18f,
-                    //    fontWeight = FontWeight.Medium
+                        forceFontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
@@ -95,8 +95,7 @@ fun AccessibilityScreen(
                     AccessibleText(
                         text = "Tt",
                         fallbackColor = Color(0xFF6B4D8A),
-                        baseFontSizeSp = 16f,
-                       // fontWeight = FontWeight.Bold
+                        baseFontSizeSp = 16f
                     )
                 }
 
@@ -105,7 +104,7 @@ fun AccessibilityScreen(
                 AccessibleText(
                     text = "Display and AccessibleText Size",
                     baseFontSizeSp = 16f,
-                //    fontWeight = FontWeight.Medium,
+                    forceFontWeight = FontWeight.Bold,
                     fallbackColor = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -118,7 +117,6 @@ fun AccessibilityScreen(
                     AccessibleText(
                         text = "Tt",
                         baseFontSizeSp = 16f,
-                    //    fontWeight = FontWeight.Medium,
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
@@ -160,7 +158,6 @@ fun AccessibilityScreen(
                     AccessibleText(
                         text = "A",
                         baseFontSizeSp = 18f,
-                     //   fontWeight = FontWeight.Medium,
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },

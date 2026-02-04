@@ -11,18 +11,21 @@ import androidx.compose.ui.unit.sp
 fun AccessibleText(
     text: String,
     baseFontSizeSp: Float,
-    fallbackColor: Color = MaterialTheme.colorScheme.onSurface
+    fallbackColor: Color = MaterialTheme.colorScheme.onSurface,
+    forceFontWeight: FontWeight? = null
 ) {
     val accessibilityState = LocalAccessibilityState.current
 
     val finalSize = (baseFontSizeSp + accessibilityState.textSizeOffsetSp)
         .coerceAtLeast(8f)
         .sp
-    val weight = if (accessibilityState.isBoldEnabled) {
+
+    val effectiveWeight = forceFontWeight ?: if (accessibilityState.isBoldEnabled) {
         FontWeight.Bold
     } else {
         FontWeight.Normal
     }
+
     val color = if (accessibilityState.textColor != Color.Unspecified) {
         accessibilityState.textColor
     } else {
@@ -32,7 +35,7 @@ fun AccessibleText(
     Text(
         text = text,
         fontSize = finalSize,
-        fontWeight = weight,
+        fontWeight = effectiveWeight,
         color = color,
         style = MaterialTheme.typography.bodyMedium
     )
