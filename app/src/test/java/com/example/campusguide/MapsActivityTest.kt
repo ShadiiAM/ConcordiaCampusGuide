@@ -207,7 +207,7 @@ class MapsActivityTest {
     }
 
     @Test
-    fun mapsActivity_requestLocation() {
+    fun mapsActivity_requestLocation_returnsCorrectLatLng() {
         val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
         val activity = controller.create().start().resume().get()
         val location = mock(Location::class.java)
@@ -218,5 +218,21 @@ class MapsActivityTest {
         val actualLatLng = activity.setLocation(location)
         assertTrue(actualLatLng.latitude == expectedLatLng.latitude)
         assertTrue(actualLatLng.longitude == expectedLatLng.longitude)
+    }
+
+    @Test
+    fun mapActivity_requestLocation() {
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+        activity.fusedLocationProviderClient = mock(FusedLocationProviderClient::class.java)
+
+        try{
+            activity.requestLocation()
+        }
+        catch(_: NullPointerException){
+            //Expect to throw null pointer exception. The Mock doesn't have a last location
+        }
+
+        verify(activity.fusedLocationProviderClient, atLeastOnce()).lastLocation
     }
 }

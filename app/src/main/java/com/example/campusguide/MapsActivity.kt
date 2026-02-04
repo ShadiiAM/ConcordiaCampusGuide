@@ -174,8 +174,6 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-
-
     //Check if the location and network services are on
     fun isLocationEnabled() : Boolean{
         val locationManager= applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
