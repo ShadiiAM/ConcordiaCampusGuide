@@ -45,7 +45,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -175,14 +174,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
-        // Parse GeoJSON on background thread, then style/show on main thread to avoid ANR
-        activityScope.launch {
-            withContext(Dispatchers.IO) {
-                sgwOverlay.attachToMap(mMap)
-                loyOverlay.attachToMap(mMap)
-            }
-            initializeOverlays(savedCampus)
-        }
+        // attachToMap parses GeoJSON and adds polygons/markers to the map.
+        // Must run on the main thread because GoogleMap mutation methods require it.
+        sgwOverlay.attachToMap(mMap)
+        loyOverlay.attachToMap(mMap)
+        initializeOverlays(savedCampus)
     }
 
     /**

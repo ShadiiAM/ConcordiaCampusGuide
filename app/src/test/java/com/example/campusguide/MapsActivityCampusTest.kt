@@ -11,12 +11,16 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.google.android.gms.maps.CameraUpdateFactory
+import org.mockito.MockedStatic
 import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyFloat
@@ -35,11 +39,24 @@ class MapsActivityCampusTest {
     private val PREFS_NAME = "campus_preferences"
     private val KEY_SELECTED_CAMPUS = "selected_campus"
 
+    private var bitmapFactoryStatic: MockedStatic<BitmapDescriptorFactory>? = null
+
     @Before
-    fun clearPreferences() {
+    fun setUp() {
         ApplicationProvider.getApplicationContext<Context>()
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().clear().apply()
+
+        bitmapFactoryStatic = mockStatic(BitmapDescriptorFactory::class.java).also { st ->
+            st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
+                .thenReturn(mock(BitmapDescriptor::class.java))
+        }
+    }
+
+    @After
+    fun tearDown() {
+        bitmapFactoryStatic?.close()
+        bitmapFactoryStatic = null
     }
 
     private fun createMockMap(): GoogleMap {
