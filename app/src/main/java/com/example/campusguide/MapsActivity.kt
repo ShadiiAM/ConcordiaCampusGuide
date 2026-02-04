@@ -21,11 +21,6 @@ import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.google.android.gms.location.LocationResult
 
-import android.util.Log
-import com.example.campusguide.databinding.ActivityMapsBinding
-import com.example.campusguide.ui.map.utils.BuildingLocator
-import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
-import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,7 +29,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
-import org.json.JSONObject
+
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
