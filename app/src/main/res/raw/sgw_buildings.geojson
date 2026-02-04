@@ -725,7 +725,7 @@
       "properties": {
         "building-name": "FB",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -742,7 +742,7 @@
       "properties": {
         "building-name": "FG",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -759,7 +759,7 @@
       "properties": {
         "building-name": "GA",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -776,7 +776,7 @@
       "properties": {
         "building-name": "GN",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -836,7 +836,7 @@
       "properties": {
         "building-name": "CL",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -908,7 +908,7 @@
       "properties": {
         "building-name": "TD",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -926,7 +926,7 @@
         "name": "MB",
         "building-name": "MB",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1038,7 +1038,7 @@
       "properties": {
         "building-name": "EV",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1102,7 +1102,7 @@
       "properties": {
         "building-name": "GM",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1166,7 +1166,7 @@
       "properties": {
         "building-name": "LS",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1234,7 +1234,7 @@
       "properties": {
         "building-name": "ER",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1302,7 +1302,7 @@
       "properties": {
         "building-name": "GS",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1358,7 +1358,7 @@
       "properties": {
         "building-name": "Q",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1414,7 +1414,7 @@
       "properties": {
         "building-name": "P",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1470,7 +1470,7 @@
       "properties": {
         "building-name": "T",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1526,7 +1526,7 @@
       "properties": {
         "building-name": "RR",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1582,7 +1582,7 @@
       "properties": {
         "building-name": "R",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1638,7 +1638,7 @@
       "properties": {
         "building-name": "FA",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1710,7 +1710,7 @@
       "properties": {
         "building-name": "EN",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1766,7 +1766,7 @@
       "properties": {
         "building-name": "X",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1822,7 +1822,7 @@
       "properties": {
         "building-name": "PR",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1882,7 +1882,7 @@
       "properties": {
         "building-name": "V",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -1954,7 +1954,7 @@
       "properties": {
         "building-name": "M",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2038,7 +2038,7 @@
       "properties": {
         "building-name": "S",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2106,7 +2106,7 @@
       "properties": {
         "building-name": "CI",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2170,7 +2170,7 @@
       "properties": {
         "building-name": "MI",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2238,7 +2238,7 @@
       "properties": {
         "building-name": "D",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2318,7 +2318,7 @@
       "properties": {
         "building-name": "K",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2374,7 +2374,7 @@
       "properties": {
         "building-name": "B",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2430,7 +2430,7 @@
       "properties": {
         "building-name": "MU",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2486,7 +2486,7 @@
       "properties": {
         "building-name": "H",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2566,7 +2566,7 @@
       "properties": {
         "building-name": "LD",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2666,7 +2666,7 @@
       "properties": {
         "building-name": "LB",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2730,7 +2730,7 @@
       "properties": {
         "building-name": "VA",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {
@@ -2854,7 +2854,7 @@
       "properties": {
         "building-name": "SB",
         "marker-color": "#00bfff",
-        "marker-size": "small",
+        "marker-size": "medium",
         "marker-symbol": "circle"
       },
       "geometry": {

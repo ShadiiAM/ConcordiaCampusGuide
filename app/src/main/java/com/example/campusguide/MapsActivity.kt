@@ -30,7 +30,8 @@ import com.example.campusguide.databinding.ActivityMapsBinding
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.components.SearchBarWithProfile
-import com.example.campusguide.ui.map.GeoJsonOverlay
+import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
+import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -51,12 +52,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var sgwOverlay: GeoJsonOverlay
+    private lateinit var loyOverlay: GeoJsonOverlay
 
     // Coroutine scope for background operations
     private val activityScope = CoroutineScope(Dispatchers.Main + Job())
-
-    private val sgwBuildingsOverlay = GeoJsonOverlay(R.raw.sgw_buildings)
-    private val loyBuildingsOverlay = GeoJsonOverlay(R.raw.loy_buildings)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,6 +158,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
+        loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
+
         // Add a marker at Concordia University (SGW Campus) and move the camera
         val concordiaSGW = LatLng(45.4972, -73.5789)
         mMap.addMarker(MarkerOptions()
@@ -172,38 +175,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
-        // Parse GeoJSON on background thread (heavy I/O + JSON parsing), then
-        // activate layers and apply styles on main thread to avoid ANR
+        // Parse GeoJSON on background thread, then style/show on main thread to avoid ANR
         activityScope.launch {
             withContext(Dispatchers.IO) {
-                sgwBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
-                loyBuildingsOverlay.parseGeoJson(mMap, this@MapsActivity)
+                sgwOverlay.attachToMap(mMap)
+                loyOverlay.attachToMap(mMap)
             }
             initializeOverlays(savedCampus)
         }
     }
 
     /**
-     * Activate both overlays on the map, apply default campus colors,
-     * and show/hide based on the selected campus.
+     * Apply default styles and show/hide overlays based on selected campus.
      */
     internal fun initializeOverlays(campus: Campus) {
-        sgwBuildingsOverlay.activateOnMap()
-        loyBuildingsOverlay.activateOnMap()
-
-        sgwBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        sgwBuildingsOverlay.changeAllPointColors("#bc4949")
-        loyBuildingsOverlay.changeAllBuildingColors("#ffaca6")
-        loyBuildingsOverlay.changeAllPointColors("#bc4949")
+        val defaultStyle = GeoJsonStyle(
+            fillColor = 0x80ffaca6.toInt(),
+            strokeColor = 0xFFbc4949.toInt(),
+            strokeWidth = 2f,
+            zIndex = 10f,
+            clickable = true,
+            visible = true,
+            markerColor = 0xFFbc4949.toInt(),
+            markerAlpha = 1f,
+            markerScale = 1.5f
+        )
+        sgwOverlay.setAllStyles(defaultStyle)
+        loyOverlay.setAllStyles(defaultStyle)
 
         when (campus) {
             Campus.SGW -> {
-                sgwBuildingsOverlay.showOnMap()
-                loyBuildingsOverlay.hideFromMap()
+                sgwOverlay.setVisibleAll(true)
+                loyOverlay.setVisibleAll(false)
             }
             Campus.LOYOLA -> {
-                loyBuildingsOverlay.showOnMap()
-                sgwBuildingsOverlay.hideFromMap()
+                loyOverlay.setVisibleAll(true)
+                sgwOverlay.setVisibleAll(false)
             }
         }
     }
@@ -228,12 +235,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         when (campus) {
             Campus.SGW -> {
-                sgwBuildingsOverlay.showOnMap()
-                loyBuildingsOverlay.hideFromMap()
+                sgwOverlay.setVisibleAll(true)
+                loyOverlay.setVisibleAll(false)
             }
             Campus.LOYOLA -> {
-                loyBuildingsOverlay.showOnMap()
-                sgwBuildingsOverlay.hideFromMap()
+                loyOverlay.setVisibleAll(true)
+                sgwOverlay.setVisibleAll(false)
             }
         }
 
