@@ -6,9 +6,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.NavigationBarPreview
@@ -127,7 +129,7 @@ class NavigationBarTest {
         composeTestRule.waitForIdle()
     }
 
-
+    @Test
     fun navBarWithDifferentCurrentDestination() {
         composeTestRule.setContent {
             NavigationBar(
@@ -145,4 +147,51 @@ class NavigationBarTest {
         composeTestRule.waitForIdle()
     }
 
+    @Test
+    fun navBarUpdatesCurrentDestination() {
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Calendar").performClick()
+
+        assert(currentDestination.value == AppDestinations.CALENDAR)
+    }
+
+    @Test
+    fun navBarWithoutContentDoesNotRenderSearch() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                    {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertDoesNotExist()
+    }
+
+    @Test
+    fun navBarCurrentDestinationisVisuallySelected() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
+                    {}
+                )
+            }
+        }
+
+        composeTestRule
+            .onNodeWithText("Directions")
+            .assertIsSelected()
+    }
 }
