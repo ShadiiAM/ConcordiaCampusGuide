@@ -33,10 +33,10 @@ import java.util.concurrent.TimeUnit
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var callback: LocationCallback
+    lateinit var callback: LocationCallback
 
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
@@ -122,21 +122,21 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
 
     //Turn on location and request permissions
-    private fun onGPS(){
+    fun onGPS(){
         if(!isLocationEnabled()) {
             startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
         }
-        if (ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),200)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),200)
         }
-        if (ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION),200)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),200)
         }
     }
 
     //Start the location updates
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun requestLocationUpdates(callback: LocationCallback){
+    fun requestLocationUpdates(callback: LocationCallback){
         val requestLocation = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             TimeUnit.SECONDS.toMillis(10)
@@ -152,15 +152,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
      fun requestLocation() : LatLng{
         var userLocation = LatLng(45.4972, -73.5789)
         if(isPermissionsGranted()){
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener() { location: Location? ->
-                if(location != null){
-                    userLocation =LatLng(location.latitude,location.longitude)
-                }else{
-                    callback = object: LocationCallback(){}
-                    requestLocationUpdates(callback)
-                    userLocation = requestLocation()
-                }
-            }
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener{ location: Location? -> userLocation = setLocation(location)}
             return userLocation
         }
         else{
@@ -168,15 +160,28 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    fun setLocation(location: Location?) : LatLng{
+        if(location != null){
+            return LatLng(location.latitude,location.longitude)
+        }else{
+            callback = object: LocationCallback(){}
+            requestLocationUpdates(callback)
+            return requestLocation()
+        }
+    }
+
+
+
 
     //Check if the location and network services are on
-    private fun isLocationEnabled() : Boolean{
+    fun isLocationEnabled() : Boolean{
         val locationManager= applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    private fun isPermissionsGranted(): Boolean{
-        return ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+    fun isPermissionsGranted(): Boolean{
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 }
