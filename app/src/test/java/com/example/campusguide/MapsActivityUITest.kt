@@ -3,7 +3,6 @@ package com.example.campusguide
 import android.view.View
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -13,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.CampusTogglePreview
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
@@ -170,11 +170,11 @@ class MapsActivityUITest {
         assertTrue(profileClicked)
     }
 
-    // ==================== Campus toggle tests for coverage ====================
+    // ==================== Campus toggle tests — proper recomposition ====================
 
     @Test
     fun campusToggle_onCampusSelected_triggersCallback() {
-        var selectedCampus = Campus.SGW
+        var selectedCampus by mutableStateOf(Campus.SGW)
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
@@ -182,12 +182,13 @@ class MapsActivityUITest {
                     selectedCampus = selectedCampus,
                     onCampusSelected = { campus ->
                         selectedCampus = campus
-                    }
+                    },
+                    showIcon = true
                 )
             }
         }
 
-        // Click Loyola
+        // Click Loyola — recomposition flips all selectedCampus branches
         composeTestRule.onNodeWithText("Loyola").performClick()
         composeTestRule.waitForIdle()
 
@@ -196,7 +197,7 @@ class MapsActivityUITest {
 
     @Test
     fun campusToggle_switchingBackAndForth_worksCorrectly() {
-        var selectedCampus = Campus.SGW
+        var selectedCampus by mutableStateOf(Campus.SGW)
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
@@ -204,7 +205,8 @@ class MapsActivityUITest {
                     selectedCampus = selectedCampus,
                     onCampusSelected = { campus ->
                         selectedCampus = campus
-                    }
+                    },
+                    showIcon = true
                 )
             }
         }
@@ -220,6 +222,141 @@ class MapsActivityUITest {
         assertEquals(Campus.SGW, selectedCampus)
     }
 
+    @Test
+    fun campusToggle_startWithLoyola_switchToSGW() {
+        var selectedCampus by mutableStateOf(Campus.LOYOLA)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CampusToggle(
+                    selectedCampus = selectedCampus,
+                    onCampusSelected = { campus ->
+                        selectedCampus = campus
+                    },
+                    showIcon = true
+                )
+            }
+        }
+
+        // Initially LOYOLA is selected — exercises LOYOLA-selected branches on first render
+        composeTestRule.onNodeWithText("SGW").performClick()
+        composeTestRule.waitForIdle()
+        assertEquals(Campus.SGW, selectedCampus)
+    }
+
+    @Test
+    fun campusToggle_showIconFalse_SGW_to_LOYOLA() {
+        var selectedCampus by mutableStateOf(Campus.SGW)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CampusToggle(
+                    selectedCampus = selectedCampus,
+                    onCampusSelected = { campus ->
+                        selectedCampus = campus
+                    },
+                    showIcon = false
+                )
+            }
+        }
+
+        // showIcon=false exercises the null leadingIcon branches
+        composeTestRule.onNodeWithText("Loyola").performClick()
+        composeTestRule.waitForIdle()
+        assertEquals(Campus.LOYOLA, selectedCampus)
+
+        composeTestRule.onNodeWithText("SGW").performClick()
+        composeTestRule.waitForIdle()
+        assertEquals(Campus.SGW, selectedCampus)
+    }
+
+    @Test
+    fun campusToggle_showIconFalse_startLoyola() {
+        var selectedCampus by mutableStateOf(Campus.LOYOLA)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CampusToggle(
+                    selectedCampus = selectedCampus,
+                    onCampusSelected = { campus ->
+                        selectedCampus = campus
+                    },
+                    showIcon = false
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("SGW").performClick()
+        composeTestRule.waitForIdle()
+        assertEquals(Campus.SGW, selectedCampus)
+    }
+
+    @Test
+    fun campusTogglePreview_rendersWithoutCrash() {
+        composeTestRule.setContent {
+            CampusTogglePreview()
+        }
+        // Preview renders SGW selected by default
+        composeTestRule.onNodeWithText("SGW").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Loyola").assertIsDisplayed()
+    }
+
+    // ==================== ProfileOverlayContent tests (covers showProfileOverlay compose body) ====================
+
+    @Test
+    fun profileOverlayContent_showsProfileScreenInitially() {
+        composeTestRule.setContent {
+            ProfileOverlayContent(onDismiss = {})
+        }
+
+        composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
+    }
+
+    @Test
+    fun profileOverlayContent_navigateToAccessibility() {
+        composeTestRule.setContent {
+            ProfileOverlayContent(onDismiss = {})
+        }
+
+        composeTestRule.onNodeWithText("Accessibility").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Display and Text Size").assertIsDisplayed()
+    }
+
+    @Test
+    fun profileOverlayContent_accessibilityBackCallsDismiss() {
+        var dismissed = false
+
+        composeTestRule.setContent {
+            ProfileOverlayContent(onDismiss = { dismissed = true })
+        }
+
+        // Go to accessibility
+        composeTestRule.onNodeWithText("Accessibility").performClick()
+        composeTestRule.waitForIdle()
+
+        // Back from accessibility
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(dismissed)
+    }
+
+    @Test
+    fun profileOverlayContent_profileBackCallsDismiss() {
+        var dismissed = false
+
+        composeTestRule.setContent {
+            ProfileOverlayContent(onDismiss = { dismissed = true })
+        }
+
+        // Back from profile directly
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+
+        assertTrue(dismissed)
+    }
 
     // ==================== Combined flow tests ====================
 
