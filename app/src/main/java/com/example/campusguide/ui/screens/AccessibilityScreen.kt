@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
@@ -53,10 +54,10 @@ fun AccessibilityScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
+                    AccessibleText(
                         text = "Accessibility",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
+                        baseFontSizeSp = 18f,
+                    //    fontWeight = FontWeight.Medium
                     )
                 },
                 navigationIcon = {
@@ -78,7 +79,7 @@ fun AccessibilityScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Display and Text Size Section Header
+            // Display and AccessibleText Size Section Header
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -91,37 +92,37 @@ fun AccessibilityScreen(
                         .background(Color(0xFFE8E0F0)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AccessibleText(
                         text = "Tt",
-                        color = Color(0xFF6B4D8A),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fallbackColor = Color(0xFF6B4D8A),
+                        baseFontSizeSp = 16f,
+                       // fontWeight = FontWeight.Bold
                     )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Text(
-                    text = "Display and Text Size",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                AccessibleText(
+                    text = "Display and AccessibleText Size",
+                    baseFontSizeSp = 16f,
+                //    fontWeight = FontWeight.Medium,
+                    fallbackColor = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Text Size Setting
+            // AccessibleText Size Setting
             SettingRow(
                 icon = {
-                    Text(
+                    AccessibleText(
                         text = "Tt",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        baseFontSizeSp = 16f,
+                    //    fontWeight = FontWeight.Medium,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = "Text size",
+                label = "AccessibleText size",
                 action = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -130,10 +131,10 @@ fun AccessibilityScreen(
                             onClick = { accessibilityState.decreaseTextSize() },
                             modifier = Modifier.size(32.dp)
                         ) {
-                            Text(
+                            AccessibleText(
                                 text = "-",
-                                fontSize = 20.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                baseFontSizeSp = 20f,
+                                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
@@ -141,10 +142,10 @@ fun AccessibilityScreen(
                             onClick = { accessibilityState.increaseTextSize() },
                             modifier = Modifier.size(32.dp)
                         ) {
-                            Text(
+                            AccessibleText(
                                 text = "+",
-                                fontSize = 20.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                baseFontSizeSp = 20f,
+                                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -153,17 +154,17 @@ fun AccessibilityScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Text Colour Setting
+            // AccessibleText Colour Setting
             SettingRow(
                 icon = {
-                    Text(
+                    AccessibleText(
                         text = "A",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        baseFontSizeSp = 18f,
+                     //   fontWeight = FontWeight.Medium,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = "Text colour",
+                label = "AccessibleText colour",
                 action = {
                     Box(
                         modifier = Modifier
@@ -176,11 +177,11 @@ fun AccessibilityScreen(
                             ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        AccessibleText(
                             text = "A",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF6B4D8A)
+                            baseFontSizeSp = 16f,
+                        //    fontWeight = FontWeight.Bold,
+                            fallbackColor = Color(0xFF6B4D8A)
                         )
                     }
                 }
@@ -191,11 +192,11 @@ fun AccessibilityScreen(
             // Bold Setting
             SettingRow(
                 icon = {
-                    Text(
+                    AccessibleText(
                         text = "B",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        baseFontSizeSp = 18f,
+                      //  fontWeight = FontWeight.Bold,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 label = "Bold",

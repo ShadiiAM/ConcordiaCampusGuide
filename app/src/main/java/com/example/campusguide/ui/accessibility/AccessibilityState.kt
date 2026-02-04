@@ -39,7 +39,7 @@ class AccessibilityState(
         isBoldEnabled = enabled
     }
 
-    fun setTextColor(color: Color) { textColor = color }
+    fun updateTextColor(color: Color) { textColor = color }
 }
 
 // CompositionLocal to access it from any composable
