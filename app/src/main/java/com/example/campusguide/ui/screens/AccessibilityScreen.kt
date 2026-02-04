@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +47,7 @@ fun AccessibilityScreen(
     onBackClick: () -> Unit = {}
 ) {
     var isBoldEnabled by remember { mutableStateOf(true) }
+    val accessibilityState = LocalAccessibilityState.current
 
     Scaffold(
         topBar = {
@@ -125,7 +127,7 @@ fun AccessibilityScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = { /* TODO: Decrease text size */ },
+                            onClick = { accessibilityState.decreaseTextSize() },
                             modifier = Modifier.size(32.dp)
                         ) {
                             Text(
@@ -136,7 +138,7 @@ fun AccessibilityScreen(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { /* TODO: Increase text size */ },
+                            onClick = { accessibilityState.increaseTextSize() },
                             modifier = Modifier.size(32.dp)
                         ) {
                             Text(
@@ -199,8 +201,8 @@ fun AccessibilityScreen(
                 label = "Bold",
                 action = {
                     Switch(
-                        checked = isBoldEnabled,
-                        onCheckedChange = { isBoldEnabled = it },
+                        checked = accessibilityState.isBoldEnabled,
+                        onCheckedChange = { checked -> accessibilityState.setBold(checked)},
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
                             checkedTrackColor = Color(0xFF6B4D8A),
