@@ -21,6 +21,11 @@ import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.google.android.gms.location.LocationResult
 
+import android.util.Log
+import com.example.campusguide.databinding.ActivityMapsBinding
+import com.example.campusguide.ui.map.utils.BuildingLocator
+import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
+import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
+import org.json.JSONObject
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
@@ -41,6 +47,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
     private var userMarker: Marker? = null
+
 
 
 
@@ -90,7 +97,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             strokeColor = 0xFF4d0000.toInt(),
             strokeWidth = 2f,
             zIndex = 10f,
-            clickable = true,
+            clickable = false,
             visible = true,
              markerColor = 0xFF974949.toInt(),
              markerAlpha = 1f,
@@ -184,4 +191,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
+
+
+
 }
