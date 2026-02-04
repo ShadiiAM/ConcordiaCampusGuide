@@ -206,34 +206,11 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
-
+        // attachToMap parses GeoJSON and adds polygons/markers to the map.
+        // Must run on the main thread because GoogleMap mutation methods require it.
         sgwOverlay.attachToMap(mMap)
         loyOverlay.attachToMap(mMap)
-        val defaultStyle = GeoJsonStyle(
-            fillColor = 0x80ff8a8a.toInt(),
-            strokeColor = 0xFF4d0000.toInt(),
-            strokeWidth = 2f,
-            zIndex = 10f,
-            clickable = false,
-            visible = true,
-            markerColor = 0xFF974949.toInt(),
-            markerAlpha = 1f,
-            markerScale = 2f
-        )
-        sgwOverlay.setAllStyles(defaultStyle)
-        loyOverlay.setAllStyles(defaultStyle)
-
-        // Show only the initially selected campus, hide the other
-        when (savedCampus) {
-            Campus.SGW -> {
-                sgwOverlay.setVisibleAll(true)
-                loyOverlay.setVisibleAll(false)
-            }
-            Campus.LOYOLA -> {
-                loyOverlay.setVisibleAll(true)
-                sgwOverlay.setVisibleAll(false)
-            }
-        }
+        initializeOverlays(savedCampus)
 
         //Add a marker at User Position
 
