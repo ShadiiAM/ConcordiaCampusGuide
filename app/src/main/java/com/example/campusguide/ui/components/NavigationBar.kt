@@ -27,12 +27,6 @@ fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
     content: (@Composable (Modifier) -> Unit)? = null
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        content?.invoke(
-            Modifier
-                .fillMaxSize()
-        )
-    }
 
     NavigationSuiteScaffold(
         containerColor = Color.Transparent,
@@ -59,6 +53,13 @@ fun NavigationBar(
             }
         }
     )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        content?.invoke(
+            Modifier
+                .fillMaxSize()
+        )
+    }
 }
 
 

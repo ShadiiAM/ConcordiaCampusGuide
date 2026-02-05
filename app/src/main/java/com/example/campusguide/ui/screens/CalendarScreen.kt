@@ -39,131 +39,117 @@ import com.example.campusguide.ui.theme.PurpleGrey80
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalendarScreen(
-){
-
+fun CalendarScreen() {
     var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
+
     val context = LocalContext.current
 
-    NavigationBar(currentDestination, {
+    Box(modifier = Modifier.fillMaxSize().padding(top =25.dp)) {
 
-        Column(
+
+        SearchBarWithProfile(
+            onSearchQueryChange = { /* TODO: Handle search query */ },
+            onProfileClick = { showProfile = true }
+        )
+        // 1️⃣ Background
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top =25.dp)
+                .background(Color.Transparent)
+        )
+
+        // 2️⃣ Calendar content (drawn above background)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top=620.dp), //look for Better way soon
+            horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
-            SearchBarWithProfile(
-                onSearchQueryChange = { /* TODO: Handle search query */ },
-                onProfileClick = { showProfile = true }
-            )
-            Column(
+            // Example calendar box
+            Box(
                 modifier = Modifier
-                    .fillMaxSize().background(Color.White),
-                verticalArrangement = Arrangement.Bottom
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .border(
+                        width = 6.dp,
+                        color = PurpleGrey80,
+                        shape = RoundedCornerShape(60.dp)
+                    )
+                    .background(Color.White, shape = RoundedCornerShape(60.dp))
+                    .padding(top = 20.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .border(
-                            width = 6.dp,
-                            color = PurpleGrey80,
-                            shape = RoundedCornerShape(60.dp) // rounded corners
-                        )
-                        .background(Color.White, shape = RoundedCornerShape(60.dp))
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(top = 15.dp)
-                ) {
-                    Column(
-                    ){
-
-                        //Row 1
-
-                        Row(modifier = Modifier
-                            .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.Top
-                        ) {
-                            Text("< ", fontSize = 35.sp)
-
-                            Text("5 Feb", fontSize = 35.sp)
-
-                            Text(" >", fontSize = 35.sp)
-
-                        }
-
-                        //Row 2
-
-                        Row(modifier = Modifier
-                            .fillMaxWidth().padding(top = 20.dp),
-                            horizontalArrangement = Arrangement.Center) {
-
-                            Button(
-                                onClick = { /* handle click */ },
-                                modifier = Modifier
-                                    .height(24.dp).defaultMinSize(minHeight = 1.dp),
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                                shape = RoundedCornerShape(
-                                    topStart = 16.dp,
-                                    bottomStart = 16.dp,
-                                    topEnd = 5.dp,
-                                    bottomEnd = 5.dp
-                                ),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = PurpleGrey80, // background color
-                                    contentColor = Color.Black // text color
-                                )
-                            ) {
-                                Text(text = "Daily", fontSize = 15.sp) // label
-
-                            }
-
-                            Button(
-                                modifier = Modifier
-                                .height(24.dp)
-                                .defaultMinSize(minHeight = 1.dp)
-                                .padding(horizontal = 2.dp),
-
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-
-                                onClick = { /* handle click */ },
-                                shape = RoundedCornerShape(5.dp), // rounded corners
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = PurpleGrey80, // background color
-                                    contentColor = Color.Black // text color
-                                )
-                            ) {
-                                Text(text = "Weekly", fontSize = 15.sp) // label
-                            }
-
-                            Button(
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .defaultMinSize(minHeight = 1.dp),
-
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-
-                                onClick = { /* handle click */ },
-                                shape = RoundedCornerShape(
-                                    topStart = 5.dp,
-                                    bottomStart = 5.dp,
-                                    topEnd = 16.dp,
-                                    bottomEnd = 16.dp
-                                ),                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = PurpleGrey80, // background color
-                                    contentColor = Color.Black // text color
-                                )
-                            ) {
-                                Text(text = "Monthly", fontSize = 15.sp) // label
-                            }
-
-                        }
-
-                    }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                //Row 1
+                Row(modifier = Modifier .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top ) {
+                    Text("< ", fontSize = 35.sp)
+                    Text("5 Feb", fontSize = 35.sp)
+                    Text(" >", fontSize = 35.sp)
                 }
+                //Row 2
+                Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
+                    Button(
+                        onClick = { /* handle click */ },
+                        modifier = Modifier
+                            .height(24.dp)
+                            .defaultMinSize(minHeight = 1.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 16.dp,
+                            bottomStart = 16.dp,
+                            topEnd = 5.dp,
+                            bottomEnd = 5.dp ),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PurpleGrey80, // background color
+                            contentColor = Color.Black)
+                    )
+                    {
+                        Text(text = "Daily", fontSize = 15.sp)
+                    }
+
+                    Button( modifier = Modifier
+                        .height(24.dp)
+                        .defaultMinSize(minHeight = 1.dp)
+                        .padding(horizontal = 2.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                        onClick = { /* handle click */ },
+                        shape = RoundedCornerShape(5.dp),
+                        colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
+                            contentColor = Color.Black ) )
+                    {
+                        Text(
+                            text = "Weekly",
+                            fontSize = 15.sp
+                        )
+                    }
+
+                    Button(
+                        onClick = { /* handle click */ },
+                        modifier = Modifier
+                            .height(24.dp)
+                            .defaultMinSize(minHeight = 1.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 5.dp,
+                            bottomStart = 5.dp,
+                            topEnd = 16.dp,
+                            bottomEnd = 16.dp ),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PurpleGrey80, // background color
+                            contentColor = Color.Black)
+                    )
+                    {
+                        Text(text = "Monthly", fontSize = 15.sp)
+                    }
+                }}
             }
-        }})
+        }
+
+        // 3️⃣ Bottom navigation (drawn last → on top)
+        NavigationBar(currentDestination)
+    }
 }
 
 @Preview(showBackground = true)
