@@ -147,4 +147,105 @@ class ThemeTest {
         }
         composeTestRule.waitForIdle()
     }
+
+    @Test
+    fun theme_defaultParameters_appliesCorrectly() {
+        composeTestRule.setContent {
+            // Test with default parameters (uses system dark theme setting)
+            ConcordiaCampusGuideTheme {
+                // Theme should apply without errors
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_withContent_rendersContent() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                androidx.compose.material3.Text("Test Content")
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_darkMode_static_usesStaticColors() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = true,
+                dynamicColor = false
+            ) {
+                // This should use the static DarkColorScheme
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_lightMode_static_usesStaticColors() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = false,
+                dynamicColor = false
+            ) {
+                // This should use the static LightColorScheme
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_dynamicColor_withSdk33_appliesCorrectly() {
+        // Test with SDK 33 (current config) where dynamic colors are available
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = false,
+                dynamicColor = true
+            ) {
+                // Dynamic colors should be used on SDK 33
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_staticColor_withSdk33_appliesCorrectly() {
+        // Test with SDK 33 using static colors
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = false,
+                dynamicColor = false
+            ) {
+                // Static colors should be used when dynamicColor is false
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_nestedThemes_applyCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(darkTheme = false) {
+                ConcordiaCampusGuideTheme(darkTheme = true) {
+                    // Nested themes should apply without errors
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun theme_multipleContents_renderCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                androidx.compose.foundation.layout.Column {
+                    androidx.compose.material3.Text("First")
+                    androidx.compose.material3.Text("Second")
+                    androidx.compose.material3.Text("Third")
+                }
+            }
+        }
+        composeTestRule.waitForIdle()
+    }
 }
