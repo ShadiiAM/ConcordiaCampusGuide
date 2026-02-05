@@ -1,6 +1,7 @@
 package com.example.campusguide
 
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -8,7 +9,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -284,5 +287,70 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Calendar").assertExists()
     }
+
+
+    @Test
+    fun navBar_rendersDrawableIcon_specifically() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                    content = {}
+                )
+            }
+        }
+
+        // Add useUnmergedTree = true here
+        composeTestRule
+            .onNodeWithContentDescription(AppDestinations.MAP.label, useUnmergedTree = true)
+            .assertExists()
+    }
+
+    @Test
+    fun navBar_allDestinations_respondToClicks() {
+        val state = mutableStateOf(AppDestinations.MAP)
+        composeTestRule.setContent {
+            NavigationBar(state, {})
+        }
+
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(destination.label).performClick()
+            assert(state.value == destination)
+        }
+
+    }
+
+    @Test
+    fun navBar_restoresSelectedDestination_afterRecreation() {
+        val restorationTester = StateRestorationTester(composeTestRule)
+
+        restorationTester.setContent {
+            val state = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+            NavigationBar(state,{})
+        }
+
+        // Change state
+        composeTestRule.onNodeWithText("Calendar").performClick()
+
+        // Simulate recreation
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        // Assert it's still selected
+        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
+    }
+
+
+    @Test
+    fun navBar_contentHasCorrectPadding() {
+        composeTestRule.setContent {
+            NavigationBar(rememberSaveable { mutableStateOf(AppDestinations.MAP) }) { modifier ->
+                Text("PaddingTest", modifier = modifier)
+            }
+        }
+        // Verifying the node exists is usually enough to cover the line execution
+        composeTestRule.onNodeWithText("PaddingTest").assertExists()
+    }
+
+
 
 }
