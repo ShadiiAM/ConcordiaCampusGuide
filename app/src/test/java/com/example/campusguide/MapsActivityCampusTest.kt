@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.UiSettings
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
@@ -67,7 +68,7 @@ class MapsActivityCampusTest {
             .thenReturn(mock(Polygon::class.java, withSettings().lenient()))
         `when`(mockMap.addPolyline(any(PolylineOptions::class.java)))
             .thenReturn(mock(Polyline::class.java, withSettings().lenient()))
-        // moveCamera/animateCamera are void — lenient mock does nothing by default
+        `when`(mockMap.uiSettings).thenReturn(mock(UiSettings::class.java, withSettings().lenient()))
         return mockMap
     }
 
