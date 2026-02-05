@@ -8,6 +8,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import org.json.JSONObject
 import org.junit.After
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -463,5 +466,311 @@ class GeoJsonOverlayTest {
         // Now reapply styles from stored properties; should set strokeWidth=9f
         overlay.reapplyPropertiesStyles()
         verify(poly, atLeastOnce()).strokeWidth = eq(9f)
+    }
+
+    @Test
+    fun getBuildings_returnsPolygonsMap() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        val marker = mock<Marker>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+        whenever(map.addMarker(any())).thenReturn(marker)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        val buildings = overlay.getBuildings()
+
+        assertNotNull(buildings)
+        assertTrue(buildings.isNotEmpty())
+        assertTrue(buildings.containsKey("68"))
+    }
+
+    @Test
+    fun getBuildingProps_returnsPropertiesMap() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        val marker = mock<Marker>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+        whenever(map.addMarker(any())).thenReturn(marker)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        val props = overlay.getBuildingProps()
+
+        assertNotNull(props)
+        assertTrue(props.isNotEmpty())
+    }
+
+    @Test
+    fun attachToMap_withPolygonHoles_parsesCorrectly() {
+        val geoJsonWithHoles = JSONObject("""
+        {
+          "type":"FeatureCollection",
+          "features":[{
+            "type":"Feature",
+            "properties":{"building-name":"WithHole"},
+            "geometry":{
+              "type":"Polygon",
+              "coordinates":[
+                [[-73.0,45.0],[-73.0,45.1],[-73.1,45.1],[-73.1,45.0],[-73.0,45.0]],
+                [[-73.02,45.02],[-73.02,45.08],[-73.08,45.08],[-73.08,45.02],[-73.02,45.02]]
+              ]
+            },
+            "id":"hole-building"
+          }]
+        }
+        """.trimIndent())
+
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithHoles)
+
+        verify(map, times(1)).addPolygon(any())
+    }
+
+    @Test
+    fun attachToMap_withEmptyFeatures_doesNotCrash() {
+        val emptyGeoJson = JSONObject("""{"type":"FeatureCollection","features":[]}""")
+
+        val map = mock<GoogleMap>()
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, emptyGeoJson)
+
+        verify(map, never()).addPolygon(any())
+        verify(map, never()).addMarker(any())
+    }
+
+    @Test
+    fun attachToMap_withMissingFeaturesArray_doesNotCrash() {
+        val noFeaturesGeoJson = JSONObject("""{"type":"FeatureCollection"}""")
+
+        val map = mock<GoogleMap>()
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, noFeaturesGeoJson)
+
+        verify(map, never()).addPolygon(any())
+        verify(map, never()).addMarker(any())
+    }
+
+    @Test
+    fun setStyleForFeature_nonExistentFeature_doesNotCrash() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        val style = GeoJsonStyle(fillColor = 0xFFFF0000.toInt())
+
+        // Should not crash when feature doesn't exist
+        overlay.setStyleForFeature("non-existent-id", style)
+    }
+
+    @Test
+    fun removeFeature_nonExistentFeature_doesNotCrash() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        // Should not crash when feature doesn't exist
+        overlay.removeFeature("non-existent-id")
+    }
+
+    @Test
+    fun setMarkerVisible_nonExistentMarker_doesNotCrash() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        // Should not crash when marker doesn't exist
+        overlay.setMarkerVisible("non-existent-id", false)
+    }
+
+    @Test
+    fun setBuildingVisible_nonExistentBuilding_doesNotCrash() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        // Should not crash when building doesn't exist
+        overlay.setBuildingVisible("non-existent-id", false)
+    }
+
+    @Test
+    fun attachToMap_withLargeMarkerSize_appliesCorrectScale() {
+        val geoJsonLargeMarker = JSONObject("""
+        {
+          "type":"FeatureCollection",
+          "features":[{
+            "type":"Feature",
+            "properties":{
+              "building-name":"LargeMarker",
+              "marker-color":"#FF0000",
+              "marker-size":"large"
+            },
+            "geometry":{
+              "type":"Point",
+              "coordinates":[-73.05,45.05]
+            },
+            "id":"large-marker"
+          }]
+        }
+        """.trimIndent())
+
+        val map = mock<GoogleMap>()
+        val marker = mock<Marker>()
+        whenever(map.addMarker(any())).thenReturn(marker)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonLargeMarker)
+
+        verify(map, times(1)).addMarker(any())
+        verify(marker, atLeastOnce()).setIcon(any())
+    }
+
+    @Test
+    fun attachToMap_withMediumMarkerSize_appliesDefaultScale() {
+        val geoJsonMediumMarker = JSONObject("""
+        {
+          "type":"FeatureCollection",
+          "features":[{
+            "type":"Feature",
+            "properties":{
+              "building-name":"MediumMarker",
+              "marker-color":"#00FF00",
+              "marker-size":"medium"
+            },
+            "geometry":{
+              "type":"Point",
+              "coordinates":[-73.05,45.05]
+            },
+            "id":"medium-marker"
+          }]
+        }
+        """.trimIndent())
+
+        val map = mock<GoogleMap>()
+        val marker = mock<Marker>()
+        whenever(map.addMarker(any())).thenReturn(marker)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonMediumMarker)
+
+        verify(map, times(1)).addMarker(any())
+    }
+
+    @Test
+    fun attachToMap_pointWithoutBuildingName_usesNullTitle() {
+        val geoJsonNoTitle = JSONObject("""
+        {
+          "type":"FeatureCollection",
+          "features":[{
+            "type":"Feature",
+            "properties":{
+              "marker-color":"#0000FF"
+            },
+            "geometry":{
+              "type":"Point",
+              "coordinates":[-73.05,45.05]
+            },
+            "id":"no-title-marker"
+          }]
+        }
+        """.trimIndent())
+
+        val map = mock<GoogleMap>()
+        val marker = mock<Marker>()
+        whenever(map.addMarker(any())).thenReturn(marker)
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonNoTitle)
+
+        verify(map, times(1)).addMarker(any())
+    }
+
+    @Test
+    fun stableIdFor_usesPropertyIdFirst() {
+        val geoJsonWithPropertyId = JSONObject("""
+        {
+          "type":"FeatureCollection",
+          "features":[{
+            "type":"Feature",
+            "properties":{
+              "building-name":"PropertyIdBuilding"
+            },
+            "geometry":{
+              "type":"Polygon",
+              "coordinates":[[[-73.0,45.0],[-73.0,45.1],[-73.1,45.1],[-73.1,45.0],[-73.0,45.0]]]
+            },
+            "id":"feature-level-id"
+          }]
+        }
+        """.trimIndent())
+
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        whenever(map.addPolygon(any())).thenReturn(poly)
+
+        val overlay = GeoJsonOverlay(ctx, idPropertyName = "building-name")
+        overlay.attachToMap(map, geoJsonWithPropertyId)
+
+        val buildings = overlay.getBuildings()
+        assertTrue("Should use property id", buildings.containsKey("PropertyIdBuilding"))
+    }
+
+    @Test
+    fun attachToMap_nullGeoJsonRes_throwsWhenNoJsonProvided() {
+        val overlay = GeoJsonOverlay(ctx, geoJsonRawRes = null)
+        val map = mock<GoogleMap>()
+
+        try {
+            overlay.attachToMap(map)
+            fail("Should throw IllegalStateException")
+        } catch (e: IllegalStateException) {
+            assertTrue(e.message?.contains("Provide JSONObject or raw resource id") == true)
+        }
+    }
+
+    @Test
+    fun setFillOpacityForAll_withNegativeOpacity_clampsToZero() {
+        val map = mock<GoogleMap>()
+        val poly = mock<Polygon>()
+        val marker = mock<Marker>()
+
+        whenever(map.addPolygon(any())).thenReturn(poly)
+        whenever(map.addMarker(any())).thenReturn(marker)
+        whenever(poly.fillColor).thenReturn(0xFF112233.toInt())
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, geoJsonWithOnePolygonAndOnePoint())
+
+        overlay.setFillOpacityForAll(-1f)
+        verify(poly, atLeastOnce()).fillColor = eq(0x00112233)
+    }
+
+    @Test
+    fun reapplyPropertiesStyles_withNoPolygons_doesNotCrash() {
+        val map = mock<GoogleMap>()
+
+        val overlay = GeoJsonOverlay(ctx)
+        overlay.attachToMap(map, JSONObject("""{"type":"FeatureCollection","features":[]}"""))
+
+        // Should not crash
+        overlay.reapplyPropertiesStyles()
     }
 }
