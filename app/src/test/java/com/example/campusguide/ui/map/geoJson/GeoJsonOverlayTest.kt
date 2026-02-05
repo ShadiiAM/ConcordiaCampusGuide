@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets
 class GeoJsonOverlayTest {
 
     private lateinit var ctx: Context
+    private lateinit var fakeBitmapDescriptor: BitmapDescriptor
 
     private var bitmapFactoryStatic: MockedStatic<BitmapDescriptorFactory>? = null
 
@@ -37,10 +38,12 @@ class GeoJsonOverlayTest {
         ctx = ApplicationProvider.getApplicationContext()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
+        // Create mock descriptor once and reuse to avoid Mockito state issues
+        fakeBitmapDescriptor = mock<BitmapDescriptor>()
+
         // Use MarkerIconFactory hooks instead of static mocks to avoid conflicts
-        val fakeDescriptor = mock<BitmapDescriptor>()
-        MarkerIconFactory.bitmapToDescriptor = { fakeDescriptor }
-        MarkerIconFactory.defaultMarker = { fakeDescriptor }
+        MarkerIconFactory.bitmapToDescriptor = { fakeBitmapDescriptor }
+        MarkerIconFactory.defaultMarker = { fakeBitmapDescriptor }
     }
 
     @After
