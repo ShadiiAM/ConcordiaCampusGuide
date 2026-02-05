@@ -5,6 +5,16 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
+    id("org.sonarqube")
+}
+
+sonar {
+    properties {
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+    }
 }
 
 android {

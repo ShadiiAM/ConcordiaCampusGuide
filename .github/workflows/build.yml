@@ -62,6 +62,16 @@ jobs:
         with:
           name: jacoco-report
           path: app/build/reports/jacoco/
+      - name: Debug Sonar Paths
+        run: |
+          echo "=== Checking class files ==="
+          find app/build -name "*.class" -path "*debug*" | head -30
+          echo ""
+          echo "=== JaCoCo XML Report ==="
+          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          echo ""
+          echo "=== Sample coverage from report ==="
+          grep -A5 'sourcefilename="MainActivity.kt"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -20 || echo "MainActivity not found in report"
       - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

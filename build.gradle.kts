@@ -15,9 +15,8 @@ sonar {
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
 
-        // JaCoCo coverage report - explicit path
+        // JaCoCo coverage
         property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
 
         // JUnit test results
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
@@ -28,16 +27,6 @@ sonar {
         // Exclusions
         property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
         property("sonar.coverage.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/*Test*.*")
-    }
-}
-
-// Configure sonar for app module specifically
-subprojects {
-    sonar {
-        properties {
-            property("sonar.coverage.jacoco.xmlReportPaths", "${projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-            property("sonar.java.binaries", "${projectDir}/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
-        }
     }
 }
 
