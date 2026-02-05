@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.accessibility.rememberAccessibilityState
@@ -53,10 +54,13 @@ class MainActivity : ComponentActivity() {
                 LocalAccessibilityState provides accessibilityState
             ) {
                 ConcordiaCampusGuideTheme {
-                    ConcordiaCampusGuideApp()
+                    AccessibleAppRoot() {
+                        ConcordiaCampusGuideApp()
+                    }
                 }
             }
         }
+
     }
 }
 

@@ -10,10 +10,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 // Small holder for the global text-size offset
-class AccessibilityState(
-    initialOffsetSp: Float = 0f,
-    initialBoldEnabled: Boolean = false,
-    initialTextColor: Color = Color.Unspecified
+data class AccessibilityState(
+    var initialOffsetSp: Float = 0f,
+    var initialBoldEnabled: Boolean = false,
+    var initialTextColor: Color = Color.Unspecified,
+    var colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
 
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
@@ -40,6 +41,18 @@ class AccessibilityState(
     }
 
     fun updateTextColor(color: Color) { textColor = color }
+
+    fun isColorFilterEnabled(): Boolean {
+        return colorBlindMode != ColorBlindMode.NONE
+    }
+
+    fun changeColorBlindMode() {
+        colorBlindMode = if (colorBlindMode == ColorBlindMode.NONE){
+            ColorBlindMode.HIGH_CONTRAST
+        } else {
+            ColorBlindMode.NONE
+        }
+    }
 }
 
 // CompositionLocal to access it from any composable
@@ -55,4 +68,9 @@ fun rememberAccessibilityState(
     initialTextColor: Color = Color.Unspecified
 ): AccessibilityState = remember {
     AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor)
+}
+
+enum class ColorBlindMode {
+    NONE,
+    HIGH_CONTRAST
 }

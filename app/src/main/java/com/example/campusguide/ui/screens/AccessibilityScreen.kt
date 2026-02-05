@@ -2,6 +2,7 @@ package com.example.campusguide.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -163,6 +164,7 @@ fun AccessibilityScreen(
                 },
                 label = "AccessibleText colour",
                 action = {
+                    var enabled by remember { mutableStateOf(accessibilityState.isColorFilterEnabled()) }
                     Box(
                         modifier = Modifier
                             .size(28.dp)
@@ -171,14 +173,20 @@ fun AccessibilityScreen(
                                 width = 2.dp,
                                 color = Color(0xFF6B4D8A),
                                 shape = RoundedCornerShape(4.dp)
-                            ),
+                            )
+                        .background(
+                            if (enabled) Color(0xFF6B4D8A) else Color.White
+                        )
+                        .clickable {
+                            accessibilityState.changeColorBlindMode()
+                        },
                         contentAlignment = Alignment.Center
                     ) {
                         AccessibleText(
                             text = "A",
                             baseFontSizeSp = 16f,
-                        //    fontWeight = FontWeight.Bold,
-                            fallbackColor = Color(0xFF6B4D8A)
+                            forceFontWeight = FontWeight.Bold,
+                            fallbackColor = if (enabled) Color.White else Color(0xFF6B4D8A)
                         )
                     }
                 }
