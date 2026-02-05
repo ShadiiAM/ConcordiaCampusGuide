@@ -49,18 +49,20 @@ class MapsActivityCampusTest {
             .edit().clear().apply()
 
         // Close any existing static mock before creating a new one
-        bitmapFactoryStatic?.close()
-
-        // Clear any leftover static mocks from other test classes
         try {
-            framework().clearInlineMocks()
+            bitmapFactoryStatic?.close()
         } catch (e: Exception) {
-            // Ignore if clearInlineMocks fails
+            // Ignore close errors
         }
 
-        bitmapFactoryStatic = mockStatic(BitmapDescriptorFactory::class.java).also { st ->
-            st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
-                .thenReturn(mock(BitmapDescriptor::class.java))
+        // If static mock creation fails (already exists), skip it
+        try {
+            bitmapFactoryStatic = mockStatic(BitmapDescriptorFactory::class.java).also { st ->
+                st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
+                    .thenReturn(mock(BitmapDescriptor::class.java))
+            }
+        } catch (e: Exception) {
+            // Static mock already exists from another test - that's okay
         }
     }
 
@@ -739,6 +741,10 @@ class MapsActivityCampusTest {
         } catch (e: Exception) {
             // Acceptable - coroutine may fail in test environment
         }
+
+        // Grant permissions using Robolectric shadow API
+        org.robolectric.Shadows.shadowOf(activity.application)
+            .grantPermissions(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
         // Simulate permission granted
         activity.onRequestPermissionsResult(

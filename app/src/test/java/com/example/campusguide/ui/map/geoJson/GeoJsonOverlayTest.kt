@@ -40,18 +40,21 @@ class GeoJsonOverlayTest {
         val fakeDescriptor = mock<BitmapDescriptor>()
 
         // Close any existing static mock before creating a new one
-        bitmapFactoryStatic?.close()
-
-        // Clear any leftover static mocks from other test classes
         try {
-            Mockito.framework().clearInlineMocks()
+            bitmapFactoryStatic?.close()
         } catch (e: Exception) {
-            // Ignore if clearInlineMocks fails
+            // Ignore close errors
         }
 
-        bitmapFactoryStatic = Mockito.mockStatic(BitmapDescriptorFactory::class.java).also { st ->
-            st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
-                .thenReturn(fakeDescriptor)
+        // If static mock creation fails (already exists), use the existing one
+        try {
+            bitmapFactoryStatic = Mockito.mockStatic(BitmapDescriptorFactory::class.java).also { st ->
+                st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
+                    .thenReturn(fakeDescriptor)
+            }
+        } catch (e: Exception) {
+            // Static mock already exists from another test - use MarkerIconFactory hooks instead
+            MarkerIconFactory.bitmapToDescriptor = { fakeDescriptor }
         }
     }
 
