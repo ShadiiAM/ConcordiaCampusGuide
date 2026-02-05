@@ -23,7 +23,7 @@ sonar {
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
 
         // Android lint report
-        property("sonar.android.lint.report", "app/build/reports/lint-results-debug.xml")
+        property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
 
         // Exclusions
         property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
