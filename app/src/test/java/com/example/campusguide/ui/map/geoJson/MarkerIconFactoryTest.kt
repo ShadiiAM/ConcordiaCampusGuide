@@ -300,4 +300,53 @@ class MarkerIconFactoryTest {
         val bmp = requireNotNull(captured)
         assertEquals(Bitmap.Config.ARGB_8888, bmp.config)
     }
+
+    @Test
+    fun create_cacheHit_returnsSameDescriptorWithoutCreatingNewBitmap() {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        var bitmapCreationCount = 0
+        val fakeDesc = fakeDescriptor()
+
+        MarkerIconFactory.bitmapToDescriptor = { _ ->
+            bitmapCreationCount++
+            fakeDesc
+        }
+
+        // First call - creates bitmap
+        val result1 = MarkerIconFactory.create(ctx, color = 0xFFFF0000.toInt(), scale = 1.5f, alpha = 0.8f)
+        assertEquals(1, bitmapCreationCount)
+        assertSame(fakeDesc, result1)
+
+        // Second call with same params - should return cached descriptor
+        val result2 = MarkerIconFactory.create(ctx, color = 0xFFFF0000.toInt(), scale = 1.5f, alpha = 0.8f)
+        assertEquals(1, bitmapCreationCount) // No new bitmap created
+        assertSame(result1, result2) // Same descriptor returned
+    }
+
+    @Test
+    fun create_cacheMiss_createsBitmapWhenParamsChange() {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        var bitmapCreationCount = 0
+
+        MarkerIconFactory.bitmapToDescriptor = { _ ->
+            bitmapCreationCount++
+            fakeDescriptor()
+        }
+
+        // First call
+        MarkerIconFactory.create(ctx, color = 0xFFFF0000.toInt(), scale = 1.5f, alpha = 0.8f)
+        assertEquals(1, bitmapCreationCount)
+
+        // Second call with different color - should create new bitmap
+        MarkerIconFactory.create(ctx, color = 0xFF00FF00.toInt(), scale = 1.5f, alpha = 0.8f)
+        assertEquals(2, bitmapCreationCount)
+
+        // Third call with different scale - should create new bitmap
+        MarkerIconFactory.create(ctx, color = 0xFFFF0000.toInt(), scale = 2.0f, alpha = 0.8f)
+        assertEquals(3, bitmapCreationCount)
+
+        // Fourth call with different alpha - should create new bitmap
+        MarkerIconFactory.create(ctx, color = 0xFFFF0000.toInt(), scale = 1.5f, alpha = 1.0f)
+        assertEquals(4, bitmapCreationCount)
+    }
 }

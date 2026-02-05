@@ -39,6 +39,16 @@ class GeoJsonOverlayTest {
 
         val fakeDescriptor = mock<BitmapDescriptor>()
 
+        // Close any existing static mock before creating a new one
+        bitmapFactoryStatic?.close()
+
+        // Clear any leftover static mocks from other test classes
+        try {
+            Mockito.framework().clearInlineMocks()
+        } catch (e: Exception) {
+            // Ignore if clearInlineMocks fails
+        }
+
         bitmapFactoryStatic = Mockito.mockStatic(BitmapDescriptorFactory::class.java).also { st ->
             st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
                 .thenReturn(fakeDescriptor)
@@ -772,5 +782,206 @@ class GeoJsonOverlayTest {
 
         // Should not crash
         overlay.reapplyPropertiesStyles()
+    }
+
+    // ==================== attachToMapAsync tests ====================
+
+    @Test
+    fun attachToMapAsync_withPolygonPointAndMultiPolygon_addsAllFeatures() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>(defaultAnswer = org.mockito.Mockito.RETURNS_DEEP_STUBS)
+            val poly1 = mock<Polygon>()
+            val marker = mock<Marker>()
+            val mp1 = mock<Polygon>()
+            val mp2 = mock<Polygon>()
+
+            whenever(map.addPolygon(any())).thenReturn(poly1, mp1, mp2)
+            whenever(map.addMarker(any())).thenReturn(marker)
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, geoJsonWithPolygonPointAndMultiPolygon())
+
+            verify(map, times(3)).addPolygon(any())
+            verify(map, times(1)).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withEmptyFeatures_addsNothing() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val emptyGeoJson = JSONObject("""{"type":"FeatureCollection","features":[]}""")
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, emptyGeoJson)
+
+            verify(map, never()).addPolygon(any())
+            verify(map, never()).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withMissingFeatures_returnsImmediately() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val noFeaturesGeoJson = JSONObject("""{"type":"FeatureCollection"}""")
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, noFeaturesGeoJson)
+
+            verify(map, never()).addPolygon(any())
+            verify(map, never()).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withPointHavingLessThanTwoCoords_skipsPoint() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val badPointGeoJson = JSONObject("""
+            {
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{"marker-color":"#FF0000"},
+                "geometry":{"type":"Point","coordinates":[-73.0]},
+                "id":"bad-point"
+              }]
+            }
+            """.trimIndent())
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, badPointGeoJson)
+
+            verify(map, never()).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withPointWithoutTitle_addsMarkerWithNullTitle() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val marker = mock<Marker>()
+            whenever(map.addMarker(any())).thenReturn(marker)
+
+            val pointNoTitle = JSONObject("""
+            {
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{"marker-color":"#0000FF"},
+                "geometry":{"type":"Point","coordinates":[-73.05,45.05]},
+                "id":"no-title"
+              }]
+            }
+            """.trimIndent())
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, pointNoTitle)
+
+            verify(map, times(1)).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withPointWithTitle_addsMarkerWithTitle() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val marker = mock<Marker>()
+            whenever(map.addMarker(any())).thenReturn(marker)
+
+            val pointWithTitle = JSONObject("""
+            {
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{"building-name":"Test Building","marker-color":"#00FF00"},
+                "geometry":{"type":"Point","coordinates":[-73.05,45.05]},
+                "id":"with-title"
+              }]
+            }
+            """.trimIndent())
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, pointWithTitle)
+
+            verify(map, times(1)).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withMultiPolygon_addsMultiplePolygons() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val poly1 = mock<Polygon>()
+            val poly2 = mock<Polygon>()
+            whenever(map.addPolygon(any())).thenReturn(poly1, poly2)
+
+            val multiPolygonGeoJson = JSONObject("""
+            {
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{"fill":"#FF0000"},
+                "geometry":{
+                  "type":"MultiPolygon",
+                  "coordinates":[
+                    [[[-73.0,45.0],[-73.0,45.1],[-73.1,45.1],[-73.1,45.0],[-73.0,45.0]]],
+                    [[[-73.2,45.2],[-73.2,45.3],[-73.3,45.3],[-73.3,45.2],[-73.2,45.2]]]
+                  ]
+                },
+                "id":"multi-poly"
+              }]
+            }
+            """.trimIndent())
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, multiPolygonGeoJson)
+
+            verify(map, times(2)).addPolygon(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_withMissingGeometry_skipsFeature() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val missingGeometry = JSONObject("""
+            {
+              "type":"FeatureCollection",
+              "features":[{
+                "type":"Feature",
+                "properties":{"fill":"#FF0000"},
+                "id":"no-geometry"
+              }]
+            }
+            """.trimIndent())
+
+            val overlay = GeoJsonOverlay(ctx)
+            overlay.attachToMapAsync(map, missingGeometry)
+
+            verify(map, never()).addPolygon(any())
+            verify(map, never()).addMarker(any())
+        }
+    }
+
+    @Test
+    fun attachToMapAsync_clearsExistingFeaturesBeforeAdding() {
+        kotlinx.coroutines.runBlocking {
+            val map = mock<GoogleMap>()
+            val poly1 = mock<Polygon>()
+            val poly2 = mock<Polygon>()
+            whenever(map.addPolygon(any())).thenReturn(poly1, poly2)
+
+            val overlay = GeoJsonOverlay(ctx)
+
+            // First attach
+            overlay.attachToMapAsync(map, geoJsonWithOnePolygonAndOnePoint())
+            verify(poly1, atLeastOnce()).remove() // clear() is called
+
+            // Second attach
+            overlay.attachToMapAsync(map, geoJsonWithOnePolygonAndOnePoint())
+            // Verify clear was called again (existing features removed)
+        }
     }
 }

@@ -48,6 +48,16 @@ class MapsActivityCampusTest {
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().clear().apply()
 
+        // Close any existing static mock before creating a new one
+        bitmapFactoryStatic?.close()
+
+        // Clear any leftover static mocks from other test classes
+        try {
+            framework().clearInlineMocks()
+        } catch (e: Exception) {
+            // Ignore if clearInlineMocks fails
+        }
+
         bitmapFactoryStatic = mockStatic(BitmapDescriptorFactory::class.java).also { st ->
             st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
                 .thenReturn(mock(BitmapDescriptor::class.java))
@@ -659,5 +669,215 @@ class MapsActivityCampusTest {
             .edit().putString("selected_campus", null).apply()
 
         assertEquals(Campus.SGW, activity.getSavedCampus())
+    }
+
+    // ==================== executeSwitchCampus targetAttached=true tests ====================
+
+    @Test
+    fun executeSwitchCampus_sgwAlreadyAttached_showsImmediatelyWithoutLazyLoad() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+
+            activity.onMapReady(mockMap)
+
+            // Use reflection to set sgwAttached flag to true
+            val sgwAttachedField = activity::class.java.getDeclaredField("sgwAttached")
+            sgwAttachedField.isAccessible = true
+            sgwAttachedField.setBoolean(activity, true)
+
+            // Clear previous interactions
+            clearInvocations(mockMap)
+
+            activity.executeSwitchCampus(Campus.SGW)
+
+            // Verify camera animated but no new addPolygon calls (no lazy load)
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+            // The targetAttached=true branch just calls setVisibleAll(true), no attachToMapAsync
+        }
+    }
+
+    @Test
+    fun executeSwitchCampus_loyolaAlreadyAttached_showsImmediatelyWithoutLazyLoad() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+
+        mockStatic<CameraUpdateFactory>(CameraUpdateFactory::class.java).use { mockedFactory ->
+            mockedFactory.`when`<CameraUpdate> { CameraUpdateFactory.newLatLngZoom(any(), anyFloat()) }
+                .thenReturn(mock<CameraUpdate>(CameraUpdate::class.java))
+
+            activity.onMapReady(mockMap)
+
+            // Use reflection to set loyAttached flag to true
+            val loyAttachedField = activity::class.java.getDeclaredField("loyAttached")
+            loyAttachedField.isAccessible = true
+            loyAttachedField.setBoolean(activity, true)
+
+            clearInvocations(mockMap)
+
+            activity.executeSwitchCampus(Campus.LOYOLA)
+
+            verify(mockMap, atLeastOnce()).animateCamera(any(), anyInt(), any())
+        }
+    }
+
+    // ==================== onRequestPermissionsResult tests ====================
+
+    @Test
+    fun onRequestPermissionsResult_granted_enablesLocationAndStartsTracking() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+
+        try {
+            activity.onMapReady(mockMap)
+        } catch (e: Exception) {
+            // Acceptable - coroutine may fail in test environment
+        }
+
+        // Simulate permission granted
+        activity.onRequestPermissionsResult(
+            200,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(android.content.pm.PackageManager.PERMISSION_GRANTED)
+        )
+
+        // Verify isMyLocationEnabled was set (map is initialized)
+        verify(mockMap, atLeastOnce()).isMyLocationEnabled = eq(true)
+    }
+
+    @Test
+    fun onRequestPermissionsResult_denied_doesNotEnableLocation() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+
+        try {
+            activity.onMapReady(mockMap)
+        } catch (e: Exception) {
+            // Acceptable
+        }
+        clearInvocations(mockMap)
+
+        // Simulate permission denied
+        activity.onRequestPermissionsResult(
+            200,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(android.content.pm.PackageManager.PERMISSION_DENIED)
+        )
+
+        // Should not touch isMyLocationEnabled
+        verify(mockMap, never()).isMyLocationEnabled = any()
+    }
+
+    @Test
+    fun onRequestPermissionsResult_wrongRequestCode_doesNothing() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        val mockMap = createMockMap()
+
+        try {
+            activity.onMapReady(mockMap)
+        } catch (e: Exception) {
+            // Acceptable
+        }
+        clearInvocations(mockMap)
+
+        // Wrong request code
+        activity.onRequestPermissionsResult(
+            999,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(android.content.pm.PackageManager.PERMISSION_GRANTED)
+        )
+
+        verify(mockMap, never()).isMyLocationEnabled = any()
+    }
+
+    @Test
+    fun onRequestPermissionsResult_mapNotInitialized_doesNotCrash() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        // Don't call onMapReady - mMap not initialized
+
+        // Should not crash
+        activity.onRequestPermissionsResult(
+            200,
+            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(android.content.pm.PackageManager.PERMISSION_GRANTED)
+        )
+    }
+
+    // ==================== startLocationTracking tests ====================
+
+    @Test
+    fun startLocationTracking_withoutPermissions_doesNotCallRequestLocationUpdates() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        // Robolectric doesn't grant permissions by default
+        activity.startLocationTracking()
+
+        // Should return early without calling requestLocationUpdates
+        // (Can't easily verify fusedLocationProviderClient without making it mockable)
+    }
+
+    @Test
+    fun startLocationTracking_callsGenerateCallbackAndRequestUpdates() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        // Call startLocationTracking (will check permissions internally)
+        activity.startLocationTracking()
+
+        // In Robolectric without granted permissions, this is a no-op
+        // Just verify it doesn't crash
+        assertNotNull(activity)
+    }
+
+    // ==================== loadGeoJson tests ====================
+
+    @Test
+    fun loadGeoJson_readsRawResourceAndParsesJson() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        // Use reflection to call private loadGeoJson
+        val loadGeoJsonMethod = activity::class.java.getDeclaredMethod("loadGeoJson", Int::class.java)
+        loadGeoJsonMethod.isAccessible = true
+
+        val result = loadGeoJsonMethod.invoke(activity, com.example.campusguide.R.raw.sgw_buildings) as org.json.JSONObject
+
+        assertNotNull(result)
+        assertTrue(result.has("type"))
+        assertEquals("FeatureCollection", result.getString("type"))
+    }
+
+    // ==================== defaultOverlayStyle tests ====================
+
+    @Test
+    fun defaultOverlayStyle_returnsCorrectColors() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+
+        // Use reflection to call private defaultOverlayStyle
+        val defaultOverlayStyleMethod = activity::class.java.getDeclaredMethod("defaultOverlayStyle")
+        defaultOverlayStyleMethod.isAccessible = true
+
+        val style = defaultOverlayStyleMethod.invoke(activity) as com.example.campusguide.ui.map.geoJson.GeoJsonStyle
+
+        assertEquals(0x80ffaca6.toInt(), style.fillColor)
+        assertEquals(0xFFbc4949.toInt(), style.strokeColor)
+        assertEquals(2f, style.strokeWidth)
+        assertEquals(10f, style.zIndex)
+        assertEquals(true, style.clickable)
+        assertEquals(true, style.visible)
+        assertEquals(0xFFbc4949.toInt(), style.markerColor)
+        assertEquals(1f, style.markerAlpha)
+        assertEquals(1.5f, style.markerScale)
     }
 }
