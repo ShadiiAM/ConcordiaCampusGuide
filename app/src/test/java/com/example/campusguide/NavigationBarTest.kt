@@ -6,6 +6,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -130,6 +131,29 @@ class NavigationBarTest {
     }
 
     @Test
+    fun navBarEachDestinationCanBecomeSelected() {
+        val state = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(state, {})
+            }
+        }
+
+        composeTestRule.onNodeWithText("Calendar").performClick()
+        assert(state.value == AppDestinations.CALENDAR)
+
+        composeTestRule.onNodeWithText("Directions").performClick()
+        assert(state.value == AppDestinations.DIRECTIONS)
+
+        composeTestRule.onNodeWithText("POI").performClick()
+        assert(state.value == AppDestinations.POI)
+
+        composeTestRule.onNodeWithText("Map").performClick()
+        assert(state.value == AppDestinations.MAP)
+    }
+
+    @Test
     fun navBarWithDifferentCurrentDestination() {
         composeTestRule.setContent {
             NavigationBar(
@@ -194,4 +218,40 @@ class NavigationBarTest {
             .onNodeWithText("Directions")
             .assertIsSelected()
     }
+
+
+    @Test
+    fun navBarUnselectedItemsAreNotSelected() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
+                    {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Directions").assertIsSelected()
+        composeTestRule.onNodeWithText("Map").assertIsNotSelected()
+        composeTestRule.onNodeWithText("Calendar").assertIsNotSelected()
+        composeTestRule.onNodeWithText("POI").assertIsNotSelected()
+    }
+
+
+    @Test
+    fun navBar_clickingSameDestinationDoesNotCrash() {
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination, {})
+            }
+        }
+
+        composeTestRule.onNodeWithText("Map").performClick()
+        composeTestRule.onNodeWithText("Map").performClick()
+
+        assert(currentDestination.value == AppDestinations.MAP)
+    }
+
 }
