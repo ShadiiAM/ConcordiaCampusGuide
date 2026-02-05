@@ -75,6 +75,10 @@ tasks.withType<Test> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
     }
+
+    // Increase heap size to prevent OOM when running all tests
+    maxHeapSize = "4g"
+    jvmArgs("-XX:MaxMetaspaceSize=1g")
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
