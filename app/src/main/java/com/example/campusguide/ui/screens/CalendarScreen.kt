@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,9 +34,9 @@ import com.example.campusguide.AppDestinations
 import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
-import com.example.campusguide.ui.theme.Pink80
-import com.example.campusguide.ui.theme.Purple80
 import com.example.campusguide.ui.theme.PurpleGrey80
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,8 +44,36 @@ fun CalendarScreen() {
     var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
-
+    var viewMode = CalendarViewMode.DAILY
     val context = LocalContext.current
+
+
+        val date = remember { mutableStateOf(Calendar.getInstance()) }
+
+        fun formattedDate(viewMode: CalendarViewMode): String {
+        val c = date.value
+        val result: String
+
+            when (viewMode) {
+                CalendarViewMode.DAILY -> {
+                    val month = c.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                    val day = c.get(Calendar.DAY_OF_MONTH)
+                    result = "$month $day"
+                }
+                CalendarViewMode.WEEKLY -> {
+                    val month = c.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                    val start = c.get(Calendar.DAY_OF_MONTH)
+                    val endCal = (c.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 6) }
+                    val end = endCal.get(Calendar.DAY_OF_MONTH)
+                    result = "$month $start–$end"
+                }
+                else -> {
+                    result = c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) ?: ""
+                }
+            }
+
+        return result
+    }
 
     Box(modifier = Modifier.fillMaxSize().padding(top =25.dp)) {
 
@@ -85,13 +114,13 @@ fun CalendarScreen() {
                 //Row 1
                 Row(modifier = Modifier .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top ) {
                     Text("< ", fontSize = 35.sp)
-                    Text("5 Feb", fontSize = 35.sp)
+                    Text(formattedDate(viewMode ), fontSize = 35.sp)
                     Text(" >", fontSize = 35.sp)
                 }
                 //Row 2
                 Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
                     Button(
-                        onClick = { /* handle click */ },
+                        onClick = { viewMode = CalendarViewMode.DAILY },
                         modifier = Modifier
                             .height(24.dp)
                             .defaultMinSize(minHeight = 1.dp),
@@ -114,7 +143,7 @@ fun CalendarScreen() {
                         .defaultMinSize(minHeight = 1.dp)
                         .padding(horizontal = 2.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                        onClick = { /* handle click */ },
+                        onClick = { viewMode = CalendarViewMode.WEEKLY },
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
                             contentColor = Color.Black ) )
@@ -126,7 +155,7 @@ fun CalendarScreen() {
                     }
 
                     Button(
-                        onClick = { /* handle click */ },
+                        onClick = { viewMode = CalendarViewMode.MONTHLY },
                         modifier = Modifier
                             .height(24.dp)
                             .defaultMinSize(minHeight = 1.dp),
@@ -158,4 +187,8 @@ fun CalendarScreenPreview() {
     ConcordiaCampusGuideTheme {
         CalendarScreen()
     }
+}
+
+enum class CalendarViewMode {
+    DAILY, WEEKLY, MONTHLY
 }
