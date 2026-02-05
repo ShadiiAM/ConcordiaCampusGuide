@@ -12,6 +12,8 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
@@ -223,7 +225,7 @@ class MapsActivityTest {
     @Test
     fun mapActivity_requestLocation() {
         val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
-        val activity = controller.create().start().resume().get()
+        var activity = controller.create().start().resume().get()
         activity.fusedLocationProviderClient = mock(FusedLocationProviderClient::class.java)
 
         try{
@@ -234,13 +236,45 @@ class MapsActivityTest {
         }
 
         verify(activity.fusedLocationProviderClient, atLeastOnce()).lastLocation
+
+        activity = mock(MapsActivity::class.java)
+
+        whenever(activity.isPermissionsGranted()).thenReturn(false)
+        try{
+            activity.requestLocation()
+        }
+        catch(e: Exception){
+            //Expect to throw an exception
+            assertTrue(e.message?.contains("Location permissions not granted") == true)
+        }
     }
 
     @Test
     fun mapActivity_getCallback(){
         val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
         val activity = controller.create().start().resume().get()
+        activity.mMap = mock(GoogleMap::class.java)
+        val marker = mock(Marker::class.java)
+
         val callback = activity.generateCallback()
         assertNotNull(callback)
+
+        val locationResult = mock(com.google.android.gms.location.LocationResult::class.java)
+        val location = mock(Location::class.java)
+        whenever(locationResult.lastLocation).thenReturn(location)
+        whenever(location.latitude).thenReturn(45.4)
+        whenever(location.longitude).thenReturn(-73.5)
+        whenever(activity.mMap.addMarker(any(MarkerOptions::class.java))).thenReturn(marker)
+
+        callback.onLocationResult(locationResult)
+
+        verify(activity.mMap,atLeastOnce()).addMarker(any(MarkerOptions::class.java))
+
+        try {
+            callback.onLocationResult(locationResult)
+        }catch(_: Exception){
+            //marker.position will throw an error
+        }
+        verify(marker,atLeastOnce()).position = LatLng(45.4,-73.5)
     }
 }

@@ -35,13 +35,13 @@ import java.util.concurrent.TimeUnit
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var mMap: GoogleMap
+    lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     lateinit var callback: LocationCallback
 
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
-    private var userMarker: Marker? = null
+    var userMarker: Marker? = null
 
 
 
