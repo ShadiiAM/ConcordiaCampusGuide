@@ -109,7 +109,7 @@ enum class AppDestinations(
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
     DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
-    POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
+    POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
 }
 
 @Composable

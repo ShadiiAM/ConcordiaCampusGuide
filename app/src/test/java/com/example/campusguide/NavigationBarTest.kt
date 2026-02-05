@@ -20,7 +20,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.NavigationBar
-import com.example.campusguide.ui.components.NavigationBarPreviewContent
+import com.example.campusguide.ui.components.NavigationBarPreview
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Rule
@@ -125,7 +125,7 @@ class NavigationBarTest {
     @Test
     fun navBarPreview_rendersCorrectly() {
         composeTestRule.setContent {
-            NavigationBarPreviewContent()
+            NavigationBarPreview()
         }
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
@@ -403,4 +403,68 @@ class NavigationBarTest {
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
     }
 
+
+    @Test
+    fun navBar_fullRecompositionCycle() {
+        val state = mutableStateOf(AppDestinations.MAP)
+        composeTestRule.setContent {
+            NavigationBar(state, {})
+        }
+
+        // 1. Initial execution (already happened)
+
+        // 2. Change state to trigger recomposition
+        composeTestRule.runOnIdle {
+            state.value = AppDestinations.CALENDAR
+        }
+        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
+
+        // 3. Set same state to test the "skip" branch (Optimization logic)
+        composeTestRule.runOnIdle {
+            state.value = AppDestinations.CALENDAR
+        }
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun navBar_executesDrawableIconBranch() {
+        // 1. Find a destination in your enum that IS a Drawable
+        val drawableDestination = AppDestinations.entries.firstOrNull { it.icon is AppIcon.Drawable }
+
+        if (drawableDestination != null) {
+            composeTestRule.setContent {
+                ConcordiaCampusGuideTheme {
+                    NavigationBar(
+                        currentDestination = rememberSaveable{mutableStateOf(drawableDestination)},
+                        content = {}
+                    )
+                }
+            }
+
+            // 2. Finding the content description with useUnmergedTree = true
+            // forces the Icon() composable (and the painterResource call) to execute.
+            composeTestRule
+                .onNodeWithContentDescription(drawableDestination.label, useUnmergedTree = true)
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun navBar_whenContentIsNull_rendersOnlyNavigation() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                    content = null // Explicitly pass null
+                )
+            }
+        }
+
+        // Verify the nav items still exist
+        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
+
+        // Verify that NO search bar or extra text is present
+        // (proving the content lambda was skipped)
+        composeTestRule.onNodeWithText("Search...").assertDoesNotExist()
+    }
 }

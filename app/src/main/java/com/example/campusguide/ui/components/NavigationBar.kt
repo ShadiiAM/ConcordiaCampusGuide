@@ -23,7 +23,7 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 @Composable
 fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
-    content: @Composable (Modifier) -> Unit
+    content: (@Composable (Modifier) -> Unit)? = null
 ) {
 
     NavigationSuiteScaffold(
@@ -50,26 +50,18 @@ fun NavigationBar(
             }
         }
     )
-    content(Modifier
-        .fillMaxSize()
-        .padding(top = 100.dp)
+    content?.invoke(
+        Modifier
+            .fillMaxSize()
+            .padding(top = 100.dp)
     )
 }
 
 
-@Composable
-internal fun NavigationBarPreviewContent() {
-    ConcordiaCampusGuideTheme {
-        NavigationBar(
-            rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-        ) {
-            SearchBarWithProfile()
-        }
-    }
-}
-
 @Preview(showBackground = true)
-@Composable
-fun NavigationBarPreview() {
-    NavigationBarPreviewContent()
+@Composable fun NavigationBarPreview() {
+    ConcordiaCampusGuideTheme {
+        NavigationBar(rememberSaveable{mutableStateOf(AppDestinations.MAP)},
+            { SearchBarWithProfile( ) })
+    }
 }
