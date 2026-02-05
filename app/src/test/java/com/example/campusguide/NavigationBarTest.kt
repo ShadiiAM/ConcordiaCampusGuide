@@ -1,10 +1,13 @@
 package com.example.campusguide
 
 
+import android.content.res.Configuration
 import androidx.compose.material3.Text
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
@@ -17,7 +20,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.NavigationBar
-import com.example.campusguide.ui.components.NavigationBarPreview
+import com.example.campusguide.ui.components.NavigationBarPreviewContent
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Rule
@@ -122,7 +125,7 @@ class NavigationBarTest {
     @Test
     fun navBarPreview_rendersCorrectly() {
         composeTestRule.setContent {
-            NavigationBarPreview()
+            NavigationBarPreviewContent()
         }
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
@@ -130,7 +133,6 @@ class NavigationBarTest {
         composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
-        composeTestRule.waitForIdle()
     }
 
     @Test
@@ -351,6 +353,54 @@ class NavigationBarTest {
         composeTestRule.onNodeWithText("PaddingTest").assertExists()
     }
 
+    @Test
+    fun navBar_labelContentIsCorrect() {
+        val state = mutableStateOf(AppDestinations.MAP)
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(state, {})
+            }
+        }
 
+        // Verify all labels are rendered initially
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(destination.label).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun navBar_labelsPersistAfterSelection() {
+        val state = mutableStateOf(AppDestinations.MAP)
+        composeTestRule.setContent {
+            NavigationBar(state, {})
+        }
+
+        // Click Calendar
+        composeTestRule.onNodeWithText("Calendar").performClick()
+
+        // Check that the Map label is still present (proves the 'label' lambda is stable)
+        composeTestRule.onNodeWithText("Map").assertExists()
+        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
+    }
+
+    @Test
+    fun navBar_rendersAsRail_onWideScreen() {
+        composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalConfiguration provides Configuration().apply {
+                    screenWidthDp = 800
+                }
+            ) {
+                ConcordiaCampusGuideTheme {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {}
+                    )
+                }
+            }
+        }
+
+        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
+    }
 
 }

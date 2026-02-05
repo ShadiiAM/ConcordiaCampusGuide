@@ -107,7 +107,7 @@ enum class AppDestinations(
     val icon: AppIcon,
 ) {
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
-    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.ic_directions)),
+    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
     POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
 }
