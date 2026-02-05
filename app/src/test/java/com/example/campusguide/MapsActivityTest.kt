@@ -1,17 +1,25 @@
 package com.example.campusguide
 
+
 import android.content.Intent
+import android.location.Location
+import android.os.Looper
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers.any
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
@@ -178,5 +186,99 @@ class MapsActivityTest {
 
         assertNotNull("SGW overlay should be initialized", sgwField.get(activity))
         assertNotNull("LOY overlay should be initialized", loyField.get(activity))
+    }
+
+    @Test
+    fun mapsActivity_onGPS_isLocationEnabled_isPermissionsGranted() {
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        var activity = controller.create().start().resume().get()
+        activity.onGPS()
+        assertTrue(activity.isLocationEnabled())
+        assertTrue(activity.isPermissionsGranted())
+
+        activity = mock(MapsActivity::class.java)
+        whenever(activity.isLocationEnabled()).thenReturn(false)
+        activity.onGPS()
+    }
+
+    @Test
+    fun mapsActivity_requestLocationUpdates(){
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+        activity.fusedLocationProviderClient = mock(FusedLocationProviderClient::class.java)
+        activity.callback = mock(LocationCallback::class.java)
+        activity.requestLocationUpdates(activity.callback)
+
+        verify(activity.fusedLocationProviderClient, atLeastOnce()).requestLocationUpdates(any<com.google.android.gms.location.LocationRequest>(), any<LocationCallback>(), any<Looper>())
+    }
+
+    @Test
+    fun mapsActivity_requestLocation_returnsCorrectLatLng() {
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+        val location = mock(Location::class.java)
+        whenever(location.latitude).thenReturn(45.4)
+        whenever(location.longitude).thenReturn(-73.5)
+
+        val expectedLatLng = LatLng(45.4, -73.5)
+        val actualLatLng = activity.setLocation(location)
+        assertTrue(actualLatLng.latitude == expectedLatLng.latitude)
+        assertTrue(actualLatLng.longitude == expectedLatLng.longitude)
+    }
+
+    @Test
+    fun mapActivity_requestLocation() {
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        var activity = controller.create().start().resume().get()
+        activity.fusedLocationProviderClient = mock(FusedLocationProviderClient::class.java)
+
+        try{
+            activity.requestLocation()
+        }
+        catch(_: NullPointerException){
+            //Expect to throw null pointer exception. The Mock doesn't have a last location
+        }
+
+        verify(activity.fusedLocationProviderClient, atLeastOnce()).lastLocation
+
+        activity = mock(MapsActivity::class.java)
+
+        whenever(activity.isPermissionsGranted()).thenReturn(false)
+        try{
+            activity.requestLocation()
+        }
+        catch(e: Exception){
+            //Expect to throw an exception
+            assertTrue(e.message?.contains("Location permissions not granted") == true)
+        }
+    }
+
+    @Test
+    fun mapActivity_getCallback(){
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+        activity.mMap = mock(GoogleMap::class.java)
+        val marker = mock(Marker::class.java)
+
+        val callback = activity.generateCallback()
+        assertNotNull(callback)
+
+        val locationResult = mock(com.google.android.gms.location.LocationResult::class.java)
+        val location = mock(Location::class.java)
+        whenever(locationResult.lastLocation).thenReturn(location)
+        whenever(location.latitude).thenReturn(45.4)
+        whenever(location.longitude).thenReturn(-73.5)
+        whenever(activity.mMap.addMarker(any(MarkerOptions::class.java))).thenReturn(marker)
+
+        callback.onLocationResult(locationResult)
+
+        verify(activity.mMap,atLeastOnce()).addMarker(any(MarkerOptions::class.java))
+
+        try {
+            callback.onLocationResult(locationResult)
+        }catch(_: Exception){
+            //marker.position will throw an error
+        }
+        verify(marker,atLeastOnce()).position = LatLng(45.4,-73.5)
     }
 }
