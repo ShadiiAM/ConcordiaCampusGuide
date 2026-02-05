@@ -235,4 +235,12 @@ class MapsActivityTest {
 
         verify(activity.fusedLocationProviderClient, atLeastOnce()).lastLocation
     }
+
+    @Test
+    fun mapActivity_getCallback(){
+        val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().start().resume().get()
+        val callback = activity.generateCallback()
+        assertNotNull(callback)
+    }
 }

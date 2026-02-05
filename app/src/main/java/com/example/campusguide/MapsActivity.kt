@@ -103,20 +103,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         //Add a marker at User Position
 
-        callback = object: LocationCallback(){
-            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    if (userMarker == null) {
-                        userMarker = mMap.addMarker(MarkerOptions().position(userLatLng).title("You are here"))
-                    } else {
-                        userMarker?.position = userLatLng
-                    }
-                }
-
-            }
-        }
+        callback = generateCallback()
 
         requestLocationUpdates(callback)
 
@@ -185,6 +172,21 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
-
-
+    fun generateCallback(): LocationCallback{
+        return object: LocationCallback() {
+            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let { location ->
+                    val userLatLng = LatLng(location.latitude, location.longitude)
+                    if (userMarker == null) {
+                        userMarker = mMap.addMarker(
+                            MarkerOptions().position(userLatLng).title("You are here")
+                        )
+                    } else {
+                        userMarker?.position = userLatLng
+                    }
+                }
+            }
+        }
+    }
 }
