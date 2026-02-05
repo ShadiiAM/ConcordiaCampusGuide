@@ -5,6 +5,16 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
+    id("org.sonarqube")
+}
+
+sonar {
+    properties {
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+    }
 }
 
 android {
@@ -87,14 +97,28 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Test*.*",
         "android/**/*.*",
         "**/databinding/**/*.*",
-        "**/BR.class"
+        "**/BR.class",
+        "**/*\$Lambda$*.*",
+        "**/*\$inlined$*.*"
     )
 
-    val javaTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+    val buildDir = layout.buildDirectory.get().asFile
+
+    // Try multiple possible locations for Kotlin compiled classes
+    val kotlinTree = fileTree(buildDir) {
+        include(
+            "intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes/**/*.class",
+            "tmp/kotlin-classes/debug/**/*.class",
+            "intermediates/classes/debug/**/*.class"
+        )
         exclude(fileFilter)
     }
 
-    val kotlinTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+    val javaTree = fileTree(buildDir) {
+        include(
+            "intermediates/javac/debug/compileDebugJavaWithJavac/classes/**/*.class",
+            "intermediates/javac/debug/classes/**/*.class"
+        )
         exclude(fileFilter)
     }
 
@@ -104,11 +128,20 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     classDirectories.setFrom(files(kotlinTree, javaTree))
 
     // Collect all test task execution data
-    val testTasks = tasks.withType<Test>()
-    executionData.setFrom(testTasks.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile })
+    executionData.setFrom(fileTree(buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include("jacoco/testDebugUnitTest.exec")
+    })
+
+    doFirst {
+        println("JaCoCo Report Configuration:")
+        println("  Source dirs: ${sourceDirectories.files}")
+        println("  Class dirs: ${classDirectories.files.flatMap { it.walkTopDown().filter { f -> f.isFile }.take(5).toList() }}")
+        println("  Execution data: ${executionData.files}")
+    }
 
     doLast {
-        val xmlReport = file("${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        val xmlReport = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         if (xmlReport.exists()) {
             println("✓ JaCoCo XML report generated successfully at: ${xmlReport.absolutePath}")
             println("  Report size: ${xmlReport.length()} bytes")
@@ -132,11 +165,14 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.androidx.compose.ui.test.junit4)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
     testImplementation("org.mockito:mockito-core:5.8.0")
     testImplementation("org.mockito:mockito-core:5.11.0")
     testImplementation("org.mockito:mockito-inline:5.2.0")
@@ -153,6 +189,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
 
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-utils-ktx:5.0.0")
+    implementation(libs.play.services.maps.v1820)
+    implementation(libs.maps.utils.ktx)
+    implementation(libs.play.services.location.v1750)
 }

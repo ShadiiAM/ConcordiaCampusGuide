@@ -39,12 +39,39 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x gradlew
       - name: Build and run tests with coverage
-        run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport --stacktrace
+        run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport lintDebug --stacktrace
       - name: Verify JaCoCo report exists
         run: |
-          echo "Checking for JaCoCo XML report..."
+          echo "=== Checking for JaCoCo XML report ==="
           find . -name "*.xml" -path "*/jacoco/*" -type f
+          echo ""
+          echo "=== JaCoCo report directory contents ==="
           ls -la app/build/reports/jacoco/jacocoTestReport/ || echo "Report directory not found"
+          echo ""
+          echo "=== JaCoCo execution data files ==="
+          find . -name "*.exec" -type f
+          echo ""
+          echo "=== Kotlin class files (sample) ==="
+          find app/build -name "*.class" -path "*debug*" | head -20
+          echo ""
+          echo "=== JaCoCo XML report content preview ==="
+          head -50 app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml || echo "Could not read report"
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jacoco-report
+          path: app/build/reports/jacoco/
+      - name: Debug Sonar Paths
+        run: |
+          echo "=== Checking class files ==="
+          find app/build -name "*.class" -path "*debug*" | head -30
+          echo ""
+          echo "=== JaCoCo XML Report ==="
+          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
+          echo ""
+          echo "=== Sample coverage from report ==="
+          grep -A5 'sourcefilename="MainActivity.kt"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -20 || echo "MainActivity not found in report"
       - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

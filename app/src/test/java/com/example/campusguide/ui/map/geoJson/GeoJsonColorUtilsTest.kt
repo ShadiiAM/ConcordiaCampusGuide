@@ -138,4 +138,122 @@ class GeoJsonColorUtilsTest {
     fun stringOrNull_null_returnsNull() {
         assertNull(GeoJsonColorUtils.stringOrNull(null))
     }
+
+    // -------------------------
+    // Additional floatOrNull() tests
+    // -------------------------
+
+    @Test
+    fun floatOrNull_intNumber_returnsFloat() {
+        assertEquals(42f, GeoJsonColorUtils.floatOrNull(42)!!, 0.001f)
+    }
+
+    @Test
+    fun floatOrNull_doubleNumber_returnsFloat() {
+        assertEquals(3.14f, GeoJsonColorUtils.floatOrNull(3.14)!!, 0.001f)
+    }
+
+    @Test
+    fun floatOrNull_longNumber_returnsFloat() {
+        assertEquals(1000000f, GeoJsonColorUtils.floatOrNull(1000000L)!!, 0.001f)
+    }
+
+    @Test
+    fun floatOrNull_validStringNumber_returnsFloat() {
+        assertEquals(2.5f, GeoJsonColorUtils.floatOrNull("2.5")!!, 0.001f)
+    }
+
+    @Test
+    fun floatOrNull_stringInteger_returnsFloat() {
+        assertEquals(100f, GeoJsonColorUtils.floatOrNull("100")!!, 0.001f)
+    }
+
+    @Test
+    fun floatOrNull_emptyString_returnsNull() {
+        assertNull(GeoJsonColorUtils.floatOrNull(""))
+    }
+
+    @Test
+    fun floatOrNull_whitespaceString_returnsNull() {
+        assertNull(GeoJsonColorUtils.floatOrNull("   "))
+    }
+
+    // -------------------------
+    // Additional withOpacity() tests
+    // -------------------------
+
+    @Test
+    fun withOpacity_transparentColor_staysTransparent() {
+        val transparent = 0x00112233
+        val out = GeoJsonColorUtils.withOpacity(transparent, 1f)
+        assertEquals(transparent, out)
+    }
+
+    @Test
+    fun withOpacity_quarterOpacity_calculatesCorrectly() {
+        val color = 0xFF112233.toInt()
+        val out = GeoJsonColorUtils.withOpacity(color, 0.25f)
+        // 255 * 0.25 = 63.75 -> rounds to 64 (0x40)
+        assertEquals(0x40112233, out)
+    }
+
+    // -------------------------
+    // Additional parse() tests
+    // -------------------------
+
+    @Test
+    fun parse_blackColor_works() {
+        val c = GeoJsonColorUtils.parse("#000000")
+        assertEquals(0xFF000000.toInt(), c)
+    }
+
+    @Test
+    fun parse_whiteColor_works() {
+        val c = GeoJsonColorUtils.parse("#FFFFFF")
+        assertEquals(0xFFFFFFFF.toInt(), c)
+    }
+
+    @Test
+    fun parse_lowercaseHex_works() {
+        val c = GeoJsonColorUtils.parse("#aabbcc")
+        assertEquals(0xFFAABBCC.toInt(), c)
+    }
+
+    @Test
+    fun parse_mixedCaseHex_works() {
+        val c = GeoJsonColorUtils.parse("#AaBbCc")
+        assertEquals(0xFFAABBCC.toInt(), c)
+    }
+
+    @Test
+    fun parse_namedColor_blue_works() {
+        val c = GeoJsonColorUtils.parse("blue")
+        assertEquals(0xFF0000FF.toInt(), c)
+    }
+
+    @Test
+    fun parse_yellowColor_works() {
+        val c = GeoJsonColorUtils.parse("#FFFF00")
+        assertEquals(0xFFFFFF00.toInt(), c)
+    }
+
+    @Test
+    fun parse_cyanColor_works() {
+        val c = GeoJsonColorUtils.parse("#00FFFF")
+        assertEquals(0xFF00FFFF.toInt(), c)
+    }
+
+    // -------------------------
+    // Additional stringOrNull() tests
+    // -------------------------
+
+    @Test
+    fun stringOrNull_floatNumber_returnsToString() {
+        assertEquals("3.14", GeoJsonColorUtils.stringOrNull(3.14))
+    }
+
+    @Test
+    fun stringOrNull_emptyString_returnsEmpty() {
+        assertEquals("", GeoJsonColorUtils.stringOrNull(""))
+    }
 }

@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.components.SearchBarWithProfilePreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -172,6 +173,144 @@ class SearchBarTest {
         }
 
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_hasTextInputField() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile()
+            }
+        }
+
+        // Verify the search bar has a text input area (placeholder visible)
+        composeTestRule.onNodeWithText("Search...").assertExists()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_callbackSetup_isValid() {
+        var callbackProvided = false
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    onSearchQueryChange = { callbackProvided = true }
+                )
+            }
+        }
+
+        // Verify the component accepts callback without error
+        composeTestRule.waitForIdle()
+        // Callback is set up correctly (will be invoked on actual text input)
+    }
+
+    @Test
+    fun searchBar_initialState_showsPlaceholder() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile()
+            }
+        }
+
+        // Initial state should show placeholder
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_profileButton_isClickable() {
+        var clicked = false
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    onProfileClick = { clicked = true }
+                )
+            }
+        }
+
+        // Profile avatar shows "A"
+        composeTestRule.onNodeWithText("A").performClick()
+
+        assertTrue("Profile button should be clickable", clicked)
+    }
+
+    @Test
+    fun searchBar_searchIcon_contentDescriptionIsSearch() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile()
+            }
+        }
+
+        composeTestRule.onNodeWithContentDescription("Search").assertExists()
+    }
+
+    @Test
+    fun searchBar_dynamicTheme_rendersWithoutErrors() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = false,
+                dynamicColor = true
+            ) {
+                SearchBarWithProfile()
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_darkDynamicTheme_rendersWithoutErrors() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme(
+                darkTheme = true,
+                dynamicColor = true
+            ) {
+                SearchBarWithProfile()
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_allElements_areDisplayed() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile()
+            }
+        }
+
+        // Verify all main elements exist
+        composeTestRule.onNodeWithContentDescription("Search").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.onNodeWithText("A").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchBar_emptyCallbacks_renderCorrectly() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    onSearchQueryChange = { },
+                    onProfileClick = { }
+                )
+            }
+        }
+
+        // Verify component renders with empty callbacks
+        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
+        composeTestRule.onNodeWithText("A").assertIsDisplayed()
+
+        // Profile click should work
+        composeTestRule.onNodeWithText("A").performClick()
+
+        // Should not crash
         composeTestRule.waitForIdle()
     }
 }
