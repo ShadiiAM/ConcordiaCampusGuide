@@ -78,6 +78,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
+    private var sgwAttached = false
+    private var loyAttached = false
     var userMarker: Marker? = null
 
 
@@ -216,16 +218,20 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             mMap.isMyLocationEnabled = true
         }
 
-        // Parse GeoJSON on IO thread — file read + JSON decode is the slow part.
-        // GoogleMap mutations (addPolygon / addMarker) switch back to Main.
+        // Only load the active campus on startup — halves the main-thread work.
+        // The inactive campus loads on-demand the first time the user taps the toggle.
         activityScope.launch(Dispatchers.IO) {
-            val sgwJson = loadGeoJson(R.raw.sgw_buildings)
-            val loyJson = loadGeoJson(R.raw.loy_buildings)
+            val activeCampus = getSavedCampus()
+            val activeJson = loadGeoJson(when (activeCampus) {
+                Campus.SGW    -> R.raw.sgw_buildings
+                Campus.LOYOLA -> R.raw.loy_buildings
+            })
 
             withContext(Dispatchers.Main) {
-                sgwOverlay.attachToMap(mMap, sgwJson)
-                loyOverlay.attachToMap(mMap, loyJson)
-                // Re-read saved campus in case user tapped toggle while JSON was loading
+                when (activeCampus) {
+                    Campus.SGW    -> { sgwOverlay.attachToMap(mMap, activeJson); sgwAttached = true }
+                    Campus.LOYOLA -> { loyOverlay.attachToMap(mMap, activeJson); loyAttached = true }
+                }
                 initializeOverlays(getSavedCampus())
             }
         }
@@ -243,19 +249,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
      * then start tracking the user's location (if permission is granted).
      */
     internal fun initializeOverlays(campus: Campus) {
-        val defaultStyle = GeoJsonStyle(
-            fillColor = 0x80ffaca6.toInt(),
-            strokeColor = 0xFFbc4949.toInt(),
-            strokeWidth = 2f,
-            zIndex = 10f,
-            clickable = true,
-            visible = true,
-            markerColor = 0xFFbc4949.toInt(),
-            markerAlpha = 1f,
-            markerScale = 1.5f
-        )
-        sgwOverlay.setAllStyles(defaultStyle)
-        loyOverlay.setAllStyles(defaultStyle)
+        sgwOverlay.setAllStyles(defaultOverlayStyle())
+        loyOverlay.setAllStyles(defaultOverlayStyle())
 
         when (campus) {
             Campus.SGW -> {
@@ -271,17 +266,19 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         startLocationTracking()
     }
 
-    private fun defaultOverlayStyle(): GeoJsonStyle = GeoJsonStyle(
-        fillColor = 0x80ff8a8a.toInt(),
-        strokeColor = 0xFF4d0000.toInt(),
-        strokeWidth = 2f,
-        zIndex = 10f,
-        clickable = false,
-        visible = true,
-        markerColor = 0xFF974949.toInt(),
-        markerAlpha = 1f,
-        markerScale = 2f
+    private fun defaultOverlayStyle() = GeoJsonStyle(
+        fillColor    = 0x80ffaca6.toInt(),
+        strokeColor  = 0xFFbc4949.toInt(),
+        strokeWidth  = 2f,
+        zIndex       = 10f,
+        clickable    = true,
+        visible      = true,
+        markerColor  = 0xFFbc4949.toInt(),
+        markerAlpha  = 1f,
+        markerScale  = 1.5f
     )
+
+    // ==================== Campus switching ====================
 
     internal fun switchCampus(campus: Campus) {
         if (!::mMap.isInitialized) return
@@ -292,26 +289,24 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     /**
      * Show/hide campus overlays and animate the camera to the target campus.
+     * If the target campus has never been loaded, its overlay is fetched in the
+     * background while the camera animates — keeps the main thread responsive.
      */
     internal fun executeSwitchCampus(campus: Campus) {
         if (!::mMap.isInitialized) return
 
         val targetLocation = when (campus) {
-            Campus.SGW -> LatLng(45.4972, -73.5789)
+            Campus.SGW    -> LatLng(45.4972, -73.5789)
             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
         }
 
+        // Hide the other campus immediately so stale buildings vanish
         when (campus) {
-            Campus.SGW -> {
-                sgwOverlay.setVisibleAll(true)
-                loyOverlay.setVisibleAll(false)
-            }
-            Campus.LOYOLA -> {
-                loyOverlay.setVisibleAll(true)
-                sgwOverlay.setVisibleAll(false)
-            }
+            Campus.SGW    -> loyOverlay.setVisibleAll(false)
+            Campus.LOYOLA -> sgwOverlay.setVisibleAll(false)
         }
 
+        // Animate camera right away — does not block on overlay loading
         mMap.animateCamera(
             CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
             CAMERA_ANIMATION_DURATION_MS,
@@ -320,6 +315,43 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 override fun onCancel() { }
             }
         )
+
+        val targetAttached = when (campus) {
+            Campus.SGW    -> sgwAttached
+            Campus.LOYOLA -> loyAttached
+        }
+
+        if (targetAttached) {
+            // Already loaded — just show it
+            when (campus) {
+                Campus.SGW    -> sgwOverlay.setVisibleAll(true)
+                Campus.LOYOLA -> loyOverlay.setVisibleAll(true)
+            }
+        } else {
+            // First visit to this campus — load its overlay in the background
+            activityScope.launch(Dispatchers.IO) {
+                val json = loadGeoJson(when (campus) {
+                    Campus.SGW    -> R.raw.sgw_buildings
+                    Campus.LOYOLA -> R.raw.loy_buildings
+                })
+
+                withContext(Dispatchers.Main) {
+                    // Guard: onMapReady's coroutine may have already attached this overlay
+                    when (campus) {
+                        Campus.SGW    -> if (!sgwAttached)  { sgwOverlay.attachToMap(mMap, json);  sgwAttached = true }
+                        Campus.LOYOLA -> if (!loyAttached)  { loyOverlay.attachToMap(mMap, json);  loyAttached = true }
+                    }
+                    when (campus) {
+                        Campus.SGW    -> sgwOverlay.setAllStyles(defaultOverlayStyle())
+                        Campus.LOYOLA -> loyOverlay.setAllStyles(defaultOverlayStyle())
+                    }
+                    // Race-safe: user may have switched back while we were loading
+                    val current = getSavedCampus()
+                    sgwOverlay.setVisibleAll(current == Campus.SGW)
+                    loyOverlay.setVisibleAll(current == Campus.LOYOLA)
+                }
+            }
+        }
     }
 
     internal fun showProfileOverlay() {
