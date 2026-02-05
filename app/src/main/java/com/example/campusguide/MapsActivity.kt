@@ -231,10 +231,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 Campus.LOYOLA -> R.raw.loy_buildings
             })
 
+            // Coordinate parsing stays on IO; only addPolygon/addMarker hit Main
+            when (activeCampus) {
+                Campus.SGW    -> sgwOverlay.attachToMapAsync(mMap, activeJson)
+                Campus.LOYOLA -> loyOverlay.attachToMapAsync(mMap, activeJson)
+            }
+
             withContext(Dispatchers.Main) {
                 when (activeCampus) {
-                    Campus.SGW    -> { sgwOverlay.attachToMap(mMap, activeJson); sgwAttached = true }
-                    Campus.LOYOLA -> { loyOverlay.attachToMap(mMap, activeJson); loyAttached = true }
+                    Campus.SGW    -> sgwAttached = true
+                    Campus.LOYOLA -> loyAttached = true
                 }
                 initializeOverlays(getSavedCampus())
             }
@@ -339,11 +345,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                     Campus.LOYOLA -> R.raw.loy_buildings
                 })
 
+                // Pre-parse coordinates on IO; addPolygon/addMarker on Main
+                when (campus) {
+                    Campus.SGW    -> sgwOverlay.attachToMapAsync(mMap, json)
+                    Campus.LOYOLA -> loyOverlay.attachToMapAsync(mMap, json)
+                }
+
                 withContext(Dispatchers.Main) {
-                    // Guard: onMapReady's coroutine may have already attached this overlay
                     when (campus) {
-                        Campus.SGW    -> if (!sgwAttached)  { sgwOverlay.attachToMap(mMap, json);  sgwAttached = true }
-                        Campus.LOYOLA -> if (!loyAttached)  { loyOverlay.attachToMap(mMap, json);  loyAttached = true }
+                        Campus.SGW    -> sgwAttached = true
+                        Campus.LOYOLA -> loyAttached = true
                     }
                     when (campus) {
                         Campus.SGW    -> sgwOverlay.setAllStyles(defaultOverlayStyle())

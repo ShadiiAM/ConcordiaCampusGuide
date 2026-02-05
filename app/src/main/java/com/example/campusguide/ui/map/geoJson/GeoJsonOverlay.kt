@@ -13,6 +13,8 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 
@@ -47,6 +49,70 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
             addFeature(feature)
         }
     }
+    /**
+     * Async variant: coordinate parsing runs on the calling thread (intended: IO);
+     * only addPolygon / addMarker are dispatched to Main.  Keeps the main-thread
+     * block short — critical for avoiding ANR on map load.
+     */
+    suspend fun attachToMapAsync(googleMap: GoogleMap, geoJson: JSONObject) {
+        val features = geoJson.optJSONArray("features") ?: return
+
+        // --- Phase 1: build options on calling thread — zero Map API calls ---
+        class PendingPoly  (val id: String, val options: PolygonOptions,  val props: JSONObject)
+        class PendingMarker(val id: String, val options: MarkerOptions,   val props: JSONObject)
+
+        val pendingPolys   = ArrayList<PendingPoly>(features.length())
+        val pendingMarkers = ArrayList<PendingMarker>(features.length())
+
+        for (i in 0 until features.length()) {
+            val feature = features.optJSONObject(i) ?: continue
+            val id      = stableIdFor(feature)
+            val props   = feature.optJSONObject("properties") ?: JSONObject()
+            val geom    = feature.optJSONObject("geometry")   ?: continue
+
+            when (geom.optString("type")) {
+                "Polygon" -> {
+                    val coords = geom.optJSONArray("coordinates") ?: continue
+                    pendingPolys.add(PendingPoly(id, buildPolygonOptions(coords), props))
+                }
+                "MultiPolygon" -> {
+                    val coords = geom.optJSONArray("coordinates") ?: continue
+                    for (p in 0 until coords.length()) {
+                        val polyCoords = coords.optJSONArray(p) ?: continue
+                        pendingPolys.add(PendingPoly(id, buildPolygonOptions(polyCoords), props))
+                    }
+                }
+                "Point" -> {
+                    val coords = geom.optJSONArray("coordinates") ?: continue
+                    if (coords.length() < 2) continue
+                    val title = props.optString("building-name", "").ifBlank { null }
+                    val opts  = MarkerOptions().position(LatLng(coords.optDouble(1), coords.optDouble(0)))
+                    if (title != null) opts.title(title)
+                    pendingMarkers.add(PendingMarker(id, opts, props))
+                }
+            }
+        }
+
+        // --- Phase 2: Map API calls on Main only (fast: no parsing) ---
+        withContext(Dispatchers.Main) {
+            clear()
+            map = googleMap
+
+            for (p in pendingPolys) {
+                featurePropsById[p.id] = p.props
+                val poly = googleMap.addPolygon(p.options)
+                applyStyleToPolygon(poly, styleFromProperties(p.props))
+                polygonsById.getOrPut(p.id) { mutableListOf() }.add(poly)
+            }
+            for (m in pendingMarkers) {
+                featurePropsById[m.id] = m.props
+                val marker = googleMap.addMarker(m.options) ?: continue
+                applyStyleToMarker(marker, styleFromProperties(m.props))
+                markersById[m.id] = marker
+            }
+        }
+    }
+
     fun clear() {
         polygonsById.values.flatten().forEach { it.remove() }
         markersById.values.forEach { it.remove() }
@@ -160,29 +226,26 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
         }
     }
 
+    /** Build PolygonOptions from a GeoJSON coordinate array — no Map API calls, safe on any thread. */
+    private fun buildPolygonOptions(coords: JSONArray): PolygonOptions {
+        val outerRing = coords.optJSONArray(0) ?: JSONArray()
+        val options = PolygonOptions()
+            .addAll(parseLngLatRing(outerRing))
+            .clickable(true)
+        for (h in 1 until coords.length()) {
+            val hole = coords.optJSONArray(h) ?: continue
+            options.addHole(parseLngLatRing(hole))
+        }
+        return options
+    }
+
     private fun buildPolygonFromCoordinates(
         googleMap: GoogleMap,
         coords: JSONArray,
         props: JSONObject
     ): Polygon {
-        // coords: [ [ [lng,lat], ... ] , [hole...], ... ]
-        val outerRing = coords.optJSONArray(0) ?: JSONArray()
-
-        val options = PolygonOptions()
-            .addAll(parseLngLatRing(outerRing))
-            .clickable(true)
-
-        // holes
-        for (h in 1 until coords.length()) {
-            val hole = coords.optJSONArray(h) ?: continue
-            options.addHole(parseLngLatRing(hole))
-        }
-
-        val poly = googleMap.addPolygon(options)
-
-        val style = styleFromProperties(props)
-        applyStyleToPolygon(poly, style)
-
+        val poly  = googleMap.addPolygon(buildPolygonOptions(coords))
+        applyStyleToPolygon(poly, styleFromProperties(props))
         return poly
     }
 
