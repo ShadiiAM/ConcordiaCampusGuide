@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ConcordiaCampusGuide</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="button_left">Left</string>
+    <string name="button_down">Down</string>
+    <string name="button_right">Right</string>
+    <string name="button_up">Up</string>
 </resources>
