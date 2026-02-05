@@ -37,31 +37,22 @@ class GeoJsonOverlayTest {
         ctx = ApplicationProvider.getApplicationContext()
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
+        // Use MarkerIconFactory hooks instead of static mocks to avoid conflicts
         val fakeDescriptor = mock<BitmapDescriptor>()
-
-        // Close any existing static mock before creating a new one
-        try {
-            bitmapFactoryStatic?.close()
-        } catch (e: Exception) {
-            // Ignore close errors
-        }
-
-        // If static mock creation fails (already exists), use the existing one
-        try {
-            bitmapFactoryStatic = Mockito.mockStatic(BitmapDescriptorFactory::class.java).also { st ->
-                st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
-                    .thenReturn(fakeDescriptor)
-            }
-        } catch (e: Exception) {
-            // Static mock already exists from another test - use MarkerIconFactory hooks instead
-            MarkerIconFactory.bitmapToDescriptor = { fakeDescriptor }
-        }
+        MarkerIconFactory.bitmapToDescriptor = { fakeDescriptor }
+        MarkerIconFactory.defaultMarker = { fakeDescriptor }
     }
 
     @After
     fun tearDown() {
-        bitmapFactoryStatic?.close()
-        bitmapFactoryStatic = null
+        // Reset MarkerIconFactory hooks
+        MarkerIconFactory.resetForTests()
+
+        try {
+            bitmapFactoryStatic?.close()
+        } finally {
+            bitmapFactoryStatic = null
+        }
     }
 
     // --------------------------

@@ -48,28 +48,22 @@ class MapsActivityCampusTest {
             .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().clear().apply()
 
-        // Close any existing static mock before creating a new one
-        try {
-            bitmapFactoryStatic?.close()
-        } catch (e: Exception) {
-            // Ignore close errors
-        }
-
-        // If static mock creation fails (already exists), skip it
-        try {
-            bitmapFactoryStatic = mockStatic(BitmapDescriptorFactory::class.java).also { st ->
-                st.`when`<BitmapDescriptor> { BitmapDescriptorFactory.fromBitmap(any()) }
-                    .thenReturn(mock(BitmapDescriptor::class.java))
-            }
-        } catch (e: Exception) {
-            // Static mock already exists from another test - that's okay
-        }
+        // Use MarkerIconFactory hooks instead of static mocks to avoid conflicts
+        val fakeDescriptor = mock(BitmapDescriptor::class.java)
+        com.example.campusguide.ui.map.geoJson.MarkerIconFactory.bitmapToDescriptor = { fakeDescriptor }
+        com.example.campusguide.ui.map.geoJson.MarkerIconFactory.defaultMarker = { fakeDescriptor }
     }
 
     @After
     fun tearDown() {
-        bitmapFactoryStatic?.close()
-        bitmapFactoryStatic = null
+        // Reset MarkerIconFactory hooks
+        com.example.campusguide.ui.map.geoJson.MarkerIconFactory.resetForTests()
+
+        try {
+            bitmapFactoryStatic?.close()
+        } finally {
+            bitmapFactoryStatic = null
+        }
     }
 
     private fun createMockMap(): GoogleMap {
