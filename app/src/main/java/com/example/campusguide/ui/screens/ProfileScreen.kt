@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.R
+import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,10 +49,10 @@ fun ProfileScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
+                    AccessibleText(
                         text = "User settings",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
+                        baseFontSizeSp = 18f,
+                        forceFontWeight = FontWeight.Medium
                     )
                 },
                 navigationIcon = {
@@ -113,11 +114,11 @@ private fun ProfileItem(
                 .background(Color(0xFFD4C4E8)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
+            AccessibleText(
                 text = initial,
-                color = Color(0xFF6B4D8A),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium
+                fallbackColor = Color(0xFF6B4D8A),
+                baseFontSizeSp = 20f,
+                forceFontWeight = FontWeight.Medium
             )
         }
 
@@ -127,16 +128,16 @@ private fun ProfileItem(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
+            AccessibleText(
                 text = name,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                baseFontSizeSp = 16f,
+                forceFontWeight = FontWeight.Medium,
+                fallbackColor = MaterialTheme.colorScheme.onSurface
             )
-            Text(
+            AccessibleText(
                 text = subtitle,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                baseFontSizeSp = 14f,
+                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
@@ -179,11 +180,11 @@ private fun AccessibilityItem(
         Spacer(modifier = Modifier.width(16.dp))
 
         // Label
-        Text(
+        AccessibleText(
             text = "Accessibility",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            baseFontSizeSp = 16f,
+            forceFontWeight = FontWeight.Medium,
+            fallbackColor = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f)
         )
 
