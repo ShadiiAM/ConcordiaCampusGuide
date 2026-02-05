@@ -7,11 +7,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.AppDestinations
 import com.example.campusguide.AppIcon
+import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 
 
@@ -51,4 +55,15 @@ fun NavigationBar(
             .fillMaxSize()
             .padding(top = 100.dp)
     )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+@kotlin.jvm.JvmSynthetic
+fun NavigationBarPreview() {
+    ConcordiaCampusGuideTheme {
+        NavigationBar(rememberSaveable{mutableStateOf(AppDestinations.MAP)},
+            { SearchBarWithProfile( ) })
+    }
 }
