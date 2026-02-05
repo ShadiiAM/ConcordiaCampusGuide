@@ -218,6 +218,10 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             mMap.isMyLocationEnabled = true
         }
 
+        // Remove default Google Maps controls from bottom-right
+        mMap.uiSettings.isMyLocationButtonEnabled = false
+        mMap.uiSettings.isZoomControlsEnabled = false
+
         // Only load the active campus on startup — halves the main-thread work.
         // The inactive campus loads on-demand the first time the user taps the toggle.
         activityScope.launch(Dispatchers.IO) {
