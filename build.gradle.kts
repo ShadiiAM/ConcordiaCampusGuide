@@ -14,14 +14,19 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
-        // Use wildcard pattern to find JaCoCo XML reports
-        property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/**/*.xml")
+
+        // JaCoCo coverage
+        property("sonar.java.coveragePlugin", "jacoco")
+
+        // JUnit test results
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
-        property("sonar.android.lint.report", "app/build/reports/lint-results-debug.xml")
-        // New project - create new code definition
-        property("sonar.newCodeDefinition", "previous_version")
-        // Disable pull request decoration for first analysis
-        property("sonar.scm.disabled", "false")
+
+        // Android lint report
+        property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
+
+        // Exclusions
+        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
+        property("sonar.coverage.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/*Test*.*")
     }
 }
 
