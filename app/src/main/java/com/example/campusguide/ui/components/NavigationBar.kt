@@ -23,7 +23,7 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 @Composable
 fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
-    content: @Composable (Modifier) -> Unit
+    content: @Composable (Modifier) -> Unit = {}
 ) {
 
     NavigationSuiteScaffold(

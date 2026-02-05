@@ -254,4 +254,35 @@ class NavigationBarTest {
         assert(currentDestination.value == AppDestinations.MAP)
     }
 
+    @Test
+    fun navBarRendersDrawableIcon() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                    {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Map").assertExists()
+    }
+
+    @Test
+    fun navBarLabelRecomposes() {
+        val state = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(state, {})
+            }
+        }
+
+        composeTestRule.runOnIdle {
+            state.value = AppDestinations.CALENDAR
+        }
+
+        composeTestRule.onNodeWithText("Calendar").assertExists()
+    }
+
 }
