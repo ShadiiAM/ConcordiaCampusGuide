@@ -423,8 +423,11 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 200 && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
             if (::mMap.isInitialized) {
-                mMap.isMyLocationEnabled = true
-                startLocationTracking()
+                // Double-check permission before enabling location
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mMap.isMyLocationEnabled = true
+                    startLocationTracking()
+                }
             }
         }
     }
