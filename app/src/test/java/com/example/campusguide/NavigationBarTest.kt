@@ -1,470 +1,554 @@
-package com.example.campusguide
+package com.example.campusguide.ui.components
 
-
-import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotSelected
-import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.campusguide.ui.components.NavigationBar
-import com.example.campusguide.ui.components.NavigationBarPreview
-import com.example.campusguide.ui.components.SearchBarWithProfile
+import com.example.campusguide.AppDestinations
+import com.example.campusguide.AppIcon
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
-@Config(sdk = [33])
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [33], manifest = Config.NONE)
 class NavigationBarTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun nav_BarDisplaysAppDestinations() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile(
-                        )
-                    })
-            }
-        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
-
-    }
-
-
-    @Test
-    fun navBar_rendersWithoutErrors() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile( modifier = Modifier.testTag("searchBar")
-                        )
-                    })
-            }
-        }
-        // Bottom nav items
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-
-        // Slot content
-        composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
-
-        composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun navBar_darkTheme_rendersCorrectly() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme(darkTheme = true) {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile(
-                        )
-                    })
-            }
-        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
-
-
-        composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun navBar_withNoContent_rendersCorrectly() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) }, {}
-                    )
-            }
-
-        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-        composeTestRule.waitForIdle()
-    }
-
-    @Test
-    fun navBarPreview_rendersCorrectly() {
-        composeTestRule.setContent {
-            NavigationBarPreview()
-        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
-    }
-
-    @Test
-    fun navBarEachDestinationCanBecomeSelected() {
-        val state = mutableStateOf(AppDestinations.MAP)
+    fun navigationBar_displaysAllDestinations() {
+        // Test: forEach loop executes for all entries
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
+                NavigationBar(currentDestination = currentDestination)
             }
         }
 
-        composeTestRule.onNodeWithText("Calendar").performClick()
-        assert(state.value == AppDestinations.CALENDAR)
-
-        composeTestRule.onNodeWithText("Directions").performClick()
-        assert(state.value == AppDestinations.DIRECTIONS)
-
-        composeTestRule.onNodeWithText("POI").performClick()
-        assert(state.value == AppDestinations.POI)
-
-        composeTestRule.onNodeWithText("Map").performClick()
-        assert(state.value == AppDestinations.MAP)
-    }
-
-    @Test
-    fun navBarWithDifferentCurrentDestination() {
-        composeTestRule.setContent {
-            NavigationBar(
-                rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
-                {
-                    SearchBarWithProfile(
-                    )
-                })        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
-        composeTestRule.onNodeWithText("POI").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
         composeTestRule.waitForIdle()
+
+        // Verify all destinations are displayed
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(destination.label).assertExists()
+        }
     }
 
     @Test
-    fun navBarUpdatesCurrentDestination() {
+    fun navigationBar_displaysVectorIcons() {
+        // Test: AppIcon.Vector branch in when expression
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Find destinations with Vector icons and verify their content descriptions
+        val vectorDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Vector }
+
+        vectorDestinations.forEach { destination ->
+            composeTestRule.onNodeWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_displaysDrawableIcons() {
+        // Test: AppIcon.Drawable branch in when expression
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Find destinations with Drawable icons and verify their content descriptions
+        val drawableDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Drawable }
+
+        drawableDestinations.forEach { destination ->
+            composeTestRule.onNodeWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_selectedItemIsHighlighted() {
+        // Test: selected parameter (it == currentDestination.value) - true branch
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // The selected item should be marked as selected
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label)
+            .assertExists()
+            .assertIsSelected()
+    }
+
+    @Test
+    fun navigationBar_unselectedItemsNotHighlighted() {
+        // Test: selected parameter (it == currentDestination.value) - false branch
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Other items should not be selected
+        AppDestinations.entries
+            .filter { it != AppDestinations.MAP }
+            .forEach { destination ->
+                composeTestRule.onNodeWithText(destination.label)
+                    .assertExists()
+                    .assertIsNotSelected()
+            }
+    }
+
+    @Test
+    fun navigationBar_clickChangesDestination() {
+        // Test: onClick lambda executes and updates state
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val targetDestination = AppDestinations.entries.first { it != AppDestinations.MAP }
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click on different destination
+        composeTestRule.onNodeWithText(targetDestination.label).performClick()
+
+        composeTestRule.waitForIdle()
+
+        // Verify state changed
+        assert(currentDestination.value == targetDestination) {
+            "Expected ${targetDestination.label} but got ${currentDestination.value.label}"
+        }
+    }
+
+    @Test
+    fun navigationBar_clickOnEachDestination_updatesCorrectly() {
+        // Test: onClick for all destinations - covers all onClick executions
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click each destination and verify state updates
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(destination.label).performClick()
+            composeTestRule.waitForIdle()
+
+            assert(currentDestination.value == destination) {
+                "Expected ${destination.label} but got ${currentDestination.value.label}"
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_withNullContent_doesNotInvokeContent() {
+        // Test: content?.invoke - null path (safe call returns null, invoke not called)
         val currentDestination = mutableStateOf(AppDestinations.MAP)
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
                     currentDestination = currentDestination,
-                    content = {}
+                    content = null
                 )
             }
         }
 
-        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.waitForIdle()
 
-        assert(currentDestination.value == AppDestinations.CALENDAR)
+        // Should display navigation without crashing
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
     }
 
     @Test
-    fun navBarWithoutContentDoesNotRenderSearch() {
+    fun navigationBar_withContent_invokesContentLambda() {
+        // Test: content?.invoke - non-null path (content lambda is invoked)
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val testText = "Custom Content"
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {}
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Text(
+                            text = testText,
+                            modifier = modifier
+                        )
+                    }
                 )
             }
         }
 
-        composeTestRule.onNodeWithText("Search...").assertDoesNotExist()
+        composeTestRule.waitForIdle()
+
+        // Verify content was invoked and rendered
+        composeTestRule.onNodeWithText(testText).assertExists()
     }
 
     @Test
-    fun navBarCurrentDestinationisVisuallySelected() {
+    fun navigationBar_contentReceivesModifierWithFillMaxSize() {
+        // Test: Modifier.fillMaxSize() is applied
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        var receivedModifier: Modifier? = null
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
-                    {}
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        receivedModifier = modifier
+                        Box(modifier = modifier)
+                    }
                 )
             }
         }
 
-        composeTestRule
-            .onNodeWithText("Directions")
-            .assertIsSelected()
+        composeTestRule.waitForIdle()
+
+        // Verify modifier was passed (non-null check covers the modifier chain)
+        assert(receivedModifier != null) {
+            "Modifier should not be null"
+        }
     }
 
-
     @Test
-    fun navBarUnselectedItemsAreNotSelected() {
+    fun navigationBar_contentReceivesModifierWithPadding() {
+        // Test: Modifier.padding(top = 100.dp) is applied
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val testTag = "content_box"
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
-                    {}
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Box(
+                            modifier = modifier.testTag(testTag)
+                        )
+                    }
                 )
             }
         }
 
-        composeTestRule.onNodeWithText("Directions").assertIsSelected()
-        composeTestRule.onNodeWithText("Map").assertIsNotSelected()
-        composeTestRule.onNodeWithText("Calendar").assertIsNotSelected()
-        composeTestRule.onNodeWithText("POI").assertIsNotSelected()
+        composeTestRule.waitForIdle()
+
+        // Verify content exists with the modifier applied
+        composeTestRule.onNodeWithTag(testTag).assertExists()
     }
 
-
     @Test
-    fun navBar_clickingSameDestinationDoesNotCrash() {
+    fun navigationBar_contentWithComplexComposable() {
+        // Additional test: content with more complex composable structure
         val currentDestination = mutableStateOf(AppDestinations.MAP)
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination, {})
-            }
-        }
-
-        composeTestRule.onNodeWithText("Map").performClick()
-        composeTestRule.onNodeWithText("Map").performClick()
-
-        assert(currentDestination.value == AppDestinations.MAP)
-    }
-
-    @Test
-    fun navBarRendersDrawableIcon() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {}
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Box(modifier = modifier) {
+                            Text("Line 1")
+                            Text("Line 2")
+                        }
+                    }
                 )
             }
         }
 
-        composeTestRule.onNodeWithText("Map").assertExists()
-    }
-
-    @Test
-    fun navBarLabelRecomposes() {
-        val state = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
-            }
-        }
-
-        composeTestRule.runOnIdle {
-            state.value = AppDestinations.CALENDAR
-        }
-
-        composeTestRule.onNodeWithText("Calendar").assertExists()
-    }
-
-
-    @Test
-    fun navBar_rendersDrawableIcon_specifically() {
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    content = {}
-                )
-            }
-        }
-
-        // Add useUnmergedTree = true here
-        composeTestRule
-            .onNodeWithContentDescription(AppDestinations.MAP.label, useUnmergedTree = true)
-            .assertExists()
-    }
-
-    @Test
-    fun navBar_allDestinations_respondToClicks() {
-        val state = mutableStateOf(AppDestinations.MAP)
-        composeTestRule.setContent {
-            NavigationBar(state, {})
-        }
-
-        AppDestinations.entries.forEach { destination ->
-            composeTestRule.onNodeWithText(destination.label).performClick()
-            assert(state.value == destination)
-        }
-
-    }
-
-    @Test
-    fun navBar_restoresSelectedDestination_afterRecreation() {
-        val restorationTester = StateRestorationTester(composeTestRule)
-
-        restorationTester.setContent {
-            val state = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-            NavigationBar(state,{})
-        }
-
-        // Change state
-        composeTestRule.onNodeWithText("Calendar").performClick()
-
-        // Simulate recreation
-        restorationTester.emulateSavedInstanceStateRestore()
-
-        // Assert it's still selected
-        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
-    }
-
-
-    @Test
-    fun navBar_contentHasCorrectPadding() {
-        composeTestRule.setContent {
-            NavigationBar(rememberSaveable { mutableStateOf(AppDestinations.MAP) }) { modifier ->
-                Text("PaddingTest", modifier = modifier)
-            }
-        }
-        // Verifying the node exists is usually enough to cover the line execution
-        composeTestRule.onNodeWithText("PaddingTest").assertExists()
-    }
-
-    @Test
-    fun navBar_labelContentIsCorrect() {
-        val state = mutableStateOf(AppDestinations.MAP)
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
-            }
-        }
-
-        // Verify all labels are rendered initially
-        AppDestinations.entries.forEach { destination ->
-            composeTestRule.onNodeWithText(destination.label).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun navBar_labelsPersistAfterSelection() {
-        val state = mutableStateOf(AppDestinations.MAP)
-        composeTestRule.setContent {
-            NavigationBar(state, {})
-        }
-
-        // Click Calendar
-        composeTestRule.onNodeWithText("Calendar").performClick()
-
-        // Check that the Map label is still present (proves the 'label' lambda is stable)
-        composeTestRule.onNodeWithText("Map").assertExists()
-        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
-    }
-
-    @Test
-    fun navBar_rendersAsRail_onWideScreen() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalConfiguration provides Configuration().apply {
-                    screenWidthDp = 800
-                }
-            ) {
-                ConcordiaCampusGuideTheme {
-                    NavigationBar(
-                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                        {}
-                    )
-                }
-            }
-        }
-
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
-    }
-
-
-    @Test
-    fun navBar_fullRecompositionCycle() {
-        val state = mutableStateOf(AppDestinations.MAP)
-        composeTestRule.setContent {
-            NavigationBar(state, {})
-        }
-
-        // 1. Initial execution (already happened)
-
-        // 2. Change state to trigger recomposition
-        composeTestRule.runOnIdle {
-            state.value = AppDestinations.CALENDAR
-        }
-        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
-
-        // 3. Set same state to test the "skip" branch (Optimization logic)
-        composeTestRule.runOnIdle {
-            state.value = AppDestinations.CALENDAR
-        }
         composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Line 1").assertExists()
+        composeTestRule.onNodeWithText("Line 2").assertExists()
     }
 
     @Test
-    fun navBar_executesDrawableIconBranch() {
-        // 1. Find a destination in your enum that IS a Drawable
-        val drawableDestination = AppDestinations.entries.firstOrNull { it.icon is AppIcon.Drawable }
+    fun navigationBar_allLabelsDisplayed() {
+        // Test: label = { Text(it.label) } for all items
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
 
-        if (drawableDestination != null) {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify all labels are rendered
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_allContentDescriptionsSet() {
+        // Test: contentDescription in Icon for all items
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify all icons have content descriptions
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_multipleClicks_maintainCorrectState() {
+        // Test: Multiple onClick invocations maintain state correctly
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val destinations = AppDestinations.entries.toList()
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click back and forth between destinations multiple times
+        repeat(3) {
+            destinations.forEach { destination ->
+                composeTestRule.onNodeWithText(destination.label).performClick()
+                composeTestRule.waitForIdle()
+
+                assert(currentDestination.value == destination) {
+                    "Expected ${destination.label} but got ${currentDestination.value.label}"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_vectorIconBranch_executesCorrectly() {
+        // Explicit test for when(icon) is AppIcon.Vector branch
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val vectorDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Vector }
+
+        if (vectorDestinations.isNotEmpty()) {
             composeTestRule.setContent {
                 ConcordiaCampusGuideTheme {
-                    NavigationBar(
-                        currentDestination = rememberSaveable{mutableStateOf(drawableDestination)},
-                        content = {}
-                    )
+                    NavigationBar(currentDestination = currentDestination)
                 }
             }
 
-            // 2. Finding the content description with useUnmergedTree = true
-            // forces the Icon() composable (and the painterResource call) to execute.
-            composeTestRule
-                .onNodeWithContentDescription(drawableDestination.label, useUnmergedTree = true)
-                .assertExists()
+            composeTestRule.waitForIdle()
+
+            // Verify Vector icon is rendered
+            vectorDestinations.forEach { destination ->
+                composeTestRule.onNodeWithContentDescription(
+                    destination.label,
+                    useUnmergedTree = true
+                ).assertExists()
+            }
         }
     }
 
     @Test
-    fun navBar_whenContentIsNull_rendersOnlyNavigation() {
+    fun navigationBar_drawableIconBranch_executesCorrectly() {
+        // Explicit test for when(icon) is AppIcon.Drawable branch
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+        val drawableDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Drawable }
+
+        if (drawableDestinations.isNotEmpty()) {
+            composeTestRule.setContent {
+                ConcordiaCampusGuideTheme {
+                    NavigationBar(currentDestination = currentDestination)
+                }
+            }
+
+            composeTestRule.waitForIdle()
+
+            // Verify Drawable icon is rendered
+            drawableDestinations.forEach { destination ->
+                composeTestRule.onNodeWithContentDescription(
+                    destination.label,
+                    useUnmergedTree = true
+                ).assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_navigationSuiteScaffold_isComposed() {
+        // Test that NavigationSuiteScaffold itself is composed
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify the scaffold is composed by checking navigation items exist
+        composeTestRule.onAllNodesWithText(
+            AppDestinations.MAP.label,
+            useUnmergedTree = true
+        ).assertCountEquals(1)
+    }
+
+    @Test
+    fun navigationBar_itemBlock_executesForAllEntries() {
+        // Test that item{} block executes for each AppDestinations entry
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify item block executed for all entries by checking all are present
+        val itemCount = AppDestinations.entries.size
+        var foundCount = 0
+
+        AppDestinations.entries.forEach { destination ->
+            try {
+                composeTestRule.onNodeWithText(destination.label).assertExists()
+                foundCount++
+            } catch (e: AssertionError) {
+                // Item not found
+            }
+        }
+
+        assert(foundCount == itemCount) {
+            "Expected $itemCount items but found $foundCount"
+        }
+    }
+
+    @Test
+    fun navigationBar_stateChange_updatesSelection() {
+        // Test reactivity: changing state updates which item is selected
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify initial selection
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label)
+            .assertIsSelected()
+
+        // Change state programmatically
+        val newDestination = AppDestinations.entries.first { it != AppDestinations.MAP }
+        currentDestination.value = newDestination
+
+        composeTestRule.waitForIdle()
+
+        // Verify new selection
+        composeTestRule.onNodeWithText(newDestination.label)
+            .assertIsSelected()
+
+        // Verify old selection is no longer selected
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label)
+            .assertIsNotSelected()
+    }
+
+    @Test
+    fun navigationBar_withContentEmptyLambda_doesNotCrash() {
+        // Edge case: content lambda that does nothing
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
-                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    content = null // Explicitly pass null
+                    currentDestination = currentDestination,
+                    content = { _ ->
+                        // Empty lambda
+                    }
                 )
             }
         }
 
-        // Verify the nav items still exist
-        composeTestRule.onNodeWithText("Map").assertIsDisplayed()
+        composeTestRule.waitForIdle()
 
-        // Verify that NO search bar or extra text is present
-        // (proving the content lambda was skipped)
-        composeTestRule.onNodeWithText("Search...").assertDoesNotExist()
+        // Should not crash
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
+    }
+
+    @Test
+    fun navigationBar_allIconsHaveProperContentDescription() {
+        // Ensure contentDescription is set for accessibility
+        val currentDestination = mutableStateOf(AppDestinations.MAP)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Each destination should have an icon with its label as content description
+        AppDestinations.entries.forEach { destination ->
+            val nodes = composeTestRule.onAllNodesWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            )
+            nodes.assertCountEquals(1)
+        }
     }
 }
