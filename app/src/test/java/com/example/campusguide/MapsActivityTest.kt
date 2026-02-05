@@ -191,10 +191,14 @@ class MapsActivityTest {
     @Test
     fun mapsActivity_onGPS_isLocationEnabled_isPermissionsGranted() {
         val controller: ActivityController<MapsActivity> = Robolectric.buildActivity(MapsActivity::class.java)
-        val activity = controller.create().start().resume().get()
+        var activity = controller.create().start().resume().get()
         activity.onGPS()
         assertTrue(activity.isLocationEnabled())
         assertTrue(activity.isPermissionsGranted())
+
+        activity = mock(MapsActivity::class.java)
+        whenever(activity.isLocationEnabled()).thenReturn(false)
+        activity.onGPS()
     }
 
     @Test
