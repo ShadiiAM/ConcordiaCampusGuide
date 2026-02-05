@@ -2,11 +2,11 @@ package com.example.campusguide
 
 import android.content.pm.PackageManager
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
-import android.content.Context
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -58,12 +58,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
@@ -88,10 +91,11 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        onGPS()
-
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Request location permissions after layout is inflated
+        onGPS()
 
         // Hide the ActionBar
         supportActionBar?.hide()
@@ -180,16 +184,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     /**
      * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera.
+     * Quick operations (marker, camera) stay synchronous.
+     * GeoJSON file I/O + parsing runs on IO; map mutations switch back to Main.
      */
-
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
-        loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
+        // Construct overlay objects immediately so switchCampus can reference them
+        // even before attachToMap populates them.
+        sgwOverlay = GeoJsonOverlay(this, idPropertyName = "building-name")
+        loyOverlay = GeoJsonOverlay(this, idPropertyName = "building-name")
 
 
 
@@ -207,104 +211,51 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
 
-        // attachToMap parses GeoJSON and adds polygons/markers to the map.
-        // Must run on the main thread because GoogleMap mutation methods require it.
-        sgwOverlay.attachToMap(mMap)
-        loyOverlay.attachToMap(mMap)
-        initializeOverlays(savedCampus)
-
-        //Add a marker at User Position
-
-        callback = generateCallback()
-
-        requestLocationUpdates(callback)
-
-    }
-
-
-    //Turn on location and request permissions
-    fun onGPS(){
-        if(!isLocationEnabled()) {
-            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+        // Show the blue "My Location" dot if permission is already granted
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.isMyLocationEnabled = true
         }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),200)
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),200)
-        }
-    }
 
-    //Start the location updates
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    fun requestLocationUpdates(callback: LocationCallback){
-        val requestLocation = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            TimeUnit.SECONDS.toMillis(10)
-            ).setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5))
-            .build()
-        fusedLocationProviderClient.requestLocationUpdates(
-            requestLocation, callback , Looper.getMainLooper()
-        )
-    }
+        // Parse GeoJSON on IO thread — file read + JSON decode is the slow part.
+        // GoogleMap mutations (addPolygon / addMarker) switch back to Main.
+        activityScope.launch(Dispatchers.IO) {
+            val sgwJson = loadGeoJson(R.raw.sgw_buildings)
+            val loyJson = loadGeoJson(R.raw.loy_buildings)
 
-
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-     fun requestLocation() : LatLng{
-        var userLocation = LatLng(45.4972, -73.5789)
-        if(isPermissionsGranted()){
-            fusedLocationProviderClient.lastLocation.addOnSuccessListener{ location: Location? -> userLocation = setLocation(location)}
-            return userLocation
-        }
-        else{
-            throw Exception("Location permissions not granted")
-        }
-    }
-
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    fun setLocation(location: Location?) : LatLng{
-        if(location != null){
-            return LatLng(location.latitude,location.longitude)
-        }else{
-            callback = object: LocationCallback(){}
-            requestLocationUpdates(callback)
-            return requestLocation()
-        }
-    }
-
-
-    //Check if the location and network services are on
-    fun isLocationEnabled() : Boolean{
-        val locationManager= applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-    }
-
-    fun isPermissionsGranted(): Boolean{
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    }
-
-    fun generateCallback(): LocationCallback{
-        return object: LocationCallback() {
-            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    if (userMarker == null) {
-                        userMarker = mMap.addMarker(
-                            MarkerOptions().position(userLatLng).title("You are here")
-                        )
-                    } else {
-                        userMarker?.position = userLatLng
-                    }
-                }
+            withContext(Dispatchers.Main) {
+                sgwOverlay.attachToMap(mMap, sgwJson)
+                loyOverlay.attachToMap(mMap, loyJson)
+                // Re-read saved campus in case user tapped toggle while JSON was loading
+                initializeOverlays(getSavedCampus())
             }
         }
     }
 
+    /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */
+    private fun loadGeoJson(rawRes: Int): JSONObject {
+        val input = resources.openRawResource(rawRes)
+        val text = BufferedReader(InputStreamReader(input)).use { it.readText() }
+        return JSONObject(text)
+    }
+
+    /**
+     * Apply default styles and show/hide overlays based on selected campus,
+     * then start tracking the user's location (if permission is granted).
+     */
     internal fun initializeOverlays(campus: Campus) {
-        sgwOverlay.setAllStyles(defaultOverlayStyle())
-        loyOverlay.setAllStyles(defaultOverlayStyle())
+        val defaultStyle = GeoJsonStyle(
+            fillColor = 0x80ffaca6.toInt(),
+            strokeColor = 0xFFbc4949.toInt(),
+            strokeWidth = 2f,
+            zIndex = 10f,
+            clickable = true,
+            visible = true,
+            markerColor = 0xFFbc4949.toInt(),
+            markerAlpha = 1f,
+            markerScale = 1.5f
+        )
+        sgwOverlay.setAllStyles(defaultStyle)
+        loyOverlay.setAllStyles(defaultStyle)
 
         when (campus) {
             Campus.SGW -> {
@@ -316,6 +267,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 sgwOverlay.setVisibleAll(false)
             }
         }
+
+        startLocationTracking()
     }
 
     private fun defaultOverlayStyle(): GeoJsonStyle = GeoJsonStyle(
@@ -395,6 +348,103 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             .apply()
     }
 
+    // ==================== Location services ====================
+
+    fun onGPS() {
+        if (!isLocationEnabled()) {
+            startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 200)
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 200)
+        }
+    }
+
+    /** Start location updates only if both permissions are actually granted at runtime. */
+    internal fun startLocationTracking() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            callback = generateCallback()
+            requestLocationUpdates(callback)
+        }
+    }
+
+    /** Called by the system after the user responds to a permission dialog. */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 200 && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+            if (::mMap.isInitialized) {
+                mMap.isMyLocationEnabled = true
+                startLocationTracking()
+            }
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    fun requestLocationUpdates(callback: LocationCallback) {
+        val requestLocation = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            TimeUnit.SECONDS.toMillis(10)
+        ).setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5))
+            .build()
+        fusedLocationProviderClient.requestLocationUpdates(
+            requestLocation, callback, Looper.getMainLooper()
+        )
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    fun requestLocation(): LatLng {
+        var userLocation = LatLng(45.4972, -73.5789)
+        if (isPermissionsGranted()) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? -> userLocation = setLocation(location) }
+            return userLocation
+        } else {
+            throw Exception("Location permissions not granted")
+        }
+    }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    fun setLocation(location: Location?): LatLng {
+        if (location != null) {
+            return LatLng(location.latitude, location.longitude)
+        } else {
+            callback = object : LocationCallback() {}
+            requestLocationUpdates(callback)
+            return requestLocation()
+        }
+    }
+
+    fun isLocationEnabled(): Boolean {
+        val locationManager = applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    fun isPermissionsGranted(): Boolean {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+    }
+
+    fun generateCallback(): LocationCallback {
+        return object : LocationCallback() {
+            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+            override fun onLocationResult(locationResult: LocationResult) {
+                locationResult.lastLocation?.let { location ->
+                    val userLatLng = LatLng(location.latitude, location.longitude)
+                    if (userMarker == null) {
+                        userMarker = mMap.addMarker(
+                            MarkerOptions().position(userLatLng).title("You are here")
+                        )
+                    } else {
+                        userMarker?.position = userLatLng
+                    }
+                }
+            }
+        }
+    }
+
+    // ==================== Lifecycle ====================
     override fun onDestroy() {
         super.onDestroy()
         // Cancel all coroutines to prevent memory leaks
