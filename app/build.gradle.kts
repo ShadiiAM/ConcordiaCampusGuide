@@ -87,14 +87,28 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/*Test*.*",
         "android/**/*.*",
         "**/databinding/**/*.*",
-        "**/BR.class"
+        "**/BR.class",
+        "**/*\$Lambda$*.*",
+        "**/*\$inlined$*.*"
     )
 
-    val javaTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/javac/debug/compileDebugJavaWithJavac/classes") {
+    val buildDir = layout.buildDirectory.get().asFile
+
+    // Try multiple possible locations for Kotlin compiled classes
+    val kotlinTree = fileTree(buildDir) {
+        include(
+            "intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes/**/*.class",
+            "tmp/kotlin-classes/debug/**/*.class",
+            "intermediates/classes/debug/**/*.class"
+        )
         exclude(fileFilter)
     }
 
-    val kotlinTree = fileTree("${layout.buildDirectory.get().asFile}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
+    val javaTree = fileTree(buildDir) {
+        include(
+            "intermediates/javac/debug/compileDebugJavaWithJavac/classes/**/*.class",
+            "intermediates/javac/debug/classes/**/*.class"
+        )
         exclude(fileFilter)
     }
 
@@ -104,11 +118,20 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     classDirectories.setFrom(files(kotlinTree, javaTree))
 
     // Collect all test task execution data
-    val testTasks = tasks.withType<Test>()
-    executionData.setFrom(testTasks.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile })
+    executionData.setFrom(fileTree(buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include("jacoco/testDebugUnitTest.exec")
+    })
+
+    doFirst {
+        println("JaCoCo Report Configuration:")
+        println("  Source dirs: ${sourceDirectories.files}")
+        println("  Class dirs: ${classDirectories.files.flatMap { it.walkTopDown().filter { f -> f.isFile }.take(5).toList() }}")
+        println("  Execution data: ${executionData.files}")
+    }
 
     doLast {
-        val xmlReport = file("${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        val xmlReport = file("${buildDir}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
         if (xmlReport.exists()) {
             println("✓ JaCoCo XML report generated successfully at: ${xmlReport.absolutePath}")
             println("  Report size: ${xmlReport.length()} bytes")

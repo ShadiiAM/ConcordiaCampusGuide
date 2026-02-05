@@ -14,14 +14,27 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
-        // Use wildcard pattern to find JaCoCo XML reports
-        property("sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/**/*.xml")
+
+        // Source directories
+        property("sonar.sources", "app/src/main/java")
+        property("sonar.tests", "app/src/test/java")
+
+        // JaCoCo coverage report - explicit path
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // JUnit test results
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
+
+        // Android lint report
         property("sonar.android.lint.report", "app/build/reports/lint-results-debug.xml")
-        // New project - create new code definition
-        property("sonar.newCodeDefinition", "previous_version")
-        // Disable pull request decoration for first analysis
-        property("sonar.scm.disabled", "false")
+
+        // Java/Kotlin binaries for coverage mapping
+        property("sonar.java.binaries", "app/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+
+        // Exclusions
+        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
+        property("sonar.coverage.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/*Test*.*")
     }
 }
 
