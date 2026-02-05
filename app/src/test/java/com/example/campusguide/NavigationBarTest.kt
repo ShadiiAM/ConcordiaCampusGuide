@@ -2,6 +2,7 @@ package com.example.campusguide.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -10,24 +11,43 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.campusguide.AppDestinations
 import com.example.campusguide.AppIcon
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
+import androidx.test.ext.junit.runners.AndroidJUnit4
 
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [33], manifest = Config.NONE)
+@RunWith(AndroidJUnit4::class)
 class NavigationBarTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private lateinit var currentDestination: MutableState<AppDestinations>
+
+    @Before
+    fun setUp() {
+        currentDestination = mutableStateOf(AppDestinations.MAP)
+    }
+
+    @Test
+    fun navigationBar_composesSuccessfully() {
+        // Test: Basic composition without crashes
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify navigation bar is composed
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
+    }
+
     @Test
     fun navigationBar_displaysAllDestinations() {
         // Test: forEach loop executes for all entries
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -45,8 +65,6 @@ class NavigationBarTest {
     @Test
     fun navigationBar_displaysVectorIcons() {
         // Test: AppIcon.Vector branch in when expression
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -55,7 +73,7 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // Find destinations with Vector icons and verify their content descriptions
+        // Find destinations with Vector icons
         val vectorDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Vector }
 
         vectorDestinations.forEach { destination ->
@@ -69,8 +87,6 @@ class NavigationBarTest {
     @Test
     fun navigationBar_displaysDrawableIcons() {
         // Test: AppIcon.Drawable branch in when expression
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -79,7 +95,7 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // Find destinations with Drawable icons and verify their content descriptions
+        // Find destinations with Drawable icons
         val drawableDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Drawable }
 
         drawableDestinations.forEach { destination ->
@@ -91,10 +107,8 @@ class NavigationBarTest {
     }
 
     @Test
-    fun navigationBar_selectedItemIsHighlighted() {
-        // Test: selected parameter (it == currentDestination.value) - true branch
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
+    fun navigationBar_currentDestinationIsSelected() {
+        // Test: selected = true branch (it == currentDestination.value)
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -103,17 +117,14 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // The selected item should be marked as selected
+        // The current destination should be selected
         composeTestRule.onNodeWithText(AppDestinations.MAP.label)
-            .assertExists()
             .assertIsSelected()
     }
 
     @Test
-    fun navigationBar_unselectedItemsNotHighlighted() {
-        // Test: selected parameter (it == currentDestination.value) - false branch
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
+    fun navigationBar_otherDestinationsNotSelected() {
+        // Test: selected = false branch (it != currentDestination.value)
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -122,20 +133,18 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // Other items should not be selected
+        // Other destinations should not be selected
         AppDestinations.entries
             .filter { it != AppDestinations.MAP }
             .forEach { destination ->
                 composeTestRule.onNodeWithText(destination.label)
-                    .assertExists()
                     .assertIsNotSelected()
             }
     }
 
     @Test
-    fun navigationBar_clickChangesDestination() {
-        // Test: onClick lambda executes and updates state
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
+    fun navigationBar_clickUpdatesDestination() {
+        // Test: onClick lambda execution
         val targetDestination = AppDestinations.entries.first { it != AppDestinations.MAP }
 
         composeTestRule.setContent {
@@ -146,7 +155,7 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // Click on different destination
+        // Click on a different destination
         composeTestRule.onNodeWithText(targetDestination.label).performClick()
 
         composeTestRule.waitForIdle()
@@ -158,10 +167,8 @@ class NavigationBarTest {
     }
 
     @Test
-    fun navigationBar_clickOnEachDestination_updatesCorrectly() {
-        // Test: onClick for all destinations - covers all onClick executions
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
+    fun navigationBar_clickEachDestination_updatesCorrectly() {
+        // Test: onClick for all destinations
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -182,304 +189,8 @@ class NavigationBarTest {
     }
 
     @Test
-    fun navigationBar_withNullContent_doesNotInvokeContent() {
-        // Test: content?.invoke - null path (safe call returns null, invoke not called)
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = null
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Should display navigation without crashing
-        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
-    }
-
-    @Test
-    fun navigationBar_withContent_invokesContentLambda() {
-        // Test: content?.invoke - non-null path (content lambda is invoked)
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        val testText = "Custom Content"
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = { modifier ->
-                        Text(
-                            text = testText,
-                            modifier = modifier
-                        )
-                    }
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify content was invoked and rendered
-        composeTestRule.onNodeWithText(testText).assertExists()
-    }
-
-    @Test
-    fun navigationBar_contentReceivesModifierWithFillMaxSize() {
-        // Test: Modifier.fillMaxSize() is applied
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        var receivedModifier: Modifier? = null
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = { modifier ->
-                        receivedModifier = modifier
-                        Box(modifier = modifier)
-                    }
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify modifier was passed (non-null check covers the modifier chain)
-        assert(receivedModifier != null) {
-            "Modifier should not be null"
-        }
-    }
-
-    @Test
-    fun navigationBar_contentReceivesModifierWithPadding() {
-        // Test: Modifier.padding(top = 100.dp) is applied
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        val testTag = "content_box"
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = { modifier ->
-                        Box(
-                            modifier = modifier.testTag(testTag)
-                        )
-                    }
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify content exists with the modifier applied
-        composeTestRule.onNodeWithTag(testTag).assertExists()
-    }
-
-    @Test
-    fun navigationBar_contentWithComplexComposable() {
-        // Additional test: content with more complex composable structure
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = { modifier ->
-                        Box(modifier = modifier) {
-                            Text("Line 1")
-                            Text("Line 2")
-                        }
-                    }
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        composeTestRule.onNodeWithText("Line 1").assertExists()
-        composeTestRule.onNodeWithText("Line 2").assertExists()
-    }
-
-    @Test
-    fun navigationBar_allLabelsDisplayed() {
-        // Test: label = { Text(it.label) } for all items
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination = currentDestination)
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify all labels are rendered
-        AppDestinations.entries.forEach { destination ->
-            composeTestRule.onNodeWithText(
-                destination.label,
-                useUnmergedTree = true
-            ).assertExists()
-        }
-    }
-
-    @Test
-    fun navigationBar_allContentDescriptionsSet() {
-        // Test: contentDescription in Icon for all items
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination = currentDestination)
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify all icons have content descriptions
-        AppDestinations.entries.forEach { destination ->
-            composeTestRule.onNodeWithContentDescription(
-                destination.label,
-                useUnmergedTree = true
-            ).assertExists()
-        }
-    }
-
-    @Test
-    fun navigationBar_multipleClicks_maintainCorrectState() {
-        // Test: Multiple onClick invocations maintain state correctly
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        val destinations = AppDestinations.entries.toList()
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination = currentDestination)
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Click back and forth between destinations multiple times
-        repeat(3) {
-            destinations.forEach { destination ->
-                composeTestRule.onNodeWithText(destination.label).performClick()
-                composeTestRule.waitForIdle()
-
-                assert(currentDestination.value == destination) {
-                    "Expected ${destination.label} but got ${currentDestination.value.label}"
-                }
-            }
-        }
-    }
-
-    @Test
-    fun navigationBar_vectorIconBranch_executesCorrectly() {
-        // Explicit test for when(icon) is AppIcon.Vector branch
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        val vectorDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Vector }
-
-        if (vectorDestinations.isNotEmpty()) {
-            composeTestRule.setContent {
-                ConcordiaCampusGuideTheme {
-                    NavigationBar(currentDestination = currentDestination)
-                }
-            }
-
-            composeTestRule.waitForIdle()
-
-            // Verify Vector icon is rendered
-            vectorDestinations.forEach { destination ->
-                composeTestRule.onNodeWithContentDescription(
-                    destination.label,
-                    useUnmergedTree = true
-                ).assertExists()
-            }
-        }
-    }
-
-    @Test
-    fun navigationBar_drawableIconBranch_executesCorrectly() {
-        // Explicit test for when(icon) is AppIcon.Drawable branch
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-        val drawableDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Drawable }
-
-        if (drawableDestinations.isNotEmpty()) {
-            composeTestRule.setContent {
-                ConcordiaCampusGuideTheme {
-                    NavigationBar(currentDestination = currentDestination)
-                }
-            }
-
-            composeTestRule.waitForIdle()
-
-            // Verify Drawable icon is rendered
-            drawableDestinations.forEach { destination ->
-                composeTestRule.onNodeWithContentDescription(
-                    destination.label,
-                    useUnmergedTree = true
-                ).assertExists()
-            }
-        }
-    }
-
-    @Test
-    fun navigationBar_navigationSuiteScaffold_isComposed() {
-        // Test that NavigationSuiteScaffold itself is composed
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination = currentDestination)
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify the scaffold is composed by checking navigation items exist
-        composeTestRule.onAllNodesWithText(
-            AppDestinations.MAP.label,
-            useUnmergedTree = true
-        ).assertCountEquals(1)
-    }
-
-    @Test
-    fun navigationBar_itemBlock_executesForAllEntries() {
-        // Test that item{} block executes for each AppDestinations entry
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination = currentDestination)
-            }
-        }
-
-        composeTestRule.waitForIdle()
-
-        // Verify item block executed for all entries by checking all are present
-        val itemCount = AppDestinations.entries.size
-        var foundCount = 0
-
-        AppDestinations.entries.forEach { destination ->
-            try {
-                composeTestRule.onNodeWithText(destination.label).assertExists()
-                foundCount++
-            } catch (e: AssertionError) {
-                // Item not found
-            }
-        }
-
-        assert(foundCount == itemCount) {
-            "Expected $itemCount items but found $foundCount"
-        }
-    }
-
-    @Test
-    fun navigationBar_stateChange_updatesSelection() {
-        // Test reactivity: changing state updates which item is selected
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
-
+    fun navigationBar_selectionUpdates_whenStateChanges() {
+        // Test: Reactivity of selection based on state
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -502,22 +213,206 @@ class NavigationBarTest {
         composeTestRule.onNodeWithText(newDestination.label)
             .assertIsSelected()
 
-        // Verify old selection is no longer selected
+        // Verify old selection is deselected
         composeTestRule.onNodeWithText(AppDestinations.MAP.label)
             .assertIsNotSelected()
     }
 
     @Test
-    fun navigationBar_withContentEmptyLambda_doesNotCrash() {
-        // Edge case: content lambda that does nothing
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
+    fun navigationBar_withNullContent_displaysNavigation() {
+        // Test: content?.invoke - null path
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = null
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Should display navigation without crashing
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
+    }
+
+    @Test
+    fun navigationBar_withContent_rendersContent() {
+        // Test: content?.invoke - non-null path
+        val testText = "Custom Content"
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(
                     currentDestination = currentDestination,
+                    content = { modifier ->
+                        Text(
+                            text = testText,
+                            modifier = modifier
+                        )
+                    }
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify content was rendered
+        composeTestRule.onNodeWithText(testText).assertExists()
+    }
+
+    @Test
+    fun navigationBar_contentReceivesModifier() {
+        // Test: Modifier is passed to content lambda
+        var receivedModifier: Modifier? = null
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        receivedModifier = modifier
+                        Box(modifier = modifier)
+                    }
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify modifier was passed
+        assert(receivedModifier != null) {
+            "Modifier should not be null"
+        }
+    }
+
+    @Test
+    fun navigationBar_contentWithModifier_isDisplayed() {
+        // Test: Modifier.fillMaxSize().padding(top = 100.dp) is applied
+        val testTag = "content_box"
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Box(
+                            modifier = modifier.testTag(testTag)
+                        ) {
+                            Text("Content")
+                        }
+                    }
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify content with modifier exists
+        composeTestRule.onNodeWithTag(testTag).assertExists()
+        composeTestRule.onNodeWithText("Content").assertExists()
+    }
+
+    @Test
+    fun navigationBar_allLabelsRendered() {
+        // Test: label = { Text(it.label) } for all items
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify all labels are rendered
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithText(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_allIconsHaveContentDescription() {
+        // Test: contentDescription is set for all icons
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify all icons have content descriptions
+        AppDestinations.entries.forEach { destination ->
+            composeTestRule.onNodeWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
+        }
+    }
+
+    @Test
+    fun navigationBar_multipleClicksCycles_maintainState() {
+        // Test: Multiple onClick invocations in sequence
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        val destinations = AppDestinations.entries.toList()
+
+        // Click through all destinations multiple times
+        repeat(3) { cycle ->
+            destinations.forEach { destination ->
+                composeTestRule.onNodeWithText(destination.label).performClick()
+                composeTestRule.waitForIdle()
+
+                assert(currentDestination.value == destination) {
+                    "Cycle $cycle: Expected ${destination.label} but got ${currentDestination.value.label}"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_complexContentComposable() {
+        // Test: Complex content composable structure
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Box(modifier = modifier) {
+                            Text("Line 1")
+                            Text("Line 2")
+                            Text("Line 3")
+                        }
+                    }
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Line 1").assertExists()
+        composeTestRule.onNodeWithText("Line 2").assertExists()
+        composeTestRule.onNodeWithText("Line 3").assertExists()
+    }
+
+    @Test
+    fun navigationBar_emptyContentLambda_doesNotCrash() {
+        // Test: Edge case - empty content lambda
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
                     content = { _ ->
-                        // Empty lambda
+                        // Empty lambda - does nothing
                     }
                 )
             }
@@ -530,10 +425,54 @@ class NavigationBarTest {
     }
 
     @Test
-    fun navigationBar_allIconsHaveProperContentDescription() {
-        // Ensure contentDescription is set for accessibility
-        val currentDestination = mutableStateOf(AppDestinations.MAP)
+    fun navigationBar_vectorIconType_rendersCorrectly() {
+        // Explicit test for Vector icon rendering
+        val vectorDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Vector }
 
+        if (vectorDestinations.isNotEmpty()) {
+            composeTestRule.setContent {
+                ConcordiaCampusGuideTheme {
+                    NavigationBar(currentDestination = currentDestination)
+                }
+            }
+
+            composeTestRule.waitForIdle()
+
+            vectorDestinations.forEach { destination ->
+                composeTestRule.onNodeWithContentDescription(
+                    destination.label,
+                    useUnmergedTree = true
+                ).assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_drawableIconType_rendersCorrectly() {
+        // Explicit test for Drawable icon rendering
+        val drawableDestinations = AppDestinations.entries.filter { it.icon is AppIcon.Drawable }
+
+        if (drawableDestinations.isNotEmpty()) {
+            composeTestRule.setContent {
+                ConcordiaCampusGuideTheme {
+                    NavigationBar(currentDestination = currentDestination)
+                }
+            }
+
+            composeTestRule.waitForIdle()
+
+            drawableDestinations.forEach { destination ->
+                composeTestRule.onNodeWithContentDescription(
+                    destination.label,
+                    useUnmergedTree = true
+                ).assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun navigationBar_navigationItemsCount_matchesDestinationsCount() {
+        // Test: Verify all items are created in forEach
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 NavigationBar(currentDestination = currentDestination)
@@ -542,13 +481,113 @@ class NavigationBarTest {
 
         composeTestRule.waitForIdle()
 
-        // Each destination should have an icon with its label as content description
+        val expectedCount = AppDestinations.entries.size
+        var actualCount = 0
+
         AppDestinations.entries.forEach { destination ->
-            val nodes = composeTestRule.onAllNodesWithContentDescription(
+            try {
+                composeTestRule.onNodeWithText(destination.label).assertExists()
+                actualCount++
+            } catch (e: AssertionError) {
+                // Item not found
+            }
+        }
+
+        assert(actualCount == expectedCount) {
+            "Expected $expectedCount items but found $actualCount"
+        }
+    }
+
+    @Test
+    fun navigationBar_clickingSameDestination_maintainsSelection() {
+        // Test: Clicking already selected destination
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click on already selected destination
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).performClick()
+        composeTestRule.waitForIdle()
+
+        // Should still be selected
+        assert(currentDestination.value == AppDestinations.MAP) {
+            "Expected MAP but got ${currentDestination.value.label}"
+        }
+
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertIsSelected()
+    }
+
+    @Test
+    fun navigationBar_allDestinations_haveCorrectLabelAndIcon() {
+        // Comprehensive test: Verify all destinations have both label and icon
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        AppDestinations.entries.forEach { destination ->
+            // Verify label exists
+            composeTestRule.onNodeWithText(
                 destination.label,
                 useUnmergedTree = true
-            )
-            nodes.assertCountEquals(1)
+            ).assertExists()
+
+            // Verify icon exists (via content description)
+            composeTestRule.onNodeWithContentDescription(
+                destination.label,
+                useUnmergedTree = true
+            ).assertExists()
         }
+    }
+
+    @Test
+    fun navigationBar_stateChangeProgrammatically_updatesUI() {
+        // Test: UI updates when state changes programmatically (not via click)
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(currentDestination = currentDestination)
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Change each destination programmatically
+        AppDestinations.entries.forEach { destination ->
+            currentDestination.value = destination
+            composeTestRule.waitForIdle()
+
+            // Verify selection updated
+            composeTestRule.onNodeWithText(destination.label).assertIsSelected()
+        }
+    }
+
+    @Test
+    fun navigationBar_withContentAndNavigation_bothVisible() {
+        // Test: Both navigation and content are visible simultaneously
+        val contentText = "Custom Content Text"
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                NavigationBar(
+                    currentDestination = currentDestination,
+                    content = { modifier ->
+                        Text(text = contentText, modifier = modifier)
+                    }
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Both navigation and content should be visible
+        composeTestRule.onNodeWithText(AppDestinations.MAP.label).assertExists()
+        composeTestRule.onNodeWithText(contentText).assertExists()
     }
 }
