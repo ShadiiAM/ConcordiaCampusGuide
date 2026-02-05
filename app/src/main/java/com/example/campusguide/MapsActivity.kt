@@ -45,6 +45,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        // --- Enable UI Settings ---
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.uiSettings.isCompassEnabled = true
+        mMap.uiSettings.isMapToolbarEnabled = true
+
         sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
         loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
 
@@ -74,6 +79,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
 
+        binding.buttonUp.setOnClickListener {
+            mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -200f))
+        }
+
+        binding.buttonDown.setOnClickListener {
+            mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 200f))
+        }
+
+        binding.buttonLeft.setOnClickListener {
+            mMap.animateCamera(CameraUpdateFactory.scrollBy(-200f, 0f))
+        }
+
+        binding.buttonRight.setOnClickListener {
+            mMap.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
+        }
     }
 
 
