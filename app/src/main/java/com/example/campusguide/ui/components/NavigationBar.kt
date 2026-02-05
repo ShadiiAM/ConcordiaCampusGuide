@@ -59,7 +59,9 @@ fun NavigationBar(
 
 
 @Preview(showBackground = true)
-@Composable fun NavigationBarPreview() {
+@Composable
+@kotlin.jvm.JvmSynthetic
+fun NavigationBarPreview() {
     ConcordiaCampusGuideTheme {
         NavigationBar(rememberSaveable{mutableStateOf(AppDestinations.MAP)},
             { SearchBarWithProfile( ) })
