@@ -97,7 +97,14 @@ fun ConcordiaCampusGuideApp() {
                 ) {
                     SearchBarWithProfile(
                         onSearchQueryChange = { /* TODO: Handle search query */ },
-                        onProfileClick = { showProfile = true }
+                        onProfileClick = { showProfile = true },
+                        onSearchSubmit = { query ->
+                            if (query.isNotBlank()) {
+                                val intent = Intent(context, MapsActivity::class.java)
+                                intent.putExtra("SEARCH_QUERY", query)
+                                context.startActivity(intent)
+                            }
+                        }
                     )
                     Column(
                         modifier = Modifier

@@ -16,6 +16,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import androidx.compose.ui.test.performImeAction
+
+
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [33])
@@ -174,4 +177,26 @@ class SearchBarTest {
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
         composeTestRule.waitForIdle()
     }
+
+    @Test
+    fun searchBar_searchSubmit_triggersCallbackWithCorrectQuery() {
+        var submittedQuery: String? = null
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    onSearchSubmit = { submittedQuery = it }
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("Search...")
+            .performTextInput("Hall Building")
+
+        composeTestRule.onNodeWithText("Hall Building")
+            .performImeAction()
+
+        assertTrue(submittedQuery == "Hall Building")
+    }
+
 }

@@ -14,10 +14,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONObject
+import android.location.Geocoder
+import java.util.Locale
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    private var searchMarker: com.google.android.gms.maps.model.Marker? = null
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var sgwOverlay: GeoJsonOverlay
@@ -45,6 +48,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        val query = intent.getStringExtra("SEARCH_QUERY")?.trim()
+
         sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
         loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
 
@@ -55,7 +60,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        mMap.addMarker(MarkerOptions()
 //            .position(concordiaSGW)
 //            .title("Concordia University - SGW Campus"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
+        if (query.isNullOrBlank()) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
+        }
 
 
         sgwOverlay.attachToMap(mMap)
@@ -73,6 +80,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
+
+        if (!query.isNullOrBlank()) {
+            try {
+                val results = Geocoder(this, Locale.getDefault())
+                    .getFromLocationName(query, 1)
+
+                if (!results.isNullOrEmpty()) {
+                    val loc = results[0]
+                    val latLng = LatLng(loc.latitude, loc.longitude)
+
+                    searchMarker?.remove()
+                    searchMarker = mMap.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(query)
+                    )
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                }
+            } catch (_: Exception) { }
+        }
+
 
     }
 
