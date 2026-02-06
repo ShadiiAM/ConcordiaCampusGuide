@@ -12,13 +12,13 @@ import android.provider.Settings
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationResult
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,17 +28,23 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import java.util.Locale
 import java.util.concurrent.TimeUnit
+import android.location.Geocoder
 
 
 
-class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
+
+
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+
 
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    lateinit var mMap: GoogleMap
+    private var searchMarker: com.google.android.gms.maps.model.Marker? = null
+    @androidx.annotation.VisibleForTesting
+    internal lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     lateinit var callback: LocationCallback
-
     private lateinit var sgwOverlay: GeoJsonOverlay
     private lateinit var loyOverlay: GeoJsonOverlay
     var userMarker: Marker? = null
@@ -48,6 +54,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -72,6 +79,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        val query = intent.getStringExtra("SEARCH_QUERY")?.trim()
+
         sgwOverlay = GeoJsonOverlay(this, R.raw.sgw_buildings, "building-name")
         loyOverlay = GeoJsonOverlay(this, R.raw.loy_buildings, "building-name")
 
@@ -82,7 +91,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 //        mMap.addMarker(MarkerOptions()
 //            .position(concordiaSGW)
 //            .title("Concordia University - SGW Campus"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
+        if (query.isNullOrBlank()) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(concordiaSGW, 15f))
+        }
 
 
         sgwOverlay.attachToMap(mMap)
@@ -100,6 +111,29 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         )
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
+
+
+        if (!query.isNullOrBlank()) {
+            try {
+                val results = Geocoder(this, Locale.getDefault())
+                    .getFromLocationName(query, 1)
+
+                if (!results.isNullOrEmpty()) {
+                    val loc = results[0]
+                    val latLng = LatLng(loc.latitude, loc.longitude)
+
+                    searchMarker?.remove()
+                    searchMarker = mMap.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                            .title(query)
+                    )
+
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                }
+            } catch (_: Exception) { }
+        }
+
 
         //Add a marker at User Position
 

@@ -23,6 +23,8 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
+import android.location.Geocoder
+
 
 /**
  * Unit tests for MapsActivity using Robolectric

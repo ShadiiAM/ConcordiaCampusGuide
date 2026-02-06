@@ -1,6 +1,7 @@
 package com.example.campusguide
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -17,6 +18,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import androidx.compose.ui.test.performImeAction
+
+
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [33])
@@ -312,5 +316,27 @@ class SearchBarTest {
 
         // Should not crash
         composeTestRule.waitForIdle()
+    }
+
+    @Test
+    fun searchBar_searchSubmit_triggersCallbackWithCorrectQuery() {
+        var submittedQuery: String? = null
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                SearchBarWithProfile(
+                    onSearchSubmit = { submittedQuery = it }
+                )
+            }
+        }
+
+        val field = composeTestRule.onNode(hasSetTextAction())
+
+        field.performTextInput("Hall Building")
+        field.performImeAction()
+
+        composeTestRule.runOnIdle {
+            assertEquals("Hall Building", submittedQuery)
+        }
     }
 }
