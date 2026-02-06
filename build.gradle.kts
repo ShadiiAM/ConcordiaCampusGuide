@@ -15,8 +15,13 @@ sonar {
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
 
+        // Source paths
+        property("sonar.sources", "app/src/main/java")
+        property("sonar.tests", "app/src/test/java")
+
         // JaCoCo coverage
         property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
 
         // JUnit test results
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
