@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build and analyze
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,29 +33,29 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
       - name: Generate local.properties
+        shell: pwsh
         run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "MAPS_API_KEY=DUMMY_KEY_FOR_CI" >> local.properties
-      - name: Change wrapper permissions
-        run: chmod +x gradlew
+          "sdk.dir=$env:ANDROID_HOME" | Out-File -FilePath local.properties -Encoding UTF8
+          "MAPS_API_KEY=DUMMY_KEY_FOR_CI" | Add-Content -Path local.properties
       - name: Build and run tests with coverage
         run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport lintDebug --stacktrace
       - name: Verify JaCoCo report exists
+        shell: pwsh
         run: |
-          echo "=== Checking for JaCoCo XML report ==="
-          find . -name "*.xml" -path "*/jacoco/*" -type f
-          echo ""
-          echo "=== JaCoCo report directory contents ==="
-          ls -la app/build/reports/jacoco/jacocoTestReport/ || echo "Report directory not found"
-          echo ""
-          echo "=== JaCoCo execution data files ==="
-          find . -name "*.exec" -type f
-          echo ""
-          echo "=== Kotlin class files (sample) ==="
-          find app/build -name "*.class" -path "*debug*" | head -20
-          echo ""
-          echo "=== JaCoCo XML report content preview ==="
-          head -50 app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml || echo "Could not read report"
+          Write-Host "=== Checking for JaCoCo XML report ==="
+          Get-ChildItem -Recurse -Filter "*.xml" | Where-Object { $_.FullName -like "*jacoco*" }
+          Write-Host ""
+          Write-Host "=== JaCoCo report directory contents ==="
+          if (Test-Path "app/build/reports/jacoco/jacocoTestReport/") { Get-ChildItem "app/build/reports/jacoco/jacocoTestReport/" } else { Write-Host "Report directory not found" }
+          Write-Host ""
+          Write-Host "=== JaCoCo execution data files ==="
+          Get-ChildItem -Recurse -Filter "*.exec"
+          Write-Host ""
+          Write-Host "=== Kotlin class files (sample) ==="
+          Get-ChildItem -Recurse -Path "app/build" -Filter "*.class" | Where-Object { $_.FullName -like "*debug*" } | Select-Object -First 20
+          Write-Host ""
+          Write-Host "=== JaCoCo XML report content preview ==="
+          if (Test-Path "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml") { Get-Content "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml" -TotalCount 50 } else { Write-Host "Could not read report" }
       - name: Upload JaCoCo Report
         uses: actions/upload-artifact@v4
         if: always()
@@ -63,15 +63,16 @@ jobs:
           name: jacoco-report
           path: app/build/reports/jacoco/
       - name: Debug Sonar Paths
+        shell: pwsh
         run: |
-          echo "=== Checking class files ==="
-          find app/build -name "*.class" -path "*debug*" | head -30
-          echo ""
-          echo "=== JaCoCo XML Report ==="
-          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
-          echo ""
-          echo "=== Sample coverage from report ==="
-          grep -A5 'sourcefilename="MainActivity.kt"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -20 || echo "MainActivity not found in report"
+          Write-Host "=== Checking class files ==="
+          Get-ChildItem -Recurse -Path "app/build" -Filter "*.class" | Where-Object { $_.FullName -like "*debug*" } | Select-Object -First 30
+          Write-Host ""
+          Write-Host "=== JaCoCo XML Report ==="
+          Get-ChildItem "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+          Write-Host ""
+          Write-Host "=== Sample coverage from report ==="
+          if (Test-Path "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml") { Select-String -Path "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml" -Pattern 'sourcefilename="MainActivity.kt"' -Context 0,5 | Select-Object -First 20 } else { Write-Host "MainActivity not found in report" }
       - name: Analyze with SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

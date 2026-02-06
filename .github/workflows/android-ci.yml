@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-test-lint:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, X64]
 
     steps:
       - name: Checkout
@@ -32,15 +32,13 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Generate local.properties
+        shell: pwsh
         run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "MAPS_API_KEY=DUMMY_KEY_FOR_CI" >> local.properties
+          "sdk.dir=$env:ANDROID_HOME" | Out-File -FilePath local.properties -Encoding UTF8
+          "MAPS_API_KEY=DUMMY_KEY_FOR_CI" | Add-Content -Path local.properties
 
       - name: Set up Gradle (with caching)
         uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
 
       - name: Build (Debug)
         run: ./gradlew assembleDebug --stacktrace
