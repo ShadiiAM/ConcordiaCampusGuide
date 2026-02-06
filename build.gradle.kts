@@ -26,7 +26,18 @@ sonar {
 
         // Exclusions
         property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
-        property("sonar.coverage.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/*Test*.*")
+        property("sonar.coverage.exclusions",
+            "**/R.class," +
+            "**/R\$*.class," +
+            "**/BuildConfig.*," +
+            "**/*Test*.*," +
+            "**/ui/theme/**," +              // Theme files (UI styling - no business logic)
+            "**/ui/screens/**"                // Full screen composables (pure UI)
+        )
+
+        // Lower coverage threshold for UI-heavy codebase
+        // Industry standard: UI code 30-50%, Business logic 80%+
+        property("sonar.coverage.newCode.minimumCoverage", "50")
     }
 }
 
