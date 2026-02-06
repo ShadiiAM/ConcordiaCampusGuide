@@ -37,7 +37,11 @@ sonar {
             "**/BuildConfig.*," +
             "**/*Test*.*," +
             "**/ui/theme/**," +              // Theme files (UI styling - no business logic)
-            "**/ui/screens/**"                // Full screen composables (pure UI)
+            "**/ui/screens/**," +             // Full screen composables (pure UI)
+            "**/MapsActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
+            "**/MainActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
+            "**/GeoJsonOverlay.kt," +         // Map rendering with Dispatchers.Main (see TESTING.md)
+            "**/CampusToggle.kt"              // Pure UI composable (see TESTING.md)
         )
 
         // Lower coverage threshold for UI-heavy codebase
