@@ -17,6 +17,9 @@ import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.resetMain
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -32,6 +35,12 @@ class MapsActivityUITest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    @After
+    fun tearDown() {
+        // Reset coroutine dispatchers to prevent test contamination
+        Dispatchers.resetMain()
+    }
 
     // ==================== Profile/Accessibility flow simulation tests ====================
 

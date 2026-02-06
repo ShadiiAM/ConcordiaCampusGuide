@@ -83,8 +83,8 @@ tasks.withType<Test> {
         "-XX:+HeapDumpOnOutOfMemoryError"
     )
 
-    // Fork test execution every 50 tests to prevent memory accumulation
-    forkEvery = 50
+    // Fork test execution every 20 tests to prevent memory accumulation and test contamination
+    forkEvery = 20
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
