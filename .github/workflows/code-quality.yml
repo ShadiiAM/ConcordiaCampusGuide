@@ -13,7 +13,7 @@ concurrency:
 jobs:
   lint:
     name: Android Lint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, X64, Linux]
     permissions:
       contents: read
 
@@ -27,6 +27,9 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # - name: Install dependencies
+      #   run: sudo apt-get update && sudo apt-get install -y unzip
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
 
@@ -37,9 +40,6 @@ jobs:
 
       - name: Set up Gradle (with caching)
         uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
 
       - name: Run Android Lint
         run: ./gradlew lintDebug --stacktrace
@@ -55,7 +55,7 @@ jobs:
 
   test-and-coverage:
     name: Tests and Coverage
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, X64, Linux]
     permissions:
       contents: read
 
@@ -70,6 +70,9 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+
+      # - name: Install dependencies
+      #   run: sudo apt-get update && sudo apt-get install -y unzip
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
