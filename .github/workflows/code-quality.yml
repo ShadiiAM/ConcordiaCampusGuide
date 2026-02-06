@@ -13,7 +13,7 @@ concurrency:
 jobs:
   lint:
     name: Android Lint
-    runs-on: [self-hosted, X64, Linux]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
@@ -38,6 +38,9 @@ jobs:
       - name: Set up Gradle (with caching)
         uses: gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d # v4
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Run Android Lint
         run: ./gradlew lintDebug --stacktrace
 
@@ -52,7 +55,7 @@ jobs:
 
   test-and-coverage:
     name: Tests and Coverage
-    runs-on: [self-hosted, X64, Linux]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
