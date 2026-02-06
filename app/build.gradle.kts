@@ -75,6 +75,17 @@ tasks.withType<Test> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
     }
+
+    // Increase heap size to prevent OOM when running all tests
+    maxHeapSize = "4g"
+    jvmArgs(
+        "-XX:MaxMetaspaceSize=1g",
+        "-XX:+HeapDumpOnOutOfMemoryError",
+        "-XX:+UseParallelGC"
+    )
+
+    // Run all tests in single process - forking adds too much overhead
+    maxParallelForks = 1
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {

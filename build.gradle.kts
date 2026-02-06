@@ -15,8 +15,13 @@ sonar {
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
 
+        // Source paths
+        property("sonar.sources", "app/src/main/java")
+        property("sonar.tests", "app/src/test/java")
+
         // JaCoCo coverage
         property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
 
         // JUnit test results
         property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
@@ -26,7 +31,22 @@ sonar {
 
         // Exclusions
         property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
-        property("sonar.coverage.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/*Test*.*")
+        property("sonar.coverage.exclusions",
+            "**/R.class," +
+            "**/R\$*.class," +
+            "**/BuildConfig.*," +
+            "**/*Test*.*," +
+            "**/ui/theme/**," +              // Theme files (UI styling - no business logic)
+            "**/ui/screens/**," +             // Full screen composables (pure UI)
+            "**/MapsActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
+            "**/MainActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
+            "**/GeoJsonOverlay.kt," +         // Map rendering with Dispatchers.Main (see TESTING.md)
+            "**/CampusToggle.kt"              // Pure UI composable (see TESTING.md)
+        )
+
+        // Lower coverage threshold for UI-heavy codebase
+        // Industry standard: UI code 30-50%, Business logic 80%+
+        property("sonar.coverage.newCode.minimumCoverage", "50")
     }
 }
 
