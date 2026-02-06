@@ -24,10 +24,7 @@ fun AccessibleAppRoot(
                     .fillMaxSize()
                     .background(
                         color = when (accessibilityState.colorBlindMode) {
-//                            ColorBlindMode.DEUTERANOPIA -> Color(0x330000FF)
-//                            ColorBlindMode.PROTANOPIA  -> Color(0x3300FF00)
-//                            ColorBlindMode.TRITANOPIA  -> Color(0x33FFFF00)
-                            true -> Color(0x66000000)
+                            true -> Color.Black.copy(alpha = 0.3f)
                             false -> Color.Transparent
                         }
                     )
