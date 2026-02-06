@@ -164,7 +164,7 @@ fun AccessibilityScreen(
                 },
                 label = "AccessibleText colour",
                 action = {
-                    var enabled by remember { mutableStateOf(accessibilityState.isColorFilterEnabled()) }
+                    var enabled = accessibilityState.isColorFilterEnabled()
                     Box(
                         modifier = Modifier
                             .size(28.dp)

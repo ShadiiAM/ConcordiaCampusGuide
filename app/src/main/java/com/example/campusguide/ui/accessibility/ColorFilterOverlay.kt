@@ -27,8 +27,8 @@ fun AccessibleAppRoot(
 //                            ColorBlindMode.DEUTERANOPIA -> Color(0x330000FF)
 //                            ColorBlindMode.PROTANOPIA  -> Color(0x3300FF00)
 //                            ColorBlindMode.TRITANOPIA  -> Color(0x33FFFF00)
-                            ColorBlindMode.HIGH_CONTRAST -> Color(0x66000000)
-                            ColorBlindMode.NONE -> Color.Transparent
+                            true -> Color(0x66000000)
+                            false -> Color.Transparent
                         }
                     )
             )

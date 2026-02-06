@@ -10,11 +10,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 // Small holder for the global text-size offset
-data class AccessibilityState(
-    var initialOffsetSp: Float = 0f,
-    var initialBoldEnabled: Boolean = false,
-    var initialTextColor: Color = Color.Unspecified,
-    var colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
+class AccessibilityState(
+    initialOffsetSp: Float = 0f,
+    initialBoldEnabled: Boolean = false,
+    initialTextColor: Color = Color.Unspecified,
+    colorBlindMode: Boolean = false
 
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
@@ -24,6 +24,9 @@ data class AccessibilityState(
         private set
 
     var textColor by mutableStateOf(initialTextColor)
+        private set
+
+    var colorBlindMode by mutableStateOf(colorBlindMode)
         private set
 
     fun increaseTextSize() {
@@ -42,16 +45,10 @@ data class AccessibilityState(
 
     fun updateTextColor(color: Color) { textColor = color }
 
-    fun isColorFilterEnabled(): Boolean {
-        return colorBlindMode != ColorBlindMode.NONE
-    }
+    fun isColorFilterEnabled(): Boolean = colorBlindMode
 
     fun changeColorBlindMode() {
-        colorBlindMode = if (colorBlindMode == ColorBlindMode.NONE){
-            ColorBlindMode.HIGH_CONTRAST
-        } else {
-            ColorBlindMode.NONE
-        }
+        colorBlindMode = !colorBlindMode
     }
 }
 
@@ -65,12 +62,8 @@ val LocalAccessibilityState = staticCompositionLocalOf<AccessibilityState> {
 fun rememberAccessibilityState(
     initialOffsetSp: Float = 0f,
     initialBoldEnabled: Boolean = false,
-    initialTextColor: Color = Color.Unspecified
+    initialTextColor: Color = Color.Unspecified,
+    colorBlindMode: Boolean = false
 ): AccessibilityState = remember {
-    AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor)
-}
-
-enum class ColorBlindMode {
-    NONE,
-    HIGH_CONTRAST
+    AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor, colorBlindMode = colorBlindMode)
 }
