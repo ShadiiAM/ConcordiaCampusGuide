@@ -1,19 +1,17 @@
 package com.example.campusguide
 
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
+import com.example.campusguide.ui.screens.CalendarScreen
+import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
@@ -53,50 +53,48 @@ fun ConcordiaCampusGuideApp() {
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
-    if (showAccessibility) {
-        AccessibilityScreen(
-            onBackClick = { showAccessibility = false }
-        )
-    } else if (showProfile) {
-        ProfileScreen(
-            onBackClick = { showProfile = false },
-            onProfileClick = { /* TODO: Navigate to profile details */ },
-            onAccessibilityClick = { showAccessibility = true }
-        )
-    } else {
-        NavigationBar(currentDestination, {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top =25.dp)
-                ) {
+
+    when {
+        showAccessibility -> {
+            AccessibilityScreen(
+                onBackClick = { showAccessibility = false }
+            )
+        }
+
+        showProfile -> {
+            ProfileScreen(
+                onBackClick = { showProfile = false },
+                onProfileClick = { /* handle profile details */ },
+                onAccessibilityClick = { showAccessibility = true }
+            )
+        }
+        else -> {
+            NavigationBar(currentDestination) { modifier ->
+
+                Box(modifier = modifier.fillMaxSize()) {
+
+                    when (currentDestination.value) {
+                        AppDestinations.MAP -> MapScreen()
+                        AppDestinations.CALENDAR -> CalendarScreen()
+                        AppDestinations.DIRECTIONS -> PlaceholderScreen(
+                            "Directions Screen",
+                            modifier
+                        )
+
+                        AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
+
+                    }
+
                     SearchBarWithProfile(
-                        onSearchQueryChange = { /* TODO: Handle search query */ },
+                        modifier = Modifier.padding(top = 35.dp),
+                        onSearchQueryChange = { /* handle search */ },
                         onProfileClick = { showProfile = true }
                     )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 100.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Button(onClick = {
-                            val intent = Intent(context, MapsActivity::class.java)
-                            context.startActivity(intent)
-                        }) {
-                            Text("Open Campus Map")
-                        }
-                    }
                 }
-            })
+            }
+        }
     }
 }
-
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
     data class Drawable(@DrawableRes val resId: Int) : AppIcon()
@@ -125,5 +123,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     ConcordiaCampusGuideTheme {
         Greeting("Android")
+    }
+}
+
+@Composable
+fun PlaceholderScreen(name: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = name)
     }
 }
