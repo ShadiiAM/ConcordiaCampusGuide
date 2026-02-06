@@ -78,7 +78,13 @@ tasks.withType<Test> {
 
     // Increase heap size to prevent OOM when running all tests
     maxHeapSize = "4g"
-    jvmArgs("-XX:MaxMetaspaceSize=1g")
+    jvmArgs(
+        "-XX:MaxMetaspaceSize=1g",
+        "-XX:+HeapDumpOnOutOfMemoryError"
+    )
+
+    // Fork test execution every 50 tests to prevent memory accumulation
+    forkEvery = 50
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
