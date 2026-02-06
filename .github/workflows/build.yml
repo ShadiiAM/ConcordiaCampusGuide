@@ -35,7 +35,8 @@ jobs:
       - name: Generate local.properties
         shell: pwsh
         run: |
-          "sdk.dir=$env:ANDROID_HOME" | Out-File -FilePath local.properties -Encoding UTF8
+          $sdkPath = $env:ANDROID_HOME -replace '\\', '/'
+          "sdk.dir=$sdkPath" | Out-File -FilePath local.properties -Encoding UTF8
           "MAPS_API_KEY=DUMMY_KEY_FOR_CI" | Add-Content -Path local.properties
       - name: Build and run tests with coverage
         run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport lintDebug --stacktrace
