@@ -80,11 +80,12 @@ tasks.withType<Test> {
     maxHeapSize = "4g"
     jvmArgs(
         "-XX:MaxMetaspaceSize=1g",
-        "-XX:+HeapDumpOnOutOfMemoryError"
+        "-XX:+HeapDumpOnOutOfMemoryError",
+        "-XX:+UseParallelGC"
     )
 
-    // Fork test execution every 20 tests to prevent memory accumulation and test contamination
-    forkEvery = 20
+    // Run all tests in single process - forking adds too much overhead
+    maxParallelForks = 1
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
