@@ -10,13 +10,12 @@ concurrency:
   group: code-quality-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
   lint:
     name: Android Lint
     runs-on: [self-hosted, Windows, X64]
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -57,6 +56,8 @@ jobs:
   test-and-coverage:
     name: Tests and Coverage
     runs-on: [self-hosted, Windows, X64]
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
