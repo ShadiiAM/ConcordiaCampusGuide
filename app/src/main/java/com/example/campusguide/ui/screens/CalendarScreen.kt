@@ -47,22 +47,6 @@ import java.util.Locale
 @Composable
 fun CalendarScreen() {
 
-    var showProfile by rememberSaveable { mutableStateOf(false) }
-    var showAccessibility by rememberSaveable { mutableStateOf(false) }
-
-
-    if (showAccessibility) {
-        AccessibilityScreen(
-            onBackClick = { showAccessibility = false }
-        )
-    } else if (showProfile) {
-        ProfileScreen(
-            onBackClick = { showProfile = false },
-            onProfileClick = { /* TODO: Navigate to profile details */ },
-            onAccessibilityClick = { showAccessibility = true }
-        )
-    }
-
     var date by remember { mutableStateOf(Calendar.getInstance()) }
     var viewMode by remember { mutableStateOf(CalendarViewMode.DAILY) }
 
@@ -70,15 +54,22 @@ fun CalendarScreen() {
         return when (viewMode) {
             CalendarViewMode.DAILY -> {
                 val month = date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-                val day = date.get(Calendar.DAY_OF_MONTH)
+                var day = date.get(Calendar.DAY_OF_MONTH)
                 "$month $day"
             }
             CalendarViewMode.WEEKLY -> {
-                val month = date.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
-                val start = date.get(Calendar.DAY_OF_MONTH)
-                val endCal = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 6) }
-                val end = endCal.get(Calendar.DAY_OF_MONTH)
-                "$month $start–$end"
+                var start = (date.clone() as Calendar).apply {
+                    set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                }
+                var end = (start.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 6) }
+
+                var month = start.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                var weekStart = start.get(Calendar.DAY_OF_MONTH)
+
+                var weekEnd = end.get(Calendar.DAY_OF_MONTH)
+
+                "$month $weekStart–$weekEnd"
+
             }
             CalendarViewMode.MONTHLY -> {
                 date.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) ?: ""
@@ -86,7 +77,7 @@ fun CalendarScreen() {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top =25.dp)) {
+    Box(modifier = Modifier.fillMaxSize().padding(top =50.dp)) {
 
 
         Box(
@@ -148,7 +139,11 @@ fun CalendarScreen() {
                         modifier = Modifier
                             .size(44.dp)
                             .clickable {
-                                date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
+                                when (viewMode) {
+                                    CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
+                                    CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, -1) }
+                                    CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, -1) }
+                                }
                             }
                     )
 
@@ -160,8 +155,11 @@ fun CalendarScreen() {
                         modifier = Modifier
                             .size(44.dp)
                             .clickable {
-                                date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
-                            }
+                                when (viewMode) {
+                                    CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
+                                    CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, 1) }
+                                    CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, 1) }
+                                }                            }
                     )                }
 
                 Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
