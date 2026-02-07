@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -39,9 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
+import com.example.campusguide.ui.accessibility.ColorBlindMode
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
@@ -166,7 +165,19 @@ fun AccessibilityScreen(
                 },
                 label = "Text colour",
                 action = {
-                    var enabled = accessibilityState.isColorFilterEnabled()
+                    var mode = accessibilityState.colorBlindMode
+                    var boxColor = when (mode) {
+                        ColorBlindMode.NONE -> Color.White
+                        ColorBlindMode.PROTANOPIA -> Color(0xFFE57373) // Red tint
+                        ColorBlindMode.DEUTERANOPIA -> Color(0xFF81C784) // Green tint
+                        ColorBlindMode.TRITANOPIA -> Color(0xFF64B5F6) // Blue tint
+                    }
+                    var textColor = if (mode == ColorBlindMode.NONE) {
+                        Color(0xFF6B4D8A)
+                    } else {
+                        Color.Black
+                    }
+
                     Box(
                         modifier = Modifier
                             .size(28.dp)
@@ -176,11 +187,9 @@ fun AccessibilityScreen(
                                 color = Color(0xFF6B4D8A),
                                 shape = RoundedCornerShape(4.dp)
                             )
-                        .background(
-                            if (enabled) Color(0xFF6B4D8A) else Color.White
-                        )
+                        .background(boxColor)
                         .clickable {
-                            accessibilityState.changeColorBlindMode()
+                            accessibilityState.cycleColorBlindMode()
                         },
                         contentAlignment = Alignment.Center
                     ) {
@@ -188,7 +197,7 @@ fun AccessibilityScreen(
                             text = "A",
                             baseFontSizeSp = 16f,
                             forceFontWeight = FontWeight.Bold,
-                            fallbackColor = if (enabled) Color.White else Color(0xFF6B4D8A)
+                            fallbackColor = textColor
                         )
                     }
                 }

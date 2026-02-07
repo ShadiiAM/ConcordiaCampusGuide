@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
 fun AccessibleAppRoot(
@@ -17,18 +16,17 @@ fun AccessibleAppRoot(
 
     Box(modifier = modifier.fillMaxSize()) {
         content()
-
-        if (accessibilityState.isColorFilterEnabled()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         color = when (accessibilityState.colorBlindMode) {
-                            true -> Color.Black.copy(alpha = 0.3f)
-                            false -> Color.Transparent
+                            ColorBlindMode.DEUTERANOPIA -> Color(0xFF51CF66).copy(alpha = 0.18f)
+                            ColorBlindMode.PROTANOPIA -> Color(0xFFFF6B6B).copy(alpha = 0.18f)
+                            ColorBlindMode.TRITANOPIA -> Color(0xFFFFD43B).copy(alpha = 0.18f)
+                            ColorBlindMode.NONE -> Color.Transparent
                         }
                     )
             )
-        }
     }
 }

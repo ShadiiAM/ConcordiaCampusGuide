@@ -14,7 +14,7 @@ class AccessibilityState(
     initialOffsetSp: Float = 0f,
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
-    colorBlindMode: Boolean = false
+    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
 
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
@@ -30,25 +30,27 @@ class AccessibilityState(
         private set
 
     fun increaseTextSize() {
+        if (textSizeOffsetSp < 7f)
         textSizeOffsetSp += 1f
     }
 
     fun decreaseTextSize() {
-        if (textSizeOffsetSp > 0f) {
+        if (textSizeOffsetSp > -2f)
             textSizeOffsetSp -= 1f
-        }
     }
 
     fun setBold(enabled: Boolean) {
         isBoldEnabled = enabled
     }
 
-    fun updateTextColor(color: Color) { textColor = color }
 
-    fun isColorFilterEnabled(): Boolean = colorBlindMode
-
-    fun changeColorBlindMode() {
-        colorBlindMode = !colorBlindMode
+    fun cycleColorBlindMode() {
+        colorBlindMode = when (colorBlindMode) {
+            ColorBlindMode.NONE -> ColorBlindMode.PROTANOPIA
+            ColorBlindMode.PROTANOPIA -> ColorBlindMode.DEUTERANOPIA
+            ColorBlindMode.DEUTERANOPIA -> ColorBlindMode.TRITANOPIA
+            ColorBlindMode.TRITANOPIA -> ColorBlindMode.NONE
+        }
     }
 }
 
@@ -63,7 +65,14 @@ fun rememberAccessibilityState(
     initialOffsetSp: Float = 0f,
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
-    colorBlindMode: Boolean = false
+    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
 ): AccessibilityState = remember {
     AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor, colorBlindMode = colorBlindMode)
+}
+
+enum class ColorBlindMode {
+    NONE,          // normal vision
+    PROTANOPIA,    // red-weak
+    DEUTERANOPIA,  // green-weak
+    TRITANOPIA     // blue-weak
 }

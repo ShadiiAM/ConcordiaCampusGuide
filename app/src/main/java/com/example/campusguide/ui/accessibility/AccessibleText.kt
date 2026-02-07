@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.fastCoerceAtMost
 
 @Composable
 fun AccessibleText(
@@ -20,8 +19,8 @@ fun AccessibleText(
     val accessibilityState = LocalAccessibilityState.current
 
     val finalSize = (baseFontSizeSp + accessibilityState.textSizeOffsetSp)
-        .coerceAtLeast(8f)
-        .coerceAtMost(20f)
+        .coerceAtLeast(15f)
+        .coerceAtMost(23f)
         .sp
 
     val effectiveWeight = forceFontWeight ?: if (accessibilityState.isBoldEnabled) {
@@ -41,7 +40,6 @@ fun AccessibleText(
         fontSize = finalSize,
         fontWeight = effectiveWeight,
         modifier = modifier,
-        color = color,
-        style = MaterialTheme.typography.bodyMedium
+        color = color
     )
 }
