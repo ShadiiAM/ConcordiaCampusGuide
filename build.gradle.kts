@@ -41,7 +41,9 @@ sonar {
             "**/MapsActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
             "**/MainActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
             "**/GeoJsonOverlay.kt," +         // Map rendering with Dispatchers.Main (see TESTING.md)
-            "**/CampusToggle.kt"              // Pure UI composable (see TESTING.md)
+            "**/CampusToggle.kt"  +            // Pure UI composable (see TESTING.md)
+            "**/ui/accessibility/**" +         // Accessibility UI components
+            "**/AccessibilityScreen.kt"         // Accessibility screen UI
         )
 
         // Lower coverage threshold for UI-heavy codebase

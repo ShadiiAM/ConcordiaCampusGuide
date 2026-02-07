@@ -19,18 +19,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.ui.accessibility.AccessibleAppRoot
+import com.example.campusguide.ui.accessibility.AccessibleText
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
+import com.example.campusguide.ui.accessibility.rememberAccessibilityState
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
@@ -41,10 +47,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ConcordiaCampusGuideTheme {
-                ConcordiaCampusGuideApp()
+            val accessibilityState = rememberAccessibilityState(
+                initialOffsetSp = 0f,
+            )
+
+            CompositionLocalProvider(
+                LocalAccessibilityState provides accessibilityState
+            ) {
+                ConcordiaCampusGuideTheme {
+                    AccessibleAppRoot() {
+                        ConcordiaCampusGuideApp()
+                    }
+                }
             }
         }
+
     }
 }
 
@@ -83,7 +100,7 @@ fun ConcordiaCampusGuideApp() {
                                 )
                             }
                         },
-                        label = { Text(it.label) },
+                        label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                         selected = it == currentDestination,
                         onClick = { currentDestination = it }
                     )
@@ -114,7 +131,11 @@ fun ConcordiaCampusGuideApp() {
                             val intent = Intent(context, MapsActivity::class.java)
                             context.startActivity(intent)
                         }) {
-                            Text("Open Campus Map")
+                            AccessibleText(
+                                "Open Campus Map",
+                                baseFontSizeSp = 16f,
+                                fallbackColor = Color.White
+                            )
                         }
                     }
                 }
@@ -140,8 +161,9 @@ enum class AppDestinations(
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
+    AccessibleText(
         text = "Hello $name!",
+        baseFontSizeSp = 16f,
         modifier = modifier
     )
 }

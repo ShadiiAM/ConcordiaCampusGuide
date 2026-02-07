@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 @Composable
@@ -70,10 +70,10 @@ fun SearchBarWithProfile(
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (searchQuery.isEmpty()) {
-                    Text(
+                    AccessibleText(
                         text = "Search...",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = TextStyle(fontSize = 16.sp)
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        baseFontSizeSp = 16f
                     )
                 }
                 BasicTextField(
@@ -103,11 +103,11 @@ fun SearchBarWithProfile(
                     .clickable(onClick = onProfileClick),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
+                AccessibleText(
                     text = "A",
-                    color = Color(0xFF6B4D8A),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fallbackColor = Color(0xFF6B4D8A),
+                    baseFontSizeSp = 14f,
+                    forceFontWeight = FontWeight.Medium
                 )
             }
         }
