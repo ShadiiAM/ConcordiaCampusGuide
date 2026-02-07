@@ -1,11 +1,15 @@
 package com.example.campusguide
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
+import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.screens.ProfileScreenPreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -22,11 +26,20 @@ class ProfileScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
+
     @Test
     fun profileScreen_displaysTitle() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
+
             }
         }
 
@@ -37,7 +50,11 @@ class ProfileScreenTest {
     fun profileScreen_displaysUserName() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -48,7 +65,11 @@ class ProfileScreenTest {
     fun profileScreen_displaysStudentSubtitle() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -59,7 +80,11 @@ class ProfileScreenTest {
     fun profileScreen_displaysAccessibilityItem() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -72,9 +97,13 @@ class ProfileScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen(
-                    onBackClick = { backClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen(
+                        onBackClick = { backClicked = true }
+                    )
+                }
             }
         }
 
@@ -88,9 +117,13 @@ class ProfileScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen(
-                    onProfileClick = { profileClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen(
+                        onProfileClick = { profileClicked = true }
+                    )
+                }
             }
         }
 
@@ -104,9 +137,13 @@ class ProfileScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen(
-                    onAccessibilityClick = { accessibilityClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen(
+                        onAccessibilityClick = { accessibilityClicked = true }
+                    )
+                }
             }
         }
 
@@ -118,7 +155,11 @@ class ProfileScreenTest {
     fun profileScreen_displaysUserInitial() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -129,7 +170,11 @@ class ProfileScreenTest {
     fun profileScreen_rendersWithoutErrors() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -140,7 +185,11 @@ class ProfileScreenTest {
     fun profileScreen_darkTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = true) {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -151,7 +200,11 @@ class ProfileScreenTest {
     @Test
     fun profileScreenPreview_rendersCorrectly() {
         composeTestRule.setContent {
-            ProfileScreenPreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ProfileScreenPreview()
+            }
         }
 
         composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
@@ -162,7 +215,11 @@ class ProfileScreenTest {
     fun profileScreen_lightTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = false) {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -174,12 +231,16 @@ class ProfileScreenTest {
     fun profileScreen_withAllDefaultCallbacks_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
                 ProfileScreen(
                     onBackClick = {},
                     onProfileClick = {},
                     onAccessibilityClick = {}
                 )
             }
+                }
         }
 
         composeTestRule.onNodeWithText("Jane Doe").assertIsDisplayed()
@@ -190,7 +251,11 @@ class ProfileScreenTest {
     fun profileScreen_displaysAccessibilityIcon() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen()
+                }
             }
         }
 
@@ -203,9 +268,13 @@ class ProfileScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen(
-                    onProfileClick = { profileClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen(
+                        onProfileClick = { profileClicked = true }
+                    )
+                }
             }
         }
 
@@ -220,10 +289,14 @@ class ProfileScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                ProfileScreen(
-                    onBackClick = { backClickCount++ },
-                    onProfileClick = { profileClickCount++ }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    ProfileScreen(
+                        onBackClick = { backClickCount++ },
+                        onProfileClick = { profileClickCount++ }
+                    )
+                }
             }
         }
 

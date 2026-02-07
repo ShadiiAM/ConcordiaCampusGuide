@@ -27,6 +27,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -103,7 +105,7 @@ fun AccessibilityScreen(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 AccessibleText(
-                    text = "Display and AccessibleText Size",
+                    text = "Display and Text Size",
                     baseFontSizeSp = 16f,
                     forceFontWeight = FontWeight.Bold,
                     fallbackColor = MaterialTheme.colorScheme.onSurface
@@ -121,7 +123,7 @@ fun AccessibilityScreen(
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = "AccessibleText size",
+                label = "Text size",
                 action = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -162,7 +164,7 @@ fun AccessibilityScreen(
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = "AccessibleText colour",
+                label = "Text colour",
                 action = {
                     var enabled = accessibilityState.isColorFilterEnabled()
                     Box(
@@ -200,7 +202,7 @@ fun AccessibilityScreen(
                     AccessibleText(
                         text = "B",
                         baseFontSizeSp = 18f,
-                      //  fontWeight = FontWeight.Bold,
+                        forceFontWeight = FontWeight.Bold,
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
@@ -260,6 +262,10 @@ private fun SettingRow(
 @Composable
 fun AccessibilityScreenPreview() {
     ConcordiaCampusGuideTheme {
-        AccessibilityScreen()
+        CompositionLocalProvider(
+            LocalAccessibilityState provides AccessibilityState(initialOffsetSp = 16f)
+        ) {
+            AccessibilityScreen()
+        }
     }
 }

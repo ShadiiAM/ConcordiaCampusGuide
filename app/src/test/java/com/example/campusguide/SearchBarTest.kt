@@ -1,5 +1,6 @@
 package com.example.campusguide
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -8,8 +9,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.components.SearchBarWithProfilePreview
+import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -24,11 +28,20 @@ class SearchBarTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
+
     @Test
     fun searchBar_displaysPlaceholder() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
+
             }
         }
 
@@ -39,7 +52,11 @@ class SearchBarTest {
     fun searchBar_displaysSearchIcon() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 
@@ -50,7 +67,11 @@ class SearchBarTest {
     fun searchBar_displaysProfileAvatar() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 
@@ -63,9 +84,13 @@ class SearchBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile(
-                    onProfileClick = { profileClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile(
+                        onProfileClick = { profileClicked = true }
+                    )
+                }
             }
         }
 
@@ -79,9 +104,13 @@ class SearchBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile(
-                    onSearchQueryChange = { callbackTriggered = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile(
+                        onSearchQueryChange = { callbackTriggered = true }
+                    )
+                }
             }
         }
 
@@ -95,7 +124,11 @@ class SearchBarTest {
     fun searchBar_rendersWithoutErrors() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 
@@ -106,7 +139,11 @@ class SearchBarTest {
     fun searchBar_darkTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = true) {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 
@@ -118,10 +155,14 @@ class SearchBarTest {
     fun searchBar_withDefaultCallbacks_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile(
-                    onSearchQueryChange = {},
-                    onProfileClick = {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile(
+                        onSearchQueryChange = {},
+                        onProfileClick = {}
+                    )
+                }
             }
         }
 
@@ -131,7 +172,11 @@ class SearchBarTest {
     @Test
     fun searchBarWithProfilePreview_rendersCorrectly() {
         composeTestRule.setContent {
-            SearchBarWithProfilePreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                SearchBarWithProfilePreview()
+            }
         }
 
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
@@ -142,9 +187,13 @@ class SearchBarTest {
     fun searchBar_withCustomModifier_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile(
-                    modifier = androidx.compose.ui.Modifier
-                )
+                    CompositionLocalProvider(
+                        LocalAccessibilityState provides defaultState
+                    ) {
+                        SearchBarWithProfile(
+                            modifier = androidx.compose.ui.Modifier
+                        )
+                    }
             }
         }
 
@@ -155,7 +204,11 @@ class SearchBarTest {
     fun searchBar_profileAvatarDisplaysInitial() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 
@@ -167,7 +220,11 @@ class SearchBarTest {
     fun searchBar_lightTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = false) {
-                SearchBarWithProfile()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile()
+                }
             }
         }
 

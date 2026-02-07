@@ -1,6 +1,7 @@
 package com.example.campusguide
 
 import android.content.Intent
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -9,6 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Rule
@@ -24,6 +27,10 @@ class MainActivityTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
 
     @Test
     fun mainActivity_onCreate_shouldLaunchSuccessfully() {
@@ -87,7 +94,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_displaysGreeting() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
@@ -96,7 +107,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_displaysCampusMapButton() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         composeTestRule.onNodeWithText("Open Campus Map").assertIsDisplayed()
@@ -105,7 +120,11 @@ class MainActivityTest {
     @Test
     fun campusMapButton_clickable() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Verify button can be clicked (this will execute the onClick handler)
@@ -119,7 +138,11 @@ class MainActivityTest {
     @Test
     fun greeting_displaysCorrectMessage() {
         composeTestRule.setContent {
-            Greeting(name = "TestUser")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "TestUser")
+            }
         }
 
         composeTestRule.onNodeWithText("Hello TestUser!").assertIsDisplayed()
@@ -128,7 +151,11 @@ class MainActivityTest {
     @Test
     fun navigationItems_allDestinations_areClickable() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Click through all navigation items to cover navigation lambdas
@@ -156,7 +183,11 @@ class MainActivityTest {
     @Test
     fun greeting_withModifier_appliesCorrectly() {
         composeTestRule.setContent {
-            Greeting(name = "Compose")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "Compose")
+            }
         }
 
         composeTestRule.onNodeWithText("Hello Compose!").assertIsDisplayed()
@@ -166,7 +197,11 @@ class MainActivityTest {
     fun greetingPreview_rendersWithoutErrors() {
         // Test the preview function executes without errors
         composeTestRule.setContent {
-            GreetingPreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                GreetingPreview()
+            }
         }
 
         // Preview should render successfully
@@ -176,7 +211,11 @@ class MainActivityTest {
     @Test
     fun navigationSuite_switchesBetweenDestinations() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Switch between destinations to cover selection logic
@@ -193,7 +232,11 @@ class MainActivityTest {
     @Test
     fun greeting_withDifferentNames_alice() {
         composeTestRule.setContent {
-            Greeting(name = "Alice")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "Alice")
+            }
         }
         composeTestRule.onNodeWithText("Hello Alice!").assertIsDisplayed()
     }
@@ -201,7 +244,11 @@ class MainActivityTest {
     @Test
     fun greeting_withDifferentNames_bob() {
         composeTestRule.setContent {
-            Greeting(name = "Bob")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "Bob")
+            }
         }
         composeTestRule.onNodeWithText("Hello Bob!").assertIsDisplayed()
     }
@@ -209,7 +256,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_profileNavigation_showsProfileScreen() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Click on profile avatar (the "A" in search bar)
@@ -223,7 +274,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_profileToAccessibility_showsAccessibilityScreen() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Navigate to profile
@@ -241,7 +296,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_accessibilityBackButton_returnsToProfile() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Navigate to profile -> accessibility
@@ -261,7 +320,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_profileBackButton_returnsToMain() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Navigate to profile
@@ -311,7 +374,11 @@ class MainActivityTest {
     @Test
     fun greeting_withEmptyName_displaysCorrectly() {
         composeTestRule.setContent {
-            Greeting(name = "")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "")
+            }
         }
         composeTestRule.onNodeWithText("Hello !").assertIsDisplayed()
     }
@@ -319,7 +386,11 @@ class MainActivityTest {
     @Test
     fun greeting_withSpecialCharacters_displaysCorrectly() {
         composeTestRule.setContent {
-            Greeting(name = "User@123")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "User@123")
+            }
         }
         composeTestRule.onNodeWithText("Hello User@123!").assertIsDisplayed()
     }
@@ -327,7 +398,11 @@ class MainActivityTest {
     @Test
     fun greeting_withLongName_displaysCorrectly() {
         composeTestRule.setContent {
-            Greeting(name = "VeryLongUserNameThatMightCauseIssues")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting(name = "VeryLongUserNameThatMightCauseIssues")
+            }
         }
         composeTestRule.onNodeWithText("Hello VeryLongUserNameThatMightCauseIssues!").assertIsDisplayed()
     }
@@ -335,7 +410,11 @@ class MainActivityTest {
     @Test
     fun concordiaCampusGuideApp_displaysSearchBar() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()

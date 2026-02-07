@@ -1,11 +1,14 @@
 package com.example.campusguide
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import org.junit.Rule
 import org.junit.Test
@@ -22,11 +25,19 @@ class ComponentTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
+
     @Test
     fun greeting_withCustomModifier_rendersCorrectly() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                Greeting(name = "World", modifier = Modifier)
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideTheme {
+                    Greeting(name = "World", modifier = Modifier)
+                }
             }
         }
         composeTestRule.waitForIdle()
@@ -35,8 +46,12 @@ class ComponentTest {
     @Test
     fun greetingPreview_darkTheme_rendersCorrectly() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideTheme(darkTheme = true) {
-                GreetingPreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideTheme(darkTheme = true) {
+                    GreetingPreview()
+                }
             }
         }
         composeTestRule.waitForIdle()
@@ -45,8 +60,12 @@ class ComponentTest {
     @Test
     fun greetingPreview_lightTheme_rendersCorrectly() {
         composeTestRule.setContent {
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
             ConcordiaCampusGuideTheme(darkTheme = false) {
                 GreetingPreview()
+            }
             }
         }
         composeTestRule.waitForIdle()
@@ -55,7 +74,11 @@ class ComponentTest {
     @Test
     fun concordiaCampusGuideApp_multipleNavigationClicks() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Navigate through all destinations multiple times
@@ -76,8 +99,11 @@ class ComponentTest {
 
     @Test
     fun greeting_multipleNamesSequence1() {
-        composeTestRule.setContent {
+        composeTestRule.setContent {CompositionLocalProvider(
+            LocalAccessibilityState provides defaultState
+        ) {
             Greeting("User1")
+        }
         }
         composeTestRule.waitForIdle()
     }
@@ -85,7 +111,11 @@ class ComponentTest {
     @Test
     fun greeting_multipleNamesSequence2() {
         composeTestRule.setContent {
-            Greeting("User2")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting("User2")
+            }
         }
         composeTestRule.waitForIdle()
     }
@@ -93,7 +123,11 @@ class ComponentTest {
     @Test
     fun greeting_multipleNamesSequence3() {
         composeTestRule.setContent {
-            Greeting("User3")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                Greeting("User3")
+            }
         }
         composeTestRule.waitForIdle()
     }
@@ -101,8 +135,12 @@ class ComponentTest {
     @Test
     fun greeting_withNumbers_rendersCorrectly() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                Greeting(name = "12345")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideTheme {
+                    Greeting(name = "12345")
+                }
             }
         }
         composeTestRule.onNodeWithText("Hello 12345!").assertIsDisplayed()
@@ -111,8 +149,12 @@ class ComponentTest {
     @Test
     fun greeting_withUnicode_rendersCorrectly() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                Greeting(name = "Jean-Pierre")
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideTheme {
+                    Greeting(name = "Jean-Pierre")
+                }
             }
         }
         composeTestRule.onNodeWithText("Hello Jean-Pierre!").assertIsDisplayed()
@@ -121,7 +163,11 @@ class ComponentTest {
     @Test
     fun concordiaCampusGuideApp_rapidNavigationClicks() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         // Rapid clicks on same destination
@@ -134,7 +180,11 @@ class ComponentTest {
     @Test
     fun concordiaCampusGuideApp_poiDestination_isDisplayed() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         composeTestRule.onNodeWithText("POI").performClick()
@@ -144,7 +194,11 @@ class ComponentTest {
     @Test
     fun concordiaCampusGuideApp_calendarDestination_isDisplayed() {
         composeTestRule.setContent {
-            ConcordiaCampusGuideApp()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                ConcordiaCampusGuideApp()
+            }
         }
 
         composeTestRule.onNodeWithText("Calendar").performClick()

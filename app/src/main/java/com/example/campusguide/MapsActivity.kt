@@ -28,6 +28,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,8 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.components.SearchBarWithProfile
@@ -70,7 +73,9 @@ import org.json.JSONObject
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
-
+    private val defaultAccessibilityState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
@@ -106,6 +111,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         binding.searchBar.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultAccessibilityState
+                ){
                 ConcordiaCampusGuideTheme {
                     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
                     SearchBarWithProfile(
@@ -113,6 +121,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                         onProfileClick = { showProfileOverlay() },
                         modifier = Modifier.padding(top = statusBarPadding.calculateTopPadding())
                     )
+                }
                 }
             }
         }
@@ -126,6 +135,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         binding.campusToggle.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultAccessibilityState
+                ) {
                 ConcordiaCampusGuideTheme {
                     var selectedCampus by remember { mutableStateOf(getSavedCampus()) }
                     MaterialTheme {
@@ -139,6 +151,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                             showIcon = true
                         )
                     }
+                    }
                 }
             }
         }
@@ -147,6 +160,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         binding.bottomNav.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultAccessibilityState
+                ) {
                 ConcordiaCampusGuideTheme {
                     NavigationBar {
                         NavigationBarItem(
@@ -156,23 +172,39 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                             onClick = { }
                         )
                         NavigationBarItem(
-                            icon = { Icon(painterResource(R.drawable.ic_directions), contentDescription = "Directions") },
+                            icon = {
+                                Icon(
+                                    painterResource(R.drawable.ic_directions),
+                                    contentDescription = "Directions"
+                                )
+                            },
                             label = { Text("Directions") },
                             selected = false,
                             onClick = { }
                         )
                         NavigationBarItem(
-                            icon = { Icon(painterResource(R.drawable.ic_calendar), contentDescription = "Calendar") },
+                            icon = {
+                                Icon(
+                                    painterResource(R.drawable.ic_calendar),
+                                    contentDescription = "Calendar"
+                                )
+                            },
                             label = { Text("Calendar") },
                             selected = false,
                             onClick = { }
                         )
                         NavigationBarItem(
-                            icon = { Icon(painterResource(R.drawable.ic_poi), contentDescription = "POI") },
+                            icon = {
+                                Icon(
+                                    painterResource(R.drawable.ic_poi),
+                                    contentDescription = "POI"
+                                )
+                            },
                             label = { Text("POI") },
                             selected = false,
                             onClick = { }
                         )
+                    }
                     }
                 }
             }
@@ -372,9 +404,13 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     internal fun showProfileOverlay() {
         binding.profileOverlay.visibility = View.VISIBLE
         binding.profileOverlay.setContent {
-            ProfileOverlayContent(onDismiss = {
-                binding.profileOverlay.visibility = View.GONE
-            })
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultAccessibilityState
+            ) {
+                ProfileOverlayContent(onDismiss = {
+                    binding.profileOverlay.visibility = View.GONE
+                })
+            }
         }
     }
 

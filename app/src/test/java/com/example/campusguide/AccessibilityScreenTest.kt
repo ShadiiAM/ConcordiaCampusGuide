@@ -1,11 +1,14 @@
 package com.example.campusguide
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.AccessibilityScreenPreview
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -22,11 +25,19 @@ class AccessibilityScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
+
     @Test
     fun accessibilityScreen_displaysTitle() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -37,7 +48,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysSectionHeader() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -48,7 +63,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysTextSizeSetting() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -59,7 +78,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysTextColourSetting() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -70,7 +93,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysBoldSetting() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -83,9 +110,13 @@ class AccessibilityScreenTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen(
-                    onBackClick = { backClicked = true }
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen(
+                        onBackClick = { backClicked = true }
+                    )
+                }
             }
         }
 
@@ -97,7 +128,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_boldToggle_canBeClicked() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -110,7 +145,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysMinusButton() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -121,7 +160,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_displaysPlusButton() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -132,7 +175,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_rendersWithoutErrors() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -143,7 +190,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_darkTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = true) {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -155,7 +206,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_minusButton_canBeClicked() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -167,7 +222,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_plusButton_canBeClicked() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -178,7 +237,11 @@ class AccessibilityScreenTest {
     @Test
     fun accessibilityScreenPreview_rendersCorrectly() {
         composeTestRule.setContent {
-            AccessibilityScreenPreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                AccessibilityScreenPreview()
+            }
         }
 
         composeTestRule.onNodeWithText("Accessibility").assertIsDisplayed()
@@ -189,7 +252,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_lightTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = false) {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -201,9 +268,13 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_withDefaultCallback_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen(
-                    onBackClick = {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen(
+                        onBackClick = {}
+                    )
+                }
             }
         }
 
@@ -214,7 +285,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_allSettingsAreDisplayed() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
@@ -228,7 +303,11 @@ class AccessibilityScreenTest {
     fun accessibilityScreen_multipleButtonClicks() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                AccessibilityScreen()
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    AccessibilityScreen()
+                }
             }
         }
 
