@@ -30,13 +30,11 @@ class AccessibilityState(
         private set
 
     fun increaseTextSize() {
-        if (textSizeOffsetSp < 7f)
-        textSizeOffsetSp += 1f
+        if (textSizeOffsetSp < 7f) textSizeOffsetSp += 1f
     }
 
     fun decreaseTextSize() {
-        if (textSizeOffsetSp > -2f)
-            textSizeOffsetSp -= 1f
+        if (textSizeOffsetSp > -2f) textSizeOffsetSp -= 1f
     }
 
     fun setBold(enabled: Boolean) {
