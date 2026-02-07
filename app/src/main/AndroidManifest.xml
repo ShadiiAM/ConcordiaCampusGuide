@@ -26,7 +26,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".activity.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps"
             android:theme="@style/Theme.ConcordiaCampusGuide.AppCompat" />

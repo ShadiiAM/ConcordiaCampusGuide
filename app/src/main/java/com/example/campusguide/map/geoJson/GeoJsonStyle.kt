@@ -1,4 +1,4 @@
-package com.example.campusguide.ui.map.geoJson
+package com.example.campusguide.map.geoJson
 
 import androidx.annotation.ColorInt
 

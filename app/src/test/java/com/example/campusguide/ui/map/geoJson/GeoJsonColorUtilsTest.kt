@@ -1,5 +1,6 @@
 package com.example.campusguide.ui.map.geoJson
 
+import com.example.campusguide.map.geoJson.GeoJsonColorUtils
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

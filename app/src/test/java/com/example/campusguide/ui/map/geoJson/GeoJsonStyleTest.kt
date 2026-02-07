@@ -1,4 +1,5 @@
 ﻿package com.example.campusguide.ui.map.geoJson
+import com.example.campusguide.map.geoJson.GeoJsonStyle
 import org.junit.Assert.*
 import org.junit.Test
 class GeoJsonStyleTest {

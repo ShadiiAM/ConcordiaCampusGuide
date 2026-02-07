@@ -1,4 +1,4 @@
-package com.example.campusguide.ui.map.geoJson
+package com.example.campusguide.map.geoJson
 
 import android.content.Context
 import android.graphics.Bitmap

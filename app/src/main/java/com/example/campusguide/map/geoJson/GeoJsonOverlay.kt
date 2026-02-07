@@ -1,10 +1,7 @@
-package com.example.campusguide.ui.map.geoJson
+package com.example.campusguide.map.geoJson
 
-import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import android.content.Context
-import android.graphics.Color
 import androidx.annotation.RawRes
-import com.example.campusguide.ui.map.geoJson.GeoJsonColorUtils
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*

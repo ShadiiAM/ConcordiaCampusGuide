@@ -1,4 +1,4 @@
-package com.example.campusguide.ui.map.geoJson
+package com.example.campusguide.map.geoJson
 import com.google.maps.android.data.geojson.GeoJsonFeature
 
 fun interface GeoJsonStyleMapper {

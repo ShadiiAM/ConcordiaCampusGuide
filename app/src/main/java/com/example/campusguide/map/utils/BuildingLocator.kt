@@ -1,9 +1,10 @@
-package com.example.campusguide.ui.map.utils
+package com.example.campusguide.map.utils
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polygon
 import com.google.maps.android.PolyUtil
 import org.json.JSONObject
+import kotlin.collections.iterator
 
 class BuildingLocator(
     private val polygonsById: Map<String, List<Polygon>>,

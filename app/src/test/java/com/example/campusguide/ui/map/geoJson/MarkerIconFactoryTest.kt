@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.test.core.app.ApplicationProvider
+import com.example.campusguide.map.geoJson.MarkerIconFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import org.junit.After
 import org.junit.Assert.*

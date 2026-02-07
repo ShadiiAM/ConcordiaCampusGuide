@@ -1,26 +1,26 @@
-package com.example.campusguide
+package com.example.campusguide.activity
 
-import android.content.pm.PackageManager
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import androidx.annotation.RequiresPermission
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.campusguide.R
 import com.example.campusguide.databinding.ActivityMapsBinding
+import com.example.campusguide.map.geoJson.GeoJsonOverlay
+import com.example.campusguide.map.geoJson.GeoJsonStyle
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
-import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
-import com.google.android.gms.location.LocationResult
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,8 +29,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import java.util.concurrent.TimeUnit
-
-
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
@@ -88,16 +86,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         sgwOverlay.attachToMap(mMap)
         loyOverlay.attachToMap(mMap)
          val defaultStyle = GeoJsonStyle(
-            fillColor = 0x80ff8a8a.toInt(),
-            strokeColor = 0xFF4d0000.toInt(),
-            strokeWidth = 2f,
-            zIndex = 10f,
-            clickable = false,
-            visible = true,
+             fillColor = 0x80ff8a8a.toInt(),
+             strokeColor = 0xFF4d0000.toInt(),
+             strokeWidth = 2f,
+             zIndex = 10f,
+             clickable = false,
+             visible = true,
              markerColor = 0xFF974949.toInt(),
              markerAlpha = 1f,
              markerScale = 2f
-        )
+         )
         sgwOverlay.setAllStyles(defaultStyle)
         loyOverlay.setAllStyles(defaultStyle)
 
@@ -138,7 +136,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-     fun requestLocation() : LatLng{
+     fun requestLocation() : LatLng {
         var userLocation = LatLng(45.4972, -73.5789)
         if(isPermissionsGranted()){
             fusedLocationProviderClient.lastLocation.addOnSuccessListener{ location: Location? -> userLocation = setLocation(location)}
@@ -150,9 +148,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    fun setLocation(location: Location?) : LatLng{
+    fun setLocation(location: Location?) : LatLng {
         if(location != null){
-            return LatLng(location.latitude,location.longitude)
+            return LatLng(location.latitude, location.longitude)
         }else{
             callback = object: LocationCallback(){}
             requestLocationUpdates(callback)
@@ -164,7 +162,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     //Check if the location and network services are on
     fun isLocationEnabled() : Boolean{
         val locationManager= applicationContext.getSystemService(LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER)
     }
 
     fun isPermissionsGranted(): Boolean{
@@ -172,7 +171,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
-    fun generateCallback(): LocationCallback{
+    fun generateCallback(): LocationCallback {
         return object: LocationCallback() {
             @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
             override fun onLocationResult(locationResult: LocationResult) {

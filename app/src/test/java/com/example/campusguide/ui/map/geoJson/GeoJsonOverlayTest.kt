@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.test.core.app.ApplicationProvider
+import com.example.campusguide.map.geoJson.GeoJsonOverlay
+import com.example.campusguide.map.geoJson.GeoJsonStyle
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import org.json.JSONObject
