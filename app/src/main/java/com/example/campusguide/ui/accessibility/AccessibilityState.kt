@@ -41,7 +41,6 @@ class AccessibilityState(
         isBoldEnabled = enabled
     }
 
-
     fun cycleColorBlindMode() {
         colorBlindMode = when (colorBlindMode) {
             ColorBlindMode.NONE -> ColorBlindMode.PROTANOPIA
