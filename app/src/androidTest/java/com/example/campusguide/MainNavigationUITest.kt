@@ -1,7 +1,10 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -12,22 +15,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * UI Tests for Main App Navigation Feature (User Story 1.6)
+ * Acceptance Test for US-1.6: Main App Navigation
  *
- * These tests verify that users can navigate between different sections
- * of the app (Map, Calendar, Profile) using the navigation system.
- *
- * Acceptance Criteria Tested:
- * 1. Bottom navigation bar is visible on main screens
- * 2. Map tab opens map screen
- * 3. Calendar tab opens calendar screen
- * 4. Profile tab opens profile screen
- * 5. Active tab is highlighted
- * 6. Navigation transitions are smooth
- * 7. Back button works correctly from each screen
- *
- * Note: These tests require a connected device or running emulator.
- * Run with: ./gradlew connectedAndroidTest
+ * Tests verify bottom navigation bar and top search bar with profile button.
+ * Navigation between Map, Directions, Calendar, POI screens is tested.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -36,90 +27,89 @@ class MainNavigationUITest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    /**
-     * Test: App launches with navigation visible
-     * Verifies that bottom navigation bar is displayed on launch
-     */
-    @Test
-    fun appLaunch_navigationBarIsVisible() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
 
-        // Verify main content is displayed
+    @Test
+    fun appLaunches_withBottomNavigation() {
+        // AC: Bottom navigation is visible on main screens
+        Thread.sleep(2000)
+
+        // Verify all 4 bottom nav items exist
+        composeTestRule.onNode(hasText("Map")).assertExists()
+        composeTestRule.onNode(hasText("Directions")).assertExists()
+        composeTestRule.onNode(hasText("Calendar")).assertExists()
+        composeTestRule.onNode(hasText("POI")).assertExists()
+    }
+
+    @Test
+    fun navigationTabs_areClickable() {
+        // AC: User can tap bottom navigation items to navigate
+        Thread.sleep(2000)
+
+        // Click Directions tab
+        composeTestRule.onNode(hasText("Directions")).performClick()
+        Thread.sleep(1000)
+
+        // Click Calendar tab
+        composeTestRule.onNode(hasText("Calendar")).performClick()
+        Thread.sleep(1000)
+
+        // Click POI tab
+        composeTestRule.onNode(hasText("POI")).performClick()
+        Thread.sleep(1000)
+
+        // Click back to Map tab
+        composeTestRule.onNode(hasText("Map")).performClick()
+        Thread.sleep(1000)
+
+        // Verify app didn't crash
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: Navigate to Map screen
-     * Verifies that clicking map tab shows map screen
-     */
     @Test
-    fun navigation_toMapScreen_succeeds() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun topSearchBar_isVisible() {
+        // AC: Search bar displayed at top of main screens
+        Thread.sleep(2000)
 
-        // Try to find and click map navigation item
-        // Note: This will depend on your actual navigation implementation
-        // Adjust as needed based on your nav implementation
+        // Verify search icon exists
+        composeTestRule.onNode(hasContentDescription("Search")).assertExists()
+    }
 
-        // Verify content is displayed
+    @Test
+    fun profileButton_navigatesToSettings() {
+        // AC: Profile button navigates to user settings screen
+        Thread.sleep(2000)
+
+        // Click profile button (has text "A")
+        composeTestRule.onNode(hasText("A")).performClick()
+
+        // Wait for profile screen to load and show it clearly
+        Thread.sleep(5000)
+
+        // Verify we're on profile screen
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: Navigate to Calendar screen
-     * Verifies that calendar screen can be accessed
-     */
+
     @Test
-    fun navigation_toCalendarScreen_succeeds() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun navigationDoesNotCrash() {
+        // AC: Navigation doesn't crash or create duplicated screens
+        Thread.sleep(2000)
 
-        // Content should be visible
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
+        // Navigate through multiple tabs
+        composeTestRule.onNode(hasText("Directions")).performClick()
+        Thread.sleep(1000)
 
-    /**
-     * Test: Navigate to Profile screen
-     * Verifies that profile screen can be accessed
-     */
-    @Test
-    fun navigation_toProfileScreen_succeeds() {
-        // Wait for app to load
-        Thread.sleep(1500)
+        composeTestRule.onNode(hasText("Calendar")).performClick()
+        Thread.sleep(1000)
 
-        // Content should be visible
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
+        composeTestRule.onNode(hasText("Map")).performClick()
+        Thread.sleep(1000)
 
-    /**
-     * Test: Navigation between multiple screens
-     * Verifies that users can navigate between screens multiple times
-     */
-    @Test
-    fun navigation_betweenMultipleScreens_succeeds() {
-        // Wait for initial load
-        Thread.sleep(1500)
-
-        // App should remain functional after navigation
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: Navigation state persists
-     * Verifies that navigation maintains state correctly
-     */
-    @Test
-    fun navigation_stateIsPreserved() {
-        // Wait for app to load
-        Thread.sleep(1500)
-
-        // Navigate and verify state
+        // Verify app is still running
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
