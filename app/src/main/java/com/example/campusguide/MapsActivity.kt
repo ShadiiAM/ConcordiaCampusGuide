@@ -46,6 +46,7 @@ import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
+import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -87,11 +88,10 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     lateinit var callback: LocationCallback
 
-    private lateinit var sgwOverlay: GeoJsonOverlay
-    private lateinit var loyOverlay: GeoJsonOverlay
+    lateinit var sgwOverlay: GeoJsonOverlay
+    lateinit var loyOverlay: GeoJsonOverlay
     private var sgwAttached = false
     private var loyAttached = false
-    var userMarker: Marker? = null
 
     // State for building details bottom sheet
     private var selectedBuildingInfo: BuildingInfo? by mutableStateOf(null)
@@ -238,14 +238,6 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         sgwOverlay = GeoJsonOverlay(this, idPropertyName = "buildingCode")
         loyOverlay = GeoJsonOverlay(this, idPropertyName = "buildingCode")
 
-
-
-        // Add a marker at Concordia University (SGW Campus) and move the camera
-        val concordiaSGW = LatLng(45.4972, -73.5789)
-        mMap.addMarker(MarkerOptions()
-            .position(concordiaSGW)
-            .title("Concordia University - SGW Campus"))
-
         // Move camera to saved campus location
         val savedCampus = getSavedCampus()
         val initialLocation = when (savedCampus) {
@@ -294,7 +286,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */
-    private fun loadGeoJson(rawRes: Int): JSONObject {
+    fun loadGeoJson(rawRes: Int): JSONObject {
         val input = resources.openRawResource(rawRes)
         val text = BufferedReader(InputStreamReader(input)).use { it.readText() }
         return JSONObject(text)
@@ -576,17 +568,53 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { location ->
                     val userLatLng = LatLng(location.latitude, location.longitude)
-                    if (userMarker == null) {
-                        userMarker = mMap.addMarker(
-                            MarkerOptions().position(userLatLng).title("You are here")
-                        )
-                    } else {
-                        userMarker?.position = userLatLng
-                    }
+                    highlightBuildingUserIsIn(userLatLng)
                 }
             }
         }
     }
+
+    //Highlight the polygon when a user is within the perimeter
+    fun highlightBuildingUserIsIn(latLng: LatLng){
+
+        //Create building locator objects
+        val sgwBuildingLocator = BuildingLocator(
+            sgwOverlay.getBuildings(),
+            sgwOverlay.getBuildingProps()
+        )
+        val loyBuildingLocator = BuildingLocator(
+            loyOverlay.getBuildings(),
+            loyOverlay.getBuildingProps()
+        )
+
+        //Check if user is in a building in sgw, loy or neither
+        val sgwIsHit = sgwBuildingLocator.pointInBuilding(latLng)
+        val loyIsHit = loyBuildingLocator.pointInBuilding(latLng)
+
+        //Change the style of the polygon to an highlighted one
+        if (sgwIsHit) {
+            val building = sgwBuildingLocator.findBuilding(latLng)
+            sgwOverlay.setStyleForFeature(building!!.id, highlightedOverlayStyle())
+        } else if (loyIsHit) {
+            val building = loyBuildingLocator.findBuilding(latLng)
+            loyOverlay.setStyleForFeature(building!!.id,highlightedOverlayStyle())
+        }else{
+            sgwOverlay.setAllStyles(defaultOverlayStyle())
+            loyOverlay.setAllStyles(defaultOverlayStyle())
+        }
+    }
+
+    private fun highlightedOverlayStyle() = GeoJsonStyle(
+        fillColor    = 0xF0ffacaf.toInt(),
+        strokeColor  = 0xFFbc4949.toInt(),
+        strokeWidth  = 9f,
+        zIndex       = 10f,
+        clickable    = true,
+        visible      = true,
+        markerColor  = 0xFFbc4949.toInt(),
+        markerAlpha  = 1f,
+        markerScale  = 1.5f
+    )
 
     // ==================== Lifecycle ====================
     override fun onDestroy() {
