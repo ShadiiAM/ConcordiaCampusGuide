@@ -3,6 +3,8 @@
 
     <style name="Theme.ConcordiaCampusGuide" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <style name="Theme.ConcordiaCampusGuideSplashScreen" parent = "Theme.ConcordiaCampusGuide" />
+
     <!-- AppCompat theme for MapsActivity -->
     <style name="Theme.ConcordiaCampusGuide.AppCompat" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@android:color/holo_blue_dark</item>

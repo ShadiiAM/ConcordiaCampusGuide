@@ -211,6 +211,31 @@ This document provides a comprehensive overview of all unit tests in the project
 | `concordiaCampusGuideApp_poiDestination_isDisplayed` | Tests POI navigation |
 | `concordiaCampusGuideApp_calendarDestination_isDisplayed` | Tests Calendar navigation |
 
+### NavigationBarTest.kt (18 tests)
+**Location:** `app/src/test/java/com/example/campusguide/NavigationBarTest.kt`
+**Covers:** `NavigationBar.kt` - `NavigationBar` composable
+
+| Test Name | Description                                                                    |
+|-----------|--------------------------------------------------------------------------------|
+| `nav_BarDisplaysAppDestinations` | Tests UI Visibility                                                   |
+| `navBar_rendersWithoutErrors` | Tests Slot Integrity                                                    |
+| `navBar_darkTheme_rendersCorrectly` | Tests Dark Mode                                                   |
+| `navBar_withNoContent_rendersCorrectly` | Tests Empty State                                                       |
+| `navBarPreview_rendersCorrectly` | Tests Preview Execution                                                    |
+| `navBarEachDestinationCanBecomeSelected` | Tests Exhaustive Selection                                                    |
+| `navBarWithDifferentCurrentDestination` | Tests Initial State                                                     |
+| `navBarUpdatesCurrentDestination` | Tests State Callback                                                |
+| `navBarWithoutContentDoesNotRenderSearch` | Tests Conditional Rendering of the search bar/content line of nav bar          |
+| `navBarCurrentDestinationisVisuallySelected` | Tests that selected navbar item shows visual indicator                         |
+| `navBarUnselectedItemsAreNotSelected` | Tests that only one nav bar item is selected                                   |
+| `navBar_clickingSameDestinationDoesNotCrash` | Tests if clicking the active state doesnt crash code                           |
+| `navBarRendersDrawableIcon` | Tests Resource Loading                                                         |
+| `navBarLabelRecomposes` | Tests Reactivity: Ensures the UI updates automatically when state value changed |
+| `navBar_rendersDrawableIcon_specifically` | Tests the rendering of AppIcons                                                |
+| `navBar_allDestinations_respondToClicks` | Tests Enum Coverage                                                            |
+| `navBar_restoresSelectedDestination_afterRecreation` | Tests State Persistence                                                        |
+| `navBar_contentHasCorrectPadding` | Tests Modifier Consumption                                                     |
+
 ---
 
 ## Map & GeoJSON Tests

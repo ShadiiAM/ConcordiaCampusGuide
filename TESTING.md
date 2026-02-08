@@ -139,12 +139,14 @@ private fun renderPolygon(map: GoogleMap, ...) {
 **SonarCloud exclusions:**
 - `**/ui/theme/**` - Pure UI styling, no business logic
 - `**/ui/screens/**` - Full screen composables (tested via Espresso)
+- `**/ui/components/**` - component composables (tested via Espresso)
+
 
 **Coverage threshold:** 50% for new code (industry standard for UI-heavy apps)
 
 **Rationale:**
 - Business logic: Target 80%+ unit test coverage ✓
-- UI code: Covered by Espresso tests (not counted in unit test coverage)
+- UI code: Covered by Espresso tests and Jetpack Compose UI tests (not counted in unit test coverage)
 - Overall: Balanced approach for fast CI and comprehensive testing
 
 ## Running Tests
