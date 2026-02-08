@@ -220,6 +220,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         findViewById<Button>(R.id.button_down).setOnClickListener { moveDown() }
         findViewById<Button>(R.id.button_left).setOnClickListener { moveLeft() }
         findViewById<Button>(R.id.button_right).setOnClickListener { moveRight() }
+        findViewById<Button>(R.id.button_zoom_in).setOnClickListener { zoomIn() }
+        findViewById<Button>(R.id.button_zoom_out).setOnClickListener { zoomOut() }
     }
 
     /**
@@ -295,6 +297,16 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private fun moveRight() {
         if (!::mMap.isInitialized) return
         mMap.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
+    }
+
+    private fun zoomIn() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.zoomIn())
+    }
+
+    private fun zoomOut() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.zoomOut())
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */
