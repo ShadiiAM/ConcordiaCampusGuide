@@ -1,0 +1,250 @@
+buildingCode,buildingName,address,campus,departments,accessibility,notes,services,venues,hours
+B,B Annex,2160 Bishop St.,SGW,,No,Houses offices and Student Services,Engineering and Computer Science Association,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+CI,CI Annex,2149 Mackay St.,SGW,,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+CL,CL Annex,1665 Ste-Catherine St. W.,SGW,,"Accessible entrance, Accessible building elevator",,Concordia Continuing Education ,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+D,D Annex,2140 Bishop St.,SGW,,No,Student Housing,,,"24/7 access for residents
+Visitor access restrictions apply"
+EN,EN Annex,2070 Mackay St.,SGW,Research Chair on Gambling,No,Student Housing,,,"24/7 access for residents
+Visitor access restrictions apply"
+ER,ER Building,2155 Guy St.,SGW,"
+    Applied AI Institute,
+    Centre for Engineering in Society,
+    Computer Science and Software Engineering,
+    Creative Arts Therapies,
+    engAGE: Centre for Research on Aging,
+    Next-Generation Cities Institute,
+    Simone de Beauvoir Institute,
+    Sustainability in the Digital Age,
+    Urban Studies","
+
+Accessibility ramp, Accessible entrance,Accessible building elevator",,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+EV,"Engineering, Computer Science and Visual Arts Integrated Complex",1515 Ste-Catherine St. W.,SGW,"
+    Art Education,
+    Art History,
+    Building, Civil and Environmental Engineering,
+    Centre for Composites (CONCOM),
+    Centre for Pattern Recognition and Machine Intelligence (CENPARMI),
+    Centre for Zero Energy Building Studies,
+    Chemical and Materials Engineering,
+    Contemporary Dance,
+    Design and Computation Arts,
+    Electrical and Computer Engineering,
+    Faculty of Fine Arts,
+    Gina Cody School of Engineering and Computer Science,
+    ""Mechanical, Industrial and Aerospace Engineering"",
+    Recreation and Athletics,
+    Studio Arts","
+
+Accessible entrance, Accessible building elevator",,"  Le Gym,
+    Zen Den","    Abe and Harriet Gold Atrium,
+    FOFA Gallery,
+  ""Norman D. Hebert, LLD Meeting Room""
+    York Amphitheatre    ","Monday-Friday: 6:00 AM - 11:00 PM
+Saturday-Sunday: 8:00 AM - 10:00 PM
+Check concordia.ca/recreation for current schedules"
+FA,FA Annex,2060 Mackay St.,SGW,Religions and Cultures,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+FB,Faubourg Building,"1250 Guy St., 1600 Ste-Catherine St. W.",SGW,"""Classics, Modern Languages and Linguistics"",
+    Concordia Continuing Education,
+    Mel Hoppenheim School of Cinema,
+    Theological Studies","Wheelchair lift, Accessible entrance, Accessible building elevator",,"
+    Enrolment Services / Office of the Registrar / Student Recruitment,
+    Environmental Health and Safety,
+    Examinations Office,
+    Human Resources,
+    Office of Sustainability,
+    Records Management and Archives (RMA) Office,
+    Senior non-credit program,
+    Study Hub",District 3 Innovation Hub,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+FG,Faubourg Ste-Catherine Building,1610 Ste-Catherine St. W.,SGW,Education,"Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",,Records Management and Archives (RMA) Research Room and Vault,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+GA,Grey Nuns Annex,1211-1215 St-Mathieu St.,SGW,Education,"Accessibility ramp, Accessible entrance",,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+GM,Guy-De Maisonneuve Building,1550 De Maisonneuve Blvd. W.,SGW,"
+    Contemporary Dance,
+    Music,
+    Theatre","Accessible entrance, Accessible building elevator",,"
+    Access Centre for Students with Disabilities,
+    Facilities Management,
+    Financial Aid and Awards Office,
+    Financial Services,
+    Graduate Studies,
+    Health Services,
+    Institute for Co-operative Education,
+    International Students Office,
+    Office of the President and Vice-Chancellor
+    ""Office of the Provost and Vice-President, Academic"",
+    ""Office of the Vice-President, Research, Innovation and Impact"",
+    ""Office of the Vice-President, Services and Sustainability"",
+    Ombuds Office,
+    University Communications Services,
+    Zen Den",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+GN,Grey Nuns Building,"1190 Guy St., 1175 St-Mathieu St.",SGW,Philosophy (1175 St-Mathieu St.),"
+
+Accessibility ramp, Accessible entrance, Accessible building elevator",Student Housing,"
+    Concordia Daycare (1185 St-Mathieu St.),
+    Concordia University Student Parents Centre (CUSP): 1175 St-Mathieu St.,
+    Grey Nuns Reading Room & Group Study Rooms (1190 Guy St.),
+    Residences,
+    Summer accommodations","
+    Classroom entrance (1175 St-Mathieu St.),
+    Grey Nuns Garden","24/7 access for residents
+Visitor access restrictions apply"
+GS,GS Building,1538 Sherbrooke St. W.,SGW,,No,,Concordia University Part-time Faculty Association (CUPFA),,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+H,Henry F. Hall Building,1455 De Maisonneuve Blvd. W.,SGW,"
+    Economics,
+    ""Geography, Planning and Environment"",
+    Political Science,
+    School of Community and Public Affairs,
+    School of Irish Studies,
+    Sociology and Anthropology","Accessible entrance, Accessible building elevator",,"
+    Campus Safety and Prevention Services,
+    Concordia Student Union (CSU),
+    First Stop,
+    Espace Franco,
+    IT Service Desk,
+    NouLa Black Student Centre,
+    Office of Student Life and Engagement,
+    Otsenhakta Student Centre,
+    Sexual Assault Resource Centre (SARC),
+    Student Success Centre,
+    Welcome Crew Office,
+    Zen Den","
+    Concordia Theatre,
+    Reggies,
+    Sir George Williams University Alumni Auditorium","Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+K,K Annex,2150 Bishop St.,SGW,,No,Houses offices for departments and unions,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+LB,J.W. McConnell Building,1400 De Maisonneuve Blvd. W.,SGW,"
+    Centre for Interdisciplinary Studies in Society and Culture (CISSC),
+    Centre for the Study of Learning and Performance,
+    Education,
+    English,
+    Etudes francaises,
+    History,
+    Mathematics and Statistics","Accessible entrance, Accessible building elevator",,"
+    Birks Student Service Centre,
+    Concordia Book Stop,
+    Concordia Print Services,
+    First Stop,
+    Instructional and Information Technology Services (IITS),
+    J.A. De Seve Cinema,
+    R. Howard Webster Library,
+    SHIFT Centre for Social Transformation,
+    Welcome Centre","
+    4TH SPACE,
+    Atrium,
+    J.A. De Seve Cinema,
+    Leonard and Bina Ellen Art Gallery,
+    SHIFT Centre for Social Transformation","Monday-Friday: 8:00 AM - 10:00 PM
+Saturday-Sunday: 10:00 AM - 6:00 PM
+Check library.concordia.ca for current hours"
+LD,LD Building,1424 Bishop St.,SGW,,No,,CSU Daycare & Nursery,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+LS,Learning Square,1535 De Maisonneuve Blvd. W.,SGW,,"
+
+Accessibility ramp , Accessible entrance",,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+M,M Annex,2135 Mackay St.,SGW,,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+MB,John Molson Building,1450 Guy St.,SGW,"
+    Accountancy,
+    Contemporary Dance,
+    Executive MBA Program,
+    Finance,
+    Goodman Institute of Investment Management,
+    Management,
+    Marketing,
+    Music,
+    Supply Chain and Business Technology Management,
+    Theatre","Accessible entrance, Accessible building elevator",,"
+    Career Management Services,
+    First Stop,
+    John Molson Executive Centre,
+    Performing Arts Facilities,
+    Zen Den","
+    ""Concordia Conference Centre, 9th Floor"",
+    Cloud Deck,
+    Goodman Institute","Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+MI,MI Annex,2130 Bishop St.,SGW,,No,Hosts union offices,"
+    Association of Concordia University Management and Administrative Employees (ACUMAE),
+    Concordia University Continuing Education Part-time Faculty Union (CUCEPTFU),
+    Concordia University Professional Employee Union (CUPEU),
+    Concordia University Support Staff Union (CSN),
+    The Concordia University Union of Support Staff - Technical Sector (CUUSS-TS)",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+MU,MU Annex,2170 Bishop St.,SGW,,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+P,P Annex,2020 Mackay St.,SGW,,No,Houses offices and Student Services,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+PR,PR Annex,2100 Mackay St.,SGW,,No,Houses offices and Student Services,Concordia University Library Employees' Union (CULEU),,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+Q,Q Annex,2010 Mackay St.,SGW,,No,Houses offices and Student Services,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+R,R Annex,2050 Mackay St.,SGW,Religions and Cultures,No,Houses offices,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+RR,RR Annex,2040 Mackay St.,SGW,Liberal Arts College,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+S,S Annex,2145 Mackay St.,SGW,Philosophy,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+SB,Samuel Bronfman Building,1590 Docteur-Penfield,SGW,Arts and Science Research Groups,"Accessibility ramp, Accessible entrance, Accessible building elevator",,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+T,T Annex,2030 Mackay St.,SGW,Graduate Students Association,No,Houses offices and Student Services,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+TD,Toronto-Dominion Building,1410 Guy St.,SGW,,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+V,V Annex,2110 Mackay St.,SGW,,No,Houses offices and Student Services,"
+    Centre for Gender Advocacy,
+    CUTV",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+VA,Visual Arts Building,1395 Rene-Levesque Blvd. W.,SGW,"
+    Art Education
+    Art History
+    Studio Arts","Accessible entrance, Accessible building elevator",,VAV Gallery,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+X,X Annex,2080 Mackay St.,SGW,,No,Houses offices and Student Services,Concordia International,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+Z,Z Annex,2090 Mackay St.,SGW,,No,Houses offices and Student Services,"
+    Multi-Faith and Spirituality Centre
+    Sustainable Concordia",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
