@@ -1,7 +1,5 @@
 package com.example.campusguide.ui.map.geoJson
 
-import com.example.campusguide.map.geoJson.DefaultGeoJsonStyleMapper
-import com.example.campusguide.map.geoJson.GeoJsonColorUtils
 import com.google.maps.android.data.geojson.GeoJsonFeature
 import org.junit.Assert.*
 import org.junit.Test
