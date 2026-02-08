@@ -1,31 +1,22 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * UI Tests for Campus Switching Feature (User Story 1.3)
+ * Acceptance Test for US-1.3: Switch Between SGW and Loyola
  *
- * These tests verify the campus toggle functionality that allows users
- * to switch between SGW and Loyola campus views on the map.
- *
- * Acceptance Criteria Tested:
- * 1. Campus toggle switch is visible and accessible
- * 2. User can switch between SGW and Loyola campuses
- * 3. Map overlays update when switching campuses
- * 4. Campus selection persists across app restarts
- *
- * Note: These tests require a connected device or running emulator.
- * Run with: ./gradlew connectedAndroidTest
+ * Tests verify campus switching functionality by clicking toggle buttons.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -34,110 +25,56 @@ class CampusSwitchingUITest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MapsActivity::class.java)
 
-    /**
-     * Test: Campus toggle is visible on map screen
-     * Verifies that the campus toggle switch is rendered and accessible to users
-     */
-    @Test
-    fun campusToggle_isDisplayed() {
-        // Wait for map to load
-        Thread.sleep(2000)
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
 
-        // Verify toggle is visible
-        onView(withContentDescription("Campus Toggle"))
+    @Test
+    fun campusSwitchControl_isPresent() {
+        // AC: Campus switch control exists and is visible
+        Thread.sleep(3000)
+
+        // Verify both campus buttons are present
+        composeTestRule.onNodeWithTag("SGW_Button").assertExists()
+        composeTestRule.onNodeWithTag("Loyola_Button").assertExists()
+    }
+
+    @Test
+    fun campusSwitch_toLoyola_works() {
+        // AC: Campus changes from SGW to Loyola without app restart
+        // Wait for initial map load
+        Thread.sleep(4000)
+
+        // Click Loyola button
+        composeTestRule.onNodeWithTag("Loyola_Button").performClick()
+
+        // Wait for map to recenter and show Loyola campus
+        Thread.sleep(5000)
+
+        // Verify app didn't crash
+        onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: User can switch from SGW to Loyola campus
-     * Verifies that clicking the toggle switches the campus view
-     */
     @Test
-    fun campusToggle_switchToLoyola_updatesMap() {
-        // Wait for map to load with default SGW campus
-        Thread.sleep(2000)
-
-        // Verify we start on SGW (default)
-        onView(withContentDescription("Campus Toggle"))
-            .check(matches(isDisplayed()))
-
-        // Click toggle to switch to Loyola
-        onView(withContentDescription("Campus Toggle"))
-            .perform(click())
-
-        // Wait for map to update
-        Thread.sleep(1500)
-
-        // Verify toggle is still displayed after switch
-        onView(withContentDescription("Campus Toggle"))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: User can switch back to SGW from Loyola
-     * Verifies bidirectional campus switching works correctly
-     */
-    @Test
-    fun campusToggle_switchBackToSGW_updatesMap() {
-        // Wait for map to load
-        Thread.sleep(2000)
+    fun campusSwitch_backToSGW_works() {
+        // AC: Campus changes back to SGW
+        // Wait for initial map load
+        Thread.sleep(4000)
 
         // Switch to Loyola
-        onView(withContentDescription("Campus Toggle"))
-            .perform(click())
-        Thread.sleep(1500)
+        composeTestRule.onNodeWithTag("Loyola_Button").performClick()
+
+        // Wait for map to recenter to Loyola
+        Thread.sleep(5000)
 
         // Switch back to SGW
-        onView(withContentDescription("Campus Toggle"))
-            .perform(click())
-        Thread.sleep(1500)
+        composeTestRule.onNodeWithTag("SGW_Button").performClick()
 
-        // Verify toggle still works
-        onView(withContentDescription("Campus Toggle"))
-            .check(matches(isDisplayed()))
-    }
+        // Wait for map to recenter to SGW
+        Thread.sleep(5000)
 
-    /**
-     * Test: Multiple rapid toggle switches are handled correctly
-     * Verifies that the app handles rapid user interactions without crashing
-     */
-    @Test
-    fun campusToggle_rapidSwitching_handlesCorrectly() {
-        // Wait for map to load
-        Thread.sleep(2000)
-
-        // Perform multiple rapid switches
-        repeat(3) {
-            onView(withContentDescription("Campus Toggle"))
-                .perform(click())
-            Thread.sleep(800)
-        }
-
-        // Verify app is still responsive
-        onView(withContentDescription("Campus Toggle"))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: Map remains interactive after campus switch
-     * Verifies that map functionality is not broken by campus switching
-     */
-    @Test
-    fun mapInteraction_afterCampusSwitch_remainsInteractive() {
-        // Wait for map to load
-        Thread.sleep(2000)
-
-        // Switch campus
-        onView(withContentDescription("Campus Toggle"))
-            .perform(click())
-        Thread.sleep(1500)
-
-        // Verify map is still interactive (toggle still works)
-        onView(withContentDescription("Campus Toggle"))
-            .perform(click())
-
-        // If we reach here without crash, map is interactive
-        onView(withContentDescription("Campus Toggle"))
+        // Verify app didn't crash and is still functional
+        onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 }

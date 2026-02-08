@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -87,7 +88,9 @@ fun CampusToggle(
             ),
             selected = selectedCampus == Campus.SGW,
             onClick = { onCampusSelected(Campus.SGW) },
-            modifier = Modifier.weight(weight = 0.5f)
+            modifier = Modifier
+                .weight(weight = 0.5f)
+                .testTag("SGW_Button")
         )
 
         // Loyola Chip
@@ -131,7 +134,9 @@ fun CampusToggle(
             ),
             selected = selectedCampus == Campus.LOYOLA,
             onClick = { onCampusSelected(Campus.LOYOLA) },
-            modifier = Modifier.weight(weight = 0.5f)
+            modifier = Modifier
+                .weight(weight = 0.5f)
+                .testTag("Loyola_Button")
         )
     }
 }
