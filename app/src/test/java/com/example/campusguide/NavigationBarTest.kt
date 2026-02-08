@@ -19,6 +19,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.NavigationBarPreview
 import com.example.campusguide.ui.components.SearchBarWithProfile
@@ -35,16 +37,25 @@ class NavigationBarTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val defaultState = AccessibilityState(
+        initialOffsetSp = 16f
+    )
+
     @Test
     fun nav_BarDisplaysAppDestinations() {
         composeTestRule.setContent {
+
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile(
-                        )
-                    })
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {
+                            SearchBarWithProfile(
+                            )
+                        })
+                }
             }
         }
 
@@ -61,12 +72,17 @@ class NavigationBarTest {
     fun navBar_rendersWithoutErrors() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile( modifier = Modifier.testTag("searchBar")
-                        )
-                    })
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {
+                            SearchBarWithProfile(
+                                modifier = Modifier.testTag("searchBar")
+                            )
+                        })
+                }
             }
         }
         // Bottom nav items
@@ -85,12 +101,16 @@ class NavigationBarTest {
     fun navBar_darkTheme_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme(darkTheme = true) {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {
-                        SearchBarWithProfile(
-                        )
-                    })
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {
+                            SearchBarWithProfile(
+                            )
+                        })
+                }
             }
         }
 
@@ -125,7 +145,11 @@ class NavigationBarTest {
     @Test
     fun navBarPreview_rendersCorrectly() {
         composeTestRule.setContent {
-            NavigationBarPreview()
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBarPreview()
+            }
         }
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
@@ -161,12 +185,17 @@ class NavigationBarTest {
     @Test
     fun navBarWithDifferentCurrentDestination() {
         composeTestRule.setContent {
-            NavigationBar(
-                rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
-                {
-                    SearchBarWithProfile(
-                    )
-                })        }
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBar(
+                    rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
+                    {
+                        SearchBarWithProfile(
+                        )
+                    })
+            }
+        }
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()

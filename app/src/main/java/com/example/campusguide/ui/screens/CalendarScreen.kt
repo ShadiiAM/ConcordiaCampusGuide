@@ -43,7 +43,6 @@ import com.example.campusguide.ui.theme.PurpleGrey80
 import java.util.Calendar
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen() {
 

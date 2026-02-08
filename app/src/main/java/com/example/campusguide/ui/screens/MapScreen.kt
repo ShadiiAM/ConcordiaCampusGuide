@@ -18,7 +18,6 @@ import com.example.campusguide.Greeting
 import com.example.campusguide.MapsActivity
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen() {
 

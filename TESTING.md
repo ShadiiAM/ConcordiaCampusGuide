@@ -130,6 +130,8 @@ private fun renderPolygon(map: GoogleMap, ...) {
 **SonarCloud exclusions:**
 - `**/ui/theme/**` - Pure UI styling, no business logic
 - `**/ui/screens/**` - Full screen composables (tested via Espresso)
+- `**/ui/components/**` - component composables (tested via Espresso)
+
 
 **Coverage threshold:** 50% for new code (industry standard for UI-heavy apps)
 

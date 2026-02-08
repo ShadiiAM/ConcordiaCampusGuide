@@ -37,6 +37,7 @@ sonar {
             "**/BuildConfig.*," +
             "**/*Test*.*," +
             "**/ui/theme/**," +              // Theme files (UI styling - no business logic)
+            "**/ui/components/**," +          // components mostly UI
             "**/ui/screens/**," +             // Full screen composables (pure UI)
             "**/MapsActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
             "**/MainActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
