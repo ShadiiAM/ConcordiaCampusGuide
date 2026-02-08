@@ -44,7 +44,7 @@ sonar {
             "**/CampusToggle.kt"  +            // Pure UI composable (see TESTING.md)
             "**/ui/accessibility/**" +         // Accessibility UI components
             "**/AccessibilityScreen.kt" +        // Accessibility screen UI
-            "**/BuildingDetailsBottomSheet.kt" //UI activity with screen composables
+            "**/ui/components/BuildingDetailsBottomSheet.kt" //UI activity with screen composables
         )
 
         // Lower coverage threshold for UI-heavy codebase
