@@ -37,6 +37,22 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
+        android:id="@+id/button_toggle_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Controls"
+        app:layout_constraintBottom_toTopOf="@+id/button_up"
+        app:layout_constraintStart_toStartOf="@+id/button_left"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/controls_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:constraint_referenced_ids="button_up,button_down,button_left,button_right,button_zoom_in,button_zoom_out" />
+
+    <Button
         android:id="@+id/button_up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

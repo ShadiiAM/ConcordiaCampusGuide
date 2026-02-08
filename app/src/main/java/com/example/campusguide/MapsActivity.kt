@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.constraintlayout.widget.Group
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
 import com.example.campusguide.ui.accessibility.AccessibilityState
@@ -223,6 +224,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         findViewById<Button>(R.id.button_zoom_in).setOnClickListener { zoomIn() }
         findViewById<Button>(R.id.button_zoom_out).setOnClickListener { zoomOut() }
         findViewById<Button>(R.id.button_recenter).setOnClickListener { recenter() }
+        findViewById<Button>(R.id.button_toggle_controls).setOnClickListener { toggleControls() }
     }
 
     /**
@@ -327,6 +329,15 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
             }
+        }
+    }
+
+    private fun toggleControls() {
+        val controlsGroup = findViewById<Group>(R.id.controls_group)
+        if (controlsGroup.visibility == View.VISIBLE) {
+            controlsGroup.visibility = View.GONE
+        } else {
+            controlsGroup.visibility = View.VISIBLE
         }
     }
 
