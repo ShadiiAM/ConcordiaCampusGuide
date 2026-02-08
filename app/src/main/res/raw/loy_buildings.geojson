@@ -4,12 +4,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "RA",
+        "buildingName": "Recreation and Athletics Complex",
+        "address": "7200 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance",
+        "venues": "Concordia Stadium,\n    Ed Meagher Arena,\n    Gymnasium",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -83,10 +89,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RA",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "RA",
+        "buildingName": "Recreation and Athletics Complex",
+        "address": "7200 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance",
+        "venues": "Concordia Stadium,\n    Ed Meagher Arena,\n    Gymnasium",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -100,12 +112,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PC",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "PC",
+        "buildingName": "PERFORM Centre",
+        "address": "7200 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Athletic Therapy Clinic,\n    Nutrition Centre,\n    PERFORM Gym,\n    School of Health",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -139,10 +157,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PC",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "PC",
+        "buildingName": "PERFORM Centre",
+        "address": "7200 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Athletic Therapy Clinic,\n    Nutrition Centre,\n    PERFORM Gym,\n    School of Health",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -156,12 +180,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GE",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "GE",
+        "buildingName": "Centre for Structural and Functional Genomics",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Centre for Structural and Functional Genomics",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -219,10 +249,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GE",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "GE",
+        "buildingName": "Centre for Structural and Functional Genomics",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Centre for Structural and Functional Genomics",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -236,12 +272,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CJ",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "CJ",
+        "buildingName": "Communication Studies and Journalism Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Communication Studies,\n    Journalism",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Book Stop",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -367,10 +410,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CJ",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "CJ",
+        "buildingName": "Communication Studies and Journalism Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Communication Studies,\n    Journalism",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Book Stop",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -384,12 +434,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SP",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "SP",
+        "buildingName": "Richard J. Renaud Science Complex",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Biology,\n    Centre for Biological Applications of Mass Spectrometry,\n    Centre for NanoScience Research,\n    Centre for Research in Molecular Modeling,\n    Centre for Studies in Behavioral Neurobiology,\n    Chemistry and Biochemistry,\n    \"Health, Kinesiology and Applied Physiology\",\n    Physics,\n    Psychology",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Cafe,\n    Campus Safety and Prevention Services,\n    First Stop,\n    Science College",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -559,10 +616,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SP",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "SP",
+        "buildingName": "Richard J. Renaud Science Complex",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Biology,\n    Centre for Biological Applications of Mass Spectrometry,\n    Centre for NanoScience Research,\n    Centre for Research in Molecular Modeling,\n    Centre for Studies in Behavioral Neurobiology,\n    Chemistry and Biochemistry,\n    \"Health, Kinesiology and Applied Physiology\",\n    Physics,\n    Psychology",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Cafe,\n    Campus Safety and Prevention Services,\n    First Stop,\n    Science College",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -576,12 +640,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "AD",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "AD",
+        "buildingName": "Administration Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Faculty of Arts and Science",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Access Centre for Students with Disabilities,\n    Centre for Teaching and Learning,\n    Counselling and Psychological Services,\n    Health Services,\n    Loyola College for Diversity and Sustainability,\n    Loyola Landing,\n   \"Office of the Provost and Vice-President, Academic\",\n    Office of Student Life and Engagement,\n    Welcome Crew Office",
+        "hours": "Monday-Friday: 9:00 AM - 5:00 PM\nClosed weekends and holidays"
       },
       "geometry": {
         "coordinates": [
@@ -751,10 +822,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "AD",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "AD",
+        "buildingName": "Administration Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Faculty of Arts and Science",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Access Centre for Students with Disabilities,\n    Centre for Teaching and Learning,\n    Counselling and Psychological Services,\n    Health Services,\n    Loyola College for Diversity and Sustainability,\n    Loyola Landing,\n   \"Office of the Provost and Vice-President, Academic\",\n    Office of Student Life and Engagement,\n    Welcome Crew Office",
+        "hours": "Monday-Friday: 9:00 AM - 5:00 PM\nClosed weekends and holidays"
       },
       "geometry": {
         "coordinates": [
@@ -768,12 +846,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CC",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "CC",
+        "buildingName": "Central Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessible entrance, Accessible building elevator",
+        "services": "Concordia Student ,\n    Loyola College for Diversity and Sustainability and Loyola,\n    Zen Den",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -843,10 +927,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CC",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "CC",
+        "buildingName": "Central Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessible entrance, Accessible building elevator",
+        "services": "Concordia Student ,\n    Loyola College for Diversity and Sustainability and Loyola,\n    Zen Den",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -860,12 +950,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RF",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "RF",
+        "buildingName": "Loyola Jesuit Hall and Conference Centre",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessible entrance",
+        "services": "Conference services,\n    Loyola Jesuit Hall and Conference Centre",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -935,10 +1031,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RF",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "RF",
+        "buildingName": "Loyola Jesuit Hall and Conference Centre",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Wheelchair lift, Accessible entrance",
+        "services": "Conference services,\n    Loyola Jesuit Hall and Conference Centre",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -952,12 +1054,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PY",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "PY",
+        "buildingName": "Psychology Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Centre for Clinical Research in Health (CCRH),\n    Psychology",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1015,10 +1123,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PY",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "PY",
+        "buildingName": "Psychology Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Centre for Clinical Research in Health (CCRH),\n    Psychology",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1032,12 +1146,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "QA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "QA",
+        "buildingName": "Quadrangle",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Partially accessible around its perimeter",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1123,10 +1242,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "QA",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "QA",
+        "buildingName": "Quadrangle",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Partially accessible around its perimeter",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1140,12 +1264,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FC",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "FC",
+        "buildingName": "F.C. Smith Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "venues": "Loyola Chapel",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1275,10 +1405,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FC",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "FC",
+        "buildingName": "F.C. Smith Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "venues": "Loyola Chapel",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1292,12 +1428,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HU",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "HU",
+        "buildingName": "Applied Science Hub",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "notes": "Houses the District 3 Innovation Hub",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1331,10 +1473,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HU",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "HU",
+        "buildingName": "Applied Science Hub",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "notes": "Houses the District 3 Innovation Hub",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1348,12 +1496,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HB",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "HB",
+        "buildingName": "Hingston Hall, wing HB",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "notes": "Student Housing",
+        "services": "Concordia University Faculty Association (CUFA),\n    Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1463,10 +1618,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HB",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "HB",
+        "buildingName": "Hingston Hall, wing HB",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "notes": "Student Housing",
+        "services": "Concordia University Faculty Association (CUFA),\n    Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1480,12 +1642,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HC",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "HC",
+        "buildingName": "Hingston Hall, wing HC",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1535,10 +1703,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HC",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "HC",
+        "buildingName": "Hingston Hall, wing HC",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1552,12 +1726,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "HA",
+        "buildingName": "Hingston Hall, wing HA",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "notes": "Student Housing",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1651,10 +1832,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "HA",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "HA",
+        "buildingName": "Hingston Hall, wing HA",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "notes": "Student Housing",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1668,12 +1856,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SH",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "SH",
+        "buildingName": "Future Buildings Laboratory",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1707,10 +1900,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SH",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "SH",
+        "buildingName": "Future Buildings Laboratory",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1724,12 +1922,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "JR",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "JR",
+        "buildingName": "Jesuit Residence",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "notes": "Student Housing",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1811,10 +2016,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "JR",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "JR",
+        "buildingName": "Jesuit Residence",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "notes": "Student Housing",
+        "services": "Student Residence",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1828,12 +2040,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SI",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "SI",
+        "buildingName": "St. Ignatius of Loyola Church",
+        "address": "4455 West Broadway St.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1979,10 +2196,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SI",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "SI",
+        "buildingName": "St. Ignatius of Loyola Church",
+        "address": "4455 West Broadway St.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1996,12 +2218,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "TA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "TA",
+        "buildingName": "Terrebonne Building",
+        "address": "7079 de Terrebonne St.",
+        "campus": "Loyola",
+        "departments": "Centre for the Arts in Human Development (CAHD)",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2035,10 +2263,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "TA",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "TA",
+        "buildingName": "Terrebonne Building",
+        "address": "7079 de Terrebonne St.",
+        "campus": "Loyola",
+        "departments": "Centre for the Arts in Human Development (CAHD)",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2052,12 +2286,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PS",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "PS",
+        "buildingName": "Physical Services Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "Environmental Health and Safety,\n    Facilities Management",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2123,10 +2363,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PS",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "PS",
+        "buildingName": "Physical Services Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "Environmental Health and Safety,\n    Facilities Management",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2140,12 +2386,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "BH",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "BH",
+        "buildingName": "BH Annex",
+        "address": "3500 Belmore Ave.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "CPE Les P'tits Profs Daycare",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2179,10 +2431,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "BH",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "BH",
+        "buildingName": "BH Annex",
+        "address": "3500 Belmore Ave.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "CPE Les P'tits Profs Daycare",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2196,12 +2454,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "BB",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "BB",
+        "buildingName": "BB Annex",
+        "address": "3502 Belmore Ave.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "CPE Les P'tits Profs Daycare",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2235,10 +2499,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "BB",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "BB",
+        "buildingName": "BB Annex",
+        "address": "3502 Belmore Ave.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "CPE Les P'tits Profs Daycare",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2252,12 +2522,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PT",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "PT",
+        "buildingName": "Oscar Peterson Concert Hall",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "services": "Concert Hall",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2299,10 +2575,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PT",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "PT",
+        "buildingName": "Oscar Peterson Concert Hall",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance",
+        "services": "Concert Hall",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2316,12 +2598,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SC",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "SC",
+        "buildingName": "Student Centre",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "services": "Cafeteria,\n    Cafe,\n    Food Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2395,10 +2683,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SC",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "SC",
+        "buildingName": "Student Centre",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "services": "Cafeteria,\n    Cafe,\n    Food Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2412,12 +2706,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VL",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "VL",
+        "buildingName": "Vanier Library Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Georges P. Vanier Library",
+        "hours": "Monday-Friday: 8:00 AM - 10:00 PM\nSaturday-Sunday: 10:00 AM - 6:00 PM\nCheck library.concordia.ca for current hours"
       },
       "geometry": {
         "coordinates": [
@@ -2475,10 +2775,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VL",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "VL",
+        "buildingName": "Vanier Library Building",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Georges P. Vanier Library",
+        "hours": "Monday-Friday: 8:00 AM - 10:00 PM\nSaturday-Sunday: 10:00 AM - 6:00 PM\nCheck library.concordia.ca for current hours"
       },
       "geometry": {
         "coordinates": [
@@ -2492,12 +2798,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VE",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "VE",
+        "buildingName": "Vanier Extension",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Applied Human Sciences",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Library",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2531,10 +2844,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VE",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "VE",
+        "buildingName": "Vanier Extension",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "departments": "Applied Human Sciences",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Library",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2548,12 +2868,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "DO",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "DO",
+        "buildingName": "Stinger Dome",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "Concordia Stingers",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2587,10 +2913,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "DO",
         "marker-color": "#7e7e7e",
         "marker-size": "small",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "DO",
+        "buildingName": "Stinger Dome",
+        "address": "7141 Sherbrooke St. W.",
+        "campus": "Loyola",
+        "accessibility": "No",
+        "services": "Concordia Stingers",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [

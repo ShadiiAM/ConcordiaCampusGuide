@@ -40,6 +40,7 @@ import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
+import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.components.SearchBarWithProfile
@@ -61,9 +62,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.Polygon
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.campusguide.ui.map.models.BuildingInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -86,6 +92,9 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private var sgwAttached = false
     private var loyAttached = false
     var userMarker: Marker? = null
+
+    // State for building details bottom sheet
+    private var selectedBuildingInfo: BuildingInfo? by mutableStateOf(null)
 
 
 
@@ -226,8 +235,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         // Construct overlay objects immediately so switchCampus can reference them
         // even before attachToMap populates them.
-        sgwOverlay = GeoJsonOverlay(this, idPropertyName = "building-name")
-        loyOverlay = GeoJsonOverlay(this, idPropertyName = "building-name")
+        sgwOverlay = GeoJsonOverlay(this, idPropertyName = "buildingCode")
+        loyOverlay = GeoJsonOverlay(this, idPropertyName = "buildingCode")
 
 
 
@@ -253,6 +262,11 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         // Remove default Google Maps controls from bottom-right
         mMap.uiSettings.isMyLocationButtonEnabled = false
         mMap.uiSettings.isZoomControlsEnabled = false
+
+        // Set up polygon click listener for building details
+        mMap.setOnPolygonClickListener { polygon ->
+            showBuildingDetails(polygon)
+        }
 
         // Only load the active campus on startup — halves the main-thread work.
         // The inactive campus loads on-demand the first time the user taps the toggle.
@@ -410,6 +424,50 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 ProfileOverlayContent(onDismiss = {
                     binding.profileOverlay.visibility = View.GONE
                 })
+            }
+        }
+    }
+
+    /**
+     * Show building details bottom sheet when a building polygon is tapped.
+     */
+    internal fun showBuildingDetails(polygon: Polygon) {
+        // Determine which overlay is currently active
+        val currentCampus = getSavedCampus()
+        val activeOverlay = when (currentCampus) {
+            Campus.SGW -> sgwOverlay
+            Campus.LOYOLA -> loyOverlay
+        }
+
+        // Get the feature ID from the polygon
+        val featureId = activeOverlay.getPolygonId(polygon) ?: return
+
+        // Get the building properties
+        val props = activeOverlay.getBuildingProps()[featureId] ?: return
+
+        // Parse into BuildingInfo
+        val buildingInfo = BuildingInfo.fromJson(props) ?: return
+
+        // Set state to show the bottom sheet
+        selectedBuildingInfo = buildingInfo
+
+        // Show in the profile overlay ComposeView
+        binding.profileOverlay.visibility = View.VISIBLE
+        binding.profileOverlay.setContent {
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultAccessibilityState
+            ) {
+                ConcordiaCampusGuideTheme {
+                    selectedBuildingInfo?.let { info ->
+                        BuildingDetailsBottomSheet(
+                            buildingInfo = info,
+                            onDismiss = {
+                                selectedBuildingInfo = null
+                                binding.profileOverlay.visibility = View.GONE
+                            }
+                        )
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,126 @@
+buildingCode,buildingName,address,campus,departments,accessibility,notes,services,venues,hours
+AD,Administration Building,7141 Sherbrooke St. W.,Loyola,Faculty of Arts and Science,"Accessibility ramp, Accessible entrance, Accessible building elevator",,"
+    Access Centre for Students with Disabilities,
+    Centre for Teaching and Learning,
+    Counselling and Psychological Services,
+    Health Services,
+    Loyola College for Diversity and Sustainability,
+    Loyola Landing,
+   ""Office of the Provost and Vice-President, Academic"",
+    Office of Student Life and Engagement,
+    Welcome Crew Office",,"Monday-Friday: 9:00 AM - 5:00 PM
+Closed weekends and holidays"
+BB,BB Annex,3502 Belmore Ave.,Loyola,,No,,CPE Les P'tits Profs Daycare,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+BH,BH Annex,3500 Belmore Ave.,Loyola,,No,,CPE Les P'tits Profs Daycare,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+CC,Central Building,7141 Sherbrooke St. W.,Loyola,,"Wheelchair lift, Accessible entrance, Accessible building elevator",,"
+    Concordia Student ,
+    Loyola College for Diversity and Sustainability and Loyola,
+    Zen Den",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+CJ,Communication Studies and Journalism Building,7141 Sherbrooke St. W.,Loyola,"
+    Communication Studies,
+    Journalism","Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",,Book Stop,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+DO,Stinger Dome,7141 Sherbrooke St. W.,Loyola,,No,,Concordia Stingers,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+FC,F.C. Smith Building,7141 Sherbrooke St. W.,Loyola,,"Accessibility ramp, Accessible entrance",,,Loyola Chapel,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+GE,Centre for Structural and Functional Genomics,7141 Sherbrooke St. W.,Loyola,,"
+
+Accessible entrance, Accessible building elevator",,Centre for Structural and Functional Genomics,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+HA,"Hingston Hall, wing HA",7141 Sherbrooke St. W.,Loyola,,Accessible entrance,Student Housing,Student Residence,,"24/7 access for residents
+Visitor access restrictions apply"
+HB,"Hingston Hall, wing HB",7141 Sherbrooke St. W.,Loyola,,Accessible entrance,Student Housing,"
+    Concordia University Faculty Association (CUFA),
+    Student Residence",,"24/7 access for residents
+Visitor access restrictions apply"
+HC,"Hingston Hall, wing HC",7141 Sherbrooke St. W.,Loyola,,Accessible entrance,,Student Residence,,"24/7 access for residents
+Visitor access restrictions apply"
+HU,Applied Science Hub,7141 Sherbrooke St. W.,Loyola,,"Accessible entrance, Accessible building elevator",Houses the District 3 Innovation Hub,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+JR,Jesuit Residence,7141 Sherbrooke St. W.,Loyola,,"Accessibility ramp, Accessible entrance, Accessible building elevator",Student Housing,Student Residence,,"24/7 access for residents
+Visitor access restrictions apply"
+PC,PERFORM Centre,7200 Sherbrooke St. W.,Loyola,,"Accessibility ramp, Accessible entrance, Accessible building elevator",,"
+    Athletic Therapy Clinic,
+    Nutrition Centre,
+    PERFORM Gym,
+    School of Health",,"Monday-Friday: 6:00 AM - 11:00 PM
+Saturday-Sunday: 8:00 AM - 10:00 PM
+Check concordia.ca/recreation for current schedules"
+PS,Physical Services Building,7141 Sherbrooke St. W.,Loyola,,No,,"
+    Environmental Health and Safety,
+    Facilities Management",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+PT,Oscar Peterson Concert Hall,7141 Sherbrooke St. W.,Loyola,,Accessible entrance,,Concert Hall,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+PY,Psychology Building,7141 Sherbrooke St. W.,Loyola,"
+    Centre for Clinical Research in Health (CCRH),
+    Psychology","Accessible entrance, Accessible building elevator",,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+QA,Quadrangle,7141 Sherbrooke St. W.,Loyola,,Partially accessible around its perimeter,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+RA,Recreation and Athletics Complex,7200 Sherbrooke St. W.,Loyola,,"Wheelchair lift, Accessibility ramp, Accessible entrance",,,"
+    Concordia Stadium,
+    Ed Meagher Arena,
+    Gymnasium","Monday-Friday: 6:00 AM - 11:00 PM
+Saturday-Sunday: 8:00 AM - 10:00 PM
+Check concordia.ca/recreation for current schedules"
+RF,Loyola Jesuit Hall and Conference Centre,7141 Sherbrooke St. W.,Loyola,,"Wheelchair lift, Accessible entrance",,"
+    Conference services,
+    Loyola Jesuit Hall and Conference Centre",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+SC,Student Centre,7141 Sherbrooke St. W.,Loyola,,"Accessibility ramp, Accessible entrance ",,"
+    Cafeteria,
+    Cafe,
+    Food Services",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+SH,Future Buildings Laboratory,7141 Sherbrooke St. W.,Loyola,,Accessible entrance,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+SI,St. Ignatius of Loyola Church,4455 West Broadway St.,Loyola,,No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+SP,Richard J. Renaud Science Complex,7141 Sherbrooke St. W.,Loyola,"
+    Biology,
+    Centre for Biological Applications of Mass Spectrometry,
+    Centre for NanoScience Research,
+    Centre for Research in Molecular Modeling,
+    Centre for Studies in Behavioral Neurobiology,
+    Chemistry and Biochemistry,
+    ""Health, Kinesiology and Applied Physiology"",
+    Physics,
+    Psychology","Accessibility ramp, Accessible entrance, Accessible building elevator",,"
+    Cafe,
+    Campus Safety and Prevention Services,
+    First Stop,
+    Science College",,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+TA,Terrebonne Building,7079 de Terrebonne St.,Loyola,Centre for the Arts in Human Development (CAHD),No,,,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+VE,Vanier Extension,7141 Sherbrooke St. W.,Loyola,Applied Human Sciences,"Accessible entrance, Accessible building elevator",,Library,,"Monday-Friday: 7:00 AM - 11:00 PM
+Saturday-Sunday: 7:00 AM - 9:00 PM
+After-hours access for authorized personnel"
+VL,Vanier Library Building,7141 Sherbrooke St. W.,Loyola,,"
+
+Accessible entrance, Accessible building elevator",,Georges P. Vanier Library,,"Monday-Friday: 8:00 AM - 10:00 PM
+Saturday-Sunday: 10:00 AM - 6:00 PM
+Check library.concordia.ca for current hours"

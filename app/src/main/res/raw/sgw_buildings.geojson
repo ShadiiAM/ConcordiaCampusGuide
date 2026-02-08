@@ -9,7 +9,15 @@
         "stroke-opacity": 1,
         "fill": "#fe0606",
         "fill-opacity": 0.5,
-        "building-name": "MB"
+        "buildingCode": "MB",
+        "buildingName": "John Molson Building",
+        "address": "1450 Guy St.",
+        "campus": "SGW",
+        "departments": "Accountancy,\n    Contemporary Dance,\n    Executive MBA Program,\n    Finance,\n    Goodman Institute of Investment Management,\n    Management,\n    Marketing,\n    Music,\n    Supply Chain and Business Technology Management,\n    Theatre",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Career Management Services,\n    First Stop,\n    John Molson Executive Centre,\n    Performing Arts Facilities,\n    Zen Den",
+        "venues": "\"Concordia Conference Centre, 9th Floor\",\n    Cloud Deck,\n    Goodman Institute",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -55,12 +63,21 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GN",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "GN",
+        "buildingName": "Grey Nuns Building",
+        "address": "1190 Guy St., 1175 St-Mathieu St.",
+        "campus": "SGW",
+        "departments": "Philosophy (1175 St-Mathieu St.)",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "notes": "Student Housing",
+        "services": "Concordia Daycare (1185 St-Mathieu St.),\n    Concordia University Student Parents Centre (CUSP): 1175 St-Mathieu St.,\n    Grey Nuns Reading Room & Group Study Rooms (1190 Guy St.),\n    Residences,\n    Summer accommodations",
+        "venues": "Classroom entrance (1175 St-Mathieu St.),\n    Grey Nuns Garden",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -562,12 +579,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "GA",
+        "buildingName": "Grey Nuns Annex",
+        "address": "1211-1215 St-Mathieu St.",
+        "campus": "SGW",
+        "departments": "Education",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -617,12 +640,20 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FB",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "FB",
+        "buildingName": "Faubourg Building",
+        "address": "1250 Guy St., 1600 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "\"Classics, Modern Languages and Linguistics\",\n    Concordia Continuing Education,\n    Mel Hoppenheim School of Cinema,\n    Theological Studies",
+        "accessibility": "Wheelchair lift, Accessible entrance, Accessible building elevator",
+        "services": "Enrolment Services / Office of the Registrar / Student Recruitment,\n    Environmental Health and Safety,\n    Examinations Office,\n    Human Resources,\n    Office of Sustainability,\n    Records Management and Archives (RMA) Office,\n    Senior non-credit program,\n    Study Hub",
+        "venues": "District 3 Innovation Hub",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -672,12 +703,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FG",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "FG",
+        "buildingName": "Faubourg Ste-Catherine Building",
+        "address": "1610 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "Education",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Records Management and Archives (RMA) Research Room and Vault",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -723,10 +761,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FB",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "FB",
+        "buildingName": "Faubourg Building",
+        "address": "1250 Guy St., 1600 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "\"Classics, Modern Languages and Linguistics\",\n    Concordia Continuing Education,\n    Mel Hoppenheim School of Cinema,\n    Theological Studies",
+        "accessibility": "Wheelchair lift, Accessible entrance, Accessible building elevator",
+        "services": "Enrolment Services / Office of the Registrar / Student Recruitment,\n    Environmental Health and Safety,\n    Examinations Office,\n    Human Resources,\n    Office of Sustainability,\n    Records Management and Archives (RMA) Office,\n    Senior non-credit program,\n    Study Hub",
+        "venues": "District 3 Innovation Hub",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -740,10 +786,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FG",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "FG",
+        "buildingName": "Faubourg Ste-Catherine Building",
+        "address": "1610 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "Education",
+        "accessibility": "Wheelchair lift, Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "services": "Records Management and Archives (RMA) Research Room and Vault",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -757,10 +810,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GA",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "GA",
+        "buildingName": "Grey Nuns Annex",
+        "address": "1211-1215 St-Mathieu St.",
+        "campus": "SGW",
+        "departments": "Education",
+        "accessibility": "Accessibility ramp, Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -774,10 +833,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GN",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "GN",
+        "buildingName": "Grey Nuns Building",
+        "address": "1190 Guy St., 1175 St-Mathieu St.",
+        "campus": "SGW",
+        "departments": "Philosophy (1175 St-Mathieu St.)",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "notes": "Student Housing",
+        "services": "Concordia Daycare (1185 St-Mathieu St.),\n    Concordia University Student Parents Centre (CUSP): 1175 St-Mathieu St.,\n    Grey Nuns Reading Room & Group Study Rooms (1190 Guy St.),\n    Residences,\n    Summer accommodations",
+        "venues": "Classroom entrance (1175 St-Mathieu St.),\n    Grey Nuns Garden",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -791,12 +859,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CL",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "CL",
+        "buildingName": "CL Annex",
+        "address": "1665 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Concordia Continuing Education",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -834,10 +908,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CL",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "CL",
+        "buildingName": "CL Annex",
+        "address": "1665 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Concordia Continuing Education",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -851,12 +931,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "TD",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "TD",
+        "buildingName": "Toronto-Dominion Building",
+        "address": "1410 Guy St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -906,10 +991,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "TD",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "TD",
+        "buildingName": "Toronto-Dominion Building",
+        "address": "1410 Guy St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -924,10 +1014,18 @@
       "type": "Feature",
       "properties": {
         "name": "MB",
-        "building-name": "MB",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "MB",
+        "buildingName": "John Molson Building",
+        "address": "1450 Guy St.",
+        "campus": "SGW",
+        "departments": "Accountancy,\n    Contemporary Dance,\n    Executive MBA Program,\n    Finance,\n    Goodman Institute of Investment Management,\n    Management,\n    Marketing,\n    Music,\n    Supply Chain and Business Technology Management,\n    Theatre",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Career Management Services,\n    First Stop,\n    John Molson Executive Centre,\n    Performing Arts Facilities,\n    Zen Den",
+        "venues": "\"Concordia Conference Centre, 9th Floor\",\n    Cloud Deck,\n    Goodman Institute",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -941,12 +1039,20 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "EV",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "EV",
+        "buildingName": "Engineering, Computer Science and Visual Arts Integrated Complex",
+        "address": "1515 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "Art Education,\n    Art History,\n    Building, Civil and Environmental Engineering,\n    Centre for Composites (CONCOM),\n    Centre for Pattern Recognition and Machine Intelligence (CENPARMI),\n    Centre for Zero Energy Building Studies,\n    Chemical and Materials Engineering,\n    Contemporary Dance,\n    Design and Computation Arts,\n    Electrical and Computer Engineering,\n    Faculty of Fine Arts,\n    Gina Cody School of Engineering and Computer Science,\n    \"Mechanical, Industrial and Aerospace Engineering\",\n    Recreation and Athletics,\n    Studio Arts",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Le Gym,\n    Zen Den",
+        "venues": "Abe and Harriet Gold Atrium,\n    FOFA Gallery,\n  \"Norman D. Hebert, LLD Meeting Room\"\n    York Amphitheatre",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -1036,10 +1142,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "EV",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "EV",
+        "buildingName": "Engineering, Computer Science and Visual Arts Integrated Complex",
+        "address": "1515 Ste-Catherine St. W.",
+        "campus": "SGW",
+        "departments": "Art Education,\n    Art History,\n    Building, Civil and Environmental Engineering,\n    Centre for Composites (CONCOM),\n    Centre for Pattern Recognition and Machine Intelligence (CENPARMI),\n    Centre for Zero Energy Building Studies,\n    Chemical and Materials Engineering,\n    Contemporary Dance,\n    Design and Computation Arts,\n    Electrical and Computer Engineering,\n    Faculty of Fine Arts,\n    Gina Cody School of Engineering and Computer Science,\n    \"Mechanical, Industrial and Aerospace Engineering\",\n    Recreation and Athletics,\n    Studio Arts",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Le Gym,\n    Zen Den",
+        "venues": "Abe and Harriet Gold Atrium,\n    FOFA Gallery,\n  \"Norman D. Hebert, LLD Meeting Room\"\n    York Amphitheatre",
+        "hours": "Monday-Friday: 6:00 AM - 11:00 PM\nSaturday-Sunday: 8:00 AM - 10:00 PM\nCheck concordia.ca/recreation for current schedules"
       },
       "geometry": {
         "coordinates": [
@@ -1053,12 +1167,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GM",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "GM",
+        "buildingName": "Guy-De Maisonneuve Building",
+        "address": "1550 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Contemporary Dance,\n    Music,\n    Theatre",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Access Centre for Students with Disabilities,\n    Facilities Management,\n    Financial Aid and Awards Office,\n    Financial Services,\n    Graduate Studies,\n    Health Services,\n    Institute for Co-operative Education,\n    International Students Office,\n    Office of the President and Vice-Chancellor\n    \"Office of the Provost and Vice-President, Academic\",\n    \"Office of the Vice-President, Research, Innovation and Impact\",\n    \"Office of the Vice-President, Services and Sustainability\",\n    Ombuds Office,\n    University Communications Services,\n    Zen Den",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1100,10 +1221,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GM",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "GM",
+        "buildingName": "Guy-De Maisonneuve Building",
+        "address": "1550 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Contemporary Dance,\n    Music,\n    Theatre",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Access Centre for Students with Disabilities,\n    Facilities Management,\n    Financial Aid and Awards Office,\n    Financial Services,\n    Graduate Studies,\n    Health Services,\n    Institute for Co-operative Education,\n    International Students Office,\n    Office of the President and Vice-Chancellor\n    \"Office of the Provost and Vice-President, Academic\",\n    \"Office of the Vice-President, Research, Innovation and Impact\",\n    \"Office of the Vice-President, Services and Sustainability\",\n    Ombuds Office,\n    University Communications Services,\n    Zen Den",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1117,12 +1245,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LS",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "LS",
+        "buildingName": "Learning Square",
+        "address": "1535 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "accessibility": "Accessibility ramp , Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1164,10 +1297,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LS",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "LS",
+        "buildingName": "Learning Square",
+        "address": "1535 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "accessibility": "Accessibility ramp , Accessible entrance",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1181,12 +1319,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "ER",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "ER",
+        "buildingName": "ER Building",
+        "address": "2155 Guy St.",
+        "campus": "SGW",
+        "departments": "Applied AI Institute,\n    Centre for Engineering in Society,\n    Computer Science and Software Engineering,\n    Creative Arts Therapies,\n    engAGE: Centre for Research on Aging,\n    Next-Generation Cities Institute,\n    Simone de Beauvoir Institute,\n    Sustainability in the Digital Age,\n    Urban Studies",
+        "accessibility": "Accessibility ramp, Accessible entrance,Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1232,10 +1376,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "ER",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "ER",
+        "buildingName": "ER Building",
+        "address": "2155 Guy St.",
+        "campus": "SGW",
+        "departments": "Applied AI Institute,\n    Centre for Engineering in Society,\n    Computer Science and Software Engineering,\n    Creative Arts Therapies,\n    engAGE: Centre for Research on Aging,\n    Next-Generation Cities Institute,\n    Simone de Beauvoir Institute,\n    Sustainability in the Digital Age,\n    Urban Studies",
+        "accessibility": "Accessibility ramp, Accessible entrance,Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1249,12 +1399,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GS",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "GS",
+        "buildingName": "GS Building",
+        "address": "1538 Sherbrooke St. W.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "services": "Concordia University Part-time Faculty Association (CUPFA)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1300,10 +1456,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "GS",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "GS",
+        "buildingName": "GS Building",
+        "address": "1538 Sherbrooke St. W.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "services": "Concordia University Part-time Faculty Association (CUPFA)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1317,12 +1479,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "Q",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "Q",
+        "buildingName": "Q Annex",
+        "address": "2010 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1356,10 +1524,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "Q",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "Q",
+        "buildingName": "Q Annex",
+        "address": "2010 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1373,12 +1547,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "P",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "P",
+        "buildingName": "P Annex",
+        "address": "2020 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1412,10 +1592,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "P",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "P",
+        "buildingName": "P Annex",
+        "address": "2020 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1429,12 +1615,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "T",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "T",
+        "buildingName": "T Annex",
+        "address": "2030 Mackay St.",
+        "campus": "SGW",
+        "departments": "Graduate Students Association",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1468,10 +1661,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "T",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "T",
+        "buildingName": "T Annex",
+        "address": "2030 Mackay St.",
+        "campus": "SGW",
+        "departments": "Graduate Students Association",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1485,12 +1685,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RR",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "RR",
+        "buildingName": "RR Annex",
+        "address": "2040 Mackay St.",
+        "campus": "SGW",
+        "departments": "Liberal Arts College",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1524,10 +1730,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "RR",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "RR",
+        "buildingName": "RR Annex",
+        "address": "2040 Mackay St.",
+        "campus": "SGW",
+        "departments": "Liberal Arts College",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1541,12 +1753,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "R",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "R",
+        "buildingName": "R Annex",
+        "address": "2050 Mackay St.",
+        "campus": "SGW",
+        "departments": "Religions and Cultures",
+        "accessibility": "No",
+        "notes": "Houses offices",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1580,10 +1799,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "R",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "R",
+        "buildingName": "R Annex",
+        "address": "2050 Mackay St.",
+        "campus": "SGW",
+        "departments": "Religions and Cultures",
+        "accessibility": "No",
+        "notes": "Houses offices",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1597,12 +1823,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "FA",
+        "buildingName": "FA Annex",
+        "address": "2060 Mackay St.",
+        "campus": "SGW",
+        "departments": "Religions and Cultures",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1636,10 +1868,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "FA",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "FA",
+        "buildingName": "FA Annex",
+        "address": "2060 Mackay St.",
+        "campus": "SGW",
+        "departments": "Religions and Cultures",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1653,12 +1891,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "EN",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "EN",
+        "buildingName": "EN Annex",
+        "address": "2070 Mackay St.",
+        "campus": "SGW",
+        "departments": "Research Chair on Gambling",
+        "accessibility": "No",
+        "notes": "Student Housing",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1708,10 +1953,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "EN",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "EN",
+        "buildingName": "EN Annex",
+        "address": "2070 Mackay St.",
+        "campus": "SGW",
+        "departments": "Research Chair on Gambling",
+        "accessibility": "No",
+        "notes": "Student Housing",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -1725,12 +1977,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "X",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "X",
+        "buildingName": "X Annex",
+        "address": "2080 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Concordia International",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1764,10 +2023,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "X",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "X",
+        "buildingName": "X Annex",
+        "address": "2080 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Concordia International",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1781,12 +2047,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PR",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "PR",
+        "buildingName": "PR Annex",
+        "address": "2100 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Concordia University Library Employees' Union (CULEU)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1820,10 +2093,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "PR",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "PR",
+        "buildingName": "PR Annex",
+        "address": "2100 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Concordia University Library Employees' Union (CULEU)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1837,12 +2117,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "V",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "V",
+        "buildingName": "V Annex",
+        "address": "2110 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Centre for Gender Advocacy,\n    CUTV",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1880,10 +2167,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "V",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "V",
+        "buildingName": "V Annex",
+        "address": "2110 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Centre for Gender Advocacy,\n    CUTV",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1897,12 +2191,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "M",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "M",
+        "buildingName": "M Annex",
+        "address": "2135 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1952,10 +2251,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "M",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "M",
+        "buildingName": "M Annex",
+        "address": "2135 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -1969,12 +2273,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "S",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "S",
+        "buildingName": "S Annex",
+        "address": "2145 Mackay St.",
+        "campus": "SGW",
+        "departments": "Philosophy",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2036,10 +2346,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "S",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "S",
+        "buildingName": "S Annex",
+        "address": "2145 Mackay St.",
+        "campus": "SGW",
+        "departments": "Philosophy",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2053,12 +2369,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CI",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "CI",
+        "buildingName": "CI Annex",
+        "address": "2149 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2104,10 +2425,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "CI",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "CI",
+        "buildingName": "CI Annex",
+        "address": "2149 Mackay St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2121,12 +2447,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "MI",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "MI",
+        "buildingName": "MI Annex",
+        "address": "2130 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Hosts union offices",
+        "services": "Association of Concordia University Management and Administrative Employees (ACUMAE),\n    Concordia University Continuing Education Part-time Faculty Union (CUCEPTFU),\n    Concordia University Professional Employee Union (CUPEU),\n    Concordia University Support Staff Union (CSN),\n    The Concordia University Union of Support Staff - Technical Sector (CUUSS-TS)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2168,10 +2501,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "MI",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "MI",
+        "buildingName": "MI Annex",
+        "address": "2130 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Hosts union offices",
+        "services": "Association of Concordia University Management and Administrative Employees (ACUMAE),\n    Concordia University Continuing Education Part-time Faculty Union (CUCEPTFU),\n    Concordia University Professional Employee Union (CUPEU),\n    Concordia University Support Staff Union (CSN),\n    The Concordia University Union of Support Staff - Technical Sector (CUUSS-TS)",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2185,12 +2525,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "D",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "D",
+        "buildingName": "D Annex",
+        "address": "2140 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Student Housing",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -2236,10 +2582,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "D",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "D",
+        "buildingName": "D Annex",
+        "address": "2140 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Student Housing",
+        "hours": "24/7 access for residents\nVisitor access restrictions apply"
       },
       "geometry": {
         "coordinates": [
@@ -2253,12 +2605,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "K",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "K",
+        "buildingName": "K Annex",
+        "address": "2150 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices for departments and unions",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2316,10 +2674,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "K",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "K",
+        "buildingName": "K Annex",
+        "address": "2150 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices for departments and unions",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2333,12 +2697,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "B",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "B",
+        "buildingName": "B Annex",
+        "address": "2160 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Engineering and Computer Science Association",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2372,10 +2743,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "B",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "B",
+        "buildingName": "B Annex",
+        "address": "2160 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "notes": "Houses offices and Student Services",
+        "services": "Engineering and Computer Science Association",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2389,12 +2767,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "MU",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "MU",
+        "buildingName": "MU Annex",
+        "address": "2170 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2428,10 +2811,15 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "MU",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "MU",
+        "buildingName": "MU Annex",
+        "address": "2170 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2445,12 +2833,20 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "H",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "H",
+        "buildingName": "Henry F. Hall Building",
+        "address": "1455 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Economics,\n    \"Geography, Planning and Environment\",\n    Political Science,\n    School of Community and Public Affairs,\n    School of Irish Studies,\n    Sociology and Anthropology",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Campus Safety and Prevention Services,\n    Concordia Student Union (CSU),\n    First Stop,\n    Espace Franco,\n    IT Service Desk,\n    NouLa Black Student Centre,\n    Office of Student Life and Engagement,\n    Otsenhakta Student Centre,\n    Sexual Assault Resource Centre (SARC),\n    Student Success Centre,\n    Welcome Crew Office,\n    Zen Den",
+        "venues": "Concordia Theatre,\n    Reggies,\n    Sir George Williams University Alumni Auditorium",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2484,10 +2880,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "H",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "H",
+        "buildingName": "Henry F. Hall Building",
+        "address": "1455 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Economics,\n    \"Geography, Planning and Environment\",\n    Political Science,\n    School of Community and Public Affairs,\n    School of Irish Studies,\n    Sociology and Anthropology",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Campus Safety and Prevention Services,\n    Concordia Student Union (CSU),\n    First Stop,\n    Espace Franco,\n    IT Service Desk,\n    NouLa Black Student Centre,\n    Office of Student Life and Engagement,\n    Otsenhakta Student Centre,\n    Sexual Assault Resource Centre (SARC),\n    Student Success Centre,\n    Welcome Crew Office,\n    Zen Den",
+        "venues": "Concordia Theatre,\n    Reggies,\n    Sir George Williams University Alumni Auditorium",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2501,12 +2905,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LD",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "LD",
+        "buildingName": "LD Building",
+        "address": "1424 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "services": "CSU Daycare & Nursery",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2564,10 +2974,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LD",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "LD",
+        "buildingName": "LD Building",
+        "address": "1424 Bishop St.",
+        "campus": "SGW",
+        "accessibility": "No",
+        "services": "CSU Daycare & Nursery",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2581,12 +2997,20 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LB",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "LB",
+        "buildingName": "J.W. McConnell Building",
+        "address": "1400 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Centre for Interdisciplinary Studies in Society and Culture (CISSC),\n    Centre for the Study of Learning and Performance,\n    Education,\n    English,\n    Etudes francaises,\n    History,\n    Mathematics and Statistics",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Birks Student Service Centre,\n    Concordia Book Stop,\n    Concordia Print Services,\n    First Stop,\n    Instructional and Information Technology Services (IITS),\n    J.A. De Seve Cinema,\n    R. Howard Webster Library,\n    SHIFT Centre for Social Transformation,\n    Welcome Centre",
+        "venues": "4TH SPACE,\n    Atrium,\n    J.A. De Seve Cinema,\n    Leonard and Bina Ellen Art Gallery,\n    SHIFT Centre for Social Transformation",
+        "hours": "Monday-Friday: 8:00 AM - 10:00 PM\nSaturday-Sunday: 10:00 AM - 6:00 PM\nCheck library.concordia.ca for current hours"
       },
       "geometry": {
         "coordinates": [
@@ -2664,10 +3088,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "LB",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "LB",
+        "buildingName": "J.W. McConnell Building",
+        "address": "1400 De Maisonneuve Blvd. W.",
+        "campus": "SGW",
+        "departments": "Centre for Interdisciplinary Studies in Society and Culture (CISSC),\n    Centre for the Study of Learning and Performance,\n    Education,\n    English,\n    Etudes francaises,\n    History,\n    Mathematics and Statistics",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "Birks Student Service Centre,\n    Concordia Book Stop,\n    Concordia Print Services,\n    First Stop,\n    Instructional and Information Technology Services (IITS),\n    J.A. De Seve Cinema,\n    R. Howard Webster Library,\n    SHIFT Centre for Social Transformation,\n    Welcome Centre",
+        "venues": "4TH SPACE,\n    Atrium,\n    J.A. De Seve Cinema,\n    Leonard and Bina Ellen Art Gallery,\n    SHIFT Centre for Social Transformation",
+        "hours": "Monday-Friday: 8:00 AM - 10:00 PM\nSaturday-Sunday: 10:00 AM - 6:00 PM\nCheck library.concordia.ca for current hours"
       },
       "geometry": {
         "coordinates": [
@@ -2681,12 +3113,19 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VA",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "VA",
+        "buildingName": "Visual Arts Building",
+        "address": "1395 Rene-Levesque Blvd. W.",
+        "campus": "SGW",
+        "departments": "Art Education\n    Art History\n    Studio Arts",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "VAV Gallery",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2728,10 +3167,17 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "VA",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "VA",
+        "buildingName": "Visual Arts Building",
+        "address": "1395 Rene-Levesque Blvd. W.",
+        "campus": "SGW",
+        "departments": "Art Education\n    Art History\n    Studio Arts",
+        "accessibility": "Accessible entrance, Accessible building elevator",
+        "services": "VAV Gallery",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2745,12 +3191,18 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SB",
         "stroke": "#555555",
         "stroke-width": 2,
         "stroke-opacity": 1,
         "fill": "#555555",
-        "fill-opacity": 0.5
+        "fill-opacity": 0.5,
+        "buildingCode": "SB",
+        "buildingName": "Samuel Bronfman Building",
+        "address": "1590 Docteur-Penfield",
+        "campus": "SGW",
+        "departments": "Arts and Science Research Groups",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
@@ -2852,10 +3304,16 @@
     {
       "type": "Feature",
       "properties": {
-        "building-name": "SB",
         "marker-color": "#00bfff",
         "marker-size": "medium",
-        "marker-symbol": "circle"
+        "marker-symbol": "circle",
+        "buildingCode": "SB",
+        "buildingName": "Samuel Bronfman Building",
+        "address": "1590 Docteur-Penfield",
+        "campus": "SGW",
+        "departments": "Arts and Science Research Groups",
+        "accessibility": "Accessibility ramp, Accessible entrance, Accessible building elevator",
+        "hours": "Monday-Friday: 7:00 AM - 11:00 PM\nSaturday-Sunday: 7:00 AM - 9:00 PM\nAfter-hours access for authorized personnel"
       },
       "geometry": {
         "coordinates": [
