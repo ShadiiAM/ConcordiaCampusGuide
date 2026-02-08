@@ -98,6 +98,18 @@ class ScreenSwitchingUITest {
 
         @Test
         fun appStartsOnMapScreen() {
+            composeTestRule.setContent {
+                ConcordiaCampusGuideTheme {
+                    CompositionLocalProvider(
+                        LocalAccessibilityState provides defaultState
+                    ) {
+                        ConcordiaCampusGuideApp()
+                    }
+                }
+            }
+
+            composeTestRule.onNodeWithText("Hello Android!").assertExists()
+
         }
 
 }

@@ -137,7 +137,7 @@ private fun renderPolygon(map: GoogleMap, ...) {
 
 **Rationale:**
 - Business logic: Target 80%+ unit test coverage ✓
-- UI code: Covered by Espresso tests (not counted in unit test coverage)
+- UI code: Covered by Espresso tests and Jetpack Compose UI tests (not counted in unit test coverage)
 - Overall: Balanced approach for fast CI and comprehensive testing
 
 ## Running Tests
