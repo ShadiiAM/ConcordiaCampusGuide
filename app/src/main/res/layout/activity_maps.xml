@@ -38,26 +38,30 @@
 
     <Button
         android:id="@+id/button_toggle_controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Controls"
-        app:layout_constraintBottom_toTopOf="@+id/button_up"
-        app:layout_constraintStart_toStartOf="@+id/button_left"
-        android:layout_marginBottom="8dp"/>
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/panel_button_ripple"
+        android:contentDescription="Toggle Controls"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/button_zoom_in"
+        app:layout_constraintEnd_toEndOf="@+id/button_zoom_in"
+        app:layout_constraintStart_toStartOf="@+id/button_zoom_in"
+        android:layout_marginBottom="8dp" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/controls_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:constraint_referenced_ids="button_up,button_down,button_left,button_right,button_zoom_in,button_zoom_out" />
+        app:constraint_referenced_ids="button_up,button_down,button_left,button_right,button_zoom_in,button_zoom_out,button_recenter" />
 
     <Button
         android:id="@+id/button_up"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/up_button"
+        android:background="@drawable/up_button_ripple"
         android:contentDescription="Up"
+        android:soundEffectsEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,8 +71,9 @@
         android:id="@+id/button_down"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/down_button"
+        android:background="@drawable/down_button_ripple"
         android:contentDescription="Down"
+        android:soundEffectsEnabled="true"
         app:layout_constraintTop_toBottomOf="@+id/button_up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -77,8 +82,9 @@
         android:id="@+id/button_left"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/left_button"
+        android:background="@drawable/left_button_ripple"
         android:contentDescription="Left"
+        android:soundEffectsEnabled="true"
         app:layout_constraintEnd_toStartOf="@id/button_up"
         app:layout_constraintTop_toTopOf="@id/button_up"
         app:layout_constraintBottom_toBottomOf="@id/button_up"/>
@@ -87,8 +93,9 @@
         android:id="@+id/button_right"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/right_button"
+        android:background="@drawable/right_button_ripple"
         android:contentDescription="Right"
+        android:soundEffectsEnabled="true"
         app:layout_constraintStart_toEndOf="@id/button_up"
         app:layout_constraintTop_toTopOf="@id/button_up"
         app:layout_constraintBottom_toBottomOf="@id/button_up"/>
@@ -97,8 +104,9 @@
         android:id="@+id/button_zoom_in"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/zoom_in_button"
+        android:background="@drawable/zoom_in_button_ripple"
         android:contentDescription="Zoom In"
+        android:soundEffectsEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/button_right"
         android:layout_marginEnd="16dp" />
@@ -107,8 +115,9 @@
         android:id="@+id/button_zoom_out"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/zoom_out_button"
+        android:background="@drawable/zoom_out_button_ripple"
         android:contentDescription="Zoom Out"
+        android:soundEffectsEnabled="true"
         app:layout_constraintTop_toBottomOf="@+id/button_zoom_in"
         app:layout_constraintEnd_toEndOf="@+id/button_zoom_in" />
 
@@ -116,8 +125,9 @@
         android:id="@+id/button_recenter"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@drawable/recenter_button"
+        android:background="@drawable/recenter_button_ripple"
         android:contentDescription="Recenter"
+        android:soundEffectsEnabled="true"
         app:layout_constraintTop_toBottomOf="@+id/button_zoom_out"
         app:layout_constraintEnd_toEndOf="@+id/button_zoom_out" />
 
