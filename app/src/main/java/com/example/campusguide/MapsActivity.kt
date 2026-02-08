@@ -222,6 +222,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         findViewById<Button>(R.id.button_right).setOnClickListener { moveRight() }
         findViewById<Button>(R.id.button_zoom_in).setOnClickListener { zoomIn() }
         findViewById<Button>(R.id.button_zoom_out).setOnClickListener { zoomOut() }
+        findViewById<Button>(R.id.button_recenter).setOnClickListener { recenter() }
     }
 
     /**
@@ -307,6 +308,26 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private fun zoomOut() {
         if (!::mMap.isInitialized) return
         mMap.animateCamera(CameraUpdateFactory.zoomOut())
+    }
+
+    private fun recenter() {
+        if (!::mMap.isInitialized) return
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+            }
+        }
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */

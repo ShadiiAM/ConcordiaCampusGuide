@@ -90,6 +90,14 @@
         app:layout_constraintTop_toBottomOf="@+id/button_zoom_in"
         app:layout_constraintEnd_toEndOf="@+id/button_zoom_in" />
 
+    <Button
+        android:id="@+id/button_recenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recenter"
+        app:layout_constraintTop_toBottomOf="@+id/button_zoom_out"
+        app:layout_constraintEnd_toEndOf="@+id/button_zoom_out" />
+
     <!-- Bottom Navigation -->
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/bottom_nav"
