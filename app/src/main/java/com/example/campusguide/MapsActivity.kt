@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.view.View
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
@@ -214,6 +215,11 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        findViewById<Button>(R.id.button_up).setOnClickListener { moveUp() }
+        findViewById<Button>(R.id.button_down).setOnClickListener { moveDown() }
+        findViewById<Button>(R.id.button_left).setOnClickListener { moveLeft() }
+        findViewById<Button>(R.id.button_right).setOnClickListener { moveRight() }
     }
 
     /**
@@ -269,6 +275,26 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 initializeOverlays(getSavedCampus())
             }
         }
+    }
+
+    private fun moveUp() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -200f))
+    }
+
+    private fun moveDown() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 200f))
+    }
+
+    private fun moveLeft() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(-200f, 0f))
+    }
+
+    private fun moveRight() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */

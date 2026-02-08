@@ -36,6 +36,43 @@
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/button_up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Up"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="120dp"/>
+
+    <Button
+        android:id="@+id/button_down"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Down"
+        app:layout_constraintTop_toBottomOf="@+id/button_up"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Left"
+        app:layout_constraintEnd_toStartOf="@id/button_up"
+        app:layout_constraintTop_toTopOf="@id/button_up"
+        app:layout_constraintBottom_toBottomOf="@id/button_up"/>
+
+    <Button
+        android:id="@+id/button_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Right"
+        app:layout_constraintStart_toEndOf="@id/button_up"
+        app:layout_constraintTop_toTopOf="@id/button_up"
+        app:layout_constraintBottom_toBottomOf="@id/button_up"/>
+
     <!-- Bottom Navigation -->
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/bottom_nav"
