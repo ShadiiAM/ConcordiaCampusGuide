@@ -70,6 +70,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import android.location.Geocoder
+import java.util.Locale
+import kotlinx.coroutines.delay
+import android.os.Build
+import android.util.Log
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+
+
 
 
 class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
@@ -87,12 +96,20 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     private var loyAttached = false
     var userMarker: Marker? = null
 
+    private var searchMarker: Marker? = null
+
+    private var pendingSearchQuery: String = ""
+
+    private var searchJob: Job? = null
+
+
 
 
     // Coroutine scope for background operations
     private val activityScope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        pendingSearchQuery = intent.getStringExtra(EXTRA_SEARCH_QUERY).orEmpty().trim()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -100,6 +117,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        pendingSearchQuery = intent.getStringExtra(EXTRA_SEARCH_QUERY).orEmpty().trim()
 
         // Request location permissions after layout is inflated
         onGPS()
@@ -117,7 +135,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 ConcordiaCampusGuideTheme {
                     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
                     SearchBarWithProfile(
-                        onSearchQueryChange = { /* TODO: Handle search */ },
+                        onSearchQueryChange = { },
+                        onSearchSubmit = { query -> scheduleSearch(query) },
                         onProfileClick = { showProfileOverlay() },
                         modifier = Modifier.padding(top = statusBarPadding.calculateTopPadding())
                     )
@@ -216,6 +235,65 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
+    private fun scheduleSearch(rawQuery: String) {
+        val query = rawQuery.trim()
+        pendingSearchQuery = query
+
+        // Map not ready yet -> just remember it; we'll run after onMapReady finishes
+        if (!::mMap.isInitialized) return
+
+        // Cancel previous scheduled search (debounce)
+        searchJob?.cancel()
+
+        // Empty query -> remove pin and stop
+        if (query.isBlank()) {
+            searchMarker?.remove()
+            searchMarker = null
+            return
+        }
+
+        searchJob = activityScope.launch {
+            delay(400)
+
+            // If user typed more since this job started, ignore this run
+            if (query != pendingSearchQuery) return@launch
+
+            val address = withContext(Dispatchers.IO) {
+                try {
+                    val geocoder = Geocoder(this@MapsActivity, Locale.getDefault())
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        suspendCancellableCoroutine { cont ->
+                            geocoder.getFromLocationName(query, 1) { results ->
+                                cont.resume(results.firstOrNull())
+                            }
+                        }
+                    } else {
+                        @Suppress("DEPRECATION")
+                        geocoder.getFromLocationName(query, 1)?.firstOrNull()
+                    }
+
+                } catch (_: Exception) {
+                    null
+                }
+            }
+
+            if (address == null) return@launch
+
+            val latLng = LatLng(address.latitude, address.longitude)
+
+            searchMarker?.remove()
+            searchMarker = mMap.addMarker(
+                MarkerOptions()
+                    .position(latLng)
+                    .title(query)
+            )
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+        }
+    }
+
+
     /**
      * Manipulates the map once available.
      * Quick operations (marker, camera) stay synchronous.
@@ -277,6 +355,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
                 initializeOverlays(getSavedCampus())
             }
         }
+        scheduleSearch(pendingSearchQuery)
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */
@@ -537,11 +616,14 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         activityScope.coroutineContext[Job]?.cancel()
     }
 
+
     companion object {
         private const val PREFS_NAME = "campus_preferences"
         private const val KEY_SELECTED_CAMPUS = "selected_campus"
         private const val CAMERA_ANIMATION_DURATION_MS = 1500
         private const val CAMPUS_ZOOM_LEVEL = 15f
+        const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
+
     }
 }
 

@@ -114,7 +114,13 @@ fun ConcordiaCampusGuideApp() {
                         .padding(innerPadding)
                 ) {
                     SearchBarWithProfile(
-                        onSearchQueryChange = { /* TODO: Handle search query */ },
+                        onSearchQueryChange = {  },
+                        onSearchSubmit = { query ->
+                            val intent = Intent(context, MapsActivity::class.java).apply {
+                                putExtra(MapsActivity.EXTRA_SEARCH_QUERY, query)
+                            }
+                            context.startActivity(intent)
+                        },
                         onProfileClick = { showProfile = true }
                     )
                     Column(
