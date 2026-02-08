@@ -2,8 +2,10 @@ package com.example.campusguide
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
@@ -14,6 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
@@ -236,5 +239,25 @@ class MapsActivityIntegrationTest {
 
         val callback = activity.generateCallback()
         assertNotNull(callback)
+    }
+
+    @Test
+    fun highlightBuildingUserIsIn_highlightsBuilding() {
+        val controller = Robolectric.buildActivity(MapsActivity::class.java)
+        val activity = controller.create().get()
+        activity.sgwOverlay = GeoJsonOverlay(activity, idPropertyName = "building-name")
+        activity.loyOverlay = GeoJsonOverlay(activity, idPropertyName = "building-name")
+
+        val mMap = mock(GoogleMap::class.java)
+        whenever(mMap.addPolygon(any(PolygonOptions::class.java))).thenReturn(mock(Polygon::class.java))
+
+        activity.sgwOverlay.attachToMap(mMap, activity.loadGeoJson(R.raw.sgw_buildings))
+        activity.loyOverlay.attachToMap(mMap, activity.loadGeoJson(R.raw.loy_buildings))
+
+        assertNotNull(activity.sgwOverlay.getBuildings())
+        activity.highlightBuildingUserIsIn(LatLng(45.4972, -73.5789))
+        assertNotNull(activity.loyOverlay.getBuildings())
+        activity.highlightBuildingUserIsIn(LatLng(45.4582, -73.6402))
+        activity.highlightBuildingUserIsIn(LatLng(0.0, 0.0))
     }
 }
