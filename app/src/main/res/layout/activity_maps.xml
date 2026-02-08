@@ -54,9 +54,10 @@
 
     <Button
         android:id="@+id/button_up"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Up"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/up_button"
+        android:contentDescription="Up"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,53 +65,59 @@
 
     <Button
         android:id="@+id/button_down"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Down"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/down_button"
+        android:contentDescription="Down"
         app:layout_constraintTop_toBottomOf="@+id/button_up"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Left"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/left_button"
+        android:contentDescription="Left"
         app:layout_constraintEnd_toStartOf="@id/button_up"
         app:layout_constraintTop_toTopOf="@id/button_up"
         app:layout_constraintBottom_toBottomOf="@id/button_up"/>
 
     <Button
         android:id="@+id/button_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Right"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/right_button"
+        android:contentDescription="Right"
         app:layout_constraintStart_toEndOf="@id/button_up"
         app:layout_constraintTop_toTopOf="@id/button_up"
         app:layout_constraintBottom_toBottomOf="@id/button_up"/>
 
     <Button
         android:id="@+id/button_zoom_in"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="+"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/zoom_in_button"
+        android:contentDescription="Zoom In"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/button_right"
         android:layout_marginEnd="16dp" />
 
     <Button
         android:id="@+id/button_zoom_out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="-"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/zoom_out_button"
+        android:contentDescription="Zoom Out"
         app:layout_constraintTop_toBottomOf="@+id/button_zoom_in"
         app:layout_constraintEnd_toEndOf="@+id/button_zoom_in" />
 
     <Button
         android:id="@+id/button_recenter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Recenter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/recenter_button"
+        android:contentDescription="Recenter"
         app:layout_constraintTop_toBottomOf="@+id/button_zoom_out"
         app:layout_constraintEnd_toEndOf="@+id/button_zoom_out" />
 
