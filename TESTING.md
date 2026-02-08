@@ -99,6 +99,15 @@ private fun renderPolygon(map: GoogleMap, ...) {
 
 **Coverage approach:** Espresso UI tests and integration tests
 
+### 5. BuildingDetailsBottomSheet.kt
+
+**Why it cannot be unit tested:**
+- Contains `@Composable` functions that require Compose runtime
+- Uses Jetpack Compose UI components (ModalBottomSheet, AnimatedVisibility, ClickableText)
+- ClickableText and URI handler require actual Android context
+
+**Coverage approach:** Espresso UI tests for US-1.5/1.5.1
+
 ## UI/System Tests (Required for Full Coverage)
 
 **Framework:** Espresso (Android instrumentation tests)
