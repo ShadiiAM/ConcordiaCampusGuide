@@ -107,3 +107,5 @@ secrets.properties
 /test-reports/
 
 .claude/
+
+.Metrics/
