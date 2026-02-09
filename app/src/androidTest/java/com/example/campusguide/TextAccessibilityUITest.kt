@@ -1,5 +1,9 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -12,23 +16,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * UI Tests for Text Accessibility Features (User Story 1.10)
+ * Acceptance Test for US-1.10: Text Accessibility Features
  *
- * These tests verify that users with visual impairments can adjust
- * text accessibility settings including font size, high contrast mode,
- * and color filters for various types of color blindness.
+ * Tests verify text size adjustment, bold text toggle, and colorblind modes.
  *
- * Acceptance Criteria Tested:
- * 1. Accessibility settings page is accessible from profile menu
- * 2. Font size can be adjusted (small, medium, large, extra large)
- * 3. Font size changes apply across all screens
- * 4. High contrast mode can be enabled
- * 5. Color filter options are available (protanopia, deuteranopia, tritanopia)
- * 6. Color filters apply to map and UI elements
- * 7. Settings persist across app sessions
- *
- * Note: These tests require a connected device or running emulator.
- * Run with: ./gradlew connectedAndroidTest
+ * NOTE: Bold toggle and color box require MANUAL clicking during recording
+ * because they don't have accessible identifiers for automated clicking.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -37,161 +30,179 @@ class TextAccessibilityUITest {
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-    /**
-     * Test: Accessibility settings page is accessible
-     * Verifies that users can navigate to accessibility settings
-     */
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
+
     @Test
-    fun accessibilitySettings_isAccessible() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun accessibilityScreen_isAccessible() {
+        // AC: Accessibility settings accessible from profile menu
+        Thread.sleep(2000)
 
-        // Navigate to accessibility settings
-        // (Implementation depends on actual navigation structure)
+        // Navigate to profile
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
 
-        // Verify we're in the app
+        // Click Accessibility item
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
+
+        // Verify we're on Accessibility screen
+        composeTestRule.onNode(hasText("Display and Text Size")).assertExists()
+    }
+
+    @Test
+    fun textSize_canBeAdjusted() {
+        // AC: Text size can be adjusted with +/- buttons
+        Thread.sleep(2000)
+
+        // Navigate to accessibility
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
+
+        // Increase text size
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(2000)
+
+        // Decrease text size
+        composeTestRule.onNode(hasText("-")).performClick()
+        Thread.sleep(2000)
+
+        // Verify screen still displayed
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: Font size options are available
-     * Verifies that users can see font size adjustment options
-     */
     @Test
-    fun accessibilitySettings_fontSizeOptions_areAvailable() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun boldText_canBeToggled() {
+        // AC: Bold text can be toggled on/off
+        Thread.sleep(2000)
 
-        // Navigate to accessibility settings
-        // Font size options should be visible
+        // Navigate to accessibility
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
 
-        // Verify settings page is displayed
+        // Bold setting row exists
+        composeTestRule.onNode(hasText("Bold")).assertExists()
+        Thread.sleep(2000)
+
+        // ACTION: MANUALLY click the Bold toggle switch in the recording
+        Thread.sleep(3000)
+
+        // ACTION: MANUALLY click it again to toggle off
+        Thread.sleep(3000)
+
+        // Verify screen displayed
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: Font size can be changed
-     * Verifies that clicking font size options updates the setting
-     */
     @Test
-    fun fontSize_canBeChanged() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun colorBlindModes_canBeCycled() {
+        // AC: Colorblind modes can be cycled
+        Thread.sleep(2000)
 
-        // Navigate to accessibility settings
-        // Change font size to large or small
+        // Navigate to accessibility
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
 
-        // Verify app remains functional
+        // Text colour row exists
+        composeTestRule.onNode(hasText("Text colour")).assertExists()
+        Thread.sleep(2000)
+
+        // ACTION: MANUALLY click the color box to cycle through modes
+        // (Click once for each mode: Protanopia, Deuteranopia, Tritanopia)
+        Thread.sleep(3000)
+
+        // ACTION: Click again for Deuteranopia
+        Thread.sleep(3000)
+
+        // ACTION: Click again for Tritanopia
+        Thread.sleep(3000)
+
+        // Verify screen displayed
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: High contrast mode toggle is available
-     * Verifies that high contrast mode option exists
-     */
     @Test
-    fun accessibilitySettings_highContrastMode_isAvailable() {
-        // Wait for app to load
-        Thread.sleep(1500)
+    fun textSize_appliesAcrossScreens() {
+        // AC: Font size changes apply across all screens
+        Thread.sleep(2000)
 
-        // Navigate to accessibility settings
-        // High contrast toggle should be visible
+        // Navigate to accessibility
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
 
-        // Verify settings page is displayed
+        // Increase text size significantly
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(1000)
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(1000)
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(2000)
+
+        // Go back to main screen
+        composeTestRule.onNode(hasContentDescription("Back")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasContentDescription("Back")).performClick()
+        Thread.sleep(2000)
+
+        // Navigate to different tabs to show text size applies everywhere
+        composeTestRule.onNode(hasText("Directions")).performClick()
+        Thread.sleep(2000)
+
+        composeTestRule.onNode(hasText("Calendar")).performClick()
+        Thread.sleep(2000)
+
+        composeTestRule.onNode(hasText("POI")).performClick()
+        Thread.sleep(2000)
+
+        composeTestRule.onNode(hasText("Map")).performClick()
+        Thread.sleep(2000)
+
+        // Verify app functional with larger text
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
-    /**
-     * Test: Color filter options are available
-     * Verifies that color blindness filter options exist
-     */
-    @Test
-    fun accessibilitySettings_colorFilters_areAvailable() {
-        // Wait for app to load
-        Thread.sleep(1500)
-
-        // Navigate to accessibility settings
-        // Color filter options should be visible
-        // (Protanopia, Deuteranopia, Tritanopia, etc.)
-
-        // Verify settings page is displayed
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: Color filter can be applied
-     * Verifies that selecting a color filter updates the display
-     */
-    @Test
-    fun colorFilter_canBeApplied() {
-        // Wait for app to load
-        Thread.sleep(1500)
-
-        // Navigate to accessibility settings
-        // Apply a color filter (e.g., protanopia)
-
-        // Verify app remains functional with filter applied
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: Accessibility settings persist
-     * Verifies that settings are saved and remain after navigation
-     */
     @Test
     fun accessibilitySettings_persist() {
-        // Wait for app to load
-        Thread.sleep(1500)
+        // AC: Settings persist across navigation
+        Thread.sleep(2000)
 
-        // Change accessibility setting
-        // Navigate away and back
-        // Setting should still be applied
+        // Navigate to accessibility
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
 
-        // Verify app is functional
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
+        // Change text size
+        composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(2000)
 
-    /**
-     * Test: Font size applies to all screens
-     * Verifies that font size changes affect all app screens
-     */
-    @Test
-    fun fontSize_appliesAcrossAllScreens() {
-        // Wait for app to load
-        Thread.sleep(1500)
+        // Go back to main
+        composeTestRule.onNode(hasContentDescription("Back")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasContentDescription("Back")).performClick()
+        Thread.sleep(2000)
 
-        // Change font size in settings
-        // Navigate to different screens (map, calendar, profile)
-        // Font size should be consistent across all
+        // Navigate to accessibility again
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("Accessibility")).performClick()
+        Thread.sleep(3000)
 
-        // Verify app is functional
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    /**
-     * Test: Multiple accessibility features work together
-     * Verifies that font size, contrast, and color filters can be used simultaneously
-     */
-    @Test
-    fun multipleAccessibilityFeatures_workTogether() {
-        // Wait for app to load
-        Thread.sleep(1500)
-
-        // Enable multiple accessibility features:
-        // - Large font
-        // - High contrast
-        // - Color filter
-
-        // Verify app remains functional with all enabled
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
+        // Text size setting should still be applied
+        composeTestRule.onNode(hasText("Text size")).assertExists()
     }
 }

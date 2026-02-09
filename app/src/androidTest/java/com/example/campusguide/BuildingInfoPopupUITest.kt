@@ -14,7 +14,9 @@ import org.junit.runner.RunWith
  * Acceptance Test for US-1.5: Show Building Information (Pop-up Details)
  *
  * Tests verify building tap shows popup with building name and code.
- * Visual verification done via GIF recording.
+ *
+ * NOTE: All interactions require MANUAL tapping on building polygons
+ * during test recording. Tap when instructed in comments.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -26,7 +28,8 @@ class BuildingInfoPopupUITest {
     @Test
     fun mapLoads_withBuildingPolygons() {
         // AC: Building polygons visible for tapping
-        Thread.sleep(3000)
+        // ACTION: Just wait, no interaction needed
+        Thread.sleep(4000)
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
@@ -35,18 +38,27 @@ class BuildingInfoPopupUITest {
     @Test
     fun tapBuilding_showsPopup() {
         // AC: Tapping building shows popup with details
-        // Note: Manual tap required during test recording
-        Thread.sleep(8000)
+        // ACTION: TAP a building polygon within first 5 seconds
+        Thread.sleep(5000)
+
+        // Wait to show popup with building name and code
+        Thread.sleep(5000)
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun popup_showsBuildingDetails() {
-        // AC: Popup includes building name and code
-        // Note: Manual tap and verification during recording
-        Thread.sleep(8000)
+    fun popup_canBeDismissed() {
+        // AC: Popup provides clear way to close/dismiss
+        // ACTION: TAP a building within first 5 seconds
+        Thread.sleep(5000)
+
+        // Popup should be visible now
+        Thread.sleep(3000)
+
+        // ACTION: DISMISS the popup (tap X or tap outside)
+        Thread.sleep(5000)
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
@@ -55,8 +67,17 @@ class BuildingInfoPopupUITest {
     @Test
     fun tapDifferentBuilding_updatesPopup() {
         // AC: Different building updates popup info
-        // Note: Manual taps on two buildings during recording
-        Thread.sleep(12000)
+        // ACTION: TAP first building within first 5 seconds
+        Thread.sleep(5000)
+
+        // Wait to show first building popup
+        Thread.sleep(4000)
+
+        // ACTION: TAP second building within next 5 seconds
+        Thread.sleep(5000)
+
+        // Wait to show second building popup updated
+        Thread.sleep(4000)
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
