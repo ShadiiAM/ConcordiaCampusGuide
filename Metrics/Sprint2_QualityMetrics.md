@@ -29,5 +29,81 @@
 
 - **[Planned] Increase comment density to meet >10% target.** Add KDoc comments to all public classes, functions, and composables — prioritizing undocumented files: `AccessibleText.kt`, `ColorFilterOverlay.kt`, `NavigationBar.kt`, `MapScreen.kt`, `CalendarScreen.kt`, and `CampusToggle.kt`.
 - **[Planned] Refactor high-complexity functions.** Extract time-parsing logic from `HoursLine()` and `checkIfOpen()` into utility functions. Break `attachToMapAsync()` into per-geometry-type handlers. Reduce duplicated `when(campus)` branches in `executeSwitchCampus()` with a campus-dispatch helper.
-- **[Planned] Address convention violations.** Replace wildcard imports with explicit imports. Remove duplicate imports in `MapsActivity.kt`. Change `var` to `val` in `CalendarScreen.kt`. Extract magic numbers (request code `200`, coordinate literals, DP bounds) into named constants. Resolve `TODO` comments or convert to tracked issues.
+- **[Planned] Address convention violations (details below).**
 - **[Ongoing] Maintain zero duplication, zero security vulnerabilities, and low technical debt** through continued code review practices.
+
+#### Convention Violations — Detailed Breakdown
+
+**1. Replace wildcard imports with explicit imports**
+
+Wildcard imports pull in unnecessary classes, can cause naming conflicts, and make it harder to see what's actually used. Found in `BuildingDetailsBottomSheet.kt` and `GeoJsonOverlay.kt`.
+
+```kotlin
+// BAD — imports everything from the package with *
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+
+// GOOD — import only what you actually use
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+```
+
+**2. Remove duplicate imports in MapsActivity.kt**
+
+Lines 33-35 and lines 70-72 import the same symbols twice. The duplicates should be deleted.
+
+```kotlin
+// Lines 33-35 import these:
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+// Lines 70-72 import the SAME things again — redundant, delete these
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+```
+
+**3. Change `var` to `val` in CalendarScreen.kt**
+
+If a variable is never reassigned, it should be `val`. This prevents accidental mutation and communicates intent. Six variables inside `formattedDate()` are declared as `var` but never reassigned.
+
+```kotlin
+// BAD — var means the variable can be reassigned, but it never is
+var day = date.get(Calendar.DAY_OF_MONTH)
+var month = start.getDisplayName(...)
+var weekStart = start.get(Calendar.DAY_OF_MONTH)
+
+// GOOD — val means it's read-only, which is the actual intent
+val day = date.get(Calendar.DAY_OF_MONTH)
+val month = start.getDisplayName(...)
+val weekStart = start.get(Calendar.DAY_OF_MONTH)
+```
+
+**4. Extract magic numbers into named constants**
+
+"Magic numbers" are unexplained literal values scattered in the code. Giving them names makes the code readable and maintainable — if a value needs to change, you change it in one place. Found across `MapsActivity.kt` (request code `200`, coordinate literals), `AccessibilityState.kt` (bounds `7f`, `-2f`), `AccessibleText.kt` (bounds `15f`, `23f`), and `MarkerIconFactory.kt` (base size `64`).
+
+```kotlin
+// BAD — what does 200 mean? What are these coordinates?
+ActivityCompat.requestPermissions(this, arrayOf(...), 200)
+val initialLocation = LatLng(45.4972, -73.5789)
+
+// GOOD — self-documenting named constants
+companion object {
+    private const val LOCATION_PERMISSION_REQUEST_CODE = 200
+    private val SGW_LOCATION = LatLng(45.4972, -73.5789)
+    private val LOYOLA_LOCATION = LatLng(45.4582, -73.6402)
+}
+```
+
+**5. Resolve TODO comments or convert to tracked issues**
+
+TODOs in production code are unfinished work that's easy to forget. Either implement them now, or create actual GitHub issues to track them and remove the comments. Two found in `MapsActivity.kt`:
+
+```kotlin
+// These exist in MapsActivity.kt:
+onSearchQueryChange = { /* TODO: Handle search */ },          // line 129
+onProfileClick = { /* TODO: Navigate to profile details */ },  // line 671
+```
