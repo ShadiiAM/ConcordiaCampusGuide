@@ -32,6 +32,7 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
 
     private val polygonsById = ConcurrentHashMap<String, MutableList<Polygon>>() // MultiPolygon = multiple
     private val markersById = ConcurrentHashMap<String, Marker>()
+    private val polygonToIdMap = ConcurrentHashMap<Polygon, String>() // Reverse lookup: polygon -> feature ID
 
     private val featurePropsById = ConcurrentHashMap<String, JSONObject>()
 
@@ -103,6 +104,7 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
                 val poly = googleMap.addPolygon(p.options)
                 applyStyleToPolygon(poly, styleFromProperties(p.props))
                 polygonsById.getOrPut(p.id) { mutableListOf() }.add(poly)
+                polygonToIdMap[poly] = p.id  // Add reverse lookup
             }
             for (m in pendingMarkers) {
                 featurePropsById[m.id] = m.props
@@ -119,6 +121,7 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
 
         polygonsById.clear()
         markersById.clear()
+        polygonToIdMap.clear()
         featurePropsById.clear()
     }
 
@@ -185,6 +188,12 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
 
     fun getBuildings(): Map<String, List<Polygon>> = polygonsById
     fun getBuildingProps(): Map<String, JSONObject> = featurePropsById
+
+    /**
+     * Get the feature ID for a clicked polygon.
+     * Used to retrieve building metadata when a polygon is tapped.
+     */
+    fun getPolygonId(polygon: Polygon): String? = polygonToIdMap[polygon]
 
 
 
