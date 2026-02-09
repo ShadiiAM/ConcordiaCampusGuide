@@ -99,6 +99,15 @@ private fun renderPolygon(map: GoogleMap, ...) {
 
 **Coverage approach:** Espresso UI tests and integration tests
 
+### 5. BuildingDetailsBottomSheet.kt
+
+**Why it cannot be unit tested:**
+- Contains `@Composable` functions that require Compose runtime
+- Uses Jetpack Compose UI components (ModalBottomSheet, AnimatedVisibility, ClickableText)
+- ClickableText and URI handler require actual Android context
+
+**Coverage approach:** Espresso UI tests for US-1.5/1.5.1
+
 ## UI/System Tests (Required for Full Coverage)
 
 **Framework:** Espresso (Android instrumentation tests)
@@ -130,12 +139,14 @@ private fun renderPolygon(map: GoogleMap, ...) {
 **SonarCloud exclusions:**
 - `**/ui/theme/**` - Pure UI styling, no business logic
 - `**/ui/screens/**` - Full screen composables (tested via Espresso)
+- `**/ui/components/**` - component composables (tested via Espresso)
+
 
 **Coverage threshold:** 50% for new code (industry standard for UI-heavy apps)
 
 **Rationale:**
 - Business logic: Target 80%+ unit test coverage ✓
-- UI code: Covered by Espresso tests (not counted in unit test coverage)
+- UI code: Covered by Espresso tests and Jetpack Compose UI tests (not counted in unit test coverage)
 - Overall: Balanced approach for fast CI and comprehensive testing
 
 ## Running Tests
