@@ -179,6 +179,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
+    implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation(libs.androidx.navigation.testing)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
