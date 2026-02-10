@@ -84,7 +84,7 @@ fun ConcordiaCampusGuideApp() {
             )
         }
         else -> {
-            NavigationBar(currentDestination) { modifier ->
+            NavigationBar((currentDestination), { modifier ->
 
                 Box(modifier = modifier.fillMaxSize()) {
 
@@ -107,6 +107,7 @@ fun ConcordiaCampusGuideApp() {
                     )
                 }
             }
+            )
         }
     }
 }
