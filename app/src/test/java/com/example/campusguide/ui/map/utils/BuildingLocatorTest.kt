@@ -1,6 +1,5 @@
 package com.example.campusguide.ui.map.utils
 
-import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polygon
 import org.json.JSONObject

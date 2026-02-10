@@ -7,17 +7,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -26,19 +21,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.accessibility.rememberAccessibilityState
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
+import com.example.campusguide.ui.screens.CalendarScreen
+import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
@@ -68,53 +65,46 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun ConcordiaCampusGuideApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
-    if (showAccessibility) {
-        AccessibilityScreen(
-            onBackClick = { showAccessibility = false }
-        )
-    } else if (showProfile) {
-        ProfileScreen(
-            onBackClick = { showProfile = false },
-            onProfileClick = { /* TODO: Navigate to profile details */ },
-            onAccessibilityClick = { showAccessibility = true }
-        )
-    } else {
-        NavigationSuiteScaffold(
-            navigationSuiteItems = {
-                AppDestinations.entries.forEach {
-                    item(
-                        icon = {
-                            when (val icon = it.icon) {
-                                is AppIcon.Vector -> Icon(
-                                    icon.imageVector,
-                                    contentDescription = it.label
-                                )
-                                is AppIcon.Drawable -> Icon(
-                                    painter = painterResource(id = icon.resId),
-                                    contentDescription = it.label
-                                )
-                            }
-                        },
-                        label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
-                        selected = it == currentDestination,
-                        onClick = { currentDestination = it }
-                    )
-                }
-            }
-        ) {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
+
+    when {
+        showAccessibility -> {
+            AccessibilityScreen(
+                onBackClick = { showAccessibility = false }
+            )
+        }
+
+        showProfile -> {
+            ProfileScreen(
+                onBackClick = { showProfile = false },
+                onProfileClick = { /* handle profile details */ },
+                onAccessibilityClick = { showAccessibility = true }
+            )
+        }
+        else -> {
+            NavigationBar(currentDestination) { modifier ->
+
+                Box(modifier = modifier.fillMaxSize()) {
+
+                    when (currentDestination.value) {
+                        AppDestinations.MAP -> MapScreen()
+                        AppDestinations.CALENDAR -> CalendarScreen()
+                        AppDestinations.DIRECTIONS -> PlaceholderScreen(
+                            "Directions Screen",
+                            modifier
+                        )
+
+                        AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
+
+                    }
+
                     SearchBarWithProfile(
-                        onSearchQueryChange = {  },
+                        modifier = Modifier.padding(top = 35.dp),
+                        onSearchQueryChange = { /* handle search */ },
                         onSearchSubmit = { query ->
                             val intent = Intent(context, MapsActivity::class.java).apply {
                                 putExtra(MapsActivity.EXTRA_SEARCH_QUERY, query)
@@ -123,33 +113,11 @@ fun ConcordiaCampusGuideApp() {
                         },
                         onProfileClick = { showProfile = true }
                     )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Button(onClick = {
-                            val intent = Intent(context, MapsActivity::class.java)
-                            context.startActivity(intent)
-                        }) {
-                            AccessibleText(
-                                "Open Campus Map",
-                                baseFontSizeSp = 16f,
-                                fallbackColor = Color.White
-                            )
-                        }
-                    }
                 }
             }
         }
     }
 }
-
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
     data class Drawable(@DrawableRes val resId: Int) : AppIcon()
@@ -160,9 +128,9 @@ enum class AppDestinations(
     val icon: AppIcon,
 ) {
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
-    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.ic_directions)),
+    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
-    POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
+    POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
 }
 
 @Composable
@@ -179,5 +147,15 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     ConcordiaCampusGuideTheme {
         Greeting("Android")
+    }
+}
+
+@Composable
+fun PlaceholderScreen(name: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = name)
     }
 }
