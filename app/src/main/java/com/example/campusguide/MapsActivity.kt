@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.view.View
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.background
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.constraintlayout.widget.Group
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.databinding.ActivityMapsBinding
 import com.example.campusguide.ui.accessibility.AccessibilityState
@@ -238,6 +240,15 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        findViewById<Button>(R.id.button_up).setOnClickListener { moveUp() }
+        findViewById<Button>(R.id.button_down).setOnClickListener { moveDown() }
+        findViewById<Button>(R.id.button_left).setOnClickListener { moveLeft() }
+        findViewById<Button>(R.id.button_right).setOnClickListener { moveRight() }
+        findViewById<Button>(R.id.button_zoom_in).setOnClickListener { zoomIn() }
+        findViewById<Button>(R.id.button_zoom_out).setOnClickListener { zoomOut() }
+        findViewById<Button>(R.id.button_recenter).setOnClickListener { recenter() }
+        findViewById<Button>(R.id.button_toggle_controls).setOnClickListener { toggleControls() }
     }
 
     private fun scheduleSearch(rawQuery: String) {
@@ -358,6 +369,65 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             }
         }
         scheduleSearch(pendingSearchQuery)
+    }
+
+    private fun moveUp() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, -200f))
+    }
+
+    private fun moveDown() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(0f, 200f))
+    }
+
+    private fun moveLeft() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(-200f, 0f))
+    }
+
+    private fun moveRight() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
+    }
+
+    private fun zoomIn() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.zoomIn())
+    }
+
+    private fun zoomOut() {
+        if (!::mMap.isInitialized) return
+        mMap.animateCamera(CameraUpdateFactory.zoomOut())
+    }
+
+    private fun recenter() {
+        if (!::mMap.isInitialized) return
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+            }
+        }
+    }
+
+    private fun toggleControls() {
+        val controlsGroup = findViewById<Group>(R.id.controls_group)
+        if (controlsGroup.visibility == View.VISIBLE) {
+            controlsGroup.visibility = View.GONE
+        } else {
+            controlsGroup.visibility = View.VISIBLE
+        }
     }
 
     /** Read and parse a raw GeoJSON resource. Safe to call on any thread. */
