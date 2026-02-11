@@ -1,3 +1,4 @@
+
 package com.example.campusguide
 
 import android.content.pm.PackageManager
@@ -741,16 +742,17 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
         val sgwIsHit = sgwBuildingLocator.pointInBuilding(latLng)
         val loyIsHit = loyBuildingLocator.pointInBuilding(latLng)
 
+        sgwOverlay.setAllStyles(defaultOverlayStyle())
+        loyOverlay.setAllStyles(defaultOverlayStyle())
+
         //Change the style of the polygon to an highlighted one
         if (sgwIsHit) {
             val building = sgwBuildingLocator.findBuilding(latLng)
             sgwOverlay.setStyleForFeature(building!!.id, highlightedOverlayStyle())
-        } else if (loyIsHit) {
+        }
+        if (loyIsHit) {
             val building = loyBuildingLocator.findBuilding(latLng)
             loyOverlay.setStyleForFeature(building!!.id,highlightedOverlayStyle())
-        }else{
-            sgwOverlay.setAllStyles(defaultOverlayStyle())
-            loyOverlay.setAllStyles(defaultOverlayStyle())
         }
     }
 
