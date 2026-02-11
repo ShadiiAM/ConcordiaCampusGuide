@@ -1,6 +1,7 @@
 package com.example.campusguide
 
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -103,6 +105,12 @@ fun ConcordiaCampusGuideApp() {
                     SearchBarWithProfile(
                         modifier = Modifier.padding(top = 35.dp),
                         onSearchQueryChange = { /* handle search */ },
+                        onSearchSubmit = { query ->
+                            val intent = Intent(context, MapsActivity::class.java).apply {
+                                putExtra(MapsActivity.EXTRA_SEARCH_QUERY, query)
+                            }
+                            context.startActivity(intent)
+                        },
                         onProfileClick = { showProfile = true }
                     )
                 }
