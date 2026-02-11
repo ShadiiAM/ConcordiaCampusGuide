@@ -69,9 +69,6 @@ import com.google.android.gms.maps.model.Polygon
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.example.campusguide.ui.map.models.BuildingInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +80,6 @@ import android.location.Geocoder
 import java.util.Locale
 import kotlinx.coroutines.delay
 import android.os.Build
-import android.util.Log
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -263,8 +259,7 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
 
         // Empty query -> remove pin and stop
         if (query.isBlank()) {
-            searchMarker?.remove()
-            searchMarker = null
+            updateSearchMarker(null, "")
             return
         }
 
@@ -297,13 +292,8 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
             if (address == null) return@launch
 
             val latLng = LatLng(address.latitude, address.longitude)
-
-            searchMarker?.remove()
-            searchMarker = mMap.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title(query)
-            )
+            val locationName = query
+            updateSearchMarker(latLng, locationName)
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
         }
@@ -627,6 +617,21 @@ class MapsActivity() : AppCompatActivity(), OnMapReadyCallback {
     }
 
     // ==================== Location services ====================
+    private fun updateSearchMarker(latLng: LatLng?, locationName: String) {
+        searchMarker?.remove()
+        searchMarker = null
+
+        // If  the reference is null it returns early without adding a marker
+        if (latLng == null) return
+
+        // Adding the new marker and store the reference
+        searchMarker = mMap.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title(locationName)
+        )
+    }
+
 
     fun onGPS() {
         if (!isLocationEnabled()) {
