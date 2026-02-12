@@ -49,6 +49,13 @@ class AccessibilityState(
             ColorBlindMode.TRITANOPIA -> ColorBlindMode.NONE
         }
     }
+
+    fun setFrom(other: AccessibilityState) {
+        textSizeOffsetSp = other.textSizeOffsetSp
+        isBoldEnabled = other.isBoldEnabled
+        textColor = other.textColor
+        colorBlindMode = other.colorBlindMode
+    }
 }
 
 // CompositionLocal to access it from any composable
@@ -63,8 +70,15 @@ fun rememberAccessibilityState(
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
     colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
-): AccessibilityState = remember {
-    AccessibilityState(initialOffsetSp, initialBoldEnabled, initialTextColor, colorBlindMode = colorBlindMode)
+): AccessibilityState {
+    return remember {
+        AccessibilityState(
+            initialOffsetSp = initialOffsetSp,
+            initialBoldEnabled = initialBoldEnabled,
+            initialTextColor = initialTextColor,
+            colorBlindMode = colorBlindMode
+        )
+    }
 }
 
 enum class ColorBlindMode {

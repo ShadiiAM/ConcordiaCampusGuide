@@ -207,4 +207,6 @@ dependencies {
     implementation(libs.play.services.maps.v1820)
     implementation(libs.maps.utils.ktx)
     implementation(libs.play.services.location.v1750)
+    // DataStore for persisting accessibility preferences
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }
