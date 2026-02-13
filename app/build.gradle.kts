@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
     id("org.sonarqube")
@@ -207,4 +208,7 @@ dependencies {
     implementation(libs.play.services.maps.v1820)
     implementation(libs.maps.utils.ktx)
     implementation(libs.play.services.location.v1750)
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }

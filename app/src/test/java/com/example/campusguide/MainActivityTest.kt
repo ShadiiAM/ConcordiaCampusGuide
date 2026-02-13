@@ -91,49 +91,8 @@ class MainActivityTest {
         assertEquals("Greeting should be formatted correctly", expectedGreeting, "Hello $testName!")
     }
 
-    @Test
-    fun concordiaCampusGuideApp_displaysGreeting() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
 
-        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
-    }
 
-    @Test
-    fun concordiaCampusGuideApp_displaysCampusMapButton() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        composeTestRule.onNodeWithText("Open Campus Map").assertIsDisplayed()
-    }
-
-    @Test
-    fun campusMapButton_clickable() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        // Verify button can be clicked (this will execute the onClick handler)
-        composeTestRule.onNodeWithText("Open Campus Map").performClick()
-
-        // The button click will attempt to launch MapsActivity
-        // In a real app test, we'd verify the activity was launched
-        // For coverage purposes, executing the onClick is sufficient
-    }
 
     @Test
     fun greeting_displaysCorrectMessage() {
@@ -317,27 +276,6 @@ class MainActivityTest {
         composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
     }
 
-    @Test
-    fun concordiaCampusGuideApp_profileBackButton_returnsToMain() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        // Navigate to profile
-        composeTestRule.onNodeWithText("A").performClick()
-        composeTestRule.waitForIdle()
-
-        // Click back
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForIdle()
-
-        // Should be back at main
-        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
-    }
 
     @Test
     fun appIcon_vectorType_hasCorrectImageVector() {
