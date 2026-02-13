@@ -128,9 +128,13 @@ class NavigationBarTest {
     fun navBar_withNoContent_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) }, {}
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) }, {}
                     )
+                }
             }
 
         }
@@ -165,7 +169,11 @@ class NavigationBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(state, {})
+                }
             }
         }
 
@@ -211,10 +219,14 @@ class NavigationBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = currentDestination,
-                    content = {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        currentDestination = currentDestination,
+                        content = {}
+                    )
+                }
             }
         }
 
@@ -227,10 +239,14 @@ class NavigationBarTest {
     fun navBarWithoutContentDoesNotRenderSearch() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {}
+                    )
+                }
             }
         }
 
@@ -241,10 +257,14 @@ class NavigationBarTest {
     fun navBarCurrentDestinationisVisuallySelected() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
                 NavigationBar(
                     rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
                     {}
                 )
+                }
             }
         }
 
@@ -258,10 +278,14 @@ class NavigationBarTest {
     fun navBarUnselectedItemsAreNotSelected() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
-                    {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
+                        {}
+                    )
+                }
             }
         }
 
@@ -278,7 +302,11 @@ class NavigationBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(currentDestination, {})
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(currentDestination, {})
+                }
             }
         }
 
@@ -292,10 +320,14 @@ class NavigationBarTest {
     fun navBarRendersDrawableIcon() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        {}
+                    )
+                }
             }
         }
 
@@ -308,7 +340,11 @@ class NavigationBarTest {
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(state, {})
+                }
             }
         }
 
@@ -324,10 +360,14 @@ class NavigationBarTest {
     fun navBar_rendersDrawableIcon_specifically() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    content = {}
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        content = {}
+                    )
+                }
             }
         }
 
@@ -341,7 +381,11 @@ class NavigationBarTest {
     fun navBar_allDestinations_respondToClicks() {
         val state = mutableStateOf(AppDestinations.MAP)
         composeTestRule.setContent {
-            NavigationBar(state, {})
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBar(state, {})
+            }
         }
 
         AppDestinations.entries.forEach { destination ->
@@ -356,8 +400,12 @@ class NavigationBarTest {
         val restorationTester = StateRestorationTester(composeTestRule)
 
         restorationTester.setContent {
-            val state = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-            NavigationBar(state,{})
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                val state = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+                NavigationBar(state, {})
+            }
         }
 
         // Change state
@@ -374,8 +422,12 @@ class NavigationBarTest {
     @Test
     fun navBar_contentHasCorrectPadding() {
         composeTestRule.setContent {
-            NavigationBar(rememberSaveable { mutableStateOf(AppDestinations.MAP) }) { modifier ->
-                Text("PaddingTest", modifier = modifier)
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBar(rememberSaveable { mutableStateOf(AppDestinations.MAP) }) { modifier ->
+                    Text("PaddingTest", modifier = modifier)
+                }
             }
         }
         // Verifying the node exists is usually enough to cover the line execution
@@ -387,7 +439,11 @@ class NavigationBarTest {
         val state = mutableStateOf(AppDestinations.MAP)
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(state, {})
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(state, {})
+                }
             }
         }
 
@@ -401,7 +457,11 @@ class NavigationBarTest {
     fun navBar_labelsPersistAfterSelection() {
         val state = mutableStateOf(AppDestinations.MAP)
         composeTestRule.setContent {
-            NavigationBar(state, {})
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBar(state, {})
+            }
         }
 
         // Click Calendar
@@ -416,6 +476,7 @@ class NavigationBarTest {
     fun navBar_rendersAsRail_onWideScreen() {
         composeTestRule.setContent {
             CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState,
                 LocalConfiguration provides Configuration().apply {
                     screenWidthDp = 800
                 }
@@ -437,7 +498,11 @@ class NavigationBarTest {
     fun navBar_fullRecompositionCycle() {
         val state = mutableStateOf(AppDestinations.MAP)
         composeTestRule.setContent {
-            NavigationBar(state, {})
+            CompositionLocalProvider(
+                LocalAccessibilityState provides defaultState
+            ) {
+                NavigationBar(state, {})
+            }
         }
 
         // 1. Initial execution (already happened)
@@ -463,10 +528,18 @@ class NavigationBarTest {
         if (drawableDestination != null) {
             composeTestRule.setContent {
                 ConcordiaCampusGuideTheme {
-                    NavigationBar(
-                        currentDestination = rememberSaveable{mutableStateOf(drawableDestination)},
-                        content = {}
-                    )
+                    CompositionLocalProvider(
+                        LocalAccessibilityState provides defaultState
+                    ) {
+                        NavigationBar(
+                            currentDestination = rememberSaveable {
+                                mutableStateOf(
+                                    drawableDestination
+                                )
+                            },
+                            content = {}
+                        )
+                    }
                 }
             }
 
@@ -482,10 +555,14 @@ class NavigationBarTest {
     fun navBar_whenContentIsNull_rendersOnlyNavigation() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                NavigationBar(
-                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                    content = null // Explicitly pass null
-                )
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    NavigationBar(
+                        currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        content = null // Explicitly pass null
+                    )
+                }
             }
         }
 
