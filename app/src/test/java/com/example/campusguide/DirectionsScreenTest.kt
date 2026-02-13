@@ -365,8 +365,6 @@ class DirectionsScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-
-                    val r = recomposeFlag
                     DirectionsScreen()
                 }
             }
