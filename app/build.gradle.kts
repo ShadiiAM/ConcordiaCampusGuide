@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
     id("org.sonarqube")
@@ -202,11 +203,16 @@ dependencies {
     testImplementation("org.robolectric:robolectric:4.12.2")
     testImplementation("androidx.test:core:1.6.1")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 
     implementation(libs.play.services.maps.v1820)
     implementation(libs.maps.utils.ktx)
     implementation(libs.play.services.location.v1750)
+    implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     // DataStore for persisting accessibility preferences
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

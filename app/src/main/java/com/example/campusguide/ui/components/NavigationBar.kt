@@ -28,40 +28,33 @@ fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
     content: (@Composable (Modifier) -> Unit)? = null
 ) {
+    NavigationSuiteScaffold(
+        containerColor = Color.White,
+        navigationSuiteItems = {
+            AppDestinations.entries.forEach {
+                item(
+                    icon = {
+                        when (val icon = it.icon) {
+                            is AppIcon.Vector -> Icon(
+                                icon.imageVector,
+                                contentDescription = it.label
+                            )
 
-        NavigationSuiteScaffold(
-            containerColor = Color.White,
-            navigationSuiteItems = {
-                AppDestinations.entries.forEach {
-                    item(
-                        icon = {
-                            when (val icon = it.icon) {
-                                is AppIcon.Vector -> Icon(
-                                    icon.imageVector,
-                                    contentDescription = it.label
-                                )
-
-                                is AppIcon.Drawable -> Icon(
-                                    painter = painterResource(id = icon.resId),
-                                    contentDescription = it.label
-                                )
-                            }
-                        },
-                        label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
-                        selected = it == currentDestination.value,
-                        onClick = { currentDestination.value = it }
-                    )
-                }
+                            is AppIcon.Drawable -> Icon(
+                                painter = painterResource(id = icon.resId),
+                                contentDescription = it.label
+                            )
+                        }
+                    },
+                    label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
+                    selected = it == currentDestination.value,
+                    onClick = { currentDestination.value = it }
+                )
             }
-
-        )
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            content?.invoke(
-                Modifier
-                    .fillMaxSize()
-            )
         }
+    ) {
+        content?.invoke(Modifier.fillMaxSize())
+    }
 }
 
 
