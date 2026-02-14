@@ -53,7 +53,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val scope = rememberCoroutineScope()
-            val accessibilityState = rememberAccessibilityState()
+            // Global accessibility state; on every change, persist to DataStore
+            val accessibilityState = rememberAccessibilityState { state ->
+                scope.launch {
+                    AccessibilityPreferences.saveFromState(this@MainActivity, state)
+                }
+            }
 
             // Hydrate from persisted preferences when the app starts
             LaunchedEffect(Unit) {

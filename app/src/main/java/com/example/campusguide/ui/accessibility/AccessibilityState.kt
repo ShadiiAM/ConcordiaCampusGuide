@@ -14,8 +14,9 @@ class AccessibilityState(
     initialOffsetSp: Float = 0f,
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
-    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
-
+    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE,
+    // Callback invoked whenever the state changes; default is no-op
+    private val onStateChanged: (AccessibilityState) -> Unit = {}
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
         private set
@@ -29,16 +30,29 @@ class AccessibilityState(
     var colorBlindMode by mutableStateOf(colorBlindMode)
         private set
 
+    private fun notifyChanged() {
+        onStateChanged(this)
+    }
+
     fun increaseTextSize() {
-        if (textSizeOffsetSp < 6f) textSizeOffsetSp += 1f
+        if (textSizeOffsetSp < 6f) {
+            textSizeOffsetSp += 1f
+            notifyChanged()
+        }
     }
 
     fun decreaseTextSize() {
-        if (textSizeOffsetSp > -2f) textSizeOffsetSp -= 1f
+        if (textSizeOffsetSp > -2f) {
+            textSizeOffsetSp -= 1f
+            notifyChanged()
+        }
     }
 
     fun setBold(enabled: Boolean) {
-        isBoldEnabled = enabled
+        if (isBoldEnabled != enabled) {
+            isBoldEnabled = enabled
+            notifyChanged()
+        }
     }
 
     fun cycleColorBlindMode() {
@@ -48,6 +62,7 @@ class AccessibilityState(
             ColorBlindMode.DEUTERANOPIA -> ColorBlindMode.TRITANOPIA
             ColorBlindMode.TRITANOPIA -> ColorBlindMode.NONE
         }
+        notifyChanged()
     }
 
     fun setFrom(other: AccessibilityState) {
@@ -55,6 +70,7 @@ class AccessibilityState(
         isBoldEnabled = other.isBoldEnabled
         textColor = other.textColor
         colorBlindMode = other.colorBlindMode
+        notifyChanged()
     }
 }
 
@@ -69,14 +85,16 @@ fun rememberAccessibilityState(
     initialOffsetSp: Float = 0f,
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
-    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE
+    colorBlindMode: ColorBlindMode = ColorBlindMode.NONE,
+    onStateChanged: (AccessibilityState) -> Unit = {}
 ): AccessibilityState {
     return remember {
         AccessibilityState(
             initialOffsetSp = initialOffsetSp,
             initialBoldEnabled = initialBoldEnabled,
             initialTextColor = initialTextColor,
-            colorBlindMode = colorBlindMode
+            colorBlindMode = colorBlindMode,
+            onStateChanged = onStateChanged
         )
     }
 }
