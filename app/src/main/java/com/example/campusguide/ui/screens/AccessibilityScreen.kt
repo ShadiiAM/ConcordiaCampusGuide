@@ -27,22 +27,27 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.ColorBlindMode
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +56,19 @@ fun AccessibilityScreen(
 ) {
     var isBoldEnabled by remember { mutableStateOf(true) }
     val accessibilityState = LocalAccessibilityState.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    fun persist() {
+        scope.launch {
+            AccessibilityPreferences.saveFromState(context, accessibilityState)
+        }
+    }
+
+    // Current state is written at least once when screen opens
+    LaunchedEffect(Unit) {
+        persist()
+    }
 
     Scaffold(
         topBar = {
@@ -128,7 +146,10 @@ fun AccessibilityScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = { accessibilityState.decreaseTextSize() },
+                            onClick = {
+                                accessibilityState.decreaseTextSize()
+                                persist()
+                            },
                             modifier = Modifier.size(32.dp)
                         ) {
                             AccessibleText(
@@ -139,7 +160,10 @@ fun AccessibilityScreen(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
-                            onClick = { accessibilityState.increaseTextSize() },
+                            onClick = {
+                                accessibilityState.increaseTextSize()
+                                persist()
+                            },
                             modifier = Modifier.size(32.dp)
                         ) {
                             AccessibleText(
@@ -163,7 +187,7 @@ fun AccessibilityScreen(
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                label = "Text colour",
+                label = "Colorblind mode",
                 action = {
                     var mode = accessibilityState.colorBlindMode
                     var boxColor = when (mode) {
@@ -187,10 +211,11 @@ fun AccessibilityScreen(
                                 color = Color(0xFF6B4D8A),
                                 shape = RoundedCornerShape(4.dp)
                             )
-                        .background(boxColor)
-                        .clickable {
-                            accessibilityState.cycleColorBlindMode()
-                        },
+                            .background(boxColor)
+                            .clickable {
+                                accessibilityState.cycleColorBlindMode()
+                                persist()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         AccessibleText(
@@ -219,7 +244,10 @@ fun AccessibilityScreen(
                 action = {
                     Switch(
                         checked = accessibilityState.isBoldEnabled,
-                        onCheckedChange = { checked -> accessibilityState.setBold(checked)},
+                        onCheckedChange = { checked ->
+                            accessibilityState.setBold(checked)
+                            persist()
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
                             checkedTrackColor = Color(0xFF6B4D8A),
@@ -254,7 +282,7 @@ private fun SettingRow(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        Box(modifier = Modifier.weight(1f)){
+        Box(modifier = Modifier.weight(1f)) {
             AccessibleText(
                 text = label,
                 baseFontSizeSp = 16f,

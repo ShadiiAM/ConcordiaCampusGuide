@@ -20,7 +20,7 @@ fun AccessibleText(
 
     val finalSize = (baseFontSizeSp + accessibilityState.textSizeOffsetSp)
         .coerceAtLeast(15f)
-        .coerceAtMost(23f)
+        .coerceAtMost(22f)
         .sp
 
     val effectiveWeight = forceFontWeight ?: if (accessibilityState.isBoldEnabled) {
