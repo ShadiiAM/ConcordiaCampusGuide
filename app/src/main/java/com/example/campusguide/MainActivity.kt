@@ -57,10 +57,8 @@ class MainActivity : ComponentActivity() {
 
             // Hydrate from persisted preferences when the app starts
             LaunchedEffect(Unit) {
-                scope.launch {
-                    val persisted = AccessibilityPreferences.load(this@MainActivity)
-                    accessibilityState.setFrom(persisted)
-                }
+                val persisted = AccessibilityPreferences.load(this@MainActivity)
+                accessibilityState.setFrom(persisted)
             }
 
             CompositionLocalProvider(
