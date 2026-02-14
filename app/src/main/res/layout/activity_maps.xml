@@ -36,6 +36,106 @@
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/controls_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:constraint_referenced_ids="button_up,button_down,button_left,button_right,button_zoom_in,button_zoom_out" />
+
+    <Button
+        android:id="@+id/button_right"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/right_button_ripple"
+        android:contentDescription="Right"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/campus_toggle"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/button_zoom_in"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/zoom_in_button_ripple"
+        android:contentDescription="Zoom In"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/button_right"
+        app:layout_constraintEnd_toEndOf="@+id/button_right"
+        app:layout_constraintStart_toStartOf="@+id/button_right" />
+
+    <Button
+        android:id="@+id/button_toggle_controls"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/panel_button_ripple"
+        android:contentDescription="Toggle Controls"
+        android:soundEffectsEnabled="true"
+
+        app:layout_constraintBottom_toTopOf="@+id/button_up"
+        app:layout_constraintEnd_toEndOf="@+id/button_up"
+        app:layout_constraintStart_toStartOf="@+id/button_up" />
+
+    <Button
+        android:id="@+id/button_zoom_out"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/zoom_out_button_ripple"
+        android:contentDescription="Zoom Out"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintTop_toBottomOf="@+id/button_right"
+        app:layout_constraintEnd_toEndOf="@+id/button_right"
+        app:layout_constraintStart_toStartOf="@+id/button_right" />
+
+    <Button
+        android:id="@+id/button_recenter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/recenter_button_ripple"
+        android:contentDescription="Recenter"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintEnd_toStartOf="@+id/button_right"
+        app:layout_constraintTop_toTopOf="@+id/button_right"
+        app:layout_constraintBottom_toBottomOf="@+id/button_right" />
+
+    <Button
+        android:id="@+id/button_up"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/up_button_ripple"
+        android:contentDescription="Up"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/button_recenter"
+        app:layout_constraintEnd_toEndOf="@+id/button_recenter"
+        app:layout_constraintStart_toStartOf="@+id/button_recenter" />
+
+    <Button
+        android:id="@+id/button_down"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/down_button_ripple"
+        android:contentDescription="Down"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintTop_toBottomOf="@+id/button_recenter"
+        app:layout_constraintEnd_toEndOf="@+id/button_recenter"
+        app:layout_constraintStart_toStartOf="@+id/button_recenter" />
+
+    <Button
+        android:id="@+id/button_left"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/left_button_ripple"
+        android:contentDescription="Left"
+        android:soundEffectsEnabled="true"
+        app:layout_constraintEnd_toStartOf="@+id/button_recenter"
+        app:layout_constraintTop_toTopOf="@+id/button_recenter"
+        app:layout_constraintBottom_toBottomOf="@+id/button_recenter" />
+
     <!-- Bottom Navigation -->
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/bottom_nav"
