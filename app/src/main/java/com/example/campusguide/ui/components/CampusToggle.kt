@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.campusguide.ui.accessibility.AccessibleText
 
 enum class Campus {
     SGW,
@@ -49,14 +50,13 @@ fun CampusToggle(
         // SGW Chip
         InputChip(
             label = {
-                Text(
+                AccessibleText(
                     text = "SGW",
-                    color = if (selectedCampus == Campus.SGW)
+                    baseFontSizeSp = 14f,
+                    fallbackColor = if (selectedCampus == Campus.SGW)
                         MaterialTheme.colorScheme.onSecondary
                     else
                         MaterialTheme.colorScheme.onSecondaryContainer,
-                    lineHeight = 1.43.em,
-                    style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically)
                 )
             },
@@ -93,14 +93,13 @@ fun CampusToggle(
         // Loyola Chip
         InputChip(
             label = {
-                Text(
+                AccessibleText(
                     text = "Loyola",
-                    color = if (selectedCampus == Campus.LOYOLA)
+                    baseFontSizeSp = 14f,
+                    fallbackColor = if (selectedCampus == Campus.LOYOLA)
                         MaterialTheme.colorScheme.onSecondary
                     else
                         MaterialTheme.colorScheme.onSecondaryContainer,
-                    lineHeight = 1.43.em,
-                    style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically)
                 )
             },

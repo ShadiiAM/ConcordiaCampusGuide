@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.ui.theme.PurpleGrey80
 import java.util.Calendar
@@ -180,7 +181,7 @@ fun CalendarScreen() {
                             contentColor = Color.Black)
                     )
                     {
-                        Text(text = "Daily", fontSize = 15.sp)
+                        AccessibleText(text = "Daily", baseFontSizeSp = 15f)
                     }
 
                     Button( modifier = Modifier
@@ -193,9 +194,9 @@ fun CalendarScreen() {
                         colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
                             contentColor = Color.Black ) )
                     {
-                        Text(
+                        AccessibleText(
                             text = "Weekly",
-                            fontSize = 15.sp
+                            baseFontSizeSp = 15f
                         )
                     }
 
@@ -215,7 +216,7 @@ fun CalendarScreen() {
                             contentColor = Color.Black)
                     )
                     {
-                        Text(text = "Monthly", fontSize = 15.sp)
+                        AccessibleText(text = "Monthly", baseFontSizeSp = 15f)
                     }
                 }}
             }

@@ -86,7 +86,7 @@ class AccessibilityScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("Text colour").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Colorblind mode").assertIsDisplayed()
     }
 
     @Test
@@ -295,7 +295,7 @@ class AccessibilityScreenTest {
 
         // Verify all three settings are displayed
         composeTestRule.onNodeWithText("Text size").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Text colour").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Colorblind mode").assertIsDisplayed()
         composeTestRule.onNodeWithText("Bold").assertIsDisplayed()
     }
 

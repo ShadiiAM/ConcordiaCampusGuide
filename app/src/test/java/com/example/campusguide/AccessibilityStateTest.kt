@@ -11,13 +11,13 @@ class AccessibilityStateTest {
 
     @Test
     fun `text size increases up to maximum`() {
-        val state = AccessibilityState(initialOffsetSp = 6f)
+        val state = AccessibilityState(initialOffsetSp = 5f)
 
         state.increaseTextSize()
-        Assert.assertEquals(7f, state.textSizeOffsetSp)
+        Assert.assertEquals(6f, state.textSizeOffsetSp)
 
         repeat(3) { state.increaseTextSize() }
-        Assert.assertEquals(7f, state.textSizeOffsetSp)
+        Assert.assertEquals(6f, state.textSizeOffsetSp)
     }
 
     @Test

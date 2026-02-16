@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.map.models.BuildingInfo
 import java.util.Calendar
 
@@ -103,10 +104,10 @@ fun BuildingDetailsBottomSheet(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     // Building name
-                    Text(
+                    AccessibleText(
                         text = (buildingInfo.buildingName ?: buildingInfo.buildingCode).cleanText(),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
+                        baseFontSizeSp = 24f,
+                        forceFontWeight = FontWeight.Bold,
                         modifier = Modifier.semantics {
                             contentDescription = "Building name: ${buildingInfo.buildingName ?: buildingInfo.buildingCode}"
                         }
@@ -114,10 +115,10 @@ fun BuildingDetailsBottomSheet(
 
                     // Building code as subtitle
                     if (buildingInfo.buildingName != null) {
-                        Text(
+                        AccessibleText(
                             text = buildingInfo.buildingCode,
-                            fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            baseFontSizeSp = 18f,
+                            fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .padding(top = 4.dp)
                                 .semantics {
@@ -173,8 +174,9 @@ fun BuildingDetailsBottomSheet(
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             ) {
-                Text(
+                AccessibleText(
                     text = if (isExpanded) "Show Less" else "View More Details",
+                    baseFontSizeSp = 15f,
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
@@ -247,17 +249,17 @@ private fun CompactInfoRow(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Text(
+        AccessibleText(
             text = "$label:",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
+            baseFontSizeSp = 14f,
+            forceFontWeight = FontWeight.SemiBold,
+            fallbackColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(end = 8.dp)
         )
-        Text(
+        AccessibleText(
             text = value,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            baseFontSizeSp = 14f,
+            fallbackColor = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -276,11 +278,11 @@ private fun CompactHoursDisplay(hours: String) {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Top
         ) {
-            Text(
+            AccessibleText(
                 text = "Hours:",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
+                baseFontSizeSp = 14f,
+                forceFontWeight = FontWeight.SemiBold,
+                fallbackColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(end = 8.dp)
             )
 
@@ -312,11 +314,11 @@ private fun CompactHoursDisplay(hours: String) {
                                 )
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
-                            Text(
+                            AccessibleText(
                                 text = trimmedLine,
-                                fontSize = 13.sp,
-                                fontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
-                                color = textColor
+                                baseFontSizeSp = 13f,
+                                forceFontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
+                                fallbackColor = textColor
                             )
                         }
                     }
@@ -364,11 +366,11 @@ private fun HoursLine(line: String, currentTime: CurrentTime) {
                 )
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
-            Text(
+            AccessibleText(
                 text = line,
-                fontSize = 14.sp,
-                fontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
-                color = textColor
+                baseFontSizeSp = 14f,
+                forceFontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
+                fallbackColor = textColor
             )
         }
     } else {
@@ -531,17 +533,16 @@ fun InfoSection(
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        Text(
+        AccessibleText(
             text = title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
+            baseFontSizeSp = 16f,
+            forceFontWeight = FontWeight.SemiBold,
+            fallbackColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        Text(
+        AccessibleText(
             text = content,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
+            baseFontSizeSp = 14f,
             modifier = Modifier.semantics {
                 this.contentDescription = contentDescription
             }

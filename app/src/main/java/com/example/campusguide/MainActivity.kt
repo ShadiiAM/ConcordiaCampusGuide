@@ -2,7 +2,6 @@ package com.example.campusguide
 
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,6 +21,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,21 +44,33 @@ import com.example.campusguide.ui.screens.DirectionsScreen
 import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import kotlinx.coroutines.launch
+import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val accessibilityState = rememberAccessibilityState(
-                initialOffsetSp = 0f,
-            )
+            val scope = rememberCoroutineScope()
+            // Global accessibility state; on every change, persist to DataStore
+            val accessibilityState = rememberAccessibilityState { state ->
+                scope.launch {
+                    AccessibilityPreferences.saveFromState(this@MainActivity, state)
+                }
+            }
+
+            // Hydrate from persisted preferences when the app starts
+            LaunchedEffect(Unit) {
+                val persisted = AccessibilityPreferences.load(this@MainActivity)
+                accessibilityState.setFrom(persisted)
+            }
 
             CompositionLocalProvider(
                 LocalAccessibilityState provides accessibilityState
             ) {
                 ConcordiaCampusGuideTheme {
-                    AccessibleAppRoot() {
+                    AccessibleAppRoot {
                         ConcordiaCampusGuideApp()
                     }
                 }
