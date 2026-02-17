@@ -140,6 +140,7 @@ fun CampusToggle(
                 Box(
             modifier= Modifier
                 .clip(RoundedCornerShape(20.dp))
+                .clickable { SearchFocus.focusRequesterSearch.requestFocus() }
                 .background(MaterialTheme.colorScheme.secondaryContainer)
         ){
             Row(
@@ -147,12 +148,12 @@ fun CampusToggle(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .requiredWidth(width = 86.dp)
-                    .requiredHeight(height = 48.dp)
+                    .requiredHeight(height = 47.dp)
             )
             {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    modifier = Modifier.clickable { SearchFocus.focusRequesterSearch.requestFocus() },
+                    modifier = Modifier,
                     contentDescription = "AccessibleSearch",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
