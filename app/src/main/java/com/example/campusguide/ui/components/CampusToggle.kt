@@ -26,6 +26,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.example.campusguide.ui.accessibility.AccessibleText
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 
 enum class Campus {
     SGW,
@@ -132,6 +137,35 @@ fun CampusToggle(
             onClick = { onCampusSelected(Campus.LOYOLA) },
             modifier = Modifier.weight(weight = 0.5f)
         )
+                Box(
+            modifier= Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+        ){
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier
+                    .requiredWidth(width = 86.dp)
+                    .requiredHeight(height = 48.dp)
+            )
+            {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    modifier = Modifier.clickable { SearchFocus.focusRequesterSearch.requestFocus() },
+                    contentDescription = "AccessibleSearch",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                AccessibleText(
+                    text = "SEARCH",
+                    baseFontSizeSp = 14f,
+                    fallbackColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically),
+                    forceFontWeight = FontWeight.Bold
+                )
+            }
+
+        }
     }
 }
 
