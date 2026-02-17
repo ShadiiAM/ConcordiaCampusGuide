@@ -37,10 +37,15 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 
+object SearchFocus {
+    val focusRequesterSearch = FocusRequester()
+}
 
 @Composable
 fun SearchBarWithProfile(
@@ -92,7 +97,9 @@ fun SearchBarWithProfile(
                         searchQuery = it
                         onSearchQueryChange(it)
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .focusRequester(SearchFocus.focusRequesterSearch)
+                        .fillMaxWidth(),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
