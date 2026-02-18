@@ -98,6 +98,9 @@ fun MapScreen(
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
 
+    // Snackbar state
+    val snackbarHostState = remember { SnackbarHostState() }
+
     // Directions state
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
@@ -123,7 +126,11 @@ fun MapScreen(
                         defaultOrigin = LatLng(loc.latitude, loc.longitude)
                     }
                 }
-        }.onFailure { }
+        }.onFailure {
+            scope.launch {
+                snackbarHostState.showSnackbar("Could not retrieve your location")
+            }
+        }
     }
 
     // Location services
@@ -699,6 +706,11 @@ fun MapScreen(
                 }
             )
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
 
         // Directions overlay
         when (val step = directionsUiState.step) {

@@ -341,4 +341,39 @@ class MapScreenTest {
         composeTestRule.waitForIdle()
         // Accessibility state should be respected
     }
+
+    @Test
+    fun directionsOverlay_notShownByDefault() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        // Directions bottom card must not be visible until a building is selected
+        composeTestRule.onNodeWithText("Route options").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Directions ready").assertDoesNotExist()
+    }
+
+    @Test
+    fun directionsOverlay_dismissButtonNotShownByDefault() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        // Dismiss button only appears when a directions card is active
+        composeTestRule.onNodeWithContentDescription("Close directions").assertDoesNotExist()
+    }
 }
