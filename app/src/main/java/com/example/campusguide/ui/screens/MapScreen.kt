@@ -26,6 +26,8 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -707,7 +709,14 @@ fun MapScreen(
                 // Shouldn't normally reach here since we go straight to PlanRoute
             }
             is DirectionsStep.PlanRoute -> {
-                BottomCard {
+                BottomCard(onDismiss = {
+                    routePolylineRef?.remove()
+                    routePolylineRef = null
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PickDestination,
+                        errorMessage = null
+                    )
+                }) {
                     Text(
                         text = "Route options",
                         style = MaterialTheme.typography.titleMedium,
@@ -805,7 +814,14 @@ fun MapScreen(
             }
 
             is DirectionsStep.ShowingRoute -> {
-                BottomCard {
+                BottomCard(onDismiss = {
+                    routePolylineRef?.remove()
+                    routePolylineRef = null
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PickDestination,
+                        errorMessage = null
+                    )
+                }) {
                     Text(
                         text = "Directions ready",
                         style = MaterialTheme.typography.titleMedium,
@@ -856,6 +872,7 @@ fun MapScreen(
 
 @Composable
 private fun BottomCard(
+    onDismiss: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     Box(
@@ -877,6 +894,19 @@ private fun BottomCard(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                if (onDismiss != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close directions"
+                            )
+                        }
+                    }
+                }
                 content()
             }
         }

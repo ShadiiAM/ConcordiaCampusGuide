@@ -178,7 +178,8 @@ fun BuildingDetailsBottomSheet(
                 ) {
                     AccessibleText(
                         text = "Directions",
-                        baseFontSizeSp = 15f
+                        baseFontSizeSp = 15f,
+                        fallbackColor = Color.White
                     )
                 }
 
