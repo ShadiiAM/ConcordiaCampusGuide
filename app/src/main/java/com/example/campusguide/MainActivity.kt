@@ -40,7 +40,6 @@ import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.CalendarScreen
-import com.example.campusguide.ui.screens.DirectionsScreen
 import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
@@ -128,7 +127,6 @@ fun ConcordiaCampusGuideApp() {
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(searchQuery = "$searchQuery#$searchCounter")
-                        AppDestinations.DIRECTIONS -> DirectionsScreen(modifier = Modifier.fillMaxSize())
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
                     }
@@ -139,9 +137,7 @@ fun ConcordiaCampusGuideApp() {
                         onSearchSubmit = { query ->
                             searchQuery = query
                             searchCounter++
-                            // Only switch to MAP if not already on a screen that uses the map
-                            if (currentDestination.value != AppDestinations.MAP &&
-                                currentDestination.value != AppDestinations.DIRECTIONS) {
+                            if (currentDestination.value != AppDestinations.MAP) {
                                 currentDestination.value = AppDestinations.MAP
                             }
                         },
@@ -162,7 +158,6 @@ enum class AppDestinations(
     val icon: AppIcon,
 ) {
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
-    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.ic_directions)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
     POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
 }

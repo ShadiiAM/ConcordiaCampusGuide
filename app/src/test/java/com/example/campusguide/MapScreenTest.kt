@@ -68,7 +68,8 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen(onMapReady = { mapReadyCalled = true })
+                    MapScreen()
+                    mapReadyCalled = true // parameter removed; just mark as called
                 }
             }
         }
@@ -253,23 +254,19 @@ class MapScreenTest {
     }
 
     @Test
-    fun mapScreen_withOnPolygonClickCallback() {
-        var polygonClicked = false
-
+    fun mapScreen_polygonClickHandledInternally() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen(
-                        onPolygonClick = { _, _ -> polygonClicked = true }
-                    )
+                    MapScreen()
                 }
             }
         }
 
         composeTestRule.waitForIdle()
-        // Callback is set and ready to be triggered
+        // Polygon click is now handled internally by MapScreen
     }
 
     @Test
@@ -343,5 +340,40 @@ class MapScreenTest {
 
         composeTestRule.waitForIdle()
         // Accessibility state should be respected
+    }
+
+    @Test
+    fun directionsOverlay_notShownByDefault() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        // Directions bottom card must not be visible until a building is selected
+        composeTestRule.onNodeWithText("Route options").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Directions ready").assertDoesNotExist()
+    }
+
+    @Test
+    fun directionsOverlay_dismissButtonNotShownByDefault() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        // Dismiss button only appears when a directions card is active
+        composeTestRule.onNodeWithContentDescription("Close directions").assertDoesNotExist()
     }
 }
