@@ -80,7 +80,8 @@ private fun String.cleanText(): String {
 @Composable
 fun BuildingDetailsBottomSheet(
     buildingInfo: BuildingInfo,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDirectionsClick: (() -> Unit)? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -160,6 +161,29 @@ fun BuildingDetailsBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Directions Button
+            if (onDirectionsClick != null) {
+                Button(
+                    onClick = onDirectionsClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            contentDescription = "Get directions to this building"
+                        },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    AccessibleText(
+                        text = "Directions",
+                        baseFontSizeSp = 15f
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Expand/Collapse Button
             Button(

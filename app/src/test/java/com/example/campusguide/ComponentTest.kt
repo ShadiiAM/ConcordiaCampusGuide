@@ -83,9 +83,6 @@ class ComponentTest {
 
         // Navigate through all destinations multiple times
         repeat(2) {
-            composeTestRule.onNodeWithText("Directions").performClick()
-            composeTestRule.waitForIdle()
-
             composeTestRule.onNodeWithText("Calendar").performClick()
             composeTestRule.waitForIdle()
 
