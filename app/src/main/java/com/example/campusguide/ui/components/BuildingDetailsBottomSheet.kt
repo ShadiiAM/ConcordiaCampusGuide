@@ -114,18 +114,60 @@ fun BuildingDetailsBottomSheet(
                         }
                     )
 
-                    // Building code as subtitle
                     if (buildingInfo.buildingName != null) {
-                        AccessibleText(
-                            text = buildingInfo.buildingCode,
-                            baseFontSizeSp = 18f,
-                            fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                                .semantics {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(top = 4.dp)
+                        ) {
+                            AccessibleText(
+                                text = buildingInfo.buildingCode,
+                                baseFontSizeSp = 18f,
+                                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.semantics {
                                     contentDescription = "Building code: ${buildingInfo.buildingCode}"
                                 }
-                        )
+                            )
+
+                            // Status badge next to building code
+                            buildingInfo.hours?.let { hours ->
+                                val currentTime = remember { getCurrentTime() }
+                                val openStatus = remember(hours) { checkIfOpen(hours.cleanText(), currentTime) }
+
+                                if (openStatus != OpenStatus.NOT_TODAY && openStatus != OpenStatus.ALWAYS_OPEN) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                color = when (openStatus) {
+                                                    OpenStatus.OPEN -> Color(0xFF4CAF50)
+                                                    OpenStatus.CLOSED -> Color(0xFF9D2115)
+                                                    else -> Color.Transparent
+                                                },
+                                                shape = RoundedCornerShape(4.dp)
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .semantics {
+                                                contentDescription = when (openStatus) {
+                                                    OpenStatus.OPEN -> "Currently open"
+                                                    OpenStatus.CLOSED -> "Currently closed"
+                                                    else -> ""
+                                                }
+                                            }
+                                    ) {
+                                        AccessibleText(
+                                            text = when (openStatus) {
+                                                OpenStatus.OPEN -> "Open"
+                                                OpenStatus.CLOSED -> "Closed"
+                                                else -> ""
+                                            },
+                                            baseFontSizeSp = 12f,
+                                            forceFontWeight = FontWeight.Bold,
+                                            fallbackColor = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -343,7 +385,18 @@ private fun CompactHoursDisplay(hours: String) {
                                 text = trimmedLine,
                                 baseFontSizeSp = 13f,
                                 forceFontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
-                                fallbackColor = textColor
+                                fallbackColor = textColor,
+                                modifier = Modifier.semantics {
+                                    contentDescription = if (isCurrentDay && openStatus != OpenStatus.NOT_TODAY) {
+                                        when (openStatus) {
+                                            OpenStatus.OPEN -> "$trimmedLine, Currently open"
+                                            OpenStatus.CLOSED -> "$trimmedLine, Currently closed"
+                                            else -> trimmedLine
+                                        }
+                                    } else {
+                                        trimmedLine
+                                    }
+                                }
                             )
                         }
                     }
@@ -395,7 +448,18 @@ private fun HoursLine(line: String, currentTime: CurrentTime) {
                 text = line,
                 baseFontSizeSp = 14f,
                 forceFontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
-                fallbackColor = textColor
+                fallbackColor = textColor,
+                modifier = Modifier.semantics {
+                    contentDescription = if (isCurrentDay && openStatus != OpenStatus.NOT_TODAY) {
+                        when (openStatus) {
+                            OpenStatus.OPEN -> "$line, Currently open"
+                            OpenStatus.CLOSED -> "$line, Currently closed"
+                            else -> line
+                        }
+                    } else {
+                        line
+                    }
+                }
             )
         }
     } else {
