@@ -26,6 +26,8 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,6 +46,11 @@ import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.models.BuildingInfo
+import com.example.campusguide.ui.directions.DirectionsStep
+import com.example.campusguide.ui.directions.DirectionsUiState
+import com.example.campusguide.ui.directions.GoogleRoutesRepository
+import com.example.campusguide.ui.directions.RouteRequest
+import com.example.campusguide.ui.map.utils.BuildingHit
 import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -52,6 +59,7 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -59,6 +67,7 @@ import java.io.InputStreamReader
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
+import androidx.compose.ui.text.font.FontWeight
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -68,9 +77,7 @@ const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
 @Composable
 fun MapScreen(
-    searchQuery: String = "",
-    onMapReady: ((GoogleMap) -> Unit)? = null,
-    onPolygonClick: ((LatLng, BuildingInfo?) -> Unit)? = null
+    searchQuery: String = ""
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -90,6 +97,41 @@ fun MapScreen(
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
+
+    // Snackbar state
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Directions state
+    val repo = remember { GoogleRoutesRepository() }
+    var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
+    var isPickingOrigin by remember { mutableStateOf(false) }
+    var routePolylineRef by remember {
+        mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
+    }
+    var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
+    // Track the selected building's LatLng for directions
+    var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
+
+    // Get user location for default origin
+    LaunchedEffect(Unit) {
+        val fineGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!fineGranted && !coarseGranted) return@LaunchedEffect
+
+        val fused = LocationServices.getFusedLocationProviderClient(context)
+        runCatching {
+            fused.lastLocation
+                .addOnSuccessListener { loc ->
+                    if (loc != null) {
+                        defaultOrigin = LatLng(loc.latitude, loc.longitude)
+                    }
+                }
+        }.onFailure {
+            scope.launch {
+                snackbarHostState.showSnackbar("Could not retrieve your location")
+            }
+        }
+    }
 
     // Location services
     val fusedLocationProviderClient = remember {
@@ -394,17 +436,26 @@ fun MapScreen(
                                 LatLng(avgLat, avgLng)
                             }
 
-                            // Call callback if provided (for DirectionsScreen)
-                            if (onPolygonClick != null) {
-                                onPolygonClick(latLng, buildingInfo)
-                            } else {
-                                // Default behavior: show bottom sheet
-                                selectedBuildingInfo = buildingInfo
+                            when (val step = directionsUiState.step) {
+                                is DirectionsStep.PlanRoute -> {
+                                    if (isPickingOrigin) {
+                                        directionsUiState = directionsUiState.copy(
+                                            step = step.copy(origin = latLng),
+                                            errorMessage = null
+                                        )
+                                        isPickingOrigin = false
+                                    }
+                                }
+                                is DirectionsStep.ShowingRoute -> {
+                                    // ignore taps while showing route
+                                }
+                                else -> {
+                                    // PickDestination or ConfirmDestination: show bottom sheet
+                                    selectedBuildingInfo = buildingInfo
+                                    selectedBuildingLatLng = latLng
+                                }
                             }
                         }
-
-                        // Notify caller that map is ready
-                        onMapReady?.invoke(map)
 
                         // Load active campus
                         scope.launch(Dispatchers.IO) {
@@ -633,11 +684,261 @@ fun MapScreen(
         selectedBuildingInfo?.let { info ->
             BuildingDetailsBottomSheet(
                 buildingInfo = info,
-                onDismiss = { selectedBuildingInfo = null }
+                onDismiss = { selectedBuildingInfo = null },
+                onDirectionsClick = {
+                    val latLng = selectedBuildingLatLng ?: LatLng(45.4972, -73.5789)
+                    val buildingHit = BuildingHit(
+                        id = info.buildingCode,
+                        properties = JSONObject().apply {
+                            put("building-code", info.buildingCode)
+                            put("building-name", info.buildingName)
+                            put("address", info.address)
+                        }
+                    )
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PlanRoute(
+                            origin = defaultOrigin,
+                            destination = latLng,
+                            buildingHit = buildingHit
+                        )
+                    )
+                    selectedBuildingInfo = null
+                }
             )
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+
+        // Directions overlay
+        when (val step = directionsUiState.step) {
+            is DirectionsStep.PickDestination -> {
+                // Normal map mode, nothing extra
+            }
+            is DirectionsStep.ConfirmDestination -> {
+                // Shouldn't normally reach here since we go straight to PlanRoute
+            }
+            is DirectionsStep.PlanRoute -> {
+                BottomCard(onDismiss = {
+                    routePolylineRef?.remove()
+                    routePolylineRef = null
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PickDestination,
+                        errorMessage = null
+                    )
+                }) {
+                    Text(
+                        text = "Route options",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("From:", fontWeight = FontWeight.Medium)
+                        Spacer(Modifier.width(8.dp))
+                        OutlinedButton(onClick = { isPickingOrigin = true }) {
+                            Text(
+                                if (isPickingOrigin)
+                                    "Tap map to choose origin..."
+                                else
+                                    latLngShort(step.origin)
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("To:", fontWeight = FontWeight.Medium)
+                        Spacer(Modifier.width(8.dp))
+                        Text(buildingTitle(step.buildingHit, step.destination))
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            directionsUiState = directionsUiState.copy(
+                                isLoadingRoute = true,
+                                errorMessage = null
+                            )
+
+                            scope.launch {
+                                runCatching {
+                                    repo.getRoute(
+                                        RouteRequest(
+                                            origin = step.origin,
+                                            destination = step.destination
+                                        )
+                                    )
+                                }.onSuccess { route ->
+                                    val map = googleMap
+                                    if (map != null) {
+                                        routePolylineRef?.remove()
+                                        routePolylineRef = map.addPolyline(
+                                            PolylineOptions()
+                                                .addAll(route.points)
+                                                .color(0xFF1565C0.toInt())
+                                                .width(12f)
+                                        )
+                                    }
+
+                                    directionsUiState = directionsUiState.copy(
+                                        isLoadingRoute = false,
+                                        step = DirectionsStep.ShowingRoute(
+                                            origin = step.origin,
+                                            destination = step.destination,
+                                            buildingHit = step.buildingHit,
+                                            route = route
+                                        )
+                                    )
+                                }.onFailure { e ->
+                                    directionsUiState = directionsUiState.copy(
+                                        isLoadingRoute = false,
+                                        errorMessage = e.message ?: "Failed to get route"
+                                    )
+                                }
+                            }
+                        }
+                    ) {
+                        Text(if (directionsUiState.isLoadingRoute) "Loading..." else "Go")
+                    }
+
+                    directionsUiState.errorMessage?.let {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+
+            is DirectionsStep.ShowingRoute -> {
+                BottomCard(onDismiss = {
+                    routePolylineRef?.remove()
+                    routePolylineRef = null
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PickDestination,
+                        errorMessage = null
+                    )
+                }) {
+                    Text(
+                        text = "Directions ready",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("From: ${latLngShort(step.origin)}")
+                    Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
+
+                    Spacer(Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            directionsUiState = directionsUiState.copy(
+                                step = DirectionsStep.PlanRoute(
+                                    origin = step.origin,
+                                    destination = step.destination,
+                                    buildingHit = step.buildingHit
+                                )
+                            )
+                        }
+                    ) {
+                        Text("Edit")
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            routePolylineRef?.remove()
+                            routePolylineRef = null
+                            directionsUiState = directionsUiState.copy(
+                                step = DirectionsStep.PickDestination,
+                                errorMessage = null
+                            )
+                        }
+                    ) {
+                        Text("Clear")
+                    }
+                }
+            }
         }
     }
 }
+
+@Composable
+private fun BottomCard(
+    onDismiss: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                if (onDismiss != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Close directions"
+                            )
+                        }
+                    }
+                }
+                content()
+            }
+        }
+    }
+}
+
+private fun buildingTitle(
+    hit: BuildingHit?,
+    fallback: LatLng
+): String {
+    val props = hit?.properties
+    val name = props
+        ?.optString("building-name")
+        ?.takeIf { it.isNotBlank() }
+
+    return name ?: "Destination (${latLngShort(fallback)})"
+}
+
+private fun latLngShort(p: LatLng): String =
+    "%.5f, %.5f".format(p.latitude, p.longitude)
 
 // Helper Functions
 private fun getSavedCampus(context: Context): Campus {

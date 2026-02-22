@@ -61,7 +61,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
 
@@ -88,7 +87,6 @@ class NavigationBarTest {
         // Bottom nav items
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
 
         // Slot content
@@ -116,7 +114,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
 
@@ -141,7 +138,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.waitForIdle()
     }
@@ -158,7 +154,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
     }
@@ -179,9 +174,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Calendar").performClick()
         assert(state.value == AppDestinations.CALENDAR)
-
-        composeTestRule.onNodeWithText("Directions").performClick()
-        assert(state.value == AppDestinations.DIRECTIONS)
 
         composeTestRule.onNodeWithText("POI").performClick()
         assert(state.value == AppDestinations.POI)
@@ -207,7 +199,6 @@ class NavigationBarTest {
 
         composeTestRule.onNodeWithText("Map").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calendar").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Directions").assertIsDisplayed()
         composeTestRule.onNodeWithText("POI").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search...").assertIsDisplayed()
         composeTestRule.waitForIdle()
@@ -261,7 +252,7 @@ class NavigationBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
+                    rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
                     {}
                 )
                 }
@@ -269,7 +260,7 @@ class NavigationBarTest {
         }
 
         composeTestRule
-            .onNodeWithText("Directions")
+            .onNodeWithText("Calendar")
             .assertIsSelected()
     }
 
@@ -282,16 +273,15 @@ class NavigationBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     NavigationBar(
-                        rememberSaveable { mutableStateOf(AppDestinations.DIRECTIONS) },
+                        rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
                         {}
                     )
                 }
             }
         }
 
-        composeTestRule.onNodeWithText("Directions").assertIsSelected()
+        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
         composeTestRule.onNodeWithText("Map").assertIsNotSelected()
-        composeTestRule.onNodeWithText("Calendar").assertIsNotSelected()
         composeTestRule.onNodeWithText("POI").assertIsNotSelected()
     }
 

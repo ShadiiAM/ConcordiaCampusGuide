@@ -74,11 +74,10 @@ class MainActivityTest {
     fun appDestinations_enumHasCorrectValues() {
         // Test that AppDestinations enum has the expected values
         val destinations = AppDestinations.entries
-        assertEquals("Should have 4 destinations", 4, destinations.size)
+        assertEquals("Should have 3 destinations", 3, destinations.size)
 
         val labels = destinations.map { it.label }
         assertTrue("Should contain Map", labels.contains("Map"))
-        assertTrue("Should contain Directions", labels.contains("Directions"))
         assertTrue("Should contain Calendar", labels.contains("Calendar"))
         assertTrue("Should contain POI", labels.contains("POI"))
     }
@@ -119,7 +118,6 @@ class MainActivityTest {
 
         // Click through all navigation items to cover navigation lambdas
         composeTestRule.onNodeWithText("Map").performClick()
-        composeTestRule.onNodeWithText("Directions").performClick()
         composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.onNodeWithText("POI").performClick()
         composeTestRule.onNodeWithText("Map").performClick()
@@ -129,12 +127,10 @@ class MainActivityTest {
     fun appDestinations_icon_returnsCorrectAppIcon() {
         // Test that icons are accessible
         val mapIcon = AppDestinations.MAP.icon
-        val directionsIcon = AppDestinations.DIRECTIONS.icon
         val calendarIcon = AppDestinations.CALENDAR.icon
         val poiIcon = AppDestinations.POI.icon
 
         assertNotNull("Map icon should exist", mapIcon)
-        assertNotNull("Directions icon should exist", directionsIcon)
         assertNotNull("Calendar icon should exist", calendarIcon)
         assertNotNull("POI icon should exist", poiIcon)
     }
@@ -178,9 +174,6 @@ class MainActivityTest {
         }
 
         // Switch between destinations to cover selection logic
-        composeTestRule.onNodeWithText("Directions").performClick()
-        composeTestRule.waitForIdle()
-
         composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.waitForIdle()
 
@@ -286,9 +279,9 @@ class MainActivityTest {
 
     @Test
     fun appIcon_drawableType_hasCorrectResId() {
-        val directionsIcon = AppDestinations.DIRECTIONS.icon
-        assertTrue("Directions icon should be Drawable type", directionsIcon is AppIcon.Drawable)
-        assertTrue("Drawable icon should have valid resId", (directionsIcon as AppIcon.Drawable).resId > 0)
+        val calendarIcon = AppDestinations.CALENDAR.icon
+        assertTrue("Calendar icon should be Drawable type", calendarIcon is AppIcon.Drawable)
+        assertTrue("Drawable icon should have valid resId", (calendarIcon as AppIcon.Drawable).resId > 0)
     }
 
     @Test
