@@ -42,6 +42,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.platform.testTag
 
 object SearchFocus {
     val focusRequesterSearch = FocusRequester()
@@ -99,7 +100,8 @@ fun SearchBarWithProfile(
                     },
                     modifier = Modifier
                         .focusRequester(SearchFocus.focusRequesterSearch)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .testTag("searchField"),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
