@@ -12,7 +12,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.campusguide.AppDestinations
@@ -48,7 +50,11 @@ fun NavigationBar(
                     },
                     label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                     selected = it == currentDestination.value,
-                    onClick = { currentDestination.value = it }
+                    onClick = { currentDestination.value = it },
+                    modifier = Modifier.semantics {
+                        role = Role.Tab
+                        contentDescription = it.label
+                    }
                 )
             }
         }
