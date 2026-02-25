@@ -45,7 +45,7 @@ import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
-
+import androidx.compose.runtime.remember
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +87,8 @@ fun ConcordiaCampusGuideApp() {
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var searchCounter by rememberSaveable { mutableStateOf(0) }
+    var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.data.CampusBuilding>>(emptyList()) }
+    var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
     val context = LocalContext.current
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -126,22 +128,39 @@ fun ConcordiaCampusGuideApp() {
             NavigationBar(currentDestination) { modifier ->
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
-                        AppDestinations.MAP -> MapScreen(searchQuery = "$searchQuery#$searchCounter")
+                        AppDestinations.MAP -> MapScreen(
+                            searchQuery = "$searchQuery#$searchCounter",
+                            topBarSelectedBuilding = topBarSelectedBuilding,
+                            onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
+                        )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
                     }
 
                     SearchBarWithProfile(
                         modifier = Modifier.padding(top = 35.dp),
-                        onSearchQueryChange = { /* handle search */ },
+                        onSearchQueryChange = { query ->
+                            topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
+                                query = query,
+                                activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                crossCampus = true,
+                            )
+                        },
                         onSearchSubmit = { query ->
                             searchQuery = query
                             searchCounter++
+                            topBarSuggestions = emptyList()
                             if (currentDestination.value != AppDestinations.MAP) {
                                 currentDestination.value = AppDestinations.MAP
                             }
                         },
-                        onProfileClick = { showProfile = true }
+                        onProfileClick = { showProfile = true },
+                        suggestions = topBarSuggestions,
+                        onBuildingSelected = { building ->
+                            topBarSelectedBuilding = building
+                            topBarSuggestions = emptyList()
+                            currentDestination.value = AppDestinations.MAP
+                        },
                     )
                 }
             }
