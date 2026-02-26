@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.campusguide.AppDestinations
 import com.example.campusguide.AppIcon
-import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 
 
@@ -27,17 +26,6 @@ fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
     content: (@Composable (Modifier) -> Unit)? = null
 ) {
-    NavigationSuiteScaffold(
-        containerColor = Color.White,
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        when (val icon = it.icon) {
-                            is AppIcon.Vector -> Icon(
-                                icon.imageVector,
-                                contentDescription = it.label
-                            )
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -64,7 +52,7 @@ fun NavigationBar(
                             )
                         }
                     },
-                    label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
+                    label = { Text(it.label) },
                     selected = it == currentDestination.value,
                     onClick = { currentDestination.value = it }
                 )
