@@ -46,6 +46,7 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
+import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,11 +148,22 @@ fun ConcordiaCampusGuideApp() {
                             )
                         },
                         onSearchSubmit = { query ->
-                            searchQuery = query
-                            searchCounter++
-                            topBarSuggestions = emptyList()
-                            if (currentDestination.value != AppDestinations.MAP) {
+                            // Check if query matches a campus building first
+                            val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
+                                .firstOrNull { it.matches(query) }
+                            if (matchedBuilding != null) {
+                                // Use building directly, skip geocoder
+                                topBarSelectedBuilding = matchedBuilding
+                                topBarSuggestions = emptyList()
                                 currentDestination.value = AppDestinations.MAP
+                            } else {
+                                // Fall back to geocoder search
+                                searchQuery = query
+                                searchCounter++
+                                topBarSuggestions = emptyList()
+                                if (currentDestination.value != AppDestinations.MAP) {
+                                    currentDestination.value = AppDestinations.MAP
+                                }
                             }
                         },
                         onProfileClick = { showProfile = true },
@@ -159,6 +171,7 @@ fun ConcordiaCampusGuideApp() {
                         onBuildingSelected = { building ->
                             topBarSelectedBuilding = building
                             topBarSuggestions = emptyList()
+                            searchQuery = ""
                             currentDestination.value = AppDestinations.MAP
                         },
                     )

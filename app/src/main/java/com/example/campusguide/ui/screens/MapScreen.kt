@@ -121,7 +121,7 @@ fun MapScreen(
     var crossCampusEnabled by rememberSaveable { mutableStateOf(false) }
     var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
-
+    var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
@@ -151,6 +151,17 @@ fun MapScreen(
     LaunchedEffect(topBarSelectedBuilding) {
         val building = topBarSelectedBuilding ?: return@LaunchedEffect
         val latLng = resolveBuildingLatLng(building)
+
+        // Drop pin on the building
+        searchMarker?.remove()
+        searchMarker = googleMap?.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title(building.buildingName)
+        )
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+        // Set as To destination and open route panel
         val hit = BuildingHit(
             id = building.buildingCode,
             properties = JSONObject().apply {
@@ -166,7 +177,6 @@ fun MapScreen(
                 buildingHit = hit,
             )
         )
-        snackbarHostState.showSnackbar("Routing to ${building.buildingName}")
         onTopBarBuildingConsumed()
     }
 
@@ -799,8 +809,7 @@ fun MapScreen(
 
                     BuildingAutocompleteField(
                         label         = "From:",
-                        value         = latLngShort(step.origin),
-                        suggestions   = originSuggestions,
+                        value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
                         placeholder   = "My location or building…",
                         enabled       = !directionsUiState.isLoadingRoute,
                         onQueryChange = { query ->
@@ -812,6 +821,7 @@ fun MapScreen(
                         },
                         onSelected = { building ->
                             originSuggestions = emptyList()
+                            originDisplayName = building.buildingName
                             directionsUiState = directionsUiState.copy(
                                 step = step.copy(origin = resolveBuildingLatLng(building)),
                             )
@@ -948,7 +958,7 @@ fun MapScreen(
                     )
 
                     Spacer(Modifier.height(8.dp))
-                    Text("From: ${latLngShort(step.origin)}")
+                    Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
                     Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
 
                     Spacer(Modifier.height(12.dp))
