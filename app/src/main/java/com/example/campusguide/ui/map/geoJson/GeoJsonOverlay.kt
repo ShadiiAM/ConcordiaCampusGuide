@@ -24,9 +24,9 @@ import kotlinx.coroutines.withContext
  *
  */
 class GeoJsonOverlay(
-private val context: Context,
-@RawRes private val geoJsonRawRes: Int? = null,
-private val idPropertyName: String = "id" // fallback to feature "id" field
+    private val context: Context,
+    @RawRes private val geoJsonRawRes: Int? = null,
+    private val idPropertyName: String = "id" // fallback to feature "id" field
 ) {
     private var map: GoogleMap? = null
 
@@ -55,8 +55,9 @@ private val idPropertyName: String = "id" // fallback to feature "id" field
      * only addPolygon / addMarker are dispatched to Main.  Keeps the main-thread
      * block short — critical for avoiding ANR on map load.
      */
-    suspend fun attachToMapAsync(googleMap: GoogleMap, geoJson: JSONObject) {
-        val features = geoJson.optJSONArray("features") ?: return
+    suspend fun attachToMapAsync(googleMap: GoogleMap, geoJson: JSONObject? = null) {
+        val json = geoJson ?: loadFromRawOrThrow()
+        val features = json.optJSONArray("features") ?: return
 
         // --- Phase 1: build options on calling thread — zero Map API calls ---
         class PendingPoly  (val id: String, val options: PolygonOptions,  val props: JSONObject)

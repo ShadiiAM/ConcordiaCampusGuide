@@ -1,10 +1,13 @@
 package com.example.campusguide
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.ui.accessibility.AccessibilityState
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import org.junit.Assert.*
@@ -22,6 +25,8 @@ class CampusToggleTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val defaultAccessibilityState = AccessibilityState()
 
     // ==================== Campus enum tests ====================
 
@@ -72,11 +77,13 @@ class CampusToggleTest {
     @Test
     fun campusToggle_rendersSGWLabel() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = {}
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = {}
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -85,11 +92,13 @@ class CampusToggleTest {
     @Test
     fun campusToggle_rendersLoyolaLabel() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = {}
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = {}
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("Loyola")).assertExists()
@@ -98,11 +107,13 @@ class CampusToggleTest {
     @Test
     fun campusToggle_rendersBothLabelsWithSGWSelected() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = {}
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = {}
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -112,11 +123,13 @@ class CampusToggleTest {
     @Test
     fun campusToggle_rendersBothLabelsWithLoyolaSelected() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.LOYOLA,
-                    onCampusSelected = {}
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.LOYOLA,
+                        onCampusSelected = {}
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -129,11 +142,13 @@ class CampusToggleTest {
     fun campusToggle_clickSGW_callsOnCampusSelectedWithSGW() {
         var clickedCampus: Campus? = null
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.LOYOLA,
-                    onCampusSelected = { clickedCampus = it }
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.LOYOLA,
+                        onCampusSelected = { clickedCampus = it }
+                    )
+                }
             }
         }
 
@@ -147,11 +162,13 @@ class CampusToggleTest {
     fun campusToggle_clickLoyola_callsOnCampusSelectedWithLoyola() {
         var clickedCampus: Campus? = null
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = { clickedCampus = it }
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = { clickedCampus = it }
+                    )
+                }
             }
         }
 
@@ -165,11 +182,13 @@ class CampusToggleTest {
     fun campusToggle_clickAlreadySelectedCampus_stillCallsCallback() {
         var callCount = 0
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = { callCount++ }
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = { callCount++ }
+                    )
+                }
             }
         }
 
@@ -184,12 +203,14 @@ class CampusToggleTest {
     @Test
     fun campusToggle_withIconsEnabled_rendersSuccessfully() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = {},
-                    showIcon = true
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = {},
+                        showIcon = true
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -199,12 +220,14 @@ class CampusToggleTest {
     @Test
     fun campusToggle_withIconsDisabled_rendersSuccessfully() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.SGW,
-                    onCampusSelected = {},
-                    showIcon = false
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.SGW,
+                        onCampusSelected = {},
+                        showIcon = false
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -214,12 +237,14 @@ class CampusToggleTest {
     @Test
     fun campusToggle_withIconsDisabled_loyolaSelected_rendersSuccessfully() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.LOYOLA,
-                    onCampusSelected = {},
-                    showIcon = false
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.LOYOLA,
+                        onCampusSelected = {},
+                        showIcon = false
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()
@@ -229,12 +254,14 @@ class CampusToggleTest {
     @Test
     fun campusToggle_withIconsEnabled_loyolaSelected_rendersSuccessfully() {
         composeTestRule.setContent {
-            MaterialTheme {
-                CampusToggle(
-                    selectedCampus = Campus.LOYOLA,
-                    onCampusSelected = {},
-                    showIcon = true
-                )
+            CompositionLocalProvider(LocalAccessibilityState provides defaultAccessibilityState) {
+                MaterialTheme {
+                    CampusToggle(
+                        selectedCampus = Campus.LOYOLA,
+                        onCampusSelected = {},
+                        showIcon = true
+                    )
+                }
             }
         }
         composeTestRule.onNode(hasText("SGW")).assertExists()

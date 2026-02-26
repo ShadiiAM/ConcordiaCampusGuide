@@ -74,11 +74,10 @@ class MainActivityTest {
     fun appDestinations_enumHasCorrectValues() {
         // Test that AppDestinations enum has the expected values
         val destinations = AppDestinations.entries
-        assertEquals("Should have 4 destinations", 4, destinations.size)
+        assertEquals("Should have 3 destinations", 3, destinations.size)
 
         val labels = destinations.map { it.label }
         assertTrue("Should contain Map", labels.contains("Map"))
-        assertTrue("Should contain Directions", labels.contains("Directions"))
         assertTrue("Should contain Calendar", labels.contains("Calendar"))
         assertTrue("Should contain POI", labels.contains("POI"))
     }
@@ -91,49 +90,8 @@ class MainActivityTest {
         assertEquals("Greeting should be formatted correctly", expectedGreeting, "Hello $testName!")
     }
 
-    @Test
-    fun concordiaCampusGuideApp_displaysGreeting() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
 
-        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
-    }
 
-    @Test
-    fun concordiaCampusGuideApp_displaysCampusMapButton() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        composeTestRule.onNodeWithText("Open Campus Map").assertIsDisplayed()
-    }
-
-    @Test
-    fun campusMapButton_clickable() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        // Verify button can be clicked (this will execute the onClick handler)
-        composeTestRule.onNodeWithText("Open Campus Map").performClick()
-
-        // The button click will attempt to launch MapsActivity
-        // In a real app test, we'd verify the activity was launched
-        // For coverage purposes, executing the onClick is sufficient
-    }
 
     @Test
     fun greeting_displaysCorrectMessage() {
@@ -160,7 +118,6 @@ class MainActivityTest {
 
         // Click through all navigation items to cover navigation lambdas
         composeTestRule.onNodeWithText("Map").performClick()
-        composeTestRule.onNodeWithText("Directions").performClick()
         composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.onNodeWithText("POI").performClick()
         composeTestRule.onNodeWithText("Map").performClick()
@@ -170,12 +127,10 @@ class MainActivityTest {
     fun appDestinations_icon_returnsCorrectAppIcon() {
         // Test that icons are accessible
         val mapIcon = AppDestinations.MAP.icon
-        val directionsIcon = AppDestinations.DIRECTIONS.icon
         val calendarIcon = AppDestinations.CALENDAR.icon
         val poiIcon = AppDestinations.POI.icon
 
         assertNotNull("Map icon should exist", mapIcon)
-        assertNotNull("Directions icon should exist", directionsIcon)
         assertNotNull("Calendar icon should exist", calendarIcon)
         assertNotNull("POI icon should exist", poiIcon)
     }
@@ -219,9 +174,6 @@ class MainActivityTest {
         }
 
         // Switch between destinations to cover selection logic
-        composeTestRule.onNodeWithText("Directions").performClick()
-        composeTestRule.waitForIdle()
-
         composeTestRule.onNodeWithText("Calendar").performClick()
         composeTestRule.waitForIdle()
 
@@ -317,27 +269,6 @@ class MainActivityTest {
         composeTestRule.onNodeWithText("User settings").assertIsDisplayed()
     }
 
-    @Test
-    fun concordiaCampusGuideApp_profileBackButton_returnsToMain() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(
-                LocalAccessibilityState provides defaultState
-            ) {
-                ConcordiaCampusGuideApp()
-            }
-        }
-
-        // Navigate to profile
-        composeTestRule.onNodeWithText("A").performClick()
-        composeTestRule.waitForIdle()
-
-        // Click back
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-        composeTestRule.waitForIdle()
-
-        // Should be back at main
-        composeTestRule.onNodeWithText("Hello Android!").assertIsDisplayed()
-    }
 
     @Test
     fun appIcon_vectorType_hasCorrectImageVector() {
@@ -348,9 +279,9 @@ class MainActivityTest {
 
     @Test
     fun appIcon_drawableType_hasCorrectResId() {
-        val directionsIcon = AppDestinations.DIRECTIONS.icon
-        assertTrue("Directions icon should be Drawable type", directionsIcon is AppIcon.Drawable)
-        assertTrue("Drawable icon should have valid resId", (directionsIcon as AppIcon.Drawable).resId > 0)
+        val calendarIcon = AppDestinations.CALENDAR.icon
+        assertTrue("Calendar icon should be Drawable type", calendarIcon is AppIcon.Drawable)
+        assertTrue("Drawable icon should have valid resId", (calendarIcon as AppIcon.Drawable).resId > 0)
     }
 
     @Test

@@ -34,12 +34,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+
 
 @Composable
 fun SearchBarWithProfile(
     modifier: Modifier = Modifier,
     onSearchQueryChange: (String) -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onSearchSubmit: (String) -> Unit = {},
+    onProfileClick: () -> Unit = {},
+
 ) {
     var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -60,7 +69,8 @@ fun SearchBarWithProfile(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable { onSearchSubmit(searchQuery) }
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -88,7 +98,12 @@ fun SearchBarWithProfile(
                         fontSize = 16.sp
                     ),
                     singleLine = true,
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary)
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = { onSearchSubmit(searchQuery) },
+                        onDone = { onSearchSubmit(searchQuery) }
+                    )
                 )
             }
 

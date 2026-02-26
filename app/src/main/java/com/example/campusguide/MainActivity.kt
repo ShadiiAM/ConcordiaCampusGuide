@@ -1,10 +1,14 @@
 package com.example.campusguide
 
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +18,10 @@ import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -25,32 +31,45 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import com.example.campusguide.ui.components.NavigationBar
+import androidx.core.content.ContextCompat
 import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.accessibility.rememberAccessibilityState
+import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.CalendarScreen
 import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import kotlinx.coroutines.launch
+import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val accessibilityState = rememberAccessibilityState(
-                initialOffsetSp = 0f,
-            )
+            val scope = rememberCoroutineScope()
+            // Global accessibility state; on every change, persist to DataStore
+            val accessibilityState = rememberAccessibilityState { state ->
+                scope.launch {
+                    AccessibilityPreferences.saveFromState(this@MainActivity, state)
+                }
+            }
+
+            // Hydrate from persisted preferences when the app starts
+            LaunchedEffect(Unit) {
+                val persisted = AccessibilityPreferences.load(this@MainActivity)
+                accessibilityState.setFrom(persisted)
+            }
 
             CompositionLocalProvider(
                 LocalAccessibilityState provides accessibilityState
             ) {
                 ConcordiaCampusGuideTheme {
-                    AccessibleAppRoot() {
+                    AccessibleAppRoot {
                         ConcordiaCampusGuideApp()
                     }
                 }
@@ -66,7 +85,27 @@ fun ConcordiaCampusGuideApp() {
     var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var searchCounter by rememberSaveable { mutableStateOf(0) }
     val context = LocalContext.current
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { /* no-op; screens will re-check permission */ }
+    )
+
+    LaunchedEffect(Unit) {
+        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!fineGranted && !coarseGranted) {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                )
+            )
+        }
+    }
 
 
     when {
@@ -87,22 +126,22 @@ fun ConcordiaCampusGuideApp() {
             NavigationBar((currentDestination), { modifier ->
 
                 Box(modifier = modifier.fillMaxSize()) {
-
                     when (currentDestination.value) {
-                        AppDestinations.MAP -> MapScreen()
+                        AppDestinations.MAP -> MapScreen(searchQuery = "$searchQuery#$searchCounter")
                         AppDestinations.CALENDAR -> CalendarScreen()
-                        AppDestinations.DIRECTIONS -> PlaceholderScreen(
-                            "Directions Screen",
-                            modifier
-                        )
-
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
-
                     }
 
                     SearchBarWithProfile(
                         modifier = Modifier.padding(top = 35.dp),
                         onSearchQueryChange = { /* handle search */ },
+                        onSearchSubmit = { query ->
+                            searchQuery = query
+                            searchCounter++
+                            if (currentDestination.value != AppDestinations.MAP) {
+                                currentDestination.value = AppDestinations.MAP
+                            }
+                        },
                         onProfileClick = { showProfile = true }
                     )
                 }
@@ -121,9 +160,8 @@ enum class AppDestinations(
     val icon: AppIcon,
 ) {
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
-    DIRECTIONS("Directions", AppIcon.Drawable(R.drawable.directions_icon)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
-    POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
+    POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
 }
 
 @Composable

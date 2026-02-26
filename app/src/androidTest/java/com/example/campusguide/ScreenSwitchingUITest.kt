@@ -23,7 +23,7 @@ import org.junit.Test
  *
  * Acceptance Criteria Tested:
  * 1. NavigationBar is visible and accessible
- * 2. User can switch between Map, Calendar, Directions, and POI screens
+ * 2. User can switch between Map, Calendar, and POI screens
  * 3. The screen material updates when screen switch
  * 4. The home screen of the app is the Map screen and
  * will always open on it regardless of closing screen
@@ -60,7 +60,6 @@ class ScreenSwitchingUITest {
         }
 
         composeTestRule.onNodeWithText("Map").assertExists()
-        composeTestRule.onNodeWithText("Directions").assertExists()
         composeTestRule.onNodeWithText("Calendar").assertExists()
         composeTestRule.onNodeWithText("POI").assertExists()
     }
@@ -78,10 +77,7 @@ class ScreenSwitchingUITest {
             }
         }
 
-        composeTestRule.onNodeWithText("Hello Android!").assertExists()
-        composeTestRule.onNodeWithText("Directions").performClick()
-
-        composeTestRule.onNodeWithText("Directions Screen").assertExists()
+        composeTestRule.onNodeWithText("SGW").assertExists()
         composeTestRule.onNodeWithText("Calendar").performClick()
 
         composeTestRule.onNodeWithText("Daily").assertExists()
@@ -92,7 +88,7 @@ class ScreenSwitchingUITest {
         composeTestRule.onNodeWithText("POI Screen").assertExists()
 
         composeTestRule.onNodeWithText("Map").performClick()
-        composeTestRule.onNodeWithText("Hello Android!").assertExists()
+        composeTestRule.onNodeWithText("SGW").assertExists()
 
     }
 
@@ -108,7 +104,7 @@ class ScreenSwitchingUITest {
                 }
             }
 
-            composeTestRule.onNodeWithText("Hello Android!").assertExists()
+            composeTestRule.onNodeWithText("SGW").assertExists()
 
         }
 
