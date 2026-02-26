@@ -7,7 +7,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +28,10 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class CampusSwitchingUITest {
+class AT3CampusSwitchingUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MapsActivity::class.java)
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     /**
      * Test: Campus toggle is visible on map screen

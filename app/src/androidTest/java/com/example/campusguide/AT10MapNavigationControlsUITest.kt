@@ -20,10 +20,10 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MapNavigationControlsUITest {
+class AT10MapNavigationControlsUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MapsActivity::class.java)
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     /**
      * Test: Zoom in button is displayed and clickable.
