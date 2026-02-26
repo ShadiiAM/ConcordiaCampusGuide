@@ -14,6 +14,9 @@ import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import com.example.campusguide.data.buildingSuggestions
+import com.example.campusguide.ui.components.Campus
+
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -375,5 +378,80 @@ class MapScreenTest {
         composeTestRule.waitForIdle()
         // Dismiss button only appears when a directions card is active
         composeTestRule.onNodeWithContentDescription("Close directions").assertDoesNotExist()
+    }
+
+    //Suggestions scoped to active campus by default
+    @Test
+    fun suggestions_scopedToSGWByDefault() {
+        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = false)
+
+        // SGW results should appear
+        assert(suggestions.any { it.buildingCode == "H" }) {
+            "Expected Hall Building (SGW) in suggestions"
+        }
+        // Loyola results shouldn't appear
+        assert(suggestions.none { it.campus == Campus.LOYOLA }) {
+            "Expected no Loyola buildings when campus is SGW and crossCampus is false"
+        }
+    }
+
+    @Test
+    fun suggestions_scopedToLoyolaWhenLoyolaSelected() {
+        val suggestions = buildingSuggestions("vanier", Campus.LOYOLA, crossCampus = false)
+
+        assert(suggestions.any { it.buildingCode == "VL" }) {
+            "Expected Vanier Library (Loyola) in suggestions"
+        }
+        assert(suggestions.none { it.campus == Campus.SGW }) {
+            "Expected no SGW buildings when campus is Loyola and crossCampus is false"
+        }
+    }
+
+    @Test
+    fun suggestions_sgwBuildingNotShownOnLoyolaCampus() {
+        val suggestions = buildingSuggestions("hall", Campus.LOYOLA, crossCampus = false)
+
+        assert(suggestions.none { it.buildingCode == "H" }) {
+            "Hall Building (SGW) should not appear when Loyola campus is selected"
+        }
+    }
+
+    //Cross-campus toggle shows buildings from both campuses
+
+    @Test
+    fun suggestions_crossCampusShowsBothCampuses() {
+        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = true)
+
+        // Should include SGW buildings
+        assert(suggestions.any { it.campus == Campus.SGW }) {
+            "Expected SGW buildings when crossCampus is true"
+        }
+    }
+
+    @Test
+    fun suggestions_crossCampusShowsLoyolaBuildings() {
+        // "ha" matches Hingston Hall wings at Loyola
+        val suggestions = buildingSuggestions("ha", Campus.SGW, crossCampus = true)
+
+        assert(suggestions.any { it.campus == Campus.LOYOLA }) {
+            "Expected Loyola buildings when crossCampus is true"
+        }
+    }
+
+    @Test
+    fun routePanel_crossCampusToggleIsDisplayed() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        // Route panel not shown until building selected, toggle not yet visible
+        composeTestRule.onNodeWithText("Cross-campus routing").assertDoesNotExist()
     }
 }

@@ -22,17 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.data.CampusBuilding
 
-/**
- * A labelled text field with a building-suggestion dropdown.
- *
- * @param label         Row label ("From:" / "To:")
- * @param value         The committed display text shown when field is not focused
- * @param suggestions   Filtered list provided by the caller (MapScreen)
- * @param onQueryChange Called on every keystroke — caller recomputes [suggestions]
- * @param onSelected    Called when the user taps a suggestion
- * @param placeholder   Hint text when field is empty
- * @param enabled       False while route is loading
- */
 @Composable
 fun BuildingAutocompleteField(
     label: String,
@@ -48,11 +37,11 @@ fun BuildingAutocompleteField(
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    val showDropdown = isFocused && suggestions.isNotEmpty() && query.isNotEmpty()
+    val showDropdown = suggestions.isNotEmpty()
 
     Column(modifier = modifier.fillMaxWidth()) {
 
-        // ── Label + text input ────────────────────────────────────────────
+        // Label and text input
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
@@ -107,12 +96,12 @@ fun BuildingAutocompleteField(
             }
         }
 
-        // ── Dropdown suggestions ──────────────────────────────────────────
+        //  Dropdown suggestions
         if (showDropdown) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 48.dp)   // visually aligns under the input
+                    .padding(start = 48.dp)
                     .heightIn(max = 230.dp),
                 shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
                 color = MaterialTheme.colorScheme.surface,

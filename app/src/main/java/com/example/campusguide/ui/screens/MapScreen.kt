@@ -103,10 +103,8 @@ fun MapScreen(
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
 
-    // Snackbar state
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Directions state
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
     var isPickingOrigin by remember { mutableStateOf(false) }

@@ -130,7 +130,7 @@ fun SearchBarWithProfile(
             }
         }
 
-        if (suggestions.isNotEmpty() && searchQuery.isNotEmpty()) {
+        if (suggestions.isNotEmpty()) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -176,7 +176,7 @@ fun SearchBarWithProfile(
                 }
             }
         }
-    } // closes Column
+    }
 }
 
 @Preview(showBackground = true)
