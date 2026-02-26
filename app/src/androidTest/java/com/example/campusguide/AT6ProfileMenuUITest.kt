@@ -10,8 +10,12 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.rule.GrantPermissionRule
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
+import androidx.test.uiautomator.UiDevice
 import org.junit.runner.RunWith
 
 /**
@@ -24,11 +28,19 @@ import org.junit.runner.RunWith
 @LargeTest
 class AT6ProfileMenuUITest {
 
+
+    private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
+
+    @get:Rule
+    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
 
     @Test
     fun acceptanceTest6() {
@@ -76,5 +88,27 @@ class AT6ProfileMenuUITest {
 
         Thread.sleep(2000)
 
+        composeTestRule.onNode(hasText("POI")).performClick()
+
+        onView(withId(android.R.id.content))
+            .check(matches(isDisplayed()))
+        Thread.sleep(2000)
+
+        // Click profile icon (has text "A")
+        composeTestRule.onNode(hasText("A")).performClick()
+
+        onView(withId(android.R.id.content))
+            .check(matches(isDisplayed()))
+
+        Thread.sleep(2000)
+
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+
+        onView(withId(android.R.id.content))
+            .check(matches(isDisplayed()))
+
+        Thread.sleep(2000)
+
+        device.pressHome()
     }
 }
