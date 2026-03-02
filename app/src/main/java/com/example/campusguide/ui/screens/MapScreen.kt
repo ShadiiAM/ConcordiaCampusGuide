@@ -844,6 +844,39 @@ fun MapScreen(
                     Text("From: ${latLngShort(step.origin)}")
                     Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
 
+                    // Display duration and distance if available
+                    step.route.durationSeconds?.let { seconds ->
+                        val minutes = seconds / 60
+                        val displayTime = if (minutes < 60) {
+                            "$minutes min"
+                        } else {
+                            val hours = minutes / 60
+                            val remainingMins = minutes % 60
+                            "${hours}h ${remainingMins}min"
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Duration: $displayTime",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    step.route.distanceMeters?.let { meters ->
+                        val displayDistance = if (meters < 1000) {
+                            "$meters m"
+                        } else {
+                            val km = meters / 1000.0
+                            String.format(java.util.Locale.US, "%.1f km", km)
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Distance: $displayDistance",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
                     Spacer(Modifier.height(12.dp))
 
                     OutlinedButton(
