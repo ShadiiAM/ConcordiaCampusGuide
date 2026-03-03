@@ -841,4 +841,489 @@ class GoogleRoutesRepositoryTest {
         assertEquals(1, result.legs.size)
         assertEquals(2, result.legs[0].steps.size)
     }
+
+    @Test
+    fun getRoute_withTransitDetails_parsesCompleteTransitInfo() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": "900s",
+                  "distanceMeters": 3000,
+                  "legs": [
+                    {
+                      "duration": "900s",
+                      "distanceMeters": 3000,
+                      "steps": [
+                        {
+                          "distanceMeters": 3000,
+                          "staticDuration": "900s",
+                          "navigationInstruction": {
+                            "instructions": "Take the metro"
+                          },
+                          "transitDetails": {
+                            "stopDetails": {
+                              "departureStop": {
+                                "name": "Guy-Concordia",
+                                "location": {
+                                  "latLng": {
+                                    "latitude": 45.4972,
+                                    "longitude": -73.5789
+                                  }
+                                }
+                              },
+                              "arrivalStop": {
+                                "name": "Berri-UQAM",
+                                "location": {
+                                  "latLng": {
+                                    "latitude": 45.5149,
+                                    "longitude": -73.5626
+                                  }
+                                }
+                              }
+                            },
+                            "localizedValues": {
+                              "departureTime": {
+                                "text": "3:30 PM"
+                              },
+                              "arrivalTime": {
+                                "text": "3:45 PM"
+                              }
+                            },
+                            "headsign": "Côte-Vertu",
+                            "transitLine": {
+                              "name": "Orange Line",
+                              "shortName": "2",
+                              "color": "#FF6600",
+                              "vehicle": {
+                                "name": "Metro",
+                                "type": "SUBWAY"
+                              }
+                            },
+                            "stopCount": 5
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5149, -73.5626),
+            mode = TravelMode.TRANSIT
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(900, result.durationSeconds)
+        assertEquals(3000, result.distanceMeters)
+        assertEquals(1, result.legs.size)
+
+        val leg = result.legs[0]
+        assertEquals(900, leg.durationSeconds)
+        assertEquals(3000, leg.distanceMeters)
+        assertEquals(1, leg.steps.size)
+
+        val step = leg.steps[0]
+        assertEquals(3000, step.distanceMeters)
+        assertEquals(900, step.durationSeconds)
+        assertEquals("Take the metro", step.navigationInstruction)
+
+        val transitDetails = step.transitDetails
+        assertNotNull(transitDetails)
+        assertEquals("Côte-Vertu", transitDetails?.headsign)
+        assertEquals(5, transitDetails?.stopCount)
+
+        // Test stop details
+        val stopDetails = transitDetails?.stopDetails
+        assertNotNull(stopDetails)
+        assertEquals("Guy-Concordia", stopDetails?.departureStop?.name)
+        assertEquals(45.4972, stopDetails?.departureStop?.location?.latitude ?: 0.0, 0.0001)
+        assertEquals(-73.5789, stopDetails?.departureStop?.location?.longitude ?: 0.0, 0.0001)
+        assertEquals("Berri-UQAM", stopDetails?.arrivalStop?.name)
+        assertEquals(45.5149, stopDetails?.arrivalStop?.location?.latitude ?: 0.0, 0.0001)
+        assertEquals(-73.5626, stopDetails?.arrivalStop?.location?.longitude ?: 0.0, 0.0001)
+
+        // Test localized values
+        val localizedValues = transitDetails?.localizedValues
+        assertNotNull(localizedValues)
+        assertEquals("3:30 PM", localizedValues?.departureTime)
+        assertEquals("3:45 PM", localizedValues?.arrivalTime)
+
+        // Test transit line
+        val transitLine = transitDetails?.transitLine
+        assertNotNull(transitLine)
+        assertEquals("Orange Line", transitLine?.name)
+        assertEquals("2", transitLine?.shortName)
+        assertEquals("#FF6600", transitLine?.color)
+
+        // Test vehicle
+        val vehicle = transitLine?.vehicle
+        assertNotNull(vehicle)
+        assertEquals("Metro", vehicle?.name)
+        assertEquals("SUBWAY", vehicle?.type)
+    }
+
+    @Test
+    fun getRoute_withPartialTransitDetails_parsesAvailableFields() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": "600s",
+                  "distanceMeters": 2000,
+                  "legs": [
+                    {
+                      "duration": "600s",
+                      "distanceMeters": 2000,
+                      "steps": [
+                        {
+                          "distanceMeters": 2000,
+                          "staticDuration": "600s",
+                          "transitDetails": {
+                            "headsign": "Downtown",
+                            "stopCount": 3
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        val transitDetails = result.legs[0].steps[0].transitDetails
+        assertNotNull(transitDetails)
+        assertEquals("Downtown", transitDetails?.headsign)
+        assertEquals(3, transitDetails?.stopCount)
+        assertNull(transitDetails?.stopDetails)
+        assertNull(transitDetails?.localizedValues)
+        assertNull(transitDetails?.transitLine)
+    }
+
+    @Test
+    fun getRoute_withTransitStopsOnly_parsesStopDetails() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "stopDetails": {
+                              "departureStop": {
+                                "name": "Station A"
+                              },
+                              "arrivalStop": {
+                                "name": "Station B"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val stopDetails = result.legs[0].steps[0].transitDetails?.stopDetails
+        assertNotNull(stopDetails)
+        assertEquals("Station A", stopDetails?.departureStop?.name)
+        assertEquals("Station B", stopDetails?.arrivalStop?.name)
+        assertNull(stopDetails?.departureStop?.location)
+        assertNull(stopDetails?.arrivalStop?.location)
+    }
+
+    @Test
+    fun getRoute_withTransitLineOnly_parsesLineInfo() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "transitLine": {
+                              "name": "Bus 24",
+                              "shortName": "24",
+                              "color": "#0000FF"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val transitLine = result.legs[0].steps[0].transitDetails?.transitLine
+        assertNotNull(transitLine)
+        assertEquals("Bus 24", transitLine?.name)
+        assertEquals("24", transitLine?.shortName)
+        assertEquals("#0000FF", transitLine?.color)
+        assertNull(transitLine?.vehicle)
+    }
+
+    @Test
+    fun getRoute_withVehicleInfo_parsesVehicleDetails() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "transitLine": {
+                              "vehicle": {
+                                "name": "Bus",
+                                "type": "BUS"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val vehicle = result.legs[0].steps[0].transitDetails?.transitLine?.vehicle
+        assertNotNull(vehicle)
+        assertEquals("Bus", vehicle?.name)
+        assertEquals("BUS", vehicle?.type)
+    }
+
+    @Test
+    fun getRoute_withLocalizedTimes_parsesTimeStrings() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "localizedValues": {
+                              "departureTime": {
+                                "text": "2:30 PM"
+                              },
+                              "arrivalTime": {
+                                "text": "2:50 PM"
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val localizedValues = result.legs[0].steps[0].transitDetails?.localizedValues
+        assertNotNull(localizedValues)
+        assertEquals("2:30 PM", localizedValues?.departureTime)
+        assertEquals("2:50 PM", localizedValues?.arrivalTime)
+    }
+
+    @Test
+    fun getRoute_withMultipleStepsAndTransit_parsesAllSteps() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": "1200s",
+                  "distanceMeters": 4000,
+                  "legs": [
+                    {
+                      "duration": "1200s",
+                      "distanceMeters": 4000,
+                      "steps": [
+                        {
+                          "distanceMeters": 500,
+                          "staticDuration": "300s",
+                          "navigationInstruction": {
+                            "instructions": "Walk to station"
+                          }
+                        },
+                        {
+                          "distanceMeters": 3000,
+                          "staticDuration": "600s",
+                          "navigationInstruction": {
+                            "instructions": "Take metro"
+                          },
+                          "transitDetails": {
+                            "headsign": "Angrignon",
+                            "stopCount": 4,
+                            "transitLine": {
+                              "name": "Green Line",
+                              "shortName": "1"
+                            }
+                          }
+                        },
+                        {
+                          "distanceMeters": 500,
+                          "staticDuration": "300s",
+                          "navigationInstruction": {
+                            "instructions": "Walk to destination"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(1200, result.durationSeconds)
+        assertEquals(4000, result.distanceMeters)
+        assertEquals(1, result.legs.size)
+        assertEquals(3, result.legs[0].steps.size)
+
+        // First step - walking
+        val step1 = result.legs[0].steps[0]
+        assertEquals(500, step1.distanceMeters)
+        assertEquals(300, step1.durationSeconds)
+        assertEquals("Walk to station", step1.navigationInstruction)
+        assertNull(step1.transitDetails)
+
+        // Second step - transit
+        val step2 = result.legs[0].steps[1]
+        assertEquals(3000, step2.distanceMeters)
+        assertEquals(600, step2.durationSeconds)
+        assertEquals("Take metro", step2.navigationInstruction)
+        assertNotNull(step2.transitDetails)
+        assertEquals("Angrignon", step2.transitDetails?.headsign)
+        assertEquals(4, step2.transitDetails?.stopCount)
+        assertEquals("Green Line", step2.transitDetails?.transitLine?.name)
+        assertEquals("1", step2.transitDetails?.transitLine?.shortName)
+
+        // Third step - walking
+        val step3 = result.legs[0].steps[2]
+        assertEquals(500, step3.distanceMeters)
+        assertEquals(300, step3.durationSeconds)
+        assertEquals("Walk to destination", step3.navigationInstruction)
+        assertNull(step3.transitDetails)
+    }
 }
