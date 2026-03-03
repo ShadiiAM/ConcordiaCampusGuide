@@ -1416,4 +1416,549 @@ class GoogleRoutesRepositoryTest {
             assertTrue(e.message?.isNotEmpty() == true)
         }
     }
+
+    @Test
+    fun getRoute_withNullDuration_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": null,
+                  "distanceMeters": 500
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertNull(result.durationSeconds)
+        assertEquals(500, result.distanceMeters)
+    }
+
+    @Test
+    fun getRoute_withInvalidDurationFormat_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": "invalid",
+                  "distanceMeters": 500
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertNull(result.durationSeconds)
+        assertEquals(500, result.distanceMeters)
+    }
+
+    @Test
+    fun getRoute_withDurationWithoutSuffix_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "duration": "480",
+                  "distanceMeters": 500
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(480, result.durationSeconds)
+        assertEquals(500, result.distanceMeters)
+    }
+
+    @Test
+    fun getRoute_withNullPolyline_throwsException() = runTest {
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": null
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            repository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertTrue(e.message?.contains("No route polyline") == true)
+        }
+    }
+
+    @Test
+    fun getRoute_withNullEncodedPolyline_throwsException() = runTest {
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": null
+                  }
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            repository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertTrue(e.message?.contains("No route polyline") == true)
+        }
+    }
+
+    @Test
+    fun getRoute_withBlankPolyline_throwsException() = runTest {
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "   "
+                  }
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            repository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertTrue(e.message?.contains("No route polyline") == true)
+        }
+    }
+
+    @Test
+    fun getRoute_withStopLocationNull_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "stopDetails": {
+                              "departureStop": {
+                                "name": "Station A",
+                                "location": null
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val stop = result.legs[0].steps[0].transitDetails?.stopDetails?.departureStop
+        assertNotNull(stop)
+        assertEquals("Station A", stop?.name)
+        assertNull(stop?.location)
+    }
+
+
+    @Test
+    fun getRoute_withNullLegs_returnsEmptyLegsList() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": null
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertTrue(result.legs.isEmpty())
+    }
+
+    @Test
+    fun getRoute_withNullSteps_returnsEmptyStepsList() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": null
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(1, result.legs.size)
+        assertTrue(result.legs[0].steps.isEmpty())
+    }
+
+    @Test
+    fun getRoute_withInvalidLegDuration_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "duration": "not_a_number",
+                      "distanceMeters": 500
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(1, result.legs.size)
+        assertNull(result.legs[0].durationSeconds)
+        assertEquals(500, result.legs[0].distanceMeters)
+    }
+
+    @Test
+    fun getRoute_withInvalidStepDuration_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "staticDuration": "xyz",
+                          "distanceMeters": 100
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(1, result.legs[0].steps.size)
+        assertNull(result.legs[0].steps[0].durationSeconds)
+        assertEquals(100, result.legs[0].steps[0].distanceMeters)
+    }
+
+    @Test
+    fun getRoute_withNullTransitLineText_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "transitDetails": {
+                            "localizedValues": {
+                              "departureTime": {
+                                "text": null
+                              },
+                              "arrivalTime": {
+                                "text": null
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        val localizedValues = result.legs[0].steps[0].transitDetails?.localizedValues
+        assertNotNull(localizedValues)
+        assertNull(localizedValues?.departureTime)
+        assertNull(localizedValues?.arrivalTime)
+    }
+
+    @Test
+    fun getRoute_withNullNavigationInstructions_handlesGracefully() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": [
+                        {
+                          "distanceMeters": 100,
+                          "navigationInstruction": {
+                            "instructions": null
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertNull(result.legs[0].steps[0].navigationInstruction)
+    }
+
+    @Test
+    fun getRoute_withEmptyLegsArray_returnsEmptyLegsList() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": []
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertTrue(result.legs.isEmpty())
+    }
+
+    @Test
+    fun getRoute_withEmptyStepsArray_returnsEmptyStepsList() = runTest {
+        val encodedPolyline = "a~l~Fjk~uOwHJy@P"
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "$encodedPolyline"
+                  },
+                  "legs": [
+                    {
+                      "steps": []
+                    }
+                  ]
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        val result = repository.getRoute(request)
+
+        assertNotNull(result)
+        assertEquals(1, result.legs.size)
+        assertTrue(result.legs[0].steps.isEmpty())
+    }
 }
