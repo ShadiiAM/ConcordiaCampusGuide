@@ -1326,4 +1326,94 @@ class GoogleRoutesRepositoryTest {
         assertEquals("Walk to destination", step3.navigationInstruction)
         assertNull(step3.transitDetails)
     }
+
+    @Test
+    fun getRoute_networkTimeout_throwsUserFriendlyException() = runTest {
+        // Use a custom client that times out immediately
+        val timeoutClient = OkHttpClient.Builder()
+            .connectTimeout(1, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .readTimeout(1, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .build()
+
+        val timeoutRepository = GoogleRoutesRepository(
+            client = timeoutClient,
+            apiKey = testApiKey
+        )
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            timeoutRepository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertNotNull(e.message)
+            assertTrue(
+                e.message?.contains("Network timed out") == true ||
+                e.message?.contains("Network error") == true ||
+                e.message?.contains("Unable to resolve host") == true
+            )
+        }
+    }
+
+    @Test
+    fun getRoute_malformedJson_throwsUserFriendlyException() = runTest {
+        val mockResponse = """
+            {"invalid json structure without proper closing
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            repository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertNotNull(e.message)
+            // Should get an error about parsing
+            assertNotNull(e.cause)
+        }
+    }
+
+    @Test
+    fun getRoute_unexpectedErrorType_providesGenericMessage() = runTest {
+        // Create a mock response that will cause an unexpected parsing error
+        val mockResponse = """
+            {
+              "routes": [
+                {
+                  "polyline": {
+                    "encodedPolyline": "invalid_polyline_causing_decode_error!@#$%"
+                  }
+                }
+              ]
+            }
+        """.trimIndent()
+
+        mockServer.enqueue(MockResponse().setBody(mockResponse).setResponseCode(200))
+
+        repository = createTestRepository()
+
+        val request = RouteRequest(
+            origin = LatLng(45.4972, -73.5789),
+            destination = LatLng(45.5000, -73.5800)
+        )
+
+        try {
+            repository.getRoute(request)
+            fail("Expected RuntimeException to be thrown")
+        } catch (e: RuntimeException) {
+            assertNotNull(e.message)
+            // Will get either a specific error message or "Unexpected error"
+            assertTrue(e.message?.isNotEmpty() == true)
+        }
+    }
 }
