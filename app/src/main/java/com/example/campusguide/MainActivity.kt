@@ -36,6 +36,7 @@ import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.accessibility.rememberAccessibilityState
+import androidx.compose.ui.focus.FocusRequester
 import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
@@ -90,6 +91,7 @@ fun ConcordiaCampusGuideApp() {
     var searchCounter by rememberSaveable { mutableStateOf(0) }
     var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.data.CampusBuilding>>(emptyList()) }
     var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
+    val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -133,6 +135,9 @@ fun ConcordiaCampusGuideApp() {
                             searchQuery = "$searchQuery#$searchCounter",
                             topBarSelectedBuilding = topBarSelectedBuilding,
                             onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
+                            onBottomSearchClick = {
+                                try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
+                            },
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -140,6 +145,7 @@ fun ConcordiaCampusGuideApp() {
 
                     SearchBarWithProfile(
                         modifier = Modifier.padding(top = 35.dp),
+                        focusRequester = searchFocusRequester,
                         onSearchQueryChange = { query ->
                             topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
                                 query = query,
