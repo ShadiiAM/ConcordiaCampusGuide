@@ -23,11 +23,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -58,12 +61,14 @@ object SearchFocus {
 @Composable
 fun SearchBarWithProfile(
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
     onSearchQueryChange: (String) -> Unit = {},
     onSearchSubmit: (String) -> Unit = {},
     onProfileClick: () -> Unit = {},
     suggestions: List<CampusBuilding> = emptyList(),
     onBuildingSelected: (CampusBuilding) -> Unit = {},
 ) {
+    val textFocusRequester = focusRequester ?: remember { FocusRequester() }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     Column(modifier = modifier.fillMaxWidth()) {
         Surface(
@@ -103,7 +108,9 @@ fun SearchBarWithProfile(
                             searchQuery = it
                             onSearchQueryChange(it)
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(textFocusRequester),
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
@@ -215,3 +222,4 @@ fun SearchBarWithProfilePreview() {
         SearchBarWithProfile()
     }
 }
+
