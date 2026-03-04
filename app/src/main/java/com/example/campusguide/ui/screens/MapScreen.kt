@@ -68,6 +68,9 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import androidx.compose.ui.text.font.FontWeight
+import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.buildingSuggestions
+import com.example.campusguide.ui.components.BuildingAutocompleteField
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -77,7 +80,9 @@ const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
 @Composable
 fun MapScreen(
-    searchQuery: String = ""
+    searchQuery: String = "",
+    topBarSelectedBuilding: CampusBuilding? = null,
+    onTopBarBuildingConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -98,10 +103,8 @@ fun MapScreen(
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
 
-    // Snackbar state
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Directions state
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
     var isPickingOrigin by remember { mutableStateOf(false) }
@@ -111,6 +114,69 @@ fun MapScreen(
     var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
     // Track the selected building's LatLng for directions
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
+
+    // Autocomplete state
+    var crossCampusEnabled by rememberSaveable { mutableStateOf(false) }
+    var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
+    var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
+    var originDisplayName  by remember { mutableStateOf<String?>(null) }
+
+
+    fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
+        val overlay = when (building.campus) {
+            Campus.SGW    -> sgwOverlay
+            Campus.LOYOLA -> loyOverlay
+        } ?: return when (building.campus) {
+            Campus.SGW    -> LatLng(45.4972, -73.5789)
+            Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+
+        val polygons = overlay.getBuildings()[building.buildingCode]
+        if (!polygons.isNullOrEmpty()) {
+            val pts = polygons.first().points
+            return LatLng(
+                pts.sumOf { it.latitude } / pts.size,
+                pts.sumOf { it.longitude } / pts.size
+            )
+        }
+
+        return when (building.campus) {
+            Campus.SGW    -> LatLng(45.4972, -73.5789)
+            Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+    }
+
+    LaunchedEffect(topBarSelectedBuilding) {
+        val building = topBarSelectedBuilding ?: return@LaunchedEffect
+        val latLng = resolveBuildingLatLng(building)
+
+        // Drop pin on the building
+        searchMarker?.remove()
+        searchMarker = googleMap?.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title(building.buildingName)
+        )
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+        // Set as To destination and open route panel
+        val hit = BuildingHit(
+            id = building.buildingCode,
+            properties = JSONObject().apply {
+                put("building-code", building.buildingCode)
+                put("building-name", building.buildingName)
+                put("address", building.address)
+            }
+        )
+        directionsUiState = directionsUiState.copy(
+            step = DirectionsStep.PlanRoute(
+                origin = defaultOrigin,
+                destination = latLng,
+                buildingHit = hit,
+            )
+        )
+        onTopBarBuildingConsumed()
+    }
 
     // Get user location for default origin
     LaunchedEffect(Unit) {
@@ -726,60 +792,113 @@ fun MapScreen(
                     routePolylineRef = null
                     directionsUiState = directionsUiState.copy(
                         step = DirectionsStep.PickDestination,
-                        errorMessage = null
+                        errorMessage = null,
                     )
+                    originSuggestions = emptyList()
+                    destSuggestions   = emptyList()
                 }) {
                     Text(
                         text = "Route options",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    BuildingAutocompleteField(
+                        label         = "From:",
+                        value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
+                        placeholder   = "My location or building…",
+                        enabled       = !directionsUiState.isLoadingRoute,
+                        onQueryChange = { query ->
+                            originSuggestions = buildingSuggestions(
+                                query        = query,
+                                activeCampus = selectedCampus,
+                                crossCampus  = crossCampusEnabled,
+                            )
+                        },
+                        onSelected = { building ->
+                            originSuggestions = emptyList()
+                            originDisplayName = building.buildingName
+                            directionsUiState = directionsUiState.copy(
+                                step = step.copy(origin = resolveBuildingLatLng(building)),
+                            )
+                        },
                     )
 
                     Spacer(Modifier.height(8.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("From:", fontWeight = FontWeight.Medium)
-                        Spacer(Modifier.width(8.dp))
-                        OutlinedButton(onClick = { isPickingOrigin = true }) {
-                            Text(
-                                if (isPickingOrigin)
-                                    "Tap map to choose origin..."
-                                else
-                                    latLngShort(step.origin)
+                    BuildingAutocompleteField(
+                        label         = "To:",
+                        value         = buildingTitle(step.buildingHit, step.destination),
+                        suggestions   = destSuggestions,
+                        placeholder   = "Building name or code…",
+                        enabled       = !directionsUiState.isLoadingRoute,
+                        onQueryChange = { query ->
+                            destSuggestions = buildingSuggestions(
+                                query        = query,
+                                activeCampus = selectedCampus,
+                                crossCampus  = crossCampusEnabled,
                             )
-                        }
-                    }
+                        },
+                        onSelected = { building ->
+                            val latLng = resolveBuildingLatLng(building)
+                            destSuggestions = emptyList()
+                            val hit = BuildingHit(
+                                id = building.buildingCode,
+                                properties = JSONObject().apply {
+                                    put("building-code", building.buildingCode)
+                                    put("building-name", building.buildingName)
+                                    put("address",       building.address)
+                                },
+                            )
+                            directionsUiState = directionsUiState.copy(
+                                step = step.copy(
+                                    destination = latLng,
+                                    buildingHit = hit,
+                                ),
+                            )
+                        },
+                    )
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("To:", fontWeight = FontWeight.Medium)
-                        Spacer(Modifier.width(8.dp))
-                        Text(buildingTitle(step.buildingHit, step.destination))
+                        Text(
+                            text  = "Cross-campus routing",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Switch(
+                            checked         = crossCampusEnabled,
+                            onCheckedChange = {
+                                crossCampusEnabled = it
+                                originSuggestions  = emptyList()
+                                destSuggestions    = emptyList()
+                            },
+                        )
                     }
 
                     Spacer(Modifier.height(12.dp))
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {
+                        enabled  = !directionsUiState.isLoadingRoute,
+                        onClick  = {
                             directionsUiState = directionsUiState.copy(
                                 isLoadingRoute = true,
-                                errorMessage = null
+                                errorMessage   = null,
                             )
-
                             scope.launch {
                                 runCatching {
                                     repo.getRoute(
                                         RouteRequest(
-                                            origin = step.origin,
-                                            destination = step.destination
+                                            origin      = step.origin,
+                                            destination = step.destination,
                                         )
                                     )
                                 }.onSuccess { route ->
@@ -793,34 +912,30 @@ fun MapScreen(
                                                 .width(12f)
                                         )
                                     }
-
                                     directionsUiState = directionsUiState.copy(
                                         isLoadingRoute = false,
                                         step = DirectionsStep.ShowingRoute(
-                                            origin = step.origin,
+                                            origin      = step.origin,
                                             destination = step.destination,
                                             buildingHit = step.buildingHit,
-                                            route = route
-                                        )
+                                            route       = route,
+                                        ),
                                     )
                                 }.onFailure { e ->
                                     directionsUiState = directionsUiState.copy(
                                         isLoadingRoute = false,
-                                        errorMessage = e.message ?: "Failed to get route"
+                                        errorMessage   = e.message ?: "Failed to get route",
                                     )
                                 }
                             }
-                        }
+                        },
                     ) {
-                        Text(if (directionsUiState.isLoadingRoute) "Loading..." else "Go")
+                        Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")
                     }
 
                     directionsUiState.errorMessage?.let {
                         Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        Text(text = it, color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -841,7 +956,7 @@ fun MapScreen(
                     )
 
                     Spacer(Modifier.height(8.dp))
-                    Text("From: ${latLngShort(step.origin)}")
+                    Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
                     Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
 
                     // Display duration and distance if available
