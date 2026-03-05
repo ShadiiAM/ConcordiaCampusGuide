@@ -112,7 +112,7 @@ class GoogleRoutesRepositoryTest {
             destination = LatLng(45.4980, -73.5780)
         )
 
-        assertEquals(TravelMode.WALKING, request.mode)
+        assertEquals(TravelMode.WALK, request.travelMode)
     }
 
     @Test
@@ -331,7 +331,7 @@ class GoogleRoutesRepositoryTest {
 
     @Test
     fun travelMode_walkingEnum_exists() {
-        val mode = TravelMode.WALKING
+        val mode = TravelMode.WALK
         assertNotNull(mode)
         assertEquals("WALKING", mode.name)
     }

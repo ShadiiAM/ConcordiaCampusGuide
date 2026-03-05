@@ -5,13 +5,12 @@ import com.google.android.gms.maps.model.LatLng
 data class RouteRequest(
     val origin: LatLng,
     val destination: LatLng,
-    val mode: TravelMode = TravelMode.WALKING,
+    val travelMode: String = "DRIVE",
 )
 
-enum class TravelMode {
-    WALKING,
-}
 
 data class RouteResult(
     val points: List<LatLng>,
+    val distanceMeters: Int? = null,
+    val durationSeconds: Int? = null,
 )

@@ -37,7 +37,7 @@ class GoogleRoutesRepository(
             val bodyObj = ComputeRoutesRequest(
                 origin = Waypoint(Location(LatLngLiteral(request.origin.latitude, request.origin.longitude))),
                 destination = Waypoint(Location(LatLngLiteral(request.destination.latitude, request.destination.longitude))),
-                travelMode = "WALK",
+                travelMode = request.travelMode,
                 polylineEncoding = "ENCODED_POLYLINE",
                 polylineQuality = "OVERVIEW",
             )
@@ -46,7 +46,7 @@ class GoogleRoutesRepository(
             val req = Request.Builder()
                 .url(url)
                 .post(bodyStr.toRequestBody("application/json".toMediaType()))
-                .header("X-Goog-FieldMask", "routes.polyline.encodedPolyline")
+                .header("X-Goog-FieldMask", "routes.polyline.encodedPolyline,routes.distanceMeters,routes.duration")
                 .header("X-Goog-Api-Key", apiKey)
                 .build()
 
@@ -58,15 +58,22 @@ class GoogleRoutesRepository(
                 val text = resp.body?.string() ?: throw IllegalStateException("Empty response")
                 val decoded = json.decodeFromString(ComputeRoutesResponse.serializer(), text)
 
-                val encoded = decoded.routes
-                    ?.firstOrNull()
-                    ?.polyline
-                    ?.encodedPolyline
+                val routeData = decoded.routes?.firstOrNull()
+                    ?: throw IllegalStateException("No route returned")
+
+                val encoded = routeData.polyline?.encodedPolyline
                     ?.takeIf { it.isNotBlank() }
                     ?: throw IllegalStateException("No route polyline returned")
 
                 val pts = PolyUtil.decode(encoded)
-                RouteResult(points = pts)
+                val durationSeconds = routeData.duration
+                    ?.removeSuffix("s")?.toIntOrNull()
+
+                RouteResult(
+                    points = pts,
+                    distanceMeters = routeData.distanceMeters,
+                    durationSeconds = durationSeconds,
+                )
             }
         }.getOrElse { t ->
             throw RuntimeException(t.toUserFriendlyMessage(), t)
@@ -118,6 +125,8 @@ private data class ComputeRoutesResponse(
 @Serializable
 private data class Route(
     val polyline: RoutePolyline? = null,
+    val distanceMeters: Int? = null,
+    val duration: String? = null,
 )
 
 @Serializable

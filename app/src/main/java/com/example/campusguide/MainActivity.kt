@@ -48,6 +48,9 @@ import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
+import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.screens.DirectionsTopBarState
+import com.example.campusguide.ui.components.DirectionsTopBar
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +96,10 @@ fun ConcordiaCampusGuideApp() {
     var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
+    var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
+    var directionsGoTrigger by remember { mutableStateOf(0) }
+    var directionsCancelTrigger by remember { mutableStateOf(0) }
+    var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -138,49 +145,76 @@ fun ConcordiaCampusGuideApp() {
                             onBottomSearchClick = {
                                 try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
                             },
+                            onDirectionsTopBarState = { state -> directionsTopBarState = state },  // ← add
+                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                            topBarTravelMode = topBarTravelMode,
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
                     }
 
-                    SearchBarWithProfile(
-                        modifier = Modifier.padding(top = 35.dp),
-                        focusRequester = searchFocusRequester,
-                        onSearchQueryChange = { query ->
-                            topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
-                                query = query,
-                                activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                crossCampus = true,
-                            )
-                        },
-                        onSearchSubmit = { query ->
-                            // Check if query matches a campus building first
-                            val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-                                .firstOrNull { it.matches(query) }
-                            if (matchedBuilding != null) {
-                                // Use building directly, skip geocoder
-                                topBarSelectedBuilding = matchedBuilding
-                                topBarSuggestions = emptyList()
-                                currentDestination.value = AppDestinations.MAP
-                            } else {
-                                // Fall back to geocoder search
-                                searchQuery = query
-                                searchCounter++
-                                topBarSuggestions = emptyList()
-                                if (currentDestination.value != AppDestinations.MAP) {
+                    if (directionsTopBarState.active) {
+                        DirectionsTopBar(
+                            modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp),
+                            originLabel = directionsTopBarState.originLabel,
+                            destinationLabel = directionsTopBarState.destinationLabel,
+                            isCrossCampus = directionsTopBarState.isCrossCampus,
+                            selectedMode = directionsTopBarState.selectedMode,
+                            onModeSelected = { mode -> topBarTravelMode = mode },
+                            routeSummary = directionsTopBarState.routeSummary,
+                            showActions = directionsTopBarState.showActions,
+                            isLoadingRoute = directionsTopBarState.isLoadingRoute,
+                            onGoClick = { directionsGoTrigger++ },
+                            onCancelClick = {
+                                directionsCancelTrigger++
+                                topBarTravelMode = TravelMode.DRIVE
+                            },
+                            onBackClick = {
+                                directionsCancelTrigger++
+                                topBarTravelMode = TravelMode.DRIVE
+                            },
+                        )
+                    } else {
+                        SearchBarWithProfile(
+                            modifier = Modifier.padding(top = 35.dp),
+                            focusRequester = searchFocusRequester,
+                            onSearchQueryChange = { query ->
+                                topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
+                                    query = query,
+                                    activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                    crossCampus = true,
+                                )
+                            },
+                            onSearchSubmit = { query ->
+                                // Check if query matches a campus building first
+                                val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
+                                    .firstOrNull { it.matches(query) }
+                                if (matchedBuilding != null) {
+                                    // Use building directly, skip geocoder
+                                    topBarSelectedBuilding = matchedBuilding
+                                    topBarSuggestions = emptyList()
                                     currentDestination.value = AppDestinations.MAP
+                                } else {
+                                    // Fall back to geocoder search
+                                    searchQuery = query
+                                    searchCounter++
+                                    topBarSuggestions = emptyList()
+                                    if (currentDestination.value != AppDestinations.MAP) {
+                                        currentDestination.value = AppDestinations.MAP
+                                    }
                                 }
-                            }
-                        },
-                        onProfileClick = { showProfile = true },
-                        suggestions = topBarSuggestions,
-                        onBuildingSelected = { building ->
-                            topBarSelectedBuilding = building
-                            topBarSuggestions = emptyList()
-                            searchQuery = ""
-                            currentDestination.value = AppDestinations.MAP
-                        },
-                    )
+                            },
+                            onProfileClick = { showProfile = true },
+                            suggestions = topBarSuggestions,
+                            onBuildingSelected = { building ->
+                                topBarSelectedBuilding = building
+                                topBarSuggestions = emptyList()
+                                searchQuery = ""
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                        )
+                    }
                 }
             }
         }
