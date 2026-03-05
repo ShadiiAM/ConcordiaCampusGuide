@@ -204,7 +204,7 @@ fun MapScreen(
                 RouteRequest(
                     origin = step.origin,
                     destination = step.destination,
-                    travelMode = travelMode.apiValue,
+                    mode = travelMode,
                 )
             )
         }.onSuccess { route ->
@@ -1050,7 +1050,7 @@ fun MapScreen(
                                         RouteRequest(
                                             origin      = step.origin,
                                             destination = step.destination,
-                                            travelMode  = travelMode.apiValue,
+                                            mode  = travelMode,
                                         )
                                     )
                                 }.onSuccess { route ->

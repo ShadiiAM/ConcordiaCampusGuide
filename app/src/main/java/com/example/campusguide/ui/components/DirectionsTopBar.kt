@@ -156,9 +156,10 @@ fun DirectionsTopBar(
                         contentAlignment = Alignment.Center,
                     ) {
                         val iconRes = when (mode) {
-                            TravelMode.DRIVE   -> R.drawable.ic_directions_car
+                            TravelMode.DRIVE, TravelMode.DRIVING   -> R.drawable.ic_directions_car
                             TravelMode.TRANSIT -> R.drawable.ic_directions_bus
-                            TravelMode.WALK    -> R.drawable.ic_directions_walk
+                            TravelMode.WALK, TravelMode.WALKING    -> R.drawable.ic_directions_walk
+                            TravelMode.BICYCLING -> R.drawable.ic_directions_walk
                         }
                         Icon(
                             painter = painterResource(iconRes),
