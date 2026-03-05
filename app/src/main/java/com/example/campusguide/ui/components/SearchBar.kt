@@ -47,6 +47,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import com.example.campusguide.data.CampusBuilding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.platform.testTag
 
 
 @Composable
@@ -101,6 +102,7 @@ fun SearchBarWithProfile(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .testTag("searchBar")
                             .focusRequester(textFocusRequester),
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
@@ -153,6 +155,7 @@ fun SearchBarWithProfile(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .testTag(building.buildingName)
                                 .clickable {
                                     searchQuery = ""
                                     onBuildingSelected(building)

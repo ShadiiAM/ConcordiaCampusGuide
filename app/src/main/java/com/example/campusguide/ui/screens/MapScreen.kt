@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -919,7 +920,7 @@ fun MapScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Button(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().testTag("DirectionsGo"),
                         enabled  = !directionsUiState.isLoadingRoute,
                         onClick  = {
                             directionsUiState = directionsUiState.copy(
@@ -937,13 +938,15 @@ fun MapScreen(
                                 }.onSuccess { route ->
                                     val map = googleMap
                                     if (map != null) {
-                                        routePolylineRef?.remove()
-                                        routePolylineRef = map.addPolyline(
-                                            PolylineOptions()
-                                                .addAll(route.points)
-                                                .color(0xFF1565C0.toInt())
-                                                .width(12f)
-                                        )
+                                        withContext(Dispatchers.Main) {
+                                            routePolylineRef?.remove()
+                                            routePolylineRef = map.addPolyline(
+                                                PolylineOptions()
+                                                    .addAll(route.points)
+                                                    .color(0xFF1565C0.toInt())
+                                                    .width(12f)
+                                            )
+                                        }
                                     }
                                     directionsUiState = directionsUiState.copy(
                                         isLoadingRoute = false,
