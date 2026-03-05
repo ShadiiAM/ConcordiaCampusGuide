@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 
 enum class Campus {
     SGW,
@@ -44,6 +45,8 @@ fun CampusToggle(
     modifier: Modifier = Modifier,
     showIcon: Boolean = true
 ) {
+    val accessibilityState = LocalAccessibilityState.current
+    val baseIconSize= 20.dp
     Row(
         horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically,
@@ -74,7 +77,7 @@ fun CampusToggle(
                             MaterialTheme.colorScheme.onSecondary
                         else
                             MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(baseIconSize+accessibilityState.iconSizeOffsetDp)
                     )
                 }
             } else null,

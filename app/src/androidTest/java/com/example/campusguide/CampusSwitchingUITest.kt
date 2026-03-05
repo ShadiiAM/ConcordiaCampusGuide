@@ -11,6 +11,7 @@ import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.jvm.java
 
 /**
  * UI Tests for Campus Switching Feature (User Story 1.3)

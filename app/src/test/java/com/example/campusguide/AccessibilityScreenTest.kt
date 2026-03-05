@@ -1,8 +1,10 @@
 package com.example.campusguide
 
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -153,7 +155,7 @@ class AccessibilityScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("-").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("-").assertIsDisplayed()
     }
 
     @Test
@@ -168,7 +170,7 @@ class AccessibilityScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("+").assertIsDisplayed()
+        composeTestRule.onAllNodesWithText("+").assertIsDisplayed()
     }
 
     @Test
@@ -213,9 +215,13 @@ class AccessibilityScreenTest {
                 }
             }
         }
+        composeTestRule.onAllNodesWithText("-").apply {
+            fetchSemanticsNodes().forEachIndexed { i, _ ->
+                get(i).performClick()
+                composeTestRule.waitForIdle()
+            }
+        }
 
-        composeTestRule.onNodeWithText("-").performClick()
-        composeTestRule.waitForIdle()
     }
 
     @Test
@@ -230,8 +236,12 @@ class AccessibilityScreenTest {
             }
         }
 
-        composeTestRule.onNodeWithText("+").performClick()
-        composeTestRule.waitForIdle()
+        composeTestRule.onAllNodesWithText("+").apply {
+            fetchSemanticsNodes().forEachIndexed { i, _ ->
+                get(i).performClick()
+                composeTestRule.waitForIdle()
+            }
+        }
     }
 
     @Test
@@ -300,6 +310,7 @@ class AccessibilityScreenTest {
     }
 
     @Test
+    @Order(1,2,3)
     fun accessibilityScreen_multipleButtonClicks() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
@@ -316,4 +327,12 @@ class AccessibilityScreenTest {
         composeTestRule.onNodeWithText("-").performClick()
         composeTestRule.waitForIdle()
     }
+}
+
+private fun SemanticsNodeInteractionCollection.assertIsDisplayed(): SemanticsNodeInteractionCollection {
+    val semNodes = fetchSemanticsNodes()
+    semNodes.forEachIndexed { index, _ ->
+        get(index).assertIsDisplayed()
+    }
+    return this
 }

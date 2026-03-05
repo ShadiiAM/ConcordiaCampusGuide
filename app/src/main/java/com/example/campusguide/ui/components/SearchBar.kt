@@ -43,7 +43,6 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -144,7 +143,9 @@ fun SearchBarWithProfile(
                     keyboardActions = KeyboardActions(
                         onSearch = { onSearchSubmit(searchQuery) },
                         onDone = { onSearchSubmit(searchQuery) }
-
+                    )
+                )
+            }
                 Spacer(modifier = Modifier.width(12.dp))
 
                 // Profile avatar
@@ -213,7 +214,7 @@ fun SearchBarWithProfile(
             }
         }
     }
-}
+
 
 @Preview(showBackground = true)
 @Composable

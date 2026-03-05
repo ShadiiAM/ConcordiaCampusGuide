@@ -1,5 +1,6 @@
 package com.example.campusguide
 
+import androidx.compose.ui.unit.dp
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.ColorBlindMode
 import junit.framework.TestCase.*
@@ -31,6 +32,27 @@ class AccessibilityStateTest {
         Assert.assertEquals(-2f, state.textSizeOffsetSp)
     }
 
+    @Test
+    fun `icon size increases up to maximum`() {
+        val state = AccessibilityState(initialOffsetDp = 14.dp)
+
+        state.increaseIconSize()
+        Assert.assertEquals(16.dp, state.iconSizeOffsetDp)
+
+        repeat(3) { state.increaseIconSize() }
+        Assert.assertEquals(16.dp, state.iconSizeOffsetDp)
+    }
+
+    @Test
+    fun `icon size decrease down to minimum`() {
+        val state = AccessibilityState(initialOffsetDp = -8.dp)
+
+        state.decreaseIconSize()
+        Assert.assertEquals(-10.dp, state.iconSizeOffsetDp)
+
+        repeat(3) { state.decreaseIconSize() }
+        Assert.assertEquals(-10.dp, state.iconSizeOffsetDp)
+    }
     @Test
     fun `cycleColorBlindMode cycles through all modes and back to none`() {
         val state = AccessibilityState(colorBlindMode = ColorBlindMode.NONE)

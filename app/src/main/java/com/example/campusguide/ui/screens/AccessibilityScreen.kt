@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -150,7 +151,9 @@ fun AccessibilityScreen(
                                 accessibilityState.decreaseTextSize()
                                 persist()
                             },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier
+                                .size(32.dp)
+                                .testTag("-text")
                         ) {
                             AccessibleText(
                                 text = "-",
@@ -164,7 +167,9 @@ fun AccessibilityScreen(
                                 accessibilityState.increaseTextSize()
                                 persist()
                             },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier
+                                .size(32.dp)
+                                .testTag("-text")
                         ) {
                             AccessibleText(
                                 text = "+",
@@ -176,6 +181,56 @@ fun AccessibilityScreen(
                 }
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // AccessibleText Size Setting
+            SettingRow(
+                icon = {
+                    AccessibleText(
+                        text = "Ic",
+                        baseFontSizeSp = 16f,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                label = "Icon size",
+                action = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {
+                                accessibilityState.decreaseIconSize()
+                                persist()
+                            },
+                            modifier = Modifier
+                                .size(32.dp)
+                                .testTag("-icon")
+                        ) {
+                            AccessibleText(
+                                text = "-",
+                                baseFontSizeSp = 20f,
+                                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = {
+                                accessibilityState.increaseIconSize()
+                                persist()
+                            },
+                            modifier = Modifier
+                                .size(32.dp)
+                                .testTag("-icon")
+                        ) {
+                            AccessibleText(
+                                text = "+",
+                                baseFontSizeSp = 20f,
+                                fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             // AccessibleText Colour Setting

@@ -8,10 +8,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 // Small holder for the global text-size offset
 class AccessibilityState(
     initialOffsetSp: Float = 0f,
+    initialOffsetDp: Dp = 0.dp,
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
     colorBlindMode: ColorBlindMode = ColorBlindMode.NONE,
@@ -19,6 +22,8 @@ class AccessibilityState(
     private val onStateChanged: (AccessibilityState) -> Unit = {}
 ) {
     var textSizeOffsetSp by mutableFloatStateOf(initialOffsetSp)
+        private set
+    var iconSizeOffsetDp by mutableStateOf(initialOffsetDp)
         private set
 
     var isBoldEnabled by mutableStateOf(initialBoldEnabled)
@@ -44,6 +49,20 @@ class AccessibilityState(
     fun decreaseTextSize() {
         if (textSizeOffsetSp > -2f) {
             textSizeOffsetSp -= 1f
+            notifyChanged()
+        }
+    }
+
+    fun increaseIconSize() {
+        if (iconSizeOffsetDp < 16.dp) {
+            iconSizeOffsetDp += 2.dp
+            notifyChanged()
+        }
+    }
+
+    fun decreaseIconSize() {
+        if (iconSizeOffsetDp > -10.dp) {
+            iconSizeOffsetDp -= 2.dp
             notifyChanged()
         }
     }
