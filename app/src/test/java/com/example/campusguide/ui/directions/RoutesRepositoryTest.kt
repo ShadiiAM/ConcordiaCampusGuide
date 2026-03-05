@@ -106,14 +106,13 @@ class GoogleRoutesRepositoryTest {
     }
 
     @Test
-    fun getRoute_defaultTravelMode_isWalking() = runTest {
+    fun getRoute_defaultTravelMode_isDrive() = runTest {
         val request = RouteRequest(
             origin = LatLng(45.4972, -73.5789),
             destination = LatLng(45.4980, -73.5780)
         )
 
-        assertEquals(TravelMode.WALKING, request.mode)
-    }
+        assertEquals("DRIVE", request.travelMode)    }
 
     @Test
     fun getRoute_emptyPolyline_throwsException() = runTest {
@@ -331,9 +330,9 @@ class GoogleRoutesRepositoryTest {
 
     @Test
     fun travelMode_walkingEnum_exists() {
-        val mode = TravelMode.WALKING
+        val mode = TravelMode.WALK
         assertNotNull(mode)
-        assertEquals("WALKING", mode.name)
+        assertEquals("WALK", mode.name)
     }
 
     @Test
@@ -688,18 +687,16 @@ class GoogleRoutesRepositoryTest {
 
     @Test
     fun travelMode_allEnumValues_exist() {
-        assertEquals(4, TravelMode.values().size)
-        assertNotNull(TravelMode.WALKING)
-        assertNotNull(TravelMode.DRIVING)
-        assertNotNull(TravelMode.BICYCLING)
+        assertEquals(3, TravelMode.values().size)
+        assertNotNull(TravelMode.DRIVE)
+        assertNotNull(TravelMode.WALK)
         assertNotNull(TravelMode.TRANSIT)
     }
 
     @Test
     fun travelMode_valueof_worksForAllModes() {
-        assertEquals(TravelMode.WALKING, TravelMode.valueOf("WALKING"))
-        assertEquals(TravelMode.DRIVING, TravelMode.valueOf("DRIVING"))
-        assertEquals(TravelMode.BICYCLING, TravelMode.valueOf("BICYCLING"))
+        assertEquals(TravelMode.DRIVE, TravelMode.valueOf("DRIVE"))
+        assertEquals(TravelMode.WALK, TravelMode.valueOf("WALK"))
         assertEquals(TravelMode.TRANSIT, TravelMode.valueOf("TRANSIT"))
     }
 
@@ -711,24 +708,10 @@ class GoogleRoutesRepositoryTest {
         val request = RouteRequest(
             origin = origin,
             destination = destination,
-            mode = TravelMode.DRIVING
+            mode = TravelMode.DRIVE
         )
 
-        assertEquals(TravelMode.DRIVING, request.mode)
-    }
-
-    @Test
-    fun routeRequest_withBicyclingMode_createsCorrectly() {
-        val origin = LatLng(45.4972, -73.5789)
-        val destination = LatLng(45.4980, -73.5780)
-
-        val request = RouteRequest(
-            origin = origin,
-            destination = destination,
-            mode = TravelMode.BICYCLING
-        )
-
-        assertEquals(TravelMode.BICYCLING, request.mode)
+        assertEquals(TravelMode.DRIVE, request.mode)
     }
 
     @Test

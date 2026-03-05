@@ -37,7 +37,7 @@ class GoogleRoutesRepository(
             val bodyObj = ComputeRoutesRequest(
                 origin = Waypoint(Location(LatLngLiteral(request.origin.latitude, request.origin.longitude))),
                 destination = Waypoint(Location(LatLngLiteral(request.destination.latitude, request.destination.longitude))),
-                travelMode = "WALK",
+                travelMode = request.travelMode,
                 polylineEncoding = "ENCODED_POLYLINE",
                 polylineQuality = "OVERVIEW",
             )

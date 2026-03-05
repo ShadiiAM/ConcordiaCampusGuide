@@ -15,17 +15,17 @@ class RouteModelsTest {
         
         assertEquals(origin, request.origin)
         assertEquals(destination, request.destination)
-        assertEquals(TravelMode.WALKING, request.mode)
+        assertEquals("DRIVE", request.travelMode)
     }
 
     @Test
     fun routeRequest_createsWithCustomMode() {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
-        
-        val request = RouteRequest(origin, destination, TravelMode.WALKING)
-        
-        assertEquals(TravelMode.WALKING, request.mode)
+
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
+        assertEquals("WALK", request.travelMode)
+
     }
 
     @Test
@@ -67,13 +67,13 @@ class RouteModelsTest {
 
     @Test
     fun travelMode_walking() {
-        assertEquals(TravelMode.WALKING, TravelMode.valueOf("WALKING"))
+        assertEquals(TravelMode.WALK, TravelMode.valueOf("WALK"))
     }
 
     @Test
     fun travelMode_enumProperties() {
-        val mode = TravelMode.WALKING
-        assertEquals("WALKING", mode.name)
+        val mode = TravelMode.WALK
+        assertEquals("WALK", mode.name)
     }
 
     @Test
@@ -156,12 +156,13 @@ class RouteModelsTest {
     fun routeRequest_componentAccess() {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
-        val request = RouteRequest(origin, destination, TravelMode.WALKING)
-        
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
+
         val (o, d, m) = request
         assertEquals(origin, o)
         assertEquals(destination, d)
-        assertEquals(TravelMode.WALKING, m)
+        assertEquals(TravelMode.WALK, m)
+        assertEquals("WALK", request.travelMode)
     }
 
     @Test
@@ -175,22 +176,15 @@ class RouteModelsTest {
 
     @Test
     fun travelMode_allModes_exist() {
-        assertNotNull(TravelMode.WALKING)
-        assertNotNull(TravelMode.DRIVING)
-        assertNotNull(TravelMode.BICYCLING)
+        assertNotNull(TravelMode.DRIVE)
+        assertNotNull(TravelMode.WALK)
         assertNotNull(TravelMode.TRANSIT)
     }
 
     @Test
     fun travelMode_driving() {
-        assertEquals(TravelMode.DRIVING, TravelMode.valueOf("DRIVING"))
-        assertEquals("DRIVING", TravelMode.DRIVING.name)
-    }
-
-    @Test
-    fun travelMode_bicycling() {
-        assertEquals(TravelMode.BICYCLING, TravelMode.valueOf("BICYCLING"))
-        assertEquals("BICYCLING", TravelMode.BICYCLING.name)
+        assertEquals(TravelMode.DRIVE, TravelMode.valueOf("DRIVE"))
+        assertEquals("DRIVE", TravelMode.DRIVE.name)
     }
 
     @Test
@@ -204,9 +198,9 @@ class RouteModelsTest {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
 
-        val request = RouteRequest(origin, destination, TravelMode.DRIVING)
+        val request = RouteRequest(origin, destination, TravelMode.DRIVE)
 
-        assertEquals(TravelMode.DRIVING, request.mode)
+        assertEquals(TravelMode.DRIVE, request.mode)
     }
 
     @Test

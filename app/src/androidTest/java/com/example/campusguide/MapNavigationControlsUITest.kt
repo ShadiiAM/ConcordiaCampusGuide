@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 class MapNavigationControlsUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MapsActivity::class.java)
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     /**
      * Test: Zoom in button is displayed and clickable.

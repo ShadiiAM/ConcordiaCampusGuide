@@ -77,6 +77,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.ui.components.BuildingAutocompleteField
+import com.example.campusguide.ui.directions.TravelMode
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -84,12 +85,26 @@ private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
 const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
+data class DirectionsTopBarState(
+    val active: Boolean,
+    val originLabel: String = "Your location",
+    val destinationLabel: String = "",
+    val isCrossCampus: Boolean = false,
+    val selectedMode: TravelMode = TravelMode.DRIVE,
+    val routeSummary: String? = null,
+    val isLoadingRoute: Boolean = false,
+    val showActions: Boolean = false,
+)
 @Composable
 fun MapScreen(
     searchQuery: String = "",
     topBarSelectedBuilding: CampusBuilding? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
+    onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
+    directionsGoTrigger: Int = 0,
+    directionsCancelTrigger: Int = 0,
+    topBarTravelMode: TravelMode = TravelMode.DRIVE,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -114,6 +129,7 @@ fun MapScreen(
 
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
+    var travelMode by rememberSaveable { mutableStateOf(TravelMode.DRIVE) }
     var isPickingOrigin by remember { mutableStateOf(false) }
     var routePolylineRef by remember {
         mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
@@ -127,6 +143,7 @@ fun MapScreen(
     var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
+
 
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
@@ -150,6 +167,116 @@ fun MapScreen(
         return when (building.campus) {
             Campus.SGW    -> LatLng(45.4972, -73.5789)
             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+        }
+    }
+    fun buildRouteSummary(distanceMeters: Int?, durationSeconds: Int?): String {
+        val dist = distanceMeters?.let {
+            if (it >= 1000) "${"%.1f".format(it / 1000.0)} km" else "$it m"
+        }
+        val dur = durationSeconds?.let {
+            val mins = it / 60
+            if (mins < 60) "$mins min" else "${mins / 60} h ${mins % 60} min"
+        }
+        return listOfNotNull(dur, dist).joinToString(" · ")
+    }
+    // Sync travel mode from top bar selection
+    LaunchedEffect(topBarTravelMode) {
+        travelMode = topBarTravelMode
+        val step = directionsUiState.step
+        if (step is DirectionsStep.ShowingRoute) {
+            directionsUiState = directionsUiState.copy(
+                step = DirectionsStep.PlanRoute(
+                    origin = step.origin,
+                    destination = step.destination,
+                    buildingHit = step.buildingHit,
+                )
+            )
+        }
+    }
+
+// Handle Go button from top bar
+    LaunchedEffect(directionsGoTrigger) {
+        if (directionsGoTrigger == 0) return@LaunchedEffect
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
+        runCatching {
+            repo.getRoute(
+                RouteRequest(
+                    origin = step.origin,
+                    destination = step.destination,
+                    mode = travelMode,
+                )
+            )
+        }.onSuccess { route ->
+            routePolylineRef?.remove()
+            routePolylineRef = googleMap?.addPolyline(
+                PolylineOptions()
+                    .addAll(route.points)
+                    .color(0xFF1565C0.toInt())
+                    .width(12f)
+            )
+            directionsUiState = directionsUiState.copy(
+                isLoadingRoute = false,
+                step = DirectionsStep.ShowingRoute(
+                    origin = step.origin,
+                    destination = step.destination,
+                    buildingHit = step.buildingHit,
+                    route = route,
+                ),
+            )
+        }.onFailure { e ->
+            directionsUiState = directionsUiState.copy(
+                isLoadingRoute = false,
+                errorMessage = e.message ?: "Failed to get route",
+            )
+        }
+    }
+
+// Handle Cancel from top bar
+    LaunchedEffect(directionsCancelTrigger) {
+        if (directionsCancelTrigger == 0) return@LaunchedEffect
+        routePolylineRef?.remove()
+        routePolylineRef = null
+        directionsUiState = directionsUiState.copy(
+            step = DirectionsStep.PickDestination,
+            errorMessage = null,
+        )
+        originSuggestions = emptyList()
+        destSuggestions = emptyList()
+    }
+
+// Publish top-bar state to MainActivity whenever directions state changes
+    LaunchedEffect(directionsUiState, travelMode, crossCampusEnabled, originDisplayName) {
+        when (val step = directionsUiState.step) {
+            is DirectionsStep.PlanRoute -> {
+                onDirectionsTopBarState(
+                    DirectionsTopBarState(
+                        active = true,
+                        originLabel = originDisplayName ?: "Your location",
+                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        isCrossCampus = crossCampusEnabled,
+                        selectedMode = travelMode,
+                        isLoadingRoute = directionsUiState.isLoadingRoute,
+                        showActions = true,
+                    )
+                )
+            }
+            is DirectionsStep.ShowingRoute -> {
+                onDirectionsTopBarState(
+                    DirectionsTopBarState(
+                        active = true,
+                        originLabel = originDisplayName ?: "Your location",
+                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        isCrossCampus = crossCampusEnabled,
+                        selectedMode = travelMode,
+                        routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
+                        showActions = false,
+                    )
+                )
+            }
+            else -> {
+                onDirectionsTopBarState(DirectionsTopBarState(active = false))
+            }
         }
     }
 
@@ -923,6 +1050,7 @@ fun MapScreen(
                                         RouteRequest(
                                             origin      = step.origin,
                                             destination = step.destination,
+                                            mode  = travelMode,
                                         )
                                     )
                                 }.onSuccess { route ->
@@ -1275,6 +1403,7 @@ private fun highlightBuildingUserIsIn(
             }
         }
     }
+
 }
 
 private fun isLocationEnabled(context: Context): Boolean {

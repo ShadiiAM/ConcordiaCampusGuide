@@ -32,7 +32,7 @@ import org.junit.runner.RunWith
 class CampusSwitchingUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MapsActivity::class.java)
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     /**
      * Test: Campus toggle is visible on map screen
