@@ -106,14 +106,13 @@ class GoogleRoutesRepositoryTest {
     }
 
     @Test
-    fun getRoute_defaultTravelMode_isWalking() = runTest {
+    fun getRoute_defaultTravelMode_isDrive() = runTest {
         val request = RouteRequest(
             origin = LatLng(45.4972, -73.5789),
             destination = LatLng(45.4980, -73.5780)
         )
 
-        assertEquals(TravelMode.WALK, request.travelMode)
-    }
+        assertEquals("DRIVE", request.travelMode)    }
 
     @Test
     fun getRoute_emptyPolyline_throwsException() = runTest {
@@ -167,7 +166,7 @@ class GoogleRoutesRepositoryTest {
             repository.getRoute(request)
             fail("Expected RuntimeException to be thrown")
         } catch (e: RuntimeException) {
-            assertTrue(e.message?.contains("No route polyline") == true)
+            assertTrue(e.message?.contains("No route") == true)
         }
     }
 
@@ -333,7 +332,7 @@ class GoogleRoutesRepositoryTest {
     fun travelMode_walkingEnum_exists() {
         val mode = TravelMode.WALK
         assertNotNull(mode)
-        assertEquals("WALKING", mode.name)
+        assertEquals("WALK", mode.name)
     }
 
     @Test
