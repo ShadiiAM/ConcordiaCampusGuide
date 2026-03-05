@@ -2,24 +2,30 @@ package com.example.campusguide.ui.directions
 
 enum class TravelMode {
     DRIVE,
+    DRIVING,
     TRANSIT,
-    WALK;
+    WALK,
+    WALKING,
+    BICYCLING;
 
     val label: String get() = when (this) {
-        DRIVE   -> "Drive"
+        DRIVE, DRIVING   -> "Drive"
         TRANSIT -> "Transit"
-        WALK    -> "Walk"
+        WALK, WALKING    -> "Walk"
+        BICYCLING -> "Bicycle"
     }
 
     val apiValue: String get() = when (this) {
-        DRIVE   -> "DRIVE"
+        DRIVE, DRIVING   -> "DRIVE"
         TRANSIT -> "TRANSIT"
-        WALK    -> "WALK"
+        WALK, WALKING    -> "WALK"
+        BICYCLING -> "BICYCLE"
     }
 
     val contentDescription: String get() = when (this) {
-        DRIVE   -> "Drive: car route"
+        DRIVE, DRIVING   -> "Drive: car route"
         TRANSIT -> "Transit: bus or metro route"
-        WALK    -> "Walk: pedestrian route"
+        WALK, WALKING    -> "Walk: pedestrian route"
+        BICYCLING -> "Bicycle: bike route"
     }
 }

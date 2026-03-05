@@ -1,12 +1,12 @@
 package com.example.campusguide.ui.directions
 
 import com.example.campusguide.BuildConfig
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -46,7 +46,16 @@ class GoogleRoutesRepository(
             val req = Request.Builder()
                 .url(url)
                 .post(bodyStr.toRequestBody("application/json".toMediaType()))
-                .header("X-Goog-FieldMask", "routes.polyline.encodedPolyline,routes.distanceMeters,routes.duration")
+                .header("X-Goog-FieldMask",
+                    "routes.duration," +
+                    "routes.distanceMeters," +
+                    "routes.polyline.encodedPolyline," +
+                    "routes.legs.duration," +
+                    "routes.legs.distanceMeters," +
+                    "routes.legs.steps.distanceMeters," +
+                    "routes.legs.steps.staticDuration," +
+                    "routes.legs.steps.navigationInstruction," +
+                    "routes.legs.steps.transitDetails")
                 .header("X-Goog-Api-Key", apiKey)
                 .build()
 
@@ -58,21 +67,90 @@ class GoogleRoutesRepository(
                 val text = resp.body?.string() ?: throw IllegalStateException("Empty response")
                 val decoded = json.decodeFromString(ComputeRoutesResponse.serializer(), text)
 
-                val routeData = decoded.routes?.firstOrNull()
+                val route = decoded.routes
+                    ?.firstOrNull()
                     ?: throw IllegalStateException("No route returned")
 
-                val encoded = routeData.polyline?.encodedPolyline
+                val encoded = route.polyline
+                    ?.encodedPolyline
                     ?.takeIf { it.isNotBlank() }
                     ?: throw IllegalStateException("No route polyline returned")
 
                 val pts = PolyUtil.decode(encoded)
-                val durationSeconds = routeData.duration
-                    ?.removeSuffix("s")?.toIntOrNull()
+
+                // Parse duration (e.g., "123s" -> 123)
+                val durationSeconds = route.duration?.removeSuffix("s")?.toIntOrNull()
+
+                // Parse legs
+                val legs = route.legs?.map { leg ->
+                    val legDuration = leg.duration?.removeSuffix("s")?.toIntOrNull()
+                    val steps = leg.steps?.map { step ->
+                        val stepDuration = step.staticDuration?.removeSuffix("s")?.toIntOrNull()
+                        val transitDetails = step.transitDetails?.let { td ->
+                            TransitDetails(
+                                stopDetails = td.stopDetails?.let { sd ->
+                                    TransitStopDetails(
+                                        arrivalStop = sd.arrivalStop?.let { stop ->
+                                            TransitStop(
+                                                name = stop.name,
+                                                location = stop.location?.latLng?.let {
+                                                    LatLng(it.latitude, it.longitude)
+                                                }
+                                            )
+                                        },
+                                        departureStop = sd.departureStop?.let { stop ->
+                                            TransitStop(
+                                                name = stop.name,
+                                                location = stop.location?.latLng?.let {
+                                                    LatLng(it.latitude, it.longitude)
+                                                }
+                                            )
+                                        }
+                                    )
+                                },
+                                localizedValues = td.localizedValues?.let { lv ->
+                                    TransitLocalizedValues(
+                                        arrivalTime = lv.arrivalTime?.text,
+                                        departureTime = lv.departureTime?.text
+                                    )
+                                },
+                                headsign = td.headsign,
+                                transitLine = td.transitLine?.let { tl ->
+                                    TransitLine(
+                                        name = tl.name,
+                                        shortName = tl.shortName,
+                                        color = tl.color,
+                                        vehicle = tl.vehicle?.let { v ->
+                                            TransitVehicle(
+                                                name = v.name,
+                                                type = v.type
+                                            )
+                                        }
+                                    )
+                                },
+                                stopCount = td.stopCount
+                            )
+                        }
+                        RouteStep(
+                            durationSeconds = stepDuration,
+                            distanceMeters = step.distanceMeters,
+                            navigationInstruction = step.navigationInstruction?.instructions,
+                            transitDetails = transitDetails
+                        )
+                    } ?: emptyList()
+
+                    RouteLeg(
+                        durationSeconds = legDuration,
+                        distanceMeters = leg.distanceMeters,
+                        steps = steps
+                    )
+                } ?: emptyList()
 
                 RouteResult(
                     points = pts,
-                    distanceMeters = routeData.distanceMeters,
                     durationSeconds = durationSeconds,
+                    distanceMeters = route.distanceMeters,
+                    legs = legs
                 )
             }
         }.getOrElse { t ->
@@ -119,14 +197,15 @@ private data class LatLngLiteral(
 
 @Serializable
 private data class ComputeRoutesResponse(
-    val routes: List<Route> ?= null,
+    val routes: List<Route>? = null,
 )
 
 @Serializable
 private data class Route(
     val polyline: RoutePolyline? = null,
+    val duration: String? = null,  // e.g., "123s"
     val distanceMeters: Int? = null,
-    val duration: String? = null,
+    val legs: List<ApiRouteLeg>? = null,
 )
 
 @Serializable
@@ -134,3 +213,70 @@ private data class RoutePolyline(
     @SerialName("encodedPolyline")
     val encodedPolyline: String? = null,
 )
+
+@Serializable
+private data class ApiRouteLeg(
+    val duration: String? = null,
+    val distanceMeters: Int? = null,
+    val steps: List<ApiRouteStep>? = null,
+)
+
+@Serializable
+private data class ApiRouteStep(
+    val distanceMeters: Int? = null,
+    val staticDuration: String? = null,
+    val navigationInstruction: NavigationInstruction? = null,
+    val transitDetails: ApiTransitDetails? = null,
+)
+
+@Serializable
+private data class NavigationInstruction(
+    val instructions: String? = null,
+)
+
+@Serializable
+private data class ApiTransitDetails(
+    val stopDetails: ApiTransitStopDetails? = null,
+    val localizedValues: ApiTransitLocalizedValues? = null,
+    val headsign: String? = null,
+    val transitLine: ApiTransitLine? = null,
+    val stopCount: Int? = null,
+)
+
+@Serializable
+private data class ApiTransitStopDetails(
+    val arrivalStop: ApiTransitStop? = null,
+    val departureStop: ApiTransitStop? = null,
+)
+
+@Serializable
+private data class ApiTransitStop(
+    val name: String? = null,
+    val location: Location? = null,
+)
+
+@Serializable
+private data class ApiTransitLocalizedValues(
+    val arrivalTime: LocalizedText? = null,
+    val departureTime: LocalizedText? = null,
+)
+
+@Serializable
+private data class LocalizedText(
+    val text: String? = null,
+)
+
+@Serializable
+private data class ApiTransitLine(
+    val name: String? = null,
+    val shortName: String? = null,
+    val color: String? = null,
+    val vehicle: ApiTransitVehicle? = null,
+)
+
+@Serializable
+private data class ApiTransitVehicle(
+    val name: String? = null,
+    val type: String? = null,
+)
+
