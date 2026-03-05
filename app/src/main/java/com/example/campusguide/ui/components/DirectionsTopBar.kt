@@ -34,6 +34,7 @@ fun DirectionsTopBar(
     selectedMode: TravelMode = TravelMode.DRIVE,
     onModeSelected: (TravelMode) -> Unit = {},
     routeSummary: String? = null,
+    errorMessage: String? = null,
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
     onGoClick: () -> Unit = {},
@@ -169,10 +170,67 @@ fun DirectionsTopBar(
                     }
                 }
             }
-            // TODO: Implement Concordia Shuttle bus option for cross-campus TRANSIT routes
+
+            // Error message display
+            errorMessage?.let {
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            when (selectedMode) {
+                                TravelMode.DRIVE -> R.drawable.ic_directions_car
+                                TravelMode.TRANSIT -> R.drawable.ic_directions_bus
+                                TravelMode.WALK -> R.drawable.ic_directions_walk
+                            }
+                        ),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(
+                            text = "Unavailable",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // Route summary display
             routeSummary?.let {
-                Spacer(Modifier.height(6.dp))
-                Text(it, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(
+                            when (selectedMode) {
+                                TravelMode.DRIVE -> R.drawable.ic_directions_car
+                                TravelMode.TRANSIT -> R.drawable.ic_directions_bus
+                                TravelMode.WALK -> R.drawable.ic_directions_walk
+                            }
+                        ),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
 
             // Go / Cancel
