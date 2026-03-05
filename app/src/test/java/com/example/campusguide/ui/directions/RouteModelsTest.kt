@@ -23,7 +23,7 @@ class RouteModelsTest {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
 
-        val request = RouteRequest(origin, destination, TravelMode.WALK.apiValue)
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
         assertEquals("WALK", request.travelMode)
 
     }
@@ -156,11 +156,12 @@ class RouteModelsTest {
     fun routeRequest_componentAccess() {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
-        val request = RouteRequest(origin, destination, TravelMode.WALK.apiValue)
-        
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
+
         val (o, d, m) = request
         assertEquals(origin, o)
         assertEquals(destination, d)
+        assertEquals(TravelMode.WALK, m)
         assertEquals("WALK", request.travelMode)
     }
 

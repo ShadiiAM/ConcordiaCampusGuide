@@ -21,7 +21,7 @@ class RouteRequestTest {
         val request = RouteRequest(
             origin = origin,
             destination = destination,
-            travelMode = TravelMode.WALK.apiValue
+            mode = TravelMode.WALK
         )
         assertEquals("WALK", request.travelMode)
     }
@@ -31,7 +31,7 @@ class RouteRequestTest {
         val request = RouteRequest(
             origin = origin,
             destination = destination,
-            travelMode = TravelMode.TRANSIT.apiValue
+            mode = TravelMode.TRANSIT
         )
         assertEquals("TRANSIT", request.travelMode)
     }
@@ -41,7 +41,7 @@ class RouteRequestTest {
         val request = RouteRequest(
             origin = origin,
             destination = destination,
-            travelMode = TravelMode.DRIVE.apiValue
+            mode = TravelMode.DRIVE
         )
         assertEquals("DRIVE", request.travelMode)
     }
@@ -52,9 +52,9 @@ class RouteRequestTest {
         val original = RouteRequest(
             origin = origin,
             destination = destination,
-            travelMode = TravelMode.DRIVE.apiValue
+            mode = TravelMode.DRIVE
         )
-        val switched = original.copy(travelMode = TravelMode.WALK.apiValue)
+        val switched = original.copy(mode = TravelMode.WALK)
         assertNotEquals(original.travelMode, switched.travelMode)
         assertEquals("WALK", switched.travelMode)
     }
@@ -64,8 +64,8 @@ class RouteRequestTest {
         val request = RouteRequest(
             origin = origin,
             destination = destination,
-            travelMode = TravelMode.DRIVE.apiValue
-        ).copy(travelMode = TravelMode.WALK.apiValue)
+            mode = TravelMode.DRIVE
+        ).copy(mode = TravelMode.WALK)
 
         assertEquals(origin, request.origin)
         assertEquals(destination, request.destination)
