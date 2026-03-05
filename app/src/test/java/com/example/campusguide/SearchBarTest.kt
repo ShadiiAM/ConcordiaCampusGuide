@@ -417,6 +417,39 @@ class SearchBarTest {
         }
     }
 
+    // Bottom search button tests
+
+    @Test
+    fun mapScreen_bottomSearchButton_isVisible() {
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(LocalAccessibilityState provides defaultState) {
+                    MapScreen()
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Bottom search button").assertIsDisplayed()
+    }
+
+    @Test
+    fun mapScreen_bottomSearchButton_clickTriggersCallback() {
+        var clicked = false
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(LocalAccessibilityState provides defaultState) {
+                    MapScreen(onBottomSearchClick = { clicked = true })
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Bottom search button").performClick()
+        assertTrue("Bottom search button on map should trigger callback", clicked)
+    }
+
   //Top search bar sets building as To: destination
 
     @Test
