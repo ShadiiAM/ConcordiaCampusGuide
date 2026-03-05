@@ -131,6 +131,7 @@ fun MapScreen(
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
+    val mapView = remember { MapView(context) }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -465,10 +466,19 @@ fun MapScreen(
                 else
                     "SGW map shown"
         }) {
+
+        DisposableEffect(Unit) {
+            onDispose {
+                googleMap?.clear()
+                mapView.onStop()
+                mapView.onDestroy()
+            }
+        }
+
         // Map View
         AndroidView(
             factory = { ctx ->
-                MapView(ctx).apply {
+                mapView.apply {
                     onCreate(null)
                     getMapAsync { map ->
                         googleMap = map

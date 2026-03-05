@@ -1,4 +1,4 @@
-package com.example.campusguide
+package com.example.campusguide.usability.tests
 
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -7,11 +7,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import com.example.campusguide.MainActivity
 import com.example.campusguide.usability.SimulatedUser
 import com.example.campusguide.usability.UsabilityTracker
 import com.example.campusguide.usability.UserProfile
 
-fun runSimulatedNavigation(
+fun runSimulatedNavigationTest1(
     user: SimulatedUser,
     composeTestRule: AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>
 ) {
@@ -30,23 +31,22 @@ fun runSimulatedNavigation(
     }
 
     user.pause()
+    val searchBar = composeTestRule.onNodeWithTag("searchBar")
 
-    val input = user.maybeMakeTypingError("Hall Bui")
-    composeTestRule
-        .onNodeWithTag("searchBar")
-        .performTextInput(input)
+    // do {    THIS IS IN CASE I want to simulate multiple fake typos not just once.
+    var input = user.maybeMakeTypingError("Hall Bui")
+
+    searchBar.performTextInput(input)
 
     user.pause()
 
     if (input != "Hall Bui") {
-        composeTestRule
-            .onNodeWithTag("searchBar")
-            .performTextClearance()
-        composeTestRule
-            .onNodeWithTag("searchBar")
-            .performTextInput("Hall Bui")
+        // input = user.maybeMakeTypingError("Hall Bui")
+        searchBar.performTextClearance()
+        searchBar.performTextInput("Hall Bui")     //  .performTextInput(input)
         user.pause()
     }
+    // }while(input != "Hall Bui")
 
     composeTestRule
         .onNodeWithTag("Henry F. Hall Building")
@@ -58,5 +58,5 @@ fun runSimulatedNavigation(
         .onNodeWithTag("DirectionsGo")
         .performClick()
 
-    UsabilityTracker.end("search_location")
+    UsabilityTracker.end("search_location", user.profile)
 }
