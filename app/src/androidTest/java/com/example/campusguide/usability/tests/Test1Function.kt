@@ -18,7 +18,7 @@ fun runSimulatedNavigationTest1(
 ) {
     UsabilityTracker.start("search_location")
     when (user.profile) {
-        UserProfile.EMILY_NGUYEN -> {
+        UserProfile.EMILY_NGUYEN -> {   //  user persona uses accessible search button
             composeTestRule
                 .onNodeWithContentDescription("Bottom search button")
                 .performClick()

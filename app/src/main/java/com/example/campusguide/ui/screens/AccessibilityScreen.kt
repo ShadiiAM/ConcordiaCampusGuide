@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -150,7 +151,7 @@ fun AccessibilityScreen(
                                 accessibilityState.decreaseTextSize()
                                 persist()
                             },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(32.dp).testTag("decreaseTextSize")
                         ) {
                             AccessibleText(
                                 text = "-",
@@ -164,7 +165,7 @@ fun AccessibilityScreen(
                                 accessibilityState.increaseTextSize()
                                 persist()
                             },
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(32.dp).testTag("increaseTextSize")
                         ) {
                             AccessibleText(
                                 text = "+",
@@ -243,6 +244,7 @@ fun AccessibilityScreen(
                 label = "Bold",
                 action = {
                     Switch(
+                        modifier = Modifier.testTag("boldenText"),
                         checked = accessibilityState.isBoldEnabled,
                         onCheckedChange = { checked ->
                             accessibilityState.setBold(checked)

@@ -14,7 +14,7 @@ import org.junit.Test
 
 
 
-class Test1PopulationSimulation {
+class Test2PopulationSimulation {
 
 
     @get:Rule
@@ -23,19 +23,10 @@ class Test1PopulationSimulation {
     @get:Rule
     val permissionRule = GrantPermissionRule.grant(Manifest.permission.ACCESS_FINE_LOCATION)
 
-    val profiles = listOf(
-        UserProfile.LIAM_DUBOIS,
-        UserProfile.EMILY_NGUYEN,
-        UserProfile.ALEXIA_MARTIN,
-        UserProfile.JORDAN_LEE,
-        UserProfile.SOFIA_LOPEZ
-
-    )
-
     private fun runBatch(range: IntRange) {
         range.forEach { iteration ->
 
-            runSimulatedNavigationTest1(SimulatedUser(profiles.random()), composeTestRule)
+            runSimulatedAccessibilityChangeTest2(SimulatedUser(UserProfile.entries.random()), composeTestRule)
             composeTestRule.activityRule.scenario.recreate()
             composeTestRule.waitForIdle()
 

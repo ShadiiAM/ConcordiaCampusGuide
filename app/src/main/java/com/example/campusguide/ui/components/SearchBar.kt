@@ -126,7 +126,8 @@ fun SearchBarWithProfile(
                         .size(32.dp)
                         .clip(CircleShape)
                         .background(Color(0xFFD4C4E8))
-                        .clickable(onClick = onProfileClick),
+                        .clickable(onClick = onProfileClick)
+                        .testTag("UserProfile"),
                     contentAlignment = Alignment.Center
                 ) {
                     AccessibleText(
