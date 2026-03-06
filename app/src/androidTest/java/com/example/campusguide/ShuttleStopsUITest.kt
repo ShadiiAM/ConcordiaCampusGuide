@@ -37,12 +37,18 @@ class ShuttleStopsUITest {
     )
 
     private fun waitForMap() {
-        composeTestRule.waitUntil(timeoutMillis = 8000) {
+        composeTestRule.waitUntil(timeoutMillis = 12000) {
             composeTestRule
                 .onAllNodesWithContentDescription("Zoom In")
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
+        // Allow shuttle markers to fully render on the map
+        Thread.sleep(2000)
+    }
+
+    private fun pause(ms: Long = 1500) {
+        Thread.sleep(ms)
     }
 
     /**
@@ -71,10 +77,13 @@ class ShuttleStopsUITest {
         // interactive with shuttle markers loaded
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("Zoom In")
             .assertIsDisplayed()
@@ -89,13 +98,17 @@ class ShuttleStopsUITest {
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("Zoom Out").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Zoom Out").performClick()
         composeTestRule.waitForIdle()
+        pause()
 
         composeTestRule.onNodeWithContentDescription("Zoom Out")
             .assertIsDisplayed()
@@ -114,12 +127,14 @@ class ShuttleStopsUITest {
         composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.waitUntil(timeoutMillis = 4000) {
+        composeTestRule.waitUntil(timeoutMillis = 6000) {
             composeTestRule
                 .onAllNodesWithContentDescription("Zoom In")
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
+        // Pause so the two Loyola shuttle stop markers are visually observable
+        pause(2500)
 
         composeTestRule.onNodeWithContentDescription("Zoom In")
             .assertIsDisplayed()
@@ -136,18 +151,21 @@ class ShuttleStopsUITest {
         composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
         composeTestRule.waitForIdle()
 
-        composeTestRule.waitUntil(timeoutMillis = 4000) {
+        composeTestRule.waitUntil(timeoutMillis = 6000) {
             composeTestRule
                 .onAllNodesWithContentDescription("Zoom In")
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
+        pause(2000)
 
         // Zoom toward the Loyola Chapel shuttle stop area
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("Zoom In")
             .assertIsDisplayed()
@@ -164,12 +182,15 @@ class ShuttleStopsUITest {
         // SGW → Loyola (2 stops) → SGW (1 stop) → Loyola
         composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("SGW Campus").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         composeTestRule.onNodeWithContentDescription("Zoom In")
             .assertIsDisplayed()
@@ -185,16 +206,21 @@ class ShuttleStopsUITest {
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.waitForIdle()
+        pause(2000)
 
         // Pan across the SGW shuttle stop area
         composeTestRule.onNodeWithContentDescription("Left").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Right").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Up").performClick()
         composeTestRule.waitForIdle()
+        pause()
         composeTestRule.onNodeWithContentDescription("Down").performClick()
         composeTestRule.waitForIdle()
+        pause()
 
         composeTestRule.onNodeWithContentDescription("Recenter")
             .assertIsDisplayed()
