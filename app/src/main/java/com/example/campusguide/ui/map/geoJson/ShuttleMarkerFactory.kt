@@ -3,6 +3,7 @@ package com.example.campusguide.ui.map.geoJson
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import androidx.core.graphics.createBitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
@@ -46,7 +47,7 @@ object ShuttleMarkerFactory {
     }
 
     fun create(context: Context): BitmapDescriptor {
-        val bitmap = Bitmap.createBitmap(MARKER_WIDTH_PX, MARKER_HEIGHT_PX, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(MARKER_WIDTH_PX, MARKER_HEIGHT_PX)
         val canvas = Canvas(bitmap)
 
         val bluePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

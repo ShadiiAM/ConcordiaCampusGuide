@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import com.example.campusguide.R
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
@@ -480,7 +481,7 @@ fun MapScreen(
                     try {
                         val geocoder = Geocoder(context, Locale.getDefault())
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NOSONAR: minSdk=33, kept for explicit API clarity
                             suspendCancellableCoroutine { cont ->
                                 geocoder.getFromLocationName(query, 1) { results ->
                                     cont.resume(results.firstOrNull())
@@ -704,7 +705,8 @@ fun MapScreen(
                         }
 
                         // Marker click: handle shuttle stop taps (US-3.1)
-                        map.setOnMarkerClickListener { marker ->
+                        // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
+                        map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
@@ -1337,9 +1339,7 @@ private fun getSavedCampus(context: Context): Campus {
 
 private fun saveCampus(context: Context, campus: Campus) {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit()
-        .putString(KEY_SELECTED_CAMPUS, campus.name)
-        .apply()
+    prefs.edit { putString(KEY_SELECTED_CAMPUS, campus.name) }
 }
 
 private fun loadGeoJson(context: Context, rawRes: Int): JSONObject {
