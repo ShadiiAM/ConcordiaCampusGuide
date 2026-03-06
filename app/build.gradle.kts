@@ -27,7 +27,10 @@ sonar {
                 "**/ui/components/**",
                 "**/ui/accessibility/**",
                 "**/ui/theme/**",
-                "**/MainActivity.kt"
+                "**/ui/map/**",
+                "**/MainActivity.kt",
+                // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
+                "**/ShuttleMarkerFactory.kt"
             ).joinToString(",")
         )
         // ShuttleMarkerFactory uses Canvas/Paint and requires Android Context — it has no
@@ -35,7 +38,7 @@ sonar {
         // so SonarQube does not count its lines against coverage.
         property(
             "sonar.exclusions",
-            "**/ui/map/geoJson/ShuttleMarkerFactory.kt"
+            "**/ShuttleMarkerFactory.kt"
         )
     }
 }
