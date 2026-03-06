@@ -218,16 +218,18 @@ fun MapScreen(
                 )
             )
         }.onSuccess { route ->
-            routePolylineRef?.remove()
-            routePolylineRef = googleMap?.addPolyline(
-                PolylineOptions()
-                    .addAll(route.points)
-                    .color(0xFF1565C0.toInt())
-                    .width(12f)
-            )
+            withContext(Dispatchers.Main) {
+                routePolylineRef?.remove()
+                routePolylineRef = googleMap?.addPolyline(
+                    PolylineOptions()
+                        .addAll(route.points)
+                        .color(0xFF1565C0.toInt())
+                        .width(12f)
+                )
+            }
 
             // Show helpful message for cross-campus routes
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding)
+            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
             if (isCrossCampus) {
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -248,7 +250,7 @@ fun MapScreen(
             )
         }.onFailure { e ->
             // Check if this is a cross-campus route and provide helpful error message
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding)
+            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
             val errorMsg = if (isCrossCampus) {
                 getCrossCampusErrorMessage(travelMode)
             } else {
@@ -280,7 +282,7 @@ fun MapScreen(
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding)
+                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -297,7 +299,7 @@ fun MapScreen(
             }
             is DirectionsStep.ShowingRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding)
+                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -1005,6 +1007,7 @@ fun MapScreen(
                         value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
                         placeholder   = "My location or building…",
                         enabled       = !directionsUiState.isLoadingRoute,
+                        testTag       = "origin_building_field",
                         onQueryChange = { query ->
                             originSuggestions = buildingSuggestions(
                                 query        = query,
@@ -1030,6 +1033,7 @@ fun MapScreen(
                         suggestions   = destSuggestions,
                         placeholder   = "Building name or code…",
                         enabled       = !directionsUiState.isLoadingRoute,
+                        testTag       = "destination_building_field",
                         onQueryChange = { query ->
                             destSuggestions = buildingSuggestions(
                                 query        = query,

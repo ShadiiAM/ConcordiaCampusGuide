@@ -6,14 +6,18 @@ import com.google.android.gms.maps.model.LatLng
 
 /**
  * Detects if a route is cross-campus based on building information.
+ * If [originBuilding] is null, falls back to detecting the campus from [originLatLng].
  */
 fun isCrossCampusRoute(
     originBuilding: CampusBuilding?,
-    destinationBuilding: CampusBuilding?
+    destinationBuilding: CampusBuilding?,
+    originLatLng: LatLng? = null,
 ): Boolean {
-    return originBuilding != null &&
-           destinationBuilding != null &&
-           originBuilding.campus != destinationBuilding.campus
+    if (destinationBuilding == null) return false
+    val originCampus = originBuilding?.campus
+        ?: originLatLng?.let { detectCampus(it) }
+        ?: return false
+    return originCampus != destinationBuilding.campus
 }
 
 /**

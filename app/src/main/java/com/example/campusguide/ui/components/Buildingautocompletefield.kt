@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,6 +33,7 @@ fun BuildingAutocompleteField(
     modifier: Modifier = Modifier,
     placeholder: String = "Building name or code…",
     enabled: Boolean = true,
+    testTag: String = "",
 ) {
     var query by remember(value) { mutableStateOf(value) }
     var isFocused by remember { mutableStateOf(false) }
@@ -90,7 +92,8 @@ fun BuildingAutocompleteField(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onFocusChanged { isFocused = it.isFocused },
+                            .onFocusChanged { isFocused = it.isFocused }
+                            .then(if (testTag.isNotEmpty()) Modifier.testTag(testTag) else Modifier),
                     )
                 }
             }
