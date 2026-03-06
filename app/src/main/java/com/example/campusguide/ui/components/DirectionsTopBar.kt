@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.ui.accessibility.AccessibleText
+import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.TravelMode
 
 
@@ -36,6 +40,7 @@ fun DirectionsTopBar(
     routeSummary: String? = null,
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
+    currentSteps: RouteLeg? = null,
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -172,8 +177,47 @@ fun DirectionsTopBar(
             // TODO: Implement Concordia Shuttle bus option for cross-campus TRANSIT routes
             routeSummary?.let {
                 Spacer(Modifier.height(6.dp))
-                Text(it, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                AccessibleText(it,
+                    baseFontSizeSp = 14f,
+                    fallbackColor = Color(0xFF6B4D8A),
+                    forceFontWeight = FontWeight.SemiBold)
             }
+
+            if(!showActions){
+                //todo potencial modifier for the lazy column
+                LazyColumn {
+                    items(currentSteps?.steps ?: emptyList()) { index ->
+                        if (currentSteps?.steps==null){
+                            AccessibleText(
+                                "Unable to generate steps for this route.",
+                                baseFontSizeSp = 10f,
+                                fallbackColor = Color(0xFF6B4D8A)
+                            )
+                        }
+                        else{
+                            //todo transit type or direction icon
+                            //val iconRes = when (index.transitDetails.transitLine.) {
+                            //    TravelMode.DRIVE -> R.drawable.ic_directions_car
+                            //    TravelMode.TRANSIT -> R.drawable.ic_directions_bus
+                            //    TravelMode.WALK -> R.drawable.ic_directions_walk
+                            //    else -> {R.drawable.poi_icon}
+                            //
+                            //}
+                        index.navigationInstruction?.let {
+                            AccessibleText(
+                                it,
+                                baseFontSizeSp = 10f,
+                                fallbackColor = Color(0xFF6B4D8A)
+                            )
+                        }
+                            //todo display
+                            val seconds = index.durationSeconds
+
+                        }
+                    }
+                }
+            }
+
 
             // Go / Cancel
             if (showActions) {
