@@ -1,13 +1,10 @@
 package com.example.campusguide
 
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
-import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.rule.GrantPermissionRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,8 +18,8 @@ import org.junit.runner.RunWith
  * where shuttle stops are located.
  *
  * Shuttle stop coordinates tested:
- *   - SGW:             Hall Building, 1455 De Maisonneuve Blvd W
- *   - Loyola Arrival:  Loyola Chapel, 7137 Sherbrooke St W
+ *   - SGW:              Hall Building, 1455 De Maisonneuve Blvd W
+ *   - Loyola Arrival:   Loyola Chapel, 7137 Sherbrooke St W
  *   - Loyola Departure: Loyola Chapel, 7137 Sherbrooke St W
  *
  * Run with: ./gradlew connectedAndroidTest --tests "*.ShuttleStopsUITest"
@@ -32,7 +29,21 @@ import org.junit.runner.RunWith
 class ShuttleStopsUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule
+    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    private fun waitForMap() {
+        composeTestRule.waitUntil(timeoutMillis = 8000) {
+            composeTestRule
+                .onAllNodesWithContentDescription("Zoom In")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+    }
 
     /**
      * Verifies the app launches and map loads without crashing when
@@ -40,15 +51,12 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_mapLoadsWithoutCrash() {
-        // Wait for map and shuttle markers to initialize
-        Thread.sleep(3000)
+        waitForMap()
 
-        // Map controls are visible — confirms map loaded successfully
-        // alongside shuttle marker initialization
-        onView(withContentDescription("Zoom In"))
-            .check(matches(isDisplayed()))
-        onView(withContentDescription("Zoom Out"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom In")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Zoom Out")
+            .assertIsDisplayed()
     }
 
     /**
@@ -57,19 +65,19 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_zoomIn_withShuttleMarkersPresent() {
-        Thread.sleep(3000)
+        waitForMap()
 
         // Zoom into the SGW shuttle stop area — confirms map is still
         // interactive with shuttle markers loaded
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Zoom In"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom In")
+            .assertIsDisplayed()
     }
 
     /**
@@ -77,21 +85,20 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_zoomOut_afterZoomingInToStop() {
-        Thread.sleep(3000)
+        waitForMap()
 
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
 
-        // Zoom back out — should work cleanly with shuttle markers rendered
-        onView(withContentDescription("Zoom Out")).perform(click())
-        Thread.sleep(500)
-        onView(withContentDescription("Zoom Out")).perform(click())
-        Thread.sleep(500)
+        composeTestRule.onNodeWithContentDescription("Zoom Out").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Zoom Out").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Zoom Out"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom Out")
+            .assertIsDisplayed()
     }
 
     /**
@@ -100,15 +107,22 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_switchToLoyola_twoStopsPresent_mapStable() {
-        Thread.sleep(3000)
+        waitForMap()
 
         // Switch to Loyola — both Arrival and Departure shuttle stops
         // should be visible at Loyola Chapel, 7137 Sherbrooke St W
-        onView(withContentDescription("Loyola Campus")).perform(click())
-        Thread.sleep(2000)
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Zoom In"))
-            .check(matches(isDisplayed()))
+        composeTestRule.waitUntil(timeoutMillis = 4000) {
+            composeTestRule
+                .onAllNodesWithContentDescription("Zoom In")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+
+        composeTestRule.onNodeWithContentDescription("Zoom In")
+            .assertIsDisplayed()
     }
 
     /**
@@ -117,19 +131,26 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_loyola_zoomInToShuttleStopArea() {
-        Thread.sleep(3000)
+        waitForMap()
 
-        onView(withContentDescription("Loyola Campus")).perform(click())
-        Thread.sleep(2000)
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.waitUntil(timeoutMillis = 4000) {
+            composeTestRule
+                .onAllNodesWithContentDescription("Zoom In")
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
 
         // Zoom toward the Loyola Chapel shuttle stop area
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Zoom In"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom In")
+            .assertIsDisplayed()
     }
 
     /**
@@ -138,21 +159,20 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_campusSwitching_sgwAndLoyola_allStopsStable() {
-        Thread.sleep(3000)
+        waitForMap()
 
         // SGW → Loyola (2 stops) → SGW (1 stop) → Loyola
-        onView(withContentDescription("Loyola Campus")).perform(click())
-        Thread.sleep(1500)
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("SGW Campus")).perform(click())
-        Thread.sleep(1500)
+        composeTestRule.onNodeWithContentDescription("SGW Campus").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Loyola Campus")).perform(click())
-        Thread.sleep(1500)
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
+        composeTestRule.waitForIdle()
 
-        // App still responsive after switching across all shuttle stop locations
-        onView(withContentDescription("Zoom In"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom In")
+            .assertIsDisplayed()
     }
 
     /**
@@ -161,22 +181,22 @@ class ShuttleStopsUITest {
      */
     @Test
     fun shuttleStops_panMap_overStopArea_noIncrash() {
-        Thread.sleep(3000)
+        waitForMap()
 
-        onView(withContentDescription("Zoom In")).perform(click())
-        Thread.sleep(500)
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
+        composeTestRule.waitForIdle()
 
         // Pan across the SGW shuttle stop area
-        onView(withContentDescription("Left")).perform(click())
-        Thread.sleep(400)
-        onView(withContentDescription("Right")).perform(click())
-        Thread.sleep(400)
-        onView(withContentDescription("Up")).perform(click())
-        Thread.sleep(400)
-        onView(withContentDescription("Down")).perform(click())
-        Thread.sleep(400)
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Right").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Up").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Down").performClick()
+        composeTestRule.waitForIdle()
 
-        onView(withContentDescription("Recenter"))
-            .check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Recenter")
+            .assertIsDisplayed()
     }
 }
