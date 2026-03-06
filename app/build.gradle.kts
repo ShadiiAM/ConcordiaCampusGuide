@@ -18,27 +18,24 @@ sonar {
         // Exclude UI-only files that cannot be meaningfully unit tested:
         // Compose screens, Compose components, Canvas/bitmap factories,
         // accessibility overlays, theme definitions, and the Activity entry point.
+        // Exclude UI-only files from coverage: Compose screens/components/theme/accessibility
+        // cannot be exercised by JVM unit tests — they require the Android rendering pipeline.
         property(
             "sonar.coverage.exclusions",
             listOf(
-                // Compose screens — Google Maps SurfaceView, not unit testable
                 "**/ui/screens/**",
-                "src/main/java/**/ui/screens/**",
-                // Compose components — require Android rendering pipeline
                 "**/ui/components/**",
-                "src/main/java/**/ui/components/**",
-                // Map rendering — Canvas/Paint factories and GeoJSON overlays
-                "**/ui/map/**",
-                "src/main/java/**/ui/map/**",
-                // Accessibility overlays and theme — no testable logic
                 "**/ui/accessibility/**",
-                "src/main/java/**/ui/accessibility/**",
                 "**/ui/theme/**",
-                "src/main/java/**/ui/theme/**",
-                // Activity entry point
-                "**/MainActivity.kt",
-                "src/main/java/**/MainActivity.kt"
+                "**/MainActivity.kt"
             ).joinToString(",")
+        )
+        // ShuttleMarkerFactory uses Canvas/Paint and requires Android Context — it has no
+        // business logic and is already exercised by E2E tests. Fully exclude from analysis
+        // so SonarQube does not count its lines against coverage.
+        property(
+            "sonar.exclusions",
+            "**/ui/map/geoJson/ShuttleMarkerFactory.kt"
         )
     }
 }
