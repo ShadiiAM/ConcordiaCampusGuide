@@ -86,6 +86,10 @@ import com.example.campusguide.ui.directions.getCrossCampusMessage
 import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.ui.directions.recommendedCrossCampusMode
 import com.example.campusguide.ui.directions.formatRouteSummary
+import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.ui.components.ShuttleStopInfoCard
+import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
+import com.example.campusguide.ui.shuttle.ShuttleTracker
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -159,6 +163,11 @@ fun MapScreen(
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
     var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    // Shuttle state (US-3.1)
+    val shuttleTracker = remember { ShuttleTracker() }
+    val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
+    var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
 
 
@@ -673,6 +682,38 @@ fun MapScreen(
                         map.uiSettings.isMyLocationButtonEnabled = false
                         map.uiSettings.isZoomControlsEnabled = false
 
+                        // Add shuttle stop markers (US-3.1)
+                        if (shuttleTracker.isOperational()) {
+                            val shuttleIcon = ShuttleMarkerFactory.create(ctx)
+                            shuttleTracker.getShuttleStops().forEach { stop ->
+                                val marker = map.addMarker(
+                                    MarkerOptions()
+                                        .position(stop.latLng)
+                                        .icon(shuttleIcon)
+                                        .anchor(0.5f, 1.0f) // tip of pin points to coordinate
+                                )
+                                if (marker != null) {
+                                    marker.tag = stop
+                                    shuttleMarkerMap[stop.id] = marker
+                                }
+                            }
+                        } else {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+                            }
+                        }
+
+                        // Marker click: handle shuttle stop taps (US-3.1)
+                        map.setOnMarkerClickListener { marker ->
+                            val stop = marker.tag as? ShuttleStop
+                            if (stop != null) {
+                                selectedShuttleStop = stop
+                                true
+                            } else {
+                                false
+                            }
+                        }
+
                         // Set up polygon click listener
                         map.setOnPolygonClickListener { polygon ->
                             val currentCampus = getSavedCampus(ctx)
@@ -983,6 +1024,15 @@ fun MapScreen(
                     )
                     selectedBuildingInfo = null
                 }
+            )
+        }
+
+        // Shuttle stop info card (US-3.1)
+        selectedShuttleStop?.let { stop ->
+            ShuttleStopInfoCard(
+                stop = stop,
+                isOperational = shuttleTracker.isOperational(),
+                onDismiss = { selectedShuttleStop = null }
             )
         }
 
