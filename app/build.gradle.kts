@@ -21,12 +21,23 @@ sonar {
         property(
             "sonar.coverage.exclusions",
             listOf(
+                // Compose screens — Google Maps SurfaceView, not unit testable
                 "**/ui/screens/**",
+                "src/main/java/**/ui/screens/**",
+                // Compose components — require Android rendering pipeline
                 "**/ui/components/**",
+                "src/main/java/**/ui/components/**",
+                // Map rendering — Canvas/Paint factories and GeoJSON overlays
                 "**/ui/map/**",
+                "src/main/java/**/ui/map/**",
+                // Accessibility overlays and theme — no testable logic
                 "**/ui/accessibility/**",
+                "src/main/java/**/ui/accessibility/**",
                 "**/ui/theme/**",
-                "**/MainActivity.kt"
+                "src/main/java/**/ui/theme/**",
+                // Activity entry point
+                "**/MainActivity.kt",
+                "src/main/java/**/MainActivity.kt"
             ).joinToString(",")
         )
     }
