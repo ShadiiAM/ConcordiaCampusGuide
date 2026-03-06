@@ -77,6 +77,8 @@ import androidx.compose.ui.text.font.FontWeight
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.ui.components.BuildingAutocompleteField
+import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.RouteStep
 import com.example.campusguide.ui.directions.TravelMode
 
 private const val PREFS_NAME = "campus_preferences"
@@ -94,6 +96,7 @@ data class DirectionsTopBarState(
     val routeSummary: String? = null,
     val isLoadingRoute: Boolean = false,
     val showActions: Boolean = false,
+    val currentSteps: RouteLeg? = null
 )
 @Composable
 fun MapScreen(
@@ -271,6 +274,7 @@ fun MapScreen(
                         selectedMode = travelMode,
                         routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
                         showActions = false,
+                        currentSteps= step.route.legs[0]
                     )
                 )
             }
