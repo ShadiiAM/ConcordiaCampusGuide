@@ -15,6 +15,20 @@ sonar {
         property("sonar.tests", "src/test/java")
         property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        // Exclude UI-only files that cannot be meaningfully unit tested:
+        // Compose screens, Compose components, Canvas/bitmap factories,
+        // accessibility overlays, theme definitions, and the Activity entry point.
+        property(
+            "sonar.coverage.exclusions",
+            listOf(
+                "**/ui/screens/**",
+                "**/ui/components/**",
+                "**/ui/map/**",
+                "**/ui/accessibility/**",
+                "**/ui/theme/**",
+                "**/MainActivity.kt"
+            ).joinToString(",")
+        )
     }
 }
 
@@ -111,7 +125,19 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/databinding/**/*.*",
         "**/BR.class",
         "**/*\$Lambda$*.*",
-        "**/*\$inlined$*.*"
+        "**/*\$inlined$*.*",
+        // Compose screens — tightly coupled to Google Maps SurfaceView, untestable via JVM
+        "**/ui/screens/**",
+        // Compose UI components — require Android rendering pipeline
+        "**/ui/components/**",
+        // Map rendering layer — Canvas/Paint bitmap factories and GeoJSON overlays
+        "**/ui/map/**",
+        // Accessibility overlays — Compose + Android draw passes
+        "**/ui/accessibility/**",
+        // Theme definitions — pure styling constants, no logic to test
+        "**/ui/theme/**",
+        // Activity entry point — framework lifecycle, not unit testable
+        "**/MainActivity*"
     )
 
     val buildDir = layout.buildDirectory.get().asFile
