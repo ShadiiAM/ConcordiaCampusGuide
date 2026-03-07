@@ -11,12 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.campusguide.R
 import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.ui.accessibility.AccessibleText
 
 private val ShuttleBlue = Color(0xFF1565C0)
 
@@ -47,36 +46,35 @@ fun ShuttleStopInfoCard(
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                Text(
+                AccessibleText(
                     text = stop.name,
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 0.15.sp
-                    )
+                    baseFontSizeSp = 16f,
+                    forceFontWeight = FontWeight.Medium
                 )
             }
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (!isOperational) {
-                    Text(
+                    AccessibleText(
                         text = "Shuttle data unavailable",
-                        color = MaterialTheme.colorScheme.error
+                        baseFontSizeSp = 14f,
+                        fallbackColor = MaterialTheme.colorScheme.error
                     )
                 } else {
-                    Text(
+                    AccessibleText(
                         text = stop.description,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        baseFontSizeSp = 14f,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     val campusLabel = when (stop.campus) {
                         Campus.SGW -> "SGW"
                         Campus.LOYOLA -> "Loyola"
                     }
-                    Text(
+                    AccessibleText(
                         text = "$campusLabel Campus  •  Mon\u2013Fri  •  ~30 min ride",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = TextStyle(fontSize = 12.sp)
+                        baseFontSizeSp = 12f,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
