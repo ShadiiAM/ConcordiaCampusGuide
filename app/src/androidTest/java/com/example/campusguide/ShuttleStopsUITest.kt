@@ -201,7 +201,7 @@ class ShuttleStopsUITest {
      * panning over the shuttle stop area should not cause any crash.
      */
     @Test
-    fun shuttleStops_panMap_overStopArea_noIncrash() {
+    fun shuttleStops_panMap_overStopArea_noCrash() {
         waitForMap()
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()

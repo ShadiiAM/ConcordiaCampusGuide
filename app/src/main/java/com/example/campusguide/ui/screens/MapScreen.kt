@@ -167,6 +167,7 @@ fun MapScreen(
 
     // Shuttle state (US-3.1)
     val shuttleTracker = remember { ShuttleTracker() }
+    // Reserved for US-3.2: enables removing/updating markers when switching campuses
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 

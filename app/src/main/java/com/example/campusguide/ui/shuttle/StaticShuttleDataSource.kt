@@ -5,7 +5,7 @@ import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
 
 // Applies "Replace Magic Literal" refactoring — named constants for all stop coordinates
-// Coordinates measured on-site (DMS converted to decimal)
+// Coordinates sourced from https://www.concordia.ca/maps/shuttle-bus.html (DMS converted to decimal)
 private val SGW_STOP_LAT_LNG      = LatLng(45.4971, -73.5785)  // Hall Building front door, De Maisonneuve Blvd W
 private val LOYOLA_ARRIVAL_LAT_LNG   = LatLng(45.4579, -73.6389)  // Loyola stop — arriving from downtown
 private val LOYOLA_DEPARTURE_LAT_LNG = LatLng(45.4576, -73.6390)  // Loyola stop — departing to downtown

@@ -69,8 +69,12 @@ fun ShuttleStopInfoCard(
                         text = stop.description,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    val campusLabel = when (stop.campus) {
+                        Campus.SGW -> "SGW"
+                        Campus.LOYOLA -> "Loyola"
+                    }
                     Text(
-                        text = "${stop.campus.name} Campus  •  Mon\u2013Fri  •  ~30 min ride",
+                        text = "$campusLabel Campus  •  Mon\u2013Fri  •  ~30 min ride",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = TextStyle(fontSize = 12.sp)
                     )
