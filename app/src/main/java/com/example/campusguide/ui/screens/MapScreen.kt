@@ -134,6 +134,9 @@ fun MapScreen(
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
+    // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
+    var showRouteOptionsCard by remember { mutableStateOf(true) }
+    var showDirectionsReadyCard by remember { mutableStateOf(true) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -267,6 +270,15 @@ fun MapScreen(
         }
     }
 
+// Re-show bottom cards whenever the relevant step is entered fresh
+    LaunchedEffect(directionsUiState.step) {
+        when (directionsUiState.step) {
+            is DirectionsStep.PlanRoute     -> showRouteOptionsCard = true
+            is DirectionsStep.ShowingRoute  -> showDirectionsReadyCard = false
+            else -> {}
+        }
+    }
+
 // Handle Cancel from top bar
     LaunchedEffect(directionsCancelTrigger) {
         if (directionsCancelTrigger == 0) return@LaunchedEffect
@@ -313,7 +325,7 @@ fun MapScreen(
                         selectedMode = travelMode,
                         routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
                         showActions = false,
-                        currentSteps= step.route.legs[0]
+                        currentSteps = step.route.legs.firstOrNull()
                     )
                 )
             }
@@ -987,16 +999,9 @@ fun MapScreen(
             is DirectionsStep.ConfirmDestination -> {
                 // Shouldn't normally reach here since we go straight to PlanRoute
             }
-            is DirectionsStep.PlanRoute -> {
-                BottomCard(onDismiss = {
-                    routePolylineRef?.remove()
-                    routePolylineRef = null
-                    directionsUiState = directionsUiState.copy(
-                        step = DirectionsStep.PickDestination,
-                        errorMessage = null,
-                    )
-                    originSuggestions = emptyList()
-                    destSuggestions   = emptyList()
+            is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
+                    // X just hides the card — route state and top bar remain intact
+                    showRouteOptionsCard = false
                 }) {
                     Text(
                         text = "Route options",
@@ -1125,16 +1130,10 @@ fun MapScreen(
                         Text(text = it, color = MaterialTheme.colorScheme.error)
                     }
                 }
-            }
 
-            is DirectionsStep.ShowingRoute -> {
-                BottomCard(onDismiss = {
-                    routePolylineRef?.remove()
-                    routePolylineRef = null
-                    directionsUiState = directionsUiState.copy(
-                        step = DirectionsStep.PickDestination,
-                        errorMessage = null
-                    )
+            is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
+                    // X just hides the card — route and top bar remain intact
+                    showDirectionsReadyCard = false
                 }) {
                     Text(
                         text = "Directions ready",
@@ -1212,7 +1211,7 @@ fun MapScreen(
                         Text("Clear")
                     }
                 }
-            }
+
         }
     }
 }
