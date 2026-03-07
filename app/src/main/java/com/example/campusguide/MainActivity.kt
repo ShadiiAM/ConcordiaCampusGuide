@@ -163,6 +163,7 @@ fun ConcordiaCampusGuideApp() {
                             selectedMode = directionsTopBarState.selectedMode,
                             onModeSelected = { mode -> topBarTravelMode = mode },
                             routeSummary = directionsTopBarState.routeSummary,
+                            errorMessage = directionsTopBarState.errorMessage,
                             showActions = directionsTopBarState.showActions,
                             isLoadingRoute = directionsTopBarState.isLoadingRoute,
                             onGoClick = { directionsGoTrigger++ },

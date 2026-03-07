@@ -1,5 +1,6 @@
 package com.example.campusguide.ui.directions
 
+import android.util.Log
 import com.example.campusguide.BuildConfig
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
@@ -28,6 +29,8 @@ class GoogleRoutesRepository(
     private val json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
+        isLenient = true
+        coerceInputValues = true
     }
 
     override suspend fun getRoute(request: RouteRequest): RouteResult = withContext(Dispatchers.IO) {
@@ -43,19 +46,35 @@ class GoogleRoutesRepository(
             )
 
             val bodyStr = json.encodeToString(ComputeRoutesRequest.serializer(), bodyObj)
+            // Field mask varies by travel mode
+            val fieldMask = if (request.travelMode == "TRANSIT") {
+                "routes.duration," +
+                "routes.distanceMeters," +
+                "routes.polyline.encodedPolyline," +
+                "routes.legs.duration," +
+                "routes.legs.distanceMeters," +
+                "routes.legs.steps.distanceMeters," +
+                "routes.legs.steps.staticDuration," +
+                "routes.legs.steps.transitDetails.stopDetails," +
+                "routes.legs.steps.transitDetails.localizedValues," +
+                "routes.legs.steps.transitDetails.headsign," +
+                "routes.legs.steps.transitDetails.transitLine," +
+                "routes.legs.steps.transitDetails.stopCount"
+            } else {
+                "routes.duration," +
+                "routes.distanceMeters," +
+                "routes.polyline.encodedPolyline," +
+                "routes.legs.duration," +
+                "routes.legs.distanceMeters," +
+                "routes.legs.steps.distanceMeters," +
+                "routes.legs.steps.staticDuration," +
+                "routes.legs.steps.navigationInstruction"
+            }
+
             val req = Request.Builder()
                 .url(url)
                 .post(bodyStr.toRequestBody("application/json".toMediaType()))
-                .header("X-Goog-FieldMask",
-                    "routes.duration," +
-                    "routes.distanceMeters," +
-                    "routes.polyline.encodedPolyline," +
-                    "routes.legs.duration," +
-                    "routes.legs.distanceMeters," +
-                    "routes.legs.steps.distanceMeters," +
-                    "routes.legs.steps.staticDuration," +
-                    "routes.legs.steps.navigationInstruction," +
-                    "routes.legs.steps.transitDetails")
+                .header("X-Goog-FieldMask", fieldMask)
                 .header("X-Goog-Api-Key", apiKey)
                 .build()
 
@@ -65,7 +84,15 @@ class GoogleRoutesRepository(
                     throw IllegalStateException("Routes API error ${resp.code}: ${err ?: resp.message}")
                 }
                 val text = resp.body?.string() ?: throw IllegalStateException("Empty response")
-                val decoded = json.decodeFromString(ComputeRoutesResponse.serializer(), text)
+
+                // Try to parse with better error handling
+                val decoded = try {
+                    json.decodeFromString(ComputeRoutesResponse.serializer(), text)
+                } catch (e: Exception) {
+                    // Log the problematic JSON for debugging
+                    android.util.Log.e("GoogleRoutesRepo", "Failed to parse JSON response: $text", e)
+                    throw IllegalStateException("Failed to parse Routes API response: ${e.message}", e)
+                }
 
                 val route = decoded.routes
                     ?.firstOrNull()
