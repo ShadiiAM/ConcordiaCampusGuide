@@ -77,60 +77,52 @@ fun CalendarScreen() {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top =50.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Top spacer with slightly larger weight pushes content toward the bottom
+        androidx.compose.foundation.layout.Spacer(Modifier.weight(3f))
 
+        val radius = 60.dp
+        val stroke = 6.dp
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
-        )
-
-        Column(
-            modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=620.dp), //look for Better way soon
-            horizontalAlignment = Alignment.CenterHorizontally
+                .height(200.dp)
+                .drawBehind {
+                    val r = radius.toPx()
+                    val s = stroke.toPx()
 
+                    drawLine(PurpleGrey80, Offset(r, 0f), Offset(size.width - r, 0f), s)
+                    drawLine(PurpleGrey80, Offset(0f, r), Offset(0f, size.height / 2), s)
+                    drawLine(PurpleGrey80, Offset(size.width, r), Offset(size.width, size.height / 2), s)
+
+                    drawArc(
+                        color = PurpleGrey80,
+                        startAngle = 180f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        topLeft = Offset(0f, 0f),
+                        size = Size(r * 2, r * 2),
+                        style = Stroke(s)
+                    )
+                    drawArc(
+                        color = PurpleGrey80,
+                        startAngle = 270f,
+                        sweepAngle = 90f,
+                        useCenter = false,
+                        topLeft = Offset(size.width - 2 * r, 0f),
+                        size = Size(r * 2, r * 2),
+                        style = Stroke(s)
+                    )
+                }
+                .padding(top = 20.dp)
         ) {
-
-            val radius = 60.dp
-            val stroke = 6.dp
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .drawBehind {
-                        val r = radius.toPx()
-                        val s = stroke.toPx()
-
-                        drawLine(PurpleGrey80, Offset(r, 0f), Offset(size.width - r, 0f), s)
-                        drawLine(PurpleGrey80, Offset(0f, r), Offset(0f, size.height / 2), s)
-                        drawLine(PurpleGrey80, Offset(size.width, r), Offset(size.width, size.height / 2), s)
-
-                        drawArc(
-                            color = PurpleGrey80,
-                            startAngle = 180f,
-                            sweepAngle = 90f,
-                            useCenter = false,
-                            topLeft = Offset(0f, 0f),
-                            size = Size(r * 2, r * 2),
-                            style = Stroke(s)
-                        )
-                        drawArc(
-                            color = PurpleGrey80,
-                            startAngle = 270f,
-                            sweepAngle = 90f,
-                            useCenter = false,
-                            topLeft = Offset(size.width - 2 * r, 0f),
-                            size = Size(r * 2, r * 2),
-                            style = Stroke(s)
-                        )
-                    }
-                    .padding(top = 20.dp)
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                 Row(modifier = Modifier .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top ) {
                     Icon(
@@ -160,7 +152,8 @@ fun CalendarScreen() {
                                     CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, 1) }
                                     CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, 1) }
                                 }                            }
-                    )                }
+                    )
+                }
 
                 Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
                     Button(
@@ -218,10 +211,12 @@ fun CalendarScreen() {
                     {
                         AccessibleText(text = "Monthly", baseFontSizeSp = 15f)
                     }
-                }}
+                }
             }
         }
 
+        // Bottom spacer with smaller weight keeps some space under the card
+        androidx.compose.foundation.layout.Spacer(Modifier.weight(0.7f))
     }
 }
 
