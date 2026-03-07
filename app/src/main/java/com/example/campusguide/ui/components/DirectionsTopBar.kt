@@ -239,7 +239,7 @@ fun DirectionsTopBar(
             }
 
             if(!showActions){
-                //todo potencial modifier for the lazy column
+                //todo potential modifier for the lazy column?
                 LazyColumn {
                     items(currentSteps?.steps ?: emptyList()) { index ->
                         if (currentSteps?.steps==null){
@@ -250,14 +250,7 @@ fun DirectionsTopBar(
                             )
                         }
                         else{
-                            //todo transit type or direction icon
-                            //val iconRes = when (index.transitDetails.transitLine.) {
-                            //    TravelMode.DRIVE -> R.drawable.ic_directions_car
-                            //    TravelMode.TRANSIT -> R.drawable.ic_directions_bus
-                            //    TravelMode.WALK -> R.drawable.ic_directions_walk
-                            //    else -> {R.drawable.poi_icon}
-                            //
-                            //}
+                            //todo transit type or direction icon?
                         index.navigationInstruction?.let {
                             AccessibleText(
                                 it,
@@ -265,8 +258,54 @@ fun DirectionsTopBar(
                                 fallbackColor = Color(0xFF6B4D8A)
                             )
                         }
-                            //todo display
-                            val seconds = index.durationSeconds
+                            //could use refactoring i think
+                            Column(){
+                                val minutes = index.durationSeconds?.div(60)
+
+                                val meters = index.distanceMeters
+
+                                if ( minutes!= null) {
+                                    if(minutes< 1){
+                                        AccessibleText(
+                                            "$0 min",
+                                            baseFontSizeSp = 14f,
+                                            fallbackColor = Color(0xFF6B4D8A)
+                                        )
+                                    }else if(minutes< 60){
+                                        AccessibleText(
+                                            "${minutes}min",
+                                            baseFontSizeSp = 14f,
+                                            fallbackColor = Color(0xFF6B4D8A)
+                                        )
+                                    }else{
+                                        val hours =minutes/60
+                                        val minuteRemainder= minutes%60
+                                        AccessibleText(
+                                            "${hours}h ${minuteRemainder}mins",
+                                            baseFontSizeSp = 14f,
+                                            fallbackColor = Color(0xFF6B4D8A)
+                                        )
+                                    }
+                                }
+                                if (meters != null) {
+                                    if (meters < 1000) {
+                                        AccessibleText(
+                                            "${meters} m",
+                                            baseFontSizeSp = 14f,
+                                            fallbackColor = Color(0xFF6B4D8A)
+                                        )
+                                    } else {
+                                        val km = meters / 1000.0
+                                        AccessibleText(
+                                            "${km} km",
+                                            baseFontSizeSp = 14f,
+                                            fallbackColor = Color(0xFF6B4D8A)
+                                        )
+                                    }
+                                }
+                            }
+
+
 
                         }
                     }
