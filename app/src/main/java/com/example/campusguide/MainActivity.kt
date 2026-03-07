@@ -166,14 +166,15 @@ fun ConcordiaCampusGuideApp() {
                             errorMessage = directionsTopBarState.errorMessage,
                             showActions = directionsTopBarState.showActions,
                             isLoadingRoute = directionsTopBarState.isLoadingRoute,
+                            currentSteps = directionsTopBarState.currentSteps,
                             onGoClick = { directionsGoTrigger++ },
                             onCancelClick = {
                                 directionsCancelTrigger++
                                 topBarTravelMode = TravelMode.DRIVE
                             },
                             onBackClick = {
-                                directionsCancelTrigger++
-                                topBarTravelMode = TravelMode.DRIVE
+                                // X only dismisses the bar — Cancel button is the only way to cancel the route
+                                directionsTopBarState = directionsTopBarState.copy(active = false)
                             },
                         )
                     } else {
