@@ -44,6 +44,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import com.example.campusguide.R
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
@@ -86,6 +87,10 @@ import com.example.campusguide.ui.directions.getCrossCampusMessage
 import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.ui.directions.recommendedCrossCampusMode
 import com.example.campusguide.ui.directions.formatRouteSummary
+import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.ui.components.ShuttleStopInfoCard
+import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
+import com.example.campusguide.ui.shuttle.ShuttleTracker
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -159,6 +164,12 @@ fun MapScreen(
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
     var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    // Shuttle state (US-3.1)
+    val shuttleTracker = remember { ShuttleTracker() }
+    // Reserved for US-3.2: enables removing/updating markers when switching campuses
+    val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
+    var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
 
 
@@ -471,7 +482,7 @@ fun MapScreen(
                     try {
                         val geocoder = Geocoder(context, Locale.getDefault())
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NOSONAR: minSdk=33, kept for explicit API clarity
                             suspendCancellableCoroutine { cont ->
                                 geocoder.getFromLocationName(query, 1) { results ->
                                     cont.resume(results.firstOrNull())
@@ -672,6 +683,39 @@ fun MapScreen(
                         // Remove default controls
                         map.uiSettings.isMyLocationButtonEnabled = false
                         map.uiSettings.isZoomControlsEnabled = false
+
+                        // Add shuttle stop markers (US-3.1)
+                        if (shuttleTracker.isOperational()) {
+                            val shuttleIcon = ShuttleMarkerFactory.create(ctx)
+                            shuttleTracker.getShuttleStops().forEach { stop ->
+                                val marker = map.addMarker(
+                                    MarkerOptions()
+                                        .position(stop.latLng)
+                                        .icon(shuttleIcon)
+                                        .anchor(0.5f, 1.0f) // tip of pin points to coordinate
+                                )
+                                if (marker != null) {
+                                    marker.tag = stop
+                                    shuttleMarkerMap[stop.id] = marker
+                                }
+                            }
+                        } else {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+                            }
+                        }
+
+                        // Marker click: handle shuttle stop taps (US-3.1)
+                        // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
+                        map.setOnMarkerClickListener { marker -> // NOSONAR
+                            val stop = marker.tag as? ShuttleStop
+                            if (stop != null) {
+                                selectedShuttleStop = stop
+                                true
+                            } else {
+                                false
+                            }
+                        }
 
                         // Set up polygon click listener
                         map.setOnPolygonClickListener { polygon ->
@@ -986,6 +1030,15 @@ fun MapScreen(
             )
         }
 
+        // Shuttle stop info card (US-3.1)
+        selectedShuttleStop?.let { stop ->
+            ShuttleStopInfoCard(
+                stop = stop,
+                isOperational = shuttleTracker.isOperational(),
+                onDismiss = { selectedShuttleStop = null }
+            )
+        }
+
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -1287,9 +1340,7 @@ private fun getSavedCampus(context: Context): Campus {
 
 private fun saveCampus(context: Context, campus: Campus) {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit()
-        .putString(KEY_SELECTED_CAMPUS, campus.name)
-        .apply()
+    prefs.edit { putString(KEY_SELECTED_CAMPUS, campus.name) }
 }
 
 private fun loadGeoJson(context: Context, rawRes: Int): JSONObject {
