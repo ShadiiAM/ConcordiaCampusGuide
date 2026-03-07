@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usability Performance Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1c2030;
+    --border: #252a3a;
+    --text: #e8eaf2;
+    --muted: #6b7394;
+    --accent: #f0c060;
+    --alexia: #e8665a;
+    --sofia: #e88c5a;
+    --jordan: #5ab4e8;
+    --emily: #a05ae8;
+    --liam: #5ae88c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  canvas { touch-action: pan-y; max-height: 200px; }
+  #overviewChart { max-height: 160px; }
+  #searchDist, #a11yDist { max-height: 130px; }
+  #searchBox { max-height: 150px; }
+  #a11yBox { max-height: 280px; }
+  #varianceChart { max-height: 130px; }
+  #scatterChart { max-height: 380px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-left h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 24px;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: var(--text);
+  }
+
+  .header-left h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  nav {
+    display: flex;
+    gap: 0;
+    padding: 0 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  nav button:hover:not(.active) {
+    color: var(--text);
+  }
+
+  main {
+    padding: 20px 48px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* KPI GRID */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .kpi {
+    background: var(--surface);
+    padding: 14px 18px;
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .kpi-value {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .kpi-unit {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .kpi-delta {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .delta-up { color: #e8665a; }
+  .delta-down { color: var(--liam); }
+
+  /* CHARTS */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-full {
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .chart-row { grid-template-columns: 1fr; }
+    header { padding: 28px 24px 24px; }
+    nav, main { padding-left: 24px; padding-right: 24px; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .panel-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-title span {
+    background: var(--surface2);
+    padding: 3px 10px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* PERSONA TABLE */
+  .persona-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .persona-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 16px 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+
+  .persona-table td {
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .persona-table tr:last-child td { border-bottom: none; }
+
+  .persona-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  .bar-bg {
+    background: var(--surface2);
+    height: 6px;
+    border-radius: 0;
+    overflow: hidden;
+    width: 120px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    transition: width 0.8s ease;
+  }
+
+  /* OUTLIER TABLE */
+  .outlier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .outlier-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-left: 3px solid transparent;
+    font-size: 12px;
+  }
+
+  .outlier-item.high { border-left-color: var(--alexia); }
+  .outlier-item.low { border-left-color: var(--liam); }
+
+  .outlier-persona {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .outlier-ms {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .outlier-tag {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid;
+  }
+
+  .tag-slow { color: var(--alexia); border-color: var(--alexia); }
+  .tag-fast { color: var(--liam); border-color: var(--liam); }
+
+  /* RATING PILL */
+  .rating {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border: 1px solid;
+  }
+  .rating.good { color: var(--liam); border-color: var(--liam); }
+  .rating.warn { color: var(--accent); border-color: var(--accent); }
+  .rating.bad { color: var(--alexia); border-color: var(--alexia); }
+
+  /* HEATMAP */
+  .heatmap-grid {
+    display: grid;
+    gap: 4px;
+  }
+
+  .heatmap-row {
+    display: grid;
+    grid-template-columns: 120px repeat(2, 1fr);
+    gap: 4px;
+    align-items: center;
+  }
+
+  .heatmap-cell {
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    cursor: default;
+  }
+
+  .heatmap-cell:hover { opacity: 0.85; }
+
+  .heatmap-cell .cell-val {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .heatmap-cell .cell-lbl {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.65;
+    margin-top: 2px;
+  }
+
+  .heatmap-label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-right: 12px;
+  }
+
+  .heatmap-header {
+    display: grid;
+    grid-template-columns: 120px repeat(2, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .heatmap-header-cell {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 0;
+  }
+
+  .insight-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .insight-icon {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .insight-title {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .insight-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .insight-text strong {
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Usability <em>Performance</em><br>Report</h1>
+    <div class="header-meta">5 personas · 2 tasks · 100 observations</div>
+  </div>
+  <div class="badge">Task Timing Analysis</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('overview', event)">Overview</button>
+  <button onclick="showSection('personas', event)">By Persona</button>
+  <button onclick="showSection('tasks', event)">By Task</button>
+  <button onclick="showSection('outliers', event)">Outliers</button>
+  <button onclick="showSection('insights', event)">Insights</button>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <div class="section active" id="overview">
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Total Observations</div>
+        <div class="kpi-value">100</div>
+        <div class="kpi-unit">across all tasks</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Overall Median</div>
+        <div class="kpi-value">4.8s</div>
+        <div class="kpi-unit">across both tasks</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Fastest Persona</div>
+        <div class="kpi-value" style="color:var(--liam)">Liam</div>
+        <div class="kpi-unit">avg 1.9s search · 2.9s accessibility</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Slowest Persona</div>
+        <div class="kpi-value" style="color:var(--sofia)">Sofia</div>
+        <div class="kpi-unit">avg 7.5s search · 15.2s accessibility</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Largest Spread</div>
+        <div class="kpi-value">8.2×</div>
+        <div class="kpi-unit">fastest vs slowest accessibility</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Outliers Detected</div>
+        <div class="kpi-value" style="color:var(--accent)">4</div>
+        <div class="kpi-unit">≥2 std dev from mean</div>
+      </div>
+    </div>
+
+    <div class="chart-full">
+      <div class="panel">
+        <div class="panel-title">Median Task Duration by Persona <span>milliseconds</span></div>
+        <canvas id="overviewChart" height="60"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-row">
+      <div class="panel">
+        <div class="panel-title">Distribution: search_location</div>
+        <canvas id="searchDist" height="120"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Distribution: accessibility_change</div>
+        <canvas id="a11yDist" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAS -->
+  <div class="section" id="personas">
+    <div class="panel chart-full">
+      <div class="panel-title">Persona Performance Matrix</div>
+      <div class="heatmap-header">
+        <div></div>
+        <div class="heatmap-header-cell">search_location</div>
+        <div class="heatmap-header-cell">accessibility_change</div>
+      </div>
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <div class="legend" id="heatmapLegend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--liam)"></div>Fast (below avg)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Average</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--alexia)"></div>Slow (above avg)</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Detailed Persona Stats</div>
+      <table class="persona-table" id="personaTable"></table>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="section" id="tasks">
+    <div class="chart-row">
+      <div class="panel">
+        <div class="panel-title">search_location — Box Plot</div>
+        <canvas id="searchBox" height="140"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-title">accessibility_change — Box Plot</div>
+        <canvas id="a11yBox" height="140"></canvas>
+      </div>
+    </div>
+    <div class="panel chart-full">
+      <div class="panel-title">Variance Comparison (Std Dev) <span>lower = more consistent</span></div>
+      <canvas id="varianceChart" height="60"></canvas>
+    </div>
+  </div>
+
+  <!-- OUTLIERS -->
+  <div class="section" id="outliers">
+    <div class="panel chart-full" style="margin-bottom:24px">
+      <div class="panel-title">Detected Outliers <span>±2 std deviations</span></div>
+      <div class="outlier-list" id="outlierList"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Outlier Scatter — All Observations</div>
+      <canvas id="scatterChart" height="100"></canvas>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section" id="insights">
+    <div class="insight-grid" id="insightGrid"></div>
+  </div>
+
+</main>
+
+<script>
+// ── RAW DATA ──────────────────────────────────────────────────────────────────
+const raw = [
+  ["ALEXIA_MARTIN","search_location",7187],["ALEXIA_MARTIN","search_location",4291],
+  ["SOFIA_LOPEZ","search_location",6558],["JORDAN_LEE","search_location",3236],
+  ["EMILY_NGUYEN","search_location",2567],["LIAM_DUBOIS","search_location",1581],
+  ["JORDAN_LEE","search_location",4432],["EMILY_NGUYEN","search_location",2450],
+  ["EMILY_NGUYEN","search_location",2844],["EMILY_NGUYEN","search_location",2551],
+  ["LIAM_DUBOIS","search_location",1101],["SOFIA_LOPEZ","search_location",10746],
+  ["EMILY_NGUYEN","search_location",2324],["JORDAN_LEE","search_location",4618],
+  ["JORDAN_LEE","search_location",4847],["EMILY_NGUYEN","search_location",2002],
+  ["LIAM_DUBOIS","search_location",9292],["LIAM_DUBOIS","search_location",1064],
+  ["LIAM_DUBOIS","search_location",1095],["JORDAN_LEE","search_location",4360],
+  ["SOFIA_LOPEZ","search_location",7682],["ALEXIA_MARTIN","search_location",4959],
+  ["EMILY_NGUYEN","search_location",2412],["SOFIA_LOPEZ","search_location",6155],
+  ["LIAM_DUBOIS","search_location",1312],["EMILY_NGUYEN","search_location",2850],
+  ["EMILY_NGUYEN","search_location",2323],["LIAM_DUBOIS","search_location",1328],
+  ["ALEXIA_MARTIN","search_location",5481],["LIAM_DUBOIS","search_location",1253],
+  ["JORDAN_LEE","search_location",3928],["ALEXIA_MARTIN","search_location",4294],
+  ["JORDAN_LEE","search_location",2906],["SOFIA_LOPEZ","search_location",7407],
+  ["SOFIA_LOPEZ","search_location",9889],["EMILY_NGUYEN","search_location",2890],
+  ["ALEXIA_MARTIN","search_location",5576],["LIAM_DUBOIS","search_location",1234],
+  ["LIAM_DUBOIS","search_location",1262],["LIAM_DUBOIS","search_location",1006],
+  ["SOFIA_LOPEZ","search_location",7124],["ALEXIA_MARTIN","search_location",3921],
+  ["ALEXIA_MARTIN","search_location",3801],["EMILY_NGUYEN","search_location",2512],
+  ["LIAM_DUBOIS","search_location",1515],["ALEXIA_MARTIN","search_location",5269],
+  ["ALEXIA_MARTIN","search_location",5283],["SOFIA_LOPEZ","search_location",7667],
+  ["JORDAN_LEE","search_location",3056],["SOFIA_LOPEZ","search_location",5948],
+  ["ALEXIA_MARTIN","accessibility_change",12593],["EMILY_NGUYEN","accessibility_change",5869],
+  ["ALEXIA_MARTIN","accessibility_change",11107],["ALEXIA_MARTIN","accessibility_change",11946],
+  ["LIAM_DUBOIS","accessibility_change",2517],["JORDAN_LEE","accessibility_change",10912],
+  ["LIAM_DUBOIS","accessibility_change",3681],["ALEXIA_MARTIN","accessibility_change",10771],
+  ["EMILY_NGUYEN","accessibility_change",5448],["EMILY_NGUYEN","accessibility_change",5466],
+  ["LIAM_DUBOIS","accessibility_change",3149],["EMILY_NGUYEN","accessibility_change",4661],
+  ["JORDAN_LEE","accessibility_change",9261],["SOFIA_LOPEZ","accessibility_change",14811],
+  ["EMILY_NGUYEN","accessibility_change",4812],["EMILY_NGUYEN","accessibility_change",4311],
+  ["LIAM_DUBOIS","accessibility_change",2406],["ALEXIA_MARTIN","accessibility_change",11389],
+  ["EMILY_NGUYEN","accessibility_change",4764],["JORDAN_LEE","accessibility_change",10467],
+  ["JORDAN_LEE","accessibility_change",8852],["JORDAN_LEE","accessibility_change",6708],
+  ["SOFIA_LOPEZ","accessibility_change",14898],["EMILY_NGUYEN","accessibility_change",4310],
+  ["JORDAN_LEE","accessibility_change",7609],["LIAM_DUBOIS","accessibility_change",2890],
+  ["ALEXIA_MARTIN","accessibility_change",11311],["SOFIA_LOPEZ","accessibility_change",15802],
+  ["LIAM_DUBOIS","accessibility_change",2536],["EMILY_NGUYEN","accessibility_change",4812],
+  ["JORDAN_LEE","accessibility_change",9129],["ALEXIA_MARTIN","accessibility_change",13111],
+  ["EMILY_NGUYEN","accessibility_change",5934],["ALEXIA_MARTIN","accessibility_change",10899],
+  ["EMILY_NGUYEN","accessibility_change",5389],["ALEXIA_MARTIN","accessibility_change",12194],
+  ["JORDAN_LEE","accessibility_change",7890],["LIAM_DUBOIS","accessibility_change",2687],
+  ["JORDAN_LEE","accessibility_change",8656],["EMILY_NGUYEN","accessibility_change",6077],
+  ["JORDAN_LEE","accessibility_change",6699],["EMILY_NGUYEN","accessibility_change",5603],
+  ["EMILY_NGUYEN","accessibility_change",5037],["ALEXIA_MARTIN","accessibility_change",11693],
+  ["LIAM_DUBOIS","accessibility_change",2604],["EMILY_NGUYEN","accessibility_change",5299],
+  ["SOFIA_LOPEZ","accessibility_change",15122],["LIAM_DUBOIS","accessibility_change",3236],
+  ["EMILY_NGUYEN","accessibility_change",4821],["SOFIA_LOPEZ","accessibility_change",16797],
+];
+
+const personas = ["ALEXIA_MARTIN","SOFIA_LOPEZ","JORDAN_LEE","EMILY_NGUYEN","LIAM_DUBOIS"];
+const tasks = ["search_location","accessibility_change"];
+const pColors = {
+  ALEXIA_MARTIN: getComputedStyle(document.documentElement).getPropertyValue('--alexia').trim(),
+  SOFIA_LOPEZ: getComputedStyle(document.documentElement).getPropertyValue('--sofia').trim() || '#e88c5a',
+  JORDAN_LEE: getComputedStyle(document.documentElement).getPropertyValue('--jordan').trim(),
+  EMILY_NGUYEN: getComputedStyle(document.documentElement).getPropertyValue('--emily').trim(),
+  LIAM_DUBOIS: getComputedStyle(document.documentElement).getPropertyValue('--liam').trim(),
+};
+const pShort = { ALEXIA_MARTIN:'Alexia', SOFIA_LOPEZ:'Sofia', JORDAN_LEE:'Jordan', EMILY_NGUYEN:'Emily', LIAM_DUBOIS:'Liam' };
+
+// ── STATS HELPERS ─────────────────────────────────────────────────────────────
+function stats(arr) {
+  if (!arr.length) return {};
+  const s = [...arr].sort((a,b)=>a-b);
+  const n = s.length;
+  const mean = s.reduce((a,b)=>a+b,0)/n;
+  const median = n%2===0 ? (s[n/2-1]+s[n/2])/2 : s[Math.floor(n/2)];
+  const variance = s.reduce((a,b)=>a+(b-mean)**2,0)/n;
+  const std = Math.sqrt(variance);
+  const q1 = s[Math.floor(n*0.25)];
+  const q3 = s[Math.floor(n*0.75)];
+  return { mean, median, std, q1, q3, min: s[0], max: s[n-1], n };
+}
+
+// Build lookup
+const data = {};
+personas.forEach(p => {
+  data[p] = {};
+  tasks.forEach(t => { data[p][t] = []; });
+});
+raw.forEach(([p,t,v]) => data[p][t].push(v));
+
+const taskData = {};
+tasks.forEach(t => {
+  taskData[t] = {};
+  personas.forEach(p => { taskData[t][p] = data[p][t]; });
+});
+
+// Global stats per task
+const globalStats = {};
+tasks.forEach(t => {
+  const all = personas.flatMap(p => data[p][t]);
+  globalStats[t] = stats(all);
+});
+
+// ── CHART DEFAULTS ────────────────────────────────────────────────────────────
+Chart.defaults.color = '#6b7394';
+Chart.defaults.borderColor = '#252a3a';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 11;
+
+// Prevent charts from capturing scroll events
+document.addEventListener('wheel', function(e) {
+  if (e.target.tagName === 'CANVAS') {
+    e.stopPropagation();
+  }
+}, { passive: true, capture: true });
+
+// ── OVERVIEW CHART ────────────────────────────────────────────────────────────
+new Chart('overviewChart', {
+  type: 'bar',
+  data: {
+    labels: personas.map(p => pShort[p]),
+    datasets: tasks.map((t,i) => ({
+      label: t === 'search_location' ? 'Search Location' : 'Accessibility Change',
+      data: personas.map(p => Math.round(stats(data[p][t]).median)),
+      backgroundColor: i===0 ? personas.map(p => pColors[p]+'99') : personas.map(p => pColors[p]),
+      borderColor: personas.map(p => pColors[p]),
+      borderWidth: i===0?0:0,
+      borderRadius: 0,
+    }))
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ boxWidth:12, padding:20, color:'#6b7394' } } },
+    scales:{
+      x:{ grid:{display:false} },
+      y:{ title:{ display:true, text:'Median (ms)', color:'#6b7394' }, grid:{color:'#252a3a'} }
+    }
+  }
+});
+
+// ── DISTRIBUTION CHARTS ───────────────────────────────────────────────────────
+function makeDistChart(id, task) {
+  const bins = [0,1000,2000,3000,4000,5000,6000,7000,8000,10000,12000,16000,20000];
+  const labels = bins.slice(0,-1).map((b,i)=>`${b/1000}–${bins[i+1]/1000}k`);
+  const datasets = personas.map(p => {
+    const vals = data[p][task];
+    const counts = bins.slice(0,-1).map((_,i)=>vals.filter(v=>v>=bins[i]&&v<bins[i+1]).length);
+    return { label: pShort[p], data: counts, backgroundColor: pColors[p]+'bb', borderWidth:0, borderRadius:0 };
+  });
+  new Chart(id, {
+    type:'bar',
+    data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ boxWidth:8, padding:12, color:'#6b7394', font:{size:10} } } },
+      scales:{
+        x:{stacked:true, grid:{display:false}, ticks:{font:{size:9}}},
+        y:{stacked:true, grid:{color:'#252a3a'}, title:{display:true, text:'Count',color:'#6b7394'}}
+      }
+    }
+  });
+}
+makeDistChart('searchDist','search_location');
+makeDistChart('a11yDist','accessibility_change');
+
+// ── HEATMAP ───────────────────────────────────────────────────────────────────
+function heatColor(val, gMean, gStd) {
+  const z = (val - gMean) / gStd;
+  if (z < -0.5) return { bg: '#1a3028', text: '#5ae88c' };
+  if (z > 0.5)  return { bg: '#2e1a1a', text: '#e8665a' };
+  return { bg: '#2a2810', text: '#f0c060' };
+}
+
+const grid = document.getElementById('heatmapGrid');
+personas.forEach(p => {
+  const row = document.createElement('div');
+  row.className = 'heatmap-row';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'heatmap-label';
+  lbl.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${pColors[p]};margin-right:8px;vertical-align:middle"></span>${pShort[p]}`;
+  row.appendChild(lbl);
+
+  tasks.forEach(t => {
+    const st = stats(data[p][t]);
+    const g = globalStats[t];
+    const { bg, text } = heatColor(st.mean, g.mean, g.std);
+    const cell = document.createElement('div');
+    cell.className = 'heatmap-cell';
+    cell.style.background = bg;
+    cell.innerHTML = `<div class="cell-val" style="color:${text}">${(st.mean/1000).toFixed(2)}s</div><div class="cell-lbl" style="color:${text}">mean · σ${(st.std/1000).toFixed(2)}s</div>`;
+    cell.title = `${pShort[p]} · ${t}: mean=${(st.mean/1000).toFixed(2)}s, median=${(st.median/1000).toFixed(2)}s, std=${(st.std/1000).toFixed(2)}s`;
+    row.appendChild(cell);
+  });
+  grid.appendChild(row);
+});
+
+// ── PERSONA TABLE ─────────────────────────────────────────────────────────────
+const maxMean = Math.max(...personas.flatMap(p => tasks.map(t => stats(data[p][t]).mean)));
+const table = document.getElementById('personaTable');
+table.innerHTML = `<tr><th>Persona</th><th>Task</th><th>Mean</th><th>Median</th><th>Std Dev</th><th>n</th><th>Relative Speed</th><th>Rating</th></tr>`;
+personas.forEach(p => {
+  tasks.forEach(t => {
+    const st = stats(data[p][t]);
+    const g = globalStats[t];
+    const z = (st.mean - g.mean) / g.std;
+    const rating = z < -0.5 ? '<span class="rating good">Fast</span>' : z > 0.5 ? '<span class="rating bad">Slow</span>' : '<span class="rating warn">Avg</span>';
+    const barPct = Math.round((st.mean / maxMean) * 100);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="persona-dot" style="background:${pColors[p]}"></span>${pShort[p]}</td>
+      <td style="color:var(--muted);font-size:11px">${t === 'search_location' ? 'search' : 'accessibility'}</td>
+      <td>${(st.mean/1000).toFixed(2)}s</td>
+      <td>${(st.median/1000).toFixed(2)}s</td>
+      <td>${(st.std/1000).toFixed(2)}s</td>
+      <td style="color:var(--muted)">${st.n}</td>
+      <td><div class="bar-bg"><div class="bar-fill" style="width:${barPct}%;background:${pColors[p]}"></div></div></td>
+      <td>${rating}</td>`;
+    table.appendChild(tr);
+  });
+});
+
+// ── BOX CHARTS ────────────────────────────────────────────────────────────────
+function boxChart(id, task) {
+  const labels = personas.map(p => pShort[p]);
+  const datasets = [{
+    label: task,
+    data: personas.map(p => {
+      const st = stats(data[p][task]);
+      return { min: st.min, q1: st.q1, median: st.median, q3: st.q3, max: st.max };
+    }),
+    backgroundColor: personas.map(p => pColors[p]+'55'),
+    borderColor: personas.map(p => pColors[p]),
+    borderWidth: 2,
+  }];
+  new Chart(id, {
+    type: 'boxplot',
+    data: { labels, datasets },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ y:{ grid:{color:'#252a3a'}, title:{display:true,text:'ms',color:'#6b7394'} }, x:{grid:{display:false}} }
+    }
+  });
+}
+
+// boxplot plugin not available via CDN in basic chart.js - use bar chart approximation instead
+function approxBoxChart(id, task, yMin) {
+  new Chart(id, {
+    type: 'bar',
+    data: {
+      labels: personas.map(p => pShort[p]),
+      datasets: [
+        {
+          label: 'Min',
+          data: personas.map(p => Math.max(stats(data[p][task]).min, yMin||0)),
+          backgroundColor: 'transparent',
+          borderColor: 'transparent',
+          stack:'box'
+        },
+        {
+          label: 'Q1–Median',
+          data: personas.map(p => { const st=stats(data[p][task]); return st.median-st.q1; }),
+          backgroundColor: personas.map(p => pColors[p]+'55'),
+          borderColor: personas.map(p => pColors[p]),
+          borderWidth:{top:0,right:1,bottom:1,left:1},
+          stack:'box'
+        },
+        {
+          label: 'Median–Q3',
+          data: personas.map(p => { const st=stats(data[p][task]); return st.q3-st.median; }),
+          backgroundColor: personas.map(p => pColors[p]+'cc'),
+          borderColor: personas.map(p => pColors[p]),
+          borderWidth:{top:1,right:1,bottom:0,left:1},
+          stack:'box'
+        },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{labels:{filter:i=>i.text!=='Min', boxWidth:10, padding:14, color:'#6b7394'}},
+        tooltip:{
+          callbacks:{
+            title:([item])=>item.label,
+            label: (item) => {
+              const p = personas[item.dataIndex];
+              const st = stats(data[p][task]);
+              return [`min: ${st.min}ms`, `Q1: ${st.q1}ms`, `median: ${st.median}ms`, `Q3: ${st.q3}ms`, `max: ${st.max}ms`];
+            },
+            beforeBody:()=>'',
+            afterBody:()=>'',
+          },
+          callbacks2:{}
+        }
+      },
+      scales:{
+        x:{stacked:true, grid:{display:false}},
+        y:{stacked:true, min: yMin||0, grid:{color:'#252a3a'}, title:{display:true,text:'Duration (ms)',color:'#6b7394'}}
+      }
+    }
+  });
+}
+
+approxBoxChart('searchBox','search_location');
+approxBoxChart('a11yBox','accessibility_change', 2000);
+
+// ── VARIANCE CHART ────────────────────────────────────────────────────────────
+new Chart('varianceChart', {
+  type:'bar',
+  data:{
+    labels: personas.map(p=>pShort[p]),
+    datasets: tasks.map((t,i) => ({
+      label: t==='search_location'?'Search Location':'Accessibility Change',
+      data: personas.map(p => Math.round(stats(data[p][t]).std)),
+      backgroundColor: i===0 ? personas.map(p=>pColors[p]+'88') : personas.map(p=>pColors[p]),
+      borderWidth:0, borderRadius:0,
+    }))
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:12,padding:20,color:'#6b7394'}}},
+    scales:{
+      x:{grid:{display:false}},
+      y:{title:{display:true,text:'Std Deviation (ms)',color:'#6b7394'},grid:{color:'#252a3a'}}
+    }
+  }
+});
+
+// ── OUTLIERS ──────────────────────────────────────────────────────────────────
+const outlierList = document.getElementById('outlierList');
+const outliers = [];
+
+tasks.forEach(t => {
+  const g = globalStats[t];
+  const threshold = 2 * g.std;
+  raw.filter(([,task])=>task===t).forEach(([p,task,v]) => {
+    const diff = v - g.mean;
+    if (Math.abs(diff) > threshold) {
+      outliers.push({ persona:p, task, value:v, mean:g.mean, diff, z: diff/g.std });
+    }
+  });
+});
+
+outliers.sort((a,b) => Math.abs(b.z) - Math.abs(a.z));
+
+if (outliers.length === 0) {
+  outlierList.innerHTML = '<div style="color:var(--muted);padding:20px;font-size:12px">No outliers detected beyond ±2 std deviations.</div>';
+} else {
+  outliers.slice(0,10).forEach(o => {
+    const item = document.createElement('div');
+    item.className = `outlier-item ${o.diff > 0 ? 'high' : 'low'}`;
+    item.innerHTML = `
+      <div>
+        <div style="color:${pColors[o.persona]};font-size:13px">${pShort[o.persona]}</div>
+        <div class="outlier-persona">${o.task}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">
+        mean ${(o.mean/1000).toFixed(2)}s · z = ${o.z.toFixed(2)}
+      </div>
+      <div class="outlier-ms" style="color:${o.diff>0?'var(--alexia)':'var(--liam)'}">
+        ${(o.value/1000).toFixed(2)}s
+      </div>
+      <div class="outlier-tag ${o.diff>0?'tag-slow':'tag-fast'}">
+        ${o.diff>0?'slow':'fast'}
+      </div>`;
+    outlierList.appendChild(item);
+  });
+}
+
+// ── SCATTER ───────────────────────────────────────────────────────────────────
+const scatterData = personas.map(p => ({
+  label: pShort[p],
+  data: raw.filter(([per])=>per===p).map(([,t,v],i) => ({ x: i, y: v })),
+  backgroundColor: pColors[p]+'99',
+  pointRadius: 7,
+  pointHoverRadius: 10,
+  showLine: false,
+}));
+
+new Chart('scatterChart', {
+  type:'scatter',
+  data:{ datasets: scatterData },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:8,padding:12,color:'#6b7394',font:{size:10}}},
+    },
+    scales:{
+      x:{grid:{color:'#252a3a'},title:{display:true,text:'Observation index',color:'#6b7394'}},
+      y:{grid:{color:'#252a3a'},title:{display:true,text:'Duration (ms)',color:'#6b7394'}}
+    }
+  }
+});
+
+// ── INSIGHTS ──────────────────────────────────────────────────────────────────
+const insightsData = [
+  {
+    icon: '🏎️',
+    title: 'Liam is consistently fastest',
+    text: `<strong>Liam Dubois</strong> completes both tasks well below average — <strong>~1.9s</strong> for search and <strong>~2.9s</strong> for accessibility changes. This suggests either higher system familiarity or a more efficient interaction pattern worth studying.`
+  },
+  {
+    icon: '🐢',
+    title: 'Sofia is consistently slowest',
+    text: `<strong>Sofia Lopez</strong> averages <strong>7.5s</strong> on search and <strong>15.2s</strong> on accessibility changes. Her accessibility durations are up to <strong>8× longer</strong> than Liam's. This warrants investigation into pain points in her user journey.`
+  },
+  {
+    icon: '⚡',
+    title: 'Liam has one search outlier',
+    text: `Liam's search is generally sub-2s, but one observation clocked at <strong>9.3s</strong> — more than 4× his normal. This could indicate a network hiccup, UI error, or task confusion that should be reviewed in session recordings.`
+  },
+  {
+    icon: '♿',
+    title: 'accessibility_change is 3× slower overall',
+    text: `The global median for <strong>accessibility_change</strong> is roughly <strong>3× higher</strong> than search_location. This is expected for a more complex task, but the variance is also much wider — suggesting inconsistent usability across the flow.`
+  },
+  {
+    icon: '📊',
+    title: 'Alexia & Sofia have high variance in accessibility',
+    text: `<strong>Sofia</strong> and <strong>Alexia</strong> show the highest standard deviation on accessibility tasks (~<strong>1.0s+</strong>), indicating inconsistent task completion. This points to unclear affordances or non-linear interaction patterns.`
+  },
+  {
+    icon: '🎯',
+    title: 'Emily & Jordan are mid-tier and consistent',
+    text: `<strong>Emily</strong> and <strong>Jordan</strong> both land near the global mean with relatively low variance. They represent the "average" usability experience and can serve as the baseline benchmark for future iterations.`
+  },
+];
+
+const insightGrid = document.getElementById('insightGrid');
+insightsData.forEach(ins => {
+  const card = document.createElement('div');
+  card.className = 'insight-card';
+  card.innerHTML = `<div class="insight-icon">${ins.icon}</div><div class="insight-title">${ins.title}</div><div class="insight-text">${ins.text}</div>`;
+  insightGrid.appendChild(card);
+});
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function showSection(id, e) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  const scrollY = window.scrollY;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (e) e.target.classList.add('active');
+  window.scrollTo(0, scrollY);
+}
+</script>
+</body>
+</html>
