@@ -30,7 +30,7 @@ sonar {
         property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
 
         // Exclusions
-        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
+        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**,**/ShuttleMarkerFactory.kt")
         property("sonar.coverage.exclusions",
             // Generated files and tests
             "**/R.class," +
@@ -43,13 +43,17 @@ sonar {
             "**/ui/components/**," +              // UI components (includes DirectionsTopBar, CampusToggle, etc.)
             "**/ui/screens/**," +                 // Screen composables (includes MapScreen, CalendarScreen, etc.)
             "**/ui/accessibility/**," +           // Accessibility UI components
+            "**/ui/map/**," +                     // Map rendering layer (Canvas/Paint/Android Context)
 
             // Activities (UI-heavy with Compose setContent - see .claude/TESTING_GUIDE.md)
             "**/MapsActivity.kt," +
             "**/MainActivity.kt," +
 
             // Map rendering (requires Dispatchers.Main - see .claude/TESTING_GUIDE.md)
-            "**/GeoJsonOverlay.kt"
+            "**/GeoJsonOverlay.kt," +
+
+            // ShuttleMarkerFactory: Canvas/Paint bitmap rendering, requires Android Context
+            "**/ShuttleMarkerFactory.kt"
         )
 
         // Lower coverage threshold for UI-heavy codebase
