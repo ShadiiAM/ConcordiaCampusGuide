@@ -143,10 +143,6 @@ fun CalendarScreen() {
                         )
 
                         Text(formattedDate(date, viewMode), fontSize = 35.sp)
-//                        AccessibleText(
-//                            text = formattedDate(date, viewMode),
-//                            baseFontSizeSp = 35f
-//                        )
 
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
