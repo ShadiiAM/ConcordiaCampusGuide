@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasStateDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -38,13 +39,17 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class AT3CampusSwitchingUITest {
+
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
         android.Manifest.permission.ACCESS_FINE_LOCATION
     )
+
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
 
     @Test
     fun campusToggle_fullFlow_e2e() {
@@ -94,7 +99,7 @@ class AT3CampusSwitchingUITest {
 
         Thread.sleep(3000)
 
-        composeTestRule.activityRule.scenario.recreate()
+        activityRule.scenario.recreate()
         composeTestRule.waitForIdle()
 
         Thread.sleep(2000)

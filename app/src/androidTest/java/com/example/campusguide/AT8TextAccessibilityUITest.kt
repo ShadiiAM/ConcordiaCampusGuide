@@ -1,8 +1,12 @@
 package com.example.campusguide
 
+import android.content.Intent
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -10,7 +14,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
+import androidx.test.uiautomator.UiDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,10 +34,7 @@ import org.junit.runner.RunWith
 class AT8TextAccessibilityUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
-
-    @get:Rule
-    val composeTestRule = createEmptyComposeRule()
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
 
     @get:Rule
@@ -111,6 +114,8 @@ class AT8TextAccessibilityUITest {
     @Test
     fun colorBlindModes_canBeCycled() {
         // AC: Colorblind modes can be cycled
+
+        composeTestRule.waitForIdle()
         Thread.sleep(2000)
 
         // Navigate to accessibility
@@ -120,22 +125,55 @@ class AT8TextAccessibilityUITest {
         Thread.sleep(3000)
 
         // Text colour row exists
-        composeTestRule.onNode(hasText("Text colour")).assertExists()
+        composeTestRule.onNode(hasText("Colorblind mode")).assertExists()
         Thread.sleep(2000)
 
         // ACTION: MANUALLY click the color box to cycle through modes
-        // (Click once for each mode: Protanopia, Deuteranopia, Tritanopia)
+        composeTestRule
+            .onNodeWithContentDescription("Colorblind Cycle")
+            .assertExists()
+            .assertIsDisplayed()
+            .performClick()
+
         Thread.sleep(3000)
 
-        // ACTION: Click again for Deuteranopia
+        composeTestRule
+            .onNodeWithContentDescription("Colorblind Cycle")
+            .performClick()
         Thread.sleep(3000)
 
-        // ACTION: Click again for Tritanopia
+        composeTestRule
+            .onNodeWithContentDescription("Colorblind Cycle")
+            .performClick()
         Thread.sleep(3000)
 
         // Verify screen displayed
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
+
+        composeTestRule
+            .onNodeWithContentDescription("Back")
+            .performClick()
+
+        composeTestRule
+            .onNodeWithContentDescription("Back")
+            .performClick()
+
+        Thread.sleep(3000)
+
+        composeTestRule.activityRule.scenario.recreate()
+
+        composeTestRule.waitForIdle()
+
+        onView(withId(android.R.id.content))
+            .check(matches(isDisplayed()))
+
+        Thread.sleep(5000)
+
+        composeTestRule.onNode(hasText("A")).performClick()
+        Thread.sleep(2000)
+
+
     }
 
     @Test

@@ -1,5 +1,8 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -30,6 +33,9 @@ class AT1ViewCampusMapsUITest {
         android.Manifest.permission.ACCESS_FINE_LOCATION
     )
 
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
+
     @Test
     fun appOpens_displaysDefaultCampusMap() {
         // AC: App opens for first time and displays campus map with default campus
@@ -37,25 +43,13 @@ class AT1ViewCampusMapsUITest {
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun defaultCampus_isSGW() {
-        // AC: Given SGW is selected (default), camera centers on SGW
-        Thread.sleep(3000)
-
-        // Map activity running with default SGW campus
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun mapIsUsable_doesNotCrash() {
-        // AC: Map remains usable (pan/zoom) and doesn't crash
-        Thread.sleep(3000)
-
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
             .check(matches(isEnabled()))
+
+        // map is usable and can move
+        composeTestRule.onNodeWithContentDescription("Right").performClick()
+        composeTestRule.onNodeWithContentDescription("Right").performClick()
+
+        Thread.sleep(2000)
+
     }
 }

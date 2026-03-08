@@ -10,12 +10,9 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
-import androidx.test.uiautomator.UiDevice
 import org.junit.runner.RunWith
 
 /**
@@ -28,8 +25,6 @@ import org.junit.runner.RunWith
 @LargeTest
 class AT6ProfileMenuUITest {
 
-
-    private val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
@@ -108,7 +103,5 @@ class AT6ProfileMenuUITest {
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)
-
-        device.pressHome()
     }
 }

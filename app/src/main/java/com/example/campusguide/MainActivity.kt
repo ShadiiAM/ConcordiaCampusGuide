@@ -51,6 +51,10 @@ import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (BuildConfig.DEBUG) {
+            Thread.sleep(5000) // force a 5 sec halt in debug
+        }
         enableEdgeToEdge()
         setContent {
             val scope = rememberCoroutineScope()

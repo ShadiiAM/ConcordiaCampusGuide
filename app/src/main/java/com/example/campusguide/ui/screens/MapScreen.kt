@@ -590,7 +590,8 @@ fun MapScreen(
                     }
                 }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .testTag("mapView"),
             update = { mapView ->
                 mapView.onResume()
             }
@@ -636,6 +637,7 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .testTag("mapControls").semantics { contentDescription = "Map Controls" }
                     .padding(end = 16.dp, bottom = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)

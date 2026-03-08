@@ -1,5 +1,8 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -30,6 +33,10 @@ class AT2BuildingPolygonsUITest {
         android.Manifest.permission.ACCESS_FINE_LOCATION
     )
 
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
+
+
     @Test
     fun mapLoads_withBuildingPolygons() {
         // AC: Building polygons for campus are rendered on map
@@ -38,26 +45,17 @@ class AT2BuildingPolygonsUITest {
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun polygons_remainVisibleDuringInteraction() {
-        // AC: Polygons remain visible while zooming/panning
-        // Visual verification: GIF shows polygons persist during zoom/pan
-        Thread.sleep(3000)
-
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
             .check(matches(isEnabled()))
-    }
 
-    @Test
-    fun allBuildings_areRendered() {
-        // AC: All buildings in dataset are rendered
-        // Visual verification: GIF shows all expected buildings as polygons
-        Thread.sleep(3000)
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
 
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
+        Thread.sleep(2000)
+
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
+
+        Thread.sleep(2000)
+
+
     }
 }

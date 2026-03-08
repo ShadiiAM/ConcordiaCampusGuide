@@ -1,6 +1,8 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -44,27 +46,36 @@ class AT9AccessibilityButtonUITest {
         Thread.sleep(5000)
 
         // Click the accessibility search button
-        composeTestRule.onNodeWithContentDescription("AccessibleSearch").performClick()
+        composeTestRule.onNodeWithContentDescription("Bottom search button").performClick()
 
         Thread.sleep(3000)
 
 
         // Type into the focused field
         composeTestRule
-            .onNodeWithTag("searchField")
+            .onNodeWithTag("searchBar")
             .assertIsFocused()
             .performTextInput("Accessible Button Worked!")
 
+        composeTestRule.onNodeWithTag("searchBar")
+            .assertTextEquals("Accessible Button Worked!")
 
         onView(withId(android.R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
+
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         Thread.sleep(2000)
+
+        composeTestRule.onNodeWithTag("mapControls").assertDoesNotExist()
+
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         Thread.sleep(2000)
+
+        composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
