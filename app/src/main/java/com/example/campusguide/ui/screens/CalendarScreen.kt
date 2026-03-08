@@ -97,7 +97,7 @@ fun CalendarScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(120.dp)
                     .drawBehind {
                         val r = radius.toPx()
                         val s = stroke.toPx()
@@ -145,6 +145,10 @@ fun CalendarScreen() {
                         )
 
                         Text(formattedDate(date, viewMode), fontSize = 35.sp)
+//                        AccessibleText(
+//                            text = formattedDate(date, viewMode),
+//                            baseFontSizeSp = 35f
+//                        )
 
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
