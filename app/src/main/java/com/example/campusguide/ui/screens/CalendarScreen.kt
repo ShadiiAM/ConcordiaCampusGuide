@@ -88,8 +88,6 @@ fun CalendarScreen() {
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Bottom spacer to leave some space under the card
-            androidx.compose.foundation.layout.Spacer(Modifier.height(24.dp))
 
             val radius = 60.dp
             val stroke = 6.dp
@@ -223,6 +221,8 @@ fun CalendarScreen() {
                     }
                 }
             }
+            // Bottom spacer to leave some space under the card
+            androidx.compose.foundation.layout.Spacer(Modifier.height(6.dp))
         }
     }
 }
