@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         if (BuildConfig.DEBUG) {
+            android.util.Log.d("DEBUG", "I AM IN DEBUG")
             Thread.sleep(5000) // force a 5 sec halt in debug
         }
         enableEdgeToEdge()

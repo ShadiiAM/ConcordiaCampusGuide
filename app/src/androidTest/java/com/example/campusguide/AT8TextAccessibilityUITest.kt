@@ -5,13 +5,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -161,7 +159,17 @@ class AT8TextAccessibilityUITest {
 
         Thread.sleep(3000)
 
-        composeTestRule.activityRule.scenario.recreate()
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device.pressHome()
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+
+        device.waitForIdle(2000)
+        composeTestRule.waitForIdle()
 
         composeTestRule.waitForIdle()
 
