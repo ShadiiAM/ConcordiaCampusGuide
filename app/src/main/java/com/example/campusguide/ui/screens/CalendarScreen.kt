@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.ui.theme.PurpleGrey80
@@ -139,6 +140,7 @@ fun CalendarScreen() {
                         modifier = Modifier
                             .size(44.dp)
                             .clickable {
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Go Back in Calendar Date")
                                 when (viewMode) {
                                     CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
                                     CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, -1) }
@@ -155,6 +157,7 @@ fun CalendarScreen() {
                         modifier = Modifier
                             .size(44.dp)
                             .clickable {
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Go Ahead in Calendar Date")
                                 when (viewMode) {
                                     CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
                                     CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, 1) }
@@ -165,6 +168,7 @@ fun CalendarScreen() {
                 Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
                     Button(
                         onClick = {
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Set Calendar Date Daily")
                             viewMode = CalendarViewMode.DAILY
                                   },
                         modifier = Modifier
@@ -189,7 +193,9 @@ fun CalendarScreen() {
                         .defaultMinSize(minHeight = 1.dp)
                         .padding(horizontal = 2.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                        onClick = { viewMode = CalendarViewMode.WEEKLY },
+                        onClick = {
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Set Calendar Date Weekly")
+                            viewMode = CalendarViewMode.WEEKLY },
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
                             contentColor = Color.Black ) )
@@ -201,7 +207,9 @@ fun CalendarScreen() {
                     }
 
                     Button(
-                        onClick = { viewMode = CalendarViewMode.MONTHLY },
+                        onClick = {
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Set Calendar Date Monthly")
+                            viewMode = CalendarViewMode.MONTHLY },
                         modifier = Modifier
                             .height(24.dp)
                             .defaultMinSize(minHeight = 1.dp),

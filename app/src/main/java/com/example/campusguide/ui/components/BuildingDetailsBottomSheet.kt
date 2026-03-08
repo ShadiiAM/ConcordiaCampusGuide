@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.map.models.BuildingInfo
 import java.util.Calendar
@@ -193,7 +194,10 @@ fun BuildingDetailsBottomSheet(
                 }
 
                 IconButton(
-                    onClick = onDismiss,
+                    onClick = {
+                        onDismiss()
+                        UsabilityTrackerIRLUsers.userInteractionRecord("Close building details bottom sheet")
+                    },
                     modifier = Modifier.semantics {
                         contentDescription = "Close building details"
                     }
@@ -207,7 +211,10 @@ fun BuildingDetailsBottomSheet(
             // Directions Button
             if (onDirectionsClick != null) {
                 Button(
-                    onClick = onDirectionsClick,
+                    onClick = {
+                        onDirectionsClick()
+                        UsabilityTrackerIRLUsers.userInteractionRecord("Building details directions button")
+                              },
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics {
@@ -230,7 +237,10 @@ fun BuildingDetailsBottomSheet(
 
             // Expand/Collapse Button
             Button(
-                onClick = { isExpanded = !isExpanded },
+                onClick = { isExpanded = !isExpanded
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Expand/Collapse extra building details")
+
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {

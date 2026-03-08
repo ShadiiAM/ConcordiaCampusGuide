@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.campusguide.UsabilityTrackerIRLUsers
+
 private val ShuttleBlue = Color(0xFF1565C0)
 
 @Composable
@@ -112,7 +114,9 @@ fun ShuttleStopInfoCard(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (isOperational) {
                     Button(
-                        onClick = { showSchedule = true },
+                        onClick = { showSchedule = true
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Show Shuttle full schedule")
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = ShuttleBlue)
                     ) {
                         Text("View full schedule")

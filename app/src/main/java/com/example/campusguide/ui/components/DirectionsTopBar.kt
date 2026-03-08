@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.TravelMode
 
@@ -176,7 +177,9 @@ fun DirectionsTopBar(
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(if (isSelected) purple else MaterialTheme.colorScheme.surfaceVariant)
-                                .clickable { onModeSelected(mode) }
+                                .clickable { onModeSelected(mode)
+                                            UsabilityTrackerIRLUsers.userInteractionRecord("Travel mode selected $mode")
+                                }
                                 .semantics { contentDescription = mode.contentDescription },
                             contentAlignment = Alignment.Center,
                         ) {
@@ -273,7 +276,9 @@ fun DirectionsTopBar(
                                 .width(174.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(100.dp))
-                                .clickable { showStepDetails = true }
+                                .clickable { showStepDetails = true
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("Show route steps")
+                                }
                                 .semantics { contentDescription = "View route details" },
                         ) {
                             Row(
@@ -313,7 +318,10 @@ fun DirectionsTopBar(
                             .width(174.dp)
                             .height(40.dp)
                             .clip(RoundedCornerShape(100.dp))
-                            .clickable { showStepDetails = false }
+                            .clickable { showStepDetails = false
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Hide route steps")
+
+                            }
                             .semantics { contentDescription = "Hide route details" },
                     ) {
                         Row(
@@ -419,7 +427,9 @@ fun DirectionsTopBar(
                             color = purple,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .clickable(enabled = !isLoadingRoute, onClick = onGoClick)
+                                .clickable(enabled = !isLoadingRoute, onClick = {onGoClick()
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("Top Bar go click")
+                                })
                                 .semantics { contentDescription = "Start navigation" }
                         ) {
                             Text(

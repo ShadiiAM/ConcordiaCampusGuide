@@ -75,6 +75,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import androidx.compose.ui.text.font.FontWeight
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
@@ -711,6 +712,7 @@ fun MapScreen(
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Click on Shuttle Stop marker")
                                 true
                             } else {
                                 false
@@ -728,6 +730,8 @@ fun MapScreen(
                             val featureId = activeOverlay?.getPolygonId(polygon) ?: return@setOnPolygonClickListener
                             val props = activeOverlay.getBuildingProps()[featureId] ?: return@setOnPolygonClickListener
                             val buildingInfo = BuildingInfo.fromJson(props)
+
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Building Overlay polygon Clicked")
 
                             // Calculate centroid for polygon click position
                             val latLng = polygon.points.let { points ->
@@ -817,7 +821,11 @@ fun MapScreen(
                     .size(48.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable(onClick = onBottomSearchClick)
+                    .clickable(
+
+                        onClick = onBottomSearchClick
+
+                    )
                     .semantics { contentDescription = "Bottom search button" },
                 contentAlignment = Alignment.Center
             ) {
@@ -848,12 +856,14 @@ fun MapScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = { zoomIn() },
+                    onClick = { zoomIn()
+                        UsabilityTrackerIRLUsers.userInteractionRecord("Zoom In")
+                              },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.zoom_in_button),
-                        contentDescription = "Zoom In",
+                        contentDescription = "Zoom In Map Click",
                         tint = Color.Unspecified,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -864,7 +874,9 @@ fun MapScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { moveLeft() },
+                        onClick = { moveLeft()
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Pan Left Map Click")
+                        },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -880,7 +892,10 @@ fun MapScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(
-                            onClick = { moveUp() },
+                            onClick = { moveUp()
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Pan Up Map Click")
+
+                            },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -892,7 +907,10 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { recenter() },
+                            onClick = { recenter()
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Recenter Map Click")
+
+                            },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -904,7 +922,9 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { moveDown() },
+                            onClick = { moveDown()
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Pan Down Map Click")
+                            },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -917,7 +937,9 @@ fun MapScreen(
                     }
 
                     IconButton(
-                        onClick = { moveRight() },
+                        onClick = { moveRight()
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Pan Right Map Click")
+                        },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -930,7 +952,9 @@ fun MapScreen(
                 }
 
                 IconButton(
-                    onClick = { zoomOut() },
+                    onClick = { zoomOut()
+                        UsabilityTrackerIRLUsers.userInteractionRecord("Zoom Out Map Click")
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -944,7 +968,10 @@ fun MapScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 IconButton(
-                    onClick = { controlsVisible = !controlsVisible },
+                    onClick = { controlsVisible = !controlsVisible
+                        UsabilityTrackerIRLUsers.userInteractionRecord("Map Controls Hidden Toggle")
+
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -957,7 +984,10 @@ fun MapScreen(
             }
         } else {
             IconButton(
-                onClick = { controlsVisible = true },
+                onClick = { controlsVisible = true
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Map Controls Visible Toggle")
+
+                },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 60.dp)
@@ -1035,7 +1065,9 @@ fun MapScreen(
             ShuttleStopInfoCard(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
-                onDismiss = { selectedShuttleStop = null }
+                onDismiss = { selectedShuttleStop = null
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Dismiss Shuttle Stop Info card")
+                }
             )
         }
 
@@ -1055,7 +1087,9 @@ fun MapScreen(
             is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
                     // X just hides the card — route state and top bar remain intact
                     showRouteOptionsCard = false
-                }) {
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Bottom Card Hide")
+
+            }) {
                     Text(
                         text = "Route options",
                         style = MaterialTheme.typography.titleMedium,
@@ -1084,6 +1118,8 @@ fun MapScreen(
                             directionsUiState = directionsUiState.copy(
                                 step = step.copy(origin = resolveBuildingLatLng(building)),
                             )
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Building suggestion clicked (bottom card)")
+
                         },
                     )
 
@@ -1121,6 +1157,8 @@ fun MapScreen(
                                     buildingHit = hit,
                                 ),
                             )
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Building suggestion clicked (bottom card)")
+
                         },
                     )
 
@@ -1173,6 +1211,9 @@ fun MapScreen(
                                     )
                                 }
                             }
+
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Bottom Card Go (Search route)")
+
                         },
                     ) {
                         Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")

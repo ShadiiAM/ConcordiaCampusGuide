@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 
 enum class Campus {
@@ -86,7 +87,9 @@ fun CampusToggle(
                     MaterialTheme.colorScheme.onSecondaryContainer
             ),
             selected = selectedCampus == Campus.SGW,
-            onClick = { onCampusSelected(Campus.SGW) },
+            onClick = {
+                UsabilityTrackerIRLUsers.userInteractionRecord("Campus Toggle SGW")
+                onCampusSelected(Campus.SGW) },
             modifier = Modifier.weight(weight = 0.5f)
         )
 
@@ -129,7 +132,9 @@ fun CampusToggle(
                     MaterialTheme.colorScheme.onSecondaryContainer
             ),
             selected = selectedCampus == Campus.LOYOLA,
-            onClick = { onCampusSelected(Campus.LOYOLA) },
+            onClick = {
+                UsabilityTrackerIRLUsers.userInteractionRecord("Campus Toggle LOYOLA")
+                onCampusSelected(Campus.LOYOLA) },
             modifier = Modifier.weight(weight = 0.5f)
         )
     }

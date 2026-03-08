@@ -53,6 +53,7 @@ import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        UsabilityTrackerIRLUsers.userInteractionRecord("App Start")
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -80,6 +81,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        UsabilityTrackerIRLUsers.userInteractionRecord("App Loaded")
+
 
     }
 }
@@ -123,15 +127,23 @@ fun ConcordiaCampusGuideApp() {
     when {
         showAccessibility -> {
             AccessibilityScreen(
-                onBackClick = { showAccessibility = false }
+                onBackClick = { showAccessibility = false
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Back button from accessibility page")
+                }
             )
         }
 
         showProfile -> {
             ProfileScreen(
-                onBackClick = { showProfile = false },
-                onProfileClick = { /* handle profile details */ },
-                onAccessibilityClick = { showAccessibility = true }
+                onBackClick = { showProfile = false
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Back button from profile page")
+                },
+                onProfileClick = { /* handle profile details */
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Attempted profile button from profile page")
+                },
+                onAccessibilityClick = { showAccessibility = true
+                    UsabilityTrackerIRLUsers.userInteractionRecord("Go to accessibility page click")
+                }
             )
         }
         else -> {
@@ -139,19 +151,28 @@ fun ConcordiaCampusGuideApp() {
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(
-                            searchQuery = "$searchQuery#$searchCounter",
-                            topBarSelectedBuilding = topBarSelectedBuilding,
-                            onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
-                            onBottomSearchClick = {
-                                try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
-                            },
-                            onDirectionsTopBarState = { state -> directionsTopBarState = state },  // ← add
-                            directionsGoTrigger = directionsGoTrigger,                              // ← add
-                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
-                            topBarTravelMode = topBarTravelMode,
-                        )
+
+                                searchQuery = "$searchQuery#$searchCounter",
+                                topBarSelectedBuilding = topBarSelectedBuilding,
+                                onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
+                                onBottomSearchClick = {
+                                    try {
+                                        searchFocusRequester.requestFocus()
+                                        UsabilityTrackerIRLUsers.userInteractionRecord("bottom search button click")
+                                    } catch (_: IllegalStateException) {
+                                    }
+                                },
+                                onDirectionsTopBarState = { state ->
+                                    directionsTopBarState = state
+                                },  // ← add
+                                directionsGoTrigger = directionsGoTrigger,                              // ← add
+                                directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                                topBarTravelMode = topBarTravelMode,
+                            )
+
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
+
                     }
 
                     if (directionsTopBarState.active) {
@@ -171,10 +192,14 @@ fun ConcordiaCampusGuideApp() {
                             onCancelClick = {
                                 directionsCancelTrigger++
                                 topBarTravelMode = TravelMode.DRIVE
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Cancel route button click")
+
                             },
                             onBackClick = {
                                 // X only dismisses the bar — Cancel button is the only way to cancel the route
                                 directionsTopBarState = directionsTopBarState.copy(active = false)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Remove Route bar click")
+
                             },
                         )
                     } else {
@@ -206,14 +231,21 @@ fun ConcordiaCampusGuideApp() {
                                         currentDestination.value = AppDestinations.MAP
                                     }
                                 }
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Search Bar Query submit")
+
                             },
-                            onProfileClick = { showProfile = true },
+                            onProfileClick = { showProfile = true
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Search Bar Profile Button clicked")
+
+                            },
                             suggestions = topBarSuggestions,
                             onBuildingSelected = { building ->
                                 topBarSelectedBuilding = building
                                 topBarSuggestions = emptyList()
                                 searchQuery = ""
                                 currentDestination.value = AppDestinations.MAP
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Building suggestion clicked")
+
                             },
                         )
                     }

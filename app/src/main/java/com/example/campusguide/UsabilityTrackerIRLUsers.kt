@@ -7,11 +7,22 @@ import java.io.File
 object UsabilityTrackerIRLUsers {
 
     private val results = mutableListOf<String>()
+    private val logResults = mutableListOf<String>()
 
+    private var lastTime: Long? = null
     fun userInteractionRecord(userInteraction: String){
-        val time = System.currentTimeMillis()
-        results.add("$userInteraction,$time")
-        Log.d("USABILITY", "$userInteraction recorded on time $time")
+
+        val now = System.currentTimeMillis()
+
+        if (lastTime != null) {
+            val diff = now - lastTime!!
+            val record = "$userInteraction,${diff / 1000.0}"
+            Log.d("USABILITY", record)
+            logResults.add(record)
+        }
+        results.add("$userInteraction,$now")
+
+        lastTime = now
     }
 
     fun dumpResults() {

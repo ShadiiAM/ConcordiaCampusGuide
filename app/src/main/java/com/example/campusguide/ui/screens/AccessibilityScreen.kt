@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
@@ -149,6 +150,8 @@ fun AccessibilityScreen(
                             onClick = {
                                 accessibilityState.decreaseTextSize()
                                 persist()
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Decrease Text size clicked")
+
                             },
                             modifier = Modifier.size(32.dp)
                         ) {
@@ -163,6 +166,8 @@ fun AccessibilityScreen(
                             onClick = {
                                 accessibilityState.increaseTextSize()
                                 persist()
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Increase Text size clicked")
+
                             },
                             modifier = Modifier.size(32.dp)
                         ) {
@@ -213,6 +218,8 @@ fun AccessibilityScreen(
                             )
                             .background(boxColor)
                             .clickable {
+                                UsabilityTrackerIRLUsers.userInteractionRecord("Cycle Color Blind Mode")
+
                                 accessibilityState.cycleColorBlindMode()
                                 persist()
                             },
@@ -247,6 +254,7 @@ fun AccessibilityScreen(
                         onCheckedChange = { checked ->
                             accessibilityState.setBold(checked)
                             persist()
+                            UsabilityTrackerIRLUsers.userInteractionRecord("Bold/Unbold check clicked")
                         },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
