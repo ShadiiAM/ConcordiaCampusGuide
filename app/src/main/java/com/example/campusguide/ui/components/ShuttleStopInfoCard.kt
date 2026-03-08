@@ -16,7 +16,11 @@ import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.accessibility.AccessibleText
-
+import com.example.campusguide.ui.shuttle.ShuttleSchedule
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 private val ShuttleBlue = Color(0xFF1565C0)
 
 @Composable
@@ -25,6 +29,22 @@ fun ShuttleStopInfoCard(
     isOperational: Boolean = true,
     onDismiss: () -> Unit
 ) {
+    var showSchedule by remember { mutableStateOf(false) }
+
+    if (showSchedule) {
+        ShuttleScheduleDialog(onDismiss = { showSchedule = false })
+        return
+    }
+
+    // Compute next departure
+    val nextDep = ShuttleSchedule.nextDeparture(stop.campus)
+    val nextDepText = if (nextDep != null) {
+        "Next departure: $nextDep"
+    } else {
+        val nextDay = ShuttleSchedule.nextDepartureNextDay(stop.campus)
+        if (nextDay != null) "No more departures today.\nNext departure: ${nextDay.first} ${nextDay.second}"
+        else "No more departures today."
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -67,6 +87,15 @@ fun ShuttleStopInfoCard(
                         baseFontSizeSp = 14f,
                         fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    AccessibleText(
+                        text = nextDepText,
+                        baseFontSizeSp = 14f,
+                        forceFontWeight = FontWeight.SemiBold,
+                        fallbackColor = if (nextDep != null)
+                            MaterialTheme.colorScheme.onSurface
+                        else
+                            MaterialTheme.colorScheme.error
+                    )
                     val campusLabel = when (stop.campus) {
                         Campus.SGW -> "SGW"
                         Campus.LOYOLA -> "Loyola"
@@ -80,8 +109,16 @@ fun ShuttleStopInfoCard(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK")
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (isOperational) {
+                    Button(
+                        onClick = { showSchedule = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = ShuttleBlue)
+                    ) {
+                        Text("View full schedule")
+                    }
+                }
+                TextButton(onClick = onDismiss) { Text("OK") }
             }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,

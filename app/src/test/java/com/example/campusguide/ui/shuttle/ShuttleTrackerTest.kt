@@ -53,8 +53,16 @@ class ShuttleTrackerTest {
     }
 
     @Test
-    fun `getNextShuttle returns null as stub for US-3_2`() {
-        assertNull(tracker.getNextShuttle())
+    fun `getNextShuttleForCampus returns string or null for SGW`() {
+        // Returns either a time string or null, but should never throw or return blank string.
+        val result = tracker.getNextShuttleForCampus(Campus.SGW)
+        if (result != null) assertTrue(result.isNotBlank())
+    }
+
+    @Test
+    fun `getNextShuttleForCampus returns string or null for Loyola`() {
+        val result = tracker.getNextShuttleForCampus(Campus.LOYOLA)
+        if (result != null) assertTrue(result.isNotBlank())
     }
 
     @Test
