@@ -1,0 +1,42 @@
+App Loaded,0.02
+Search Bar Profile Button clicked,14.473
+Go to accessibility page click,2.158
+Bold/Unbold check clicked,4.209
+Cycle Color Blind Mode,4.7
+Increase Text size clicked,4.209
+Back button from accessibility page,3.239
+Back button from profile page,1.448
+CALENDAR navigation button clicked,2.886
+Go Ahead in Calendar Date,3.307
+Set Calendar Date Daily,2.737
+Search Bar Query submit,7.997
+Campus Toggle LOYOLA,4.732
+Campus Toggle SGW,1.907
+Campus Toggle LOYOLA,1.523
+CALENDAR navigation button clicked,2.365
+Go Ahead in Calendar Date,2.937
+Set Calendar Date Daily,1.066
+Set Calendar Date Daily,0.811
+Set Calendar Date Daily,0.159
+Set Calendar Date Weekly,1.908
+Set Calendar Date Daily,0.82
+POI navigation button clicked,2.443
+MAP navigation button clicked,1.549
+CALENDAR navigation button clicked,2.283
+MAP navigation button clicked,1.199
+Click on Shuttle Stop marker,5.07
+Show Shuttle full schedule,4.735
+Dismiss Shuttle Stop Info card,11.423
+Building suggestion clicked,7.291
+Bottom Card Go (Search route),3.075
+
+
+Age: 25
+Gender: Female
+Technical expertise: familiar but not savvy
+Campus familiarity: visitor (has been 1-2 times)
+Accessibility needs: none
+
+Satisfaction score: 8/10
+Comments: as someone not familiar with the campus, she did not really understand where to find the shuttle and just pressed around all pages until she saw it
+Would like accessibility settings to be somewhere else with a setting icon but found it easily since there were no other options that could have it

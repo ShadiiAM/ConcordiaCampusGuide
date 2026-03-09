@@ -1,0 +1,33 @@
+2026-03-08 16:41:43.104  5614-5614  USABILITY               com.example.campusguide              D  App Loaded,2.193
+2026-03-08 16:42:22.677  5614-5614  USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,39.598
+2026-03-08 16:42:28.022  5614-5614  USABILITY               com.example.campusguide              D  Go to accessibility page click,5.344
+2026-03-08 16:42:35.201  5614-5614  USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,7.18
+2026-03-08 16:42:44.583  5614-5614  USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,9.368
+2026-03-08 16:42:48.563  5614-5614  USABILITY               com.example.campusguide              D  Increase Text size clicked,3.994
+2026-03-08 16:42:52.273  5614-5614  USABILITY               com.example.campusguide              D  Back button from accessibility page,3.71
+2026-03-08 16:42:55.156  5614-5614  USABILITY               com.example.campusguide              D  Back button from profile page,2.883
+2026-03-08 16:43:03.228  5614-5614  USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,8.072
+2026-03-08 16:43:08.315  5614-5614  USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,5.087
+2026-03-08 16:43:18.894  5614-5614  USABILITY               com.example.campusguide              D  MAP navigation button clicked,10.579
+2026-03-08 16:43:35.873  5614-5614  USABILITY               com.example.campusguide              D  Zoom In,16.979
+2026-03-08 16:43:43.998  5614-5614  USABILITY               com.example.campusguide              D  Zoom In,8.125
+2026-03-08 16:43:51.038  5614-5614  USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,7.04
+2026-03-08 16:43:54.061  5614-5614  USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,3.023
+2026-03-08 16:43:59.689  5614-5614  USABILITY               com.example.campusguide              D  Show Shuttle full schedule,5.627
+2026-03-08 16:44:17.001  5614-5614  USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,17.312
+2026-03-08 16:44:50.506  5614-5614  USABILITY               com.example.campusguide              D  Building suggestion clicked,33.505
+2026-03-08 16:45:06.183  5614-5614  USABILITY               com.example.campusguide              D  Bottom Card Go (Search route),15.678
+2026-03-08 16:45:24.771  5614-5614  USABILITY               com.example.campusguide              D  Remove Route bar click,18.587
+
+Age: 50
+Gender: Male
+Technical expertise: tech savvy
+Campus familiarity: familiar
+Accessibility needs: needed bigger text for text visibility
+
+Satisfaction: 9/10
+comments: would be better if accessibility settings were found in the settings wheel icon and not the user icon
+Could not read the shuttle icon text because it was too small. Did not think to go and increase text size more because he knew where the shuttles were on the campus
+Map UI is clean, he likes the clear overlays for the building
+
+

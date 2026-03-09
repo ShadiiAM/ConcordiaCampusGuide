@@ -1,0 +1,35 @@
+---------------------------- PROCESS STARTED (24349) for package com.example.campusguide ----------------------------
+2026-03-08 16:33:05.499 24349-24349 USABILITY               com.example.campusguide              D  App Loaded,0.056
+2026-03-08 16:33:16.802 24349-24349 USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,11.303
+2026-03-08 16:33:18.000 24349-24349 USABILITY               com.example.campusguide              D  Go to accessibility page click,1.198
+2026-03-08 16:33:25.819 24349-24349 USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,7.818
+2026-03-08 16:33:28.910 24349-24349 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,3.092
+2026-03-08 16:33:29.305 24349-24349 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,0.395
+2026-03-08 16:33:30.215 24349-24349 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,0.91
+2026-03-08 16:33:30.797 24349-24349 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,0.582
+2026-03-08 16:33:31.368 24349-24349 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,0.571
+2026-03-08 16:33:35.904 24349-24349 USABILITY               com.example.campusguide              D  Increase Text size clicked,4.536
+2026-03-08 16:33:37.983 24349-24349 USABILITY               com.example.campusguide              D  Back button from accessibility page,2.079
+2026-03-08 16:33:42.596 24349-24349 USABILITY               com.example.campusguide              D  Back button from profile page,4.613
+2026-03-08 16:33:44.624 24349-24349 USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,2.028
+2026-03-08 16:33:46.252 24349-24349 USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,1.628
+2026-03-08 16:33:55.221 24349-24349 USABILITY               com.example.campusguide              D  Set Calendar Date Daily,8.969
+2026-03-08 16:34:06.803 24349-24349 USABILITY               com.example.campusguide              D  POI navigation button clicked,11.582
+2026-03-08 16:34:08.586 24349-24349 USABILITY               com.example.campusguide              D  MAP navigation button clicked,1.783
+2026-03-08 16:34:16.902 24349-24349 USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,8.316
+2026-03-08 16:34:19.267 24349-24349 USABILITY               com.example.campusguide              D  Show Shuttle full schedule,2.365
+2026-03-08 16:34:29.305 24349-24349 USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,10.038
+2026-03-08 16:34:33.247 24349-24349 USABILITY               com.example.campusguide              D  Zoom In,3.942
+2026-03-08 16:34:33.898 24349-24349 USABILITY               com.example.campusguide              D  Zoom In,0.651
+2026-03-08 16:34:45.956 24349-24349 USABILITY               com.example.campusguide              D  Building suggestion clicked,12.058
+2026-03-08 16:34:51.120 24349-24349 USABILITY               com.example.campusguide              D  Top Bar go click,5.164
+
+
+Color scheme/Theme is rather uncomfortable. WOuldnt want to stay the in the app for too long. Doesnt like the aesthetic and would probably like a dark theme better.
+
+User flow was nice, felt comfortable and usual. Follows regular apps style and placement.
+
+score satisfaction 4.8/5 deducted 0.2 points for aesthetic choice. Liked the colorblind cycle as it felt intuitive and fast.
+
+25 years old male tech saavy. Familiar with concordia SGW campus, no accessibility needs.
+
