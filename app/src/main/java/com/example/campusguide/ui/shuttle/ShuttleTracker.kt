@@ -6,16 +6,14 @@ import com.google.android.gms.maps.model.LatLng
 
 /**
  * Domain class for shuttle bus logic.
- * Applies "Extract Class" refactoring (Fowler) — shuttle logic lives here, not inline in MapScreen.
- * Matches the class diagram: campusStops, isOperational(), getShuttleStops().
  */
 class ShuttleTracker(private val dataSource: ShuttleDataSource = StaticShuttleDataSource()) {
 
-    /** Safely retrieves shuttle stops from the data source, failing gracefully with an empty list. */
+    // retrieves shuttle stops from the data source, failing gracefully with an empty list.
     private fun safeGetShuttleStops(): List<ShuttleStop> =
         runCatching { dataSource.getShuttleStops() }.getOrDefault(emptyList())
 
-    /** Map of campus → list of shuttle stop LatLngs (matches class diagram). */
+    // Map of campus → list of shuttle stop LatLngs
     val campusStops: Map<Campus, List<LatLng>> by lazy {
         safeGetShuttleStops().groupBy(ShuttleStop::campus) { it.latLng }
     }
@@ -25,6 +23,13 @@ class ShuttleTracker(private val dataSource: ShuttleDataSource = StaticShuttleDa
 
     fun getShuttleStops(): List<ShuttleStop> = safeGetShuttleStops()
 
-    /** Stub for US-3.2 — next shuttle time. */
     fun getNextShuttle(): String? = null
+
+    fun getNextShuttleForCampus(campus: Campus): String? {
+        val next = ShuttleSchedule.nextDeparture(campus)
+        if (next != null) return next.toString()
+
+        val nextDay = ShuttleSchedule.nextDepartureNextDay(campus) ?: return null
+        return "Next ${nextDay.first}: ${nextDay.second}"
+    }
 }

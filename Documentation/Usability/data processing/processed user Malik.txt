@@ -1,0 +1,40 @@
+MAP navigation button clicked,1.352
+Map Controls Hidden Toggle,2.906
+Search Bar Query submit,6.839
+POI navigation button clicked,6.028
+MAP navigation button clicked,1.234
+Map Controls Hidden Toggle,3.474
+Search Bar Profile Button clicked,9.374
+Attempted profile button from profile page,1.816
+Go to accessibility page click,0.931
+Increase Text size clicked,1.679
+Decrease Text size clicked,1.381
+Cycle Color Blind Mode,0.718
+Cycle Color Blind Mode,0.527
+Cycle Color Blind Mode,0.534
+Cycle Color Blind Mode,0.474
+Bold/Unbold check clicked,1.439
+Bold/Unbold check clicked,0.811
+Back button from accessibility page,1.628
+Back button from profile page,1.851
+CALENDAR navigation button clicked,5.248
+Go Ahead in Calendar Date,2.153
+MAP navigation button clicked,6.097
+Zoom In,6.153
+Zoom In,0.647
+Map Controls Hidden Toggle,2.564
+Click on Shuttle Stop marker,1.392
+Show Shuttle full schedule,2.76
+Building suggestion clicked,13.764
+Bottom Card Go (Search route),3.41
+
+────────────────────────────────────────
+USER PROFILE
+────────────────────────────────────────
+Age Range: 30
+Gender: Male
+Technical Expertise: Very tech-savvy
+Campus Familiarity: Been to SGW campus 3 times
+Accessibility Needs: None
+Satisfaction Score: 4.5/5
+Comments/Feedback: Not obvious to find the accessibility page — it feels hidden.

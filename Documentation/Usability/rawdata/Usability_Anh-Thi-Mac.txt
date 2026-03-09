@@ -1,0 +1,43 @@
+---------------------------- PROCESS STARTED (9617) for package com.example.campusguide ----------------------------
+2026-03-08 16:56:15.190  9617-9617  USABILITY               com.example.campusguide              D  App Loaded,0.02
+2026-03-08 16:56:29.664  9617-9617  USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,14.473
+2026-03-08 16:56:31.821  9617-9617  USABILITY               com.example.campusguide              D  Go to accessibility page click,2.158
+2026-03-08 16:56:36.030  9617-9617  USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,4.209
+2026-03-08 16:56:40.730  9617-9617  USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,4.7
+2026-03-08 16:56:44.940  9617-9617  USABILITY               com.example.campusguide              D  Increase Text size clicked,4.209
+2026-03-08 16:56:48.178  9617-9617  USABILITY               com.example.campusguide              D  Back button from accessibility page,3.239
+2026-03-08 16:56:49.626  9617-9617  USABILITY               com.example.campusguide              D  Back button from profile page,1.448
+2026-03-08 16:56:52.512  9617-9617  USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,2.886
+2026-03-08 16:56:55.819  9617-9617  USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,3.307
+2026-03-08 16:56:58.556  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Daily,2.737
+2026-03-08 16:57:06.553  9617-9617  USABILITY               com.example.campusguide              D  Search Bar Query submit,7.997
+2026-03-08 16:57:11.288  9617-9617  USABILITY               com.example.campusguide              D  Campus Toggle LOYOLA,4.732
+2026-03-08 16:57:13.192  9617-9617  USABILITY               com.example.campusguide              D  Campus Toggle SGW,1.907
+2026-03-08 16:57:14.715  9617-9617  USABILITY               com.example.campusguide              D  Campus Toggle LOYOLA,1.523
+2026-03-08 16:57:17.080  9617-9617  USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,2.365
+2026-03-08 16:57:20.017  9617-9617  USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,2.937
+2026-03-08 16:57:21.083  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Daily,1.066
+2026-03-08 16:57:21.895  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Daily,0.811
+2026-03-08 16:57:22.053  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Daily,0.159
+2026-03-08 16:57:23.961  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Weekly,1.908
+2026-03-08 16:57:24.781  9617-9617  USABILITY               com.example.campusguide              D  Set Calendar Date Daily,0.82
+2026-03-08 16:57:27.225  9617-9617  USABILITY               com.example.campusguide              D  POI navigation button clicked,2.443
+2026-03-08 16:57:28.773  9617-9617  USABILITY               com.example.campusguide              D  MAP navigation button clicked,1.549
+2026-03-08 16:57:31.056  9617-9617  USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,2.283
+2026-03-08 16:57:32.255  9617-9617  USABILITY               com.example.campusguide              D  MAP navigation button clicked,1.199
+2026-03-08 16:57:37.325  9617-9617  USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,5.07
+2026-03-08 16:57:42.061  9617-9617  USABILITY               com.example.campusguide              D  Show Shuttle full schedule,4.735
+2026-03-08 16:57:53.483  9617-9617  USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,11.423
+2026-03-08 16:58:00.774  9617-9617  USABILITY               com.example.campusguide              D  Building suggestion clicked,7.291
+2026-03-08 16:58:03.849  9617-9617  USABILITY               com.example.campusguide              D  Bottom Card Go (Search route),3.075
+---------------------------- PROCESS ENDED (9617) for package com.example.campusguide ----------------------------
+
+Age: 25
+Gender: Female
+Technical expertise: familiar but not savvy
+Campus familiarity: visitor (has been 1-2 times)
+Accessibility needs: none
+
+Satisfaction score: 8/10
+Comments: as someone not familiar with the campus, she did not really understand where to find the shuttle and just pressed around all pages until she saw it
+Would like accessibility settings to be somewhere else with a setting icon but found it easily since there were no other options that could have it
