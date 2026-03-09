@@ -1,0 +1,437 @@
+[2026-03-08 17:20:08.038 14351-14351 USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,382.476
+ 2026-03-08 17:20:08.090 14351-14407 m140.few                com.example.campusguide              W  Destroying egl surface
+ 2026-03-08 17:20:12.741 14351-14351 USABILITY               com.example.campusguide              D  Go to accessibility page click,4.704
+ 2026-03-08 17:20:14.763 14351-14351 USABILITY               com.example.campusguide              D  Increase Text size clicked,2.022
+ 2026-03-08 17:20:17.792 14351-14351 USABILITY               com.example.campusguide              D  Back button from accessibility page,3.029
+ 2026-03-08 17:20:18.627 14351-14351 Choreographer           com.example.campusguide              I  Skipped 47 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:20:18.659 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 24MB AllocSpace bytes, 7(140KB) LOS objects, 46% free, 28MB/52MB, paused 1.615ms,12.514ms total 460.149ms
+ 2026-03-08 17:20:23.795 14351-14351 USABILITY               com.example.campusguide              D  Go to accessibility page click,6.003
+ 2026-03-08 17:20:25.822 14351-14351 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,2.027
+ 2026-03-08 17:20:27.911 14351-14351 USABILITY               com.example.campusguide              D  Back button from accessibility page,2.088
+ 2026-03-08 17:20:29.019 14351-14351 USABILITY               com.example.campusguide              D  Back button from profile page,1.109
+ 2026-03-08 17:20:30.057 14351-14351 MapsInitializer         com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:20:30.063 14351-14351 zzcc                    com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:20:30.067 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services package version: 260864038
+ 2026-03-08 17:20:30.067 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services maps renderer version(maps_core): 254515602
+ 2026-03-08 17:20:30.125 14351-14351 m140.cek                com.example.campusguide              I  FpsProfiler MAIN created on main
+ 2026-03-08 17:20:30.172 14351-14351 m140.dvj                com.example.campusguide              I  Map using legacy labeler
+ 2026-03-08 17:20:30.195 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: false
+ 2026-03-08 17:20:30.202 14351-14351 m140.duc                com.example.campusguide              I  requestDrawingConfig for epoch 769 legend ROADMAP
+ 2026-03-08 17:20:30.219 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:30.221 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:30.258 14351-14351 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:30.265 14351-14351 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:30.289 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:30.546 14351-14406 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.268 14351-14351 Choreographer           com.example.campusguide              I  Skipped 74 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:20:31.306 14351-14351 m140.dpe                com.example.campusguide              W  ClientArea created with texture coordinates, but has a non-textured style.
+ 2026-03-08 17:20:31.307 14351-14351 m140.dfg                com.example.campusguide              W  ScreenPixelGeometryUnpacker int[] getVertices not supported; float-precision would be lost.
+ 2026-03-08 17:20:31.311 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.320 14351-14361 HWUI                    com.example.campusguide              I  Davey! duration=1284ms; Flags=0, FrameTimelineVsyncId=65049, IntendedVsync=19319859541903, Vsync=19321092875187, InputEventId=0, HandleInputStart=19321101526775, AnimationStart=19321101527811, PerformTraversalsStart=19321123571707, DrawStart=19321123628757, FrameDeadline=19321142875185, FrameStartTime=19321100378386, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19321129118585, SyncStart=19321129347381, IssueDrawCommandsStart=19321129469575, SwapBuffers=19321135423660, FrameCompleted=19321144161097, DequeueBufferDuration=5751, QueueBufferDuration=2969341, GpuCompleted=19321144161097, SwapBuffersCompleted=19321139555178, DisplayPresentTime=0, CommandSubmissionCompleted=19321135423660,
+ 2026-03-08 17:20:31.321 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.324 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.336 14351-14351 WindowLayo...ponentImpl com.example.campusguide              D  Register WindowLayoutInfoListener on Context=com.example.campusguide.MainActivity@28b3d5b, of which baseContext=android.app.ContextImpl@d3d1284
+ 2026-03-08 17:20:31.345 14351-14645 m140.fhw                com.example.campusguide              W  onContextLost - The atlas still contained allocations, could be a bug.
+ 2026-03-08 17:20:31.364 14351-14649 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:31.367 14351-14649 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:31.379 14351-14649 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:31.381 14351-14649 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:31.402 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.410 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.417 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.427 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.434 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.439 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.446 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.452 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.456 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.461 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.465 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.470 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.476 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.483 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.489 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.493 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.498 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.503 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.507 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.511 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.516 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.520 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.524 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.529 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.535 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.539 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.543 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.548 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.554 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.558 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.563 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.567 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.573 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.580 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.586 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.718 14351-14645 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.753 14351-14645 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:31.809 14351-14379 m140.fqv.a              com.example.campusguide              I  Unable to retrieve flag snapshot for com.google.android.gms.clearcut_client#com.example.campusguide, using defaults.
+ 2026-03-08 17:20:31.963 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:31.982 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:31.998 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.008 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.014 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.022 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.040 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.042 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.043 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.057 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.064 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.073 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.078 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.086 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.091 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.110 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.110 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.111 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.111 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.122 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.147 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.151 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.157 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.160 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.163 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.164 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.173 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.178 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.183 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.187 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.188 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.193 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.200 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.202 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.203 14351-14645 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:32.627 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 12MB AllocSpace bytes, 147(14MB) LOS objects, 40% free, 34MB/58MB, paused 3.978ms,5.987ms total 882.083ms
+ 2026-03-08 17:20:32.663 14351-14351 Choreographer           com.example.campusguide              I  Skipped 64 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:20:33.298 14351-14351 USABILITY               com.example.campusguide              D  Search Bar Query submit,4.279
+ 2026-03-08 17:20:33.300 14351-14351 Choreographer           com.example.campusguide              I  Skipped 35 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:20:33.434 14351-14365 HWUI                    com.example.campusguide              I  Davey! duration=702ms; Flags=0, FrameTimelineVsyncId=65611, IntendedVsync=19322542875129, Vsync=19323126208439, InputEventId=359037642, HandleInputStart=19323133100972, AnimationStart=19323133102821, PerformTraversalsStart=19323203631974, DrawStart=19323203837680, FrameDeadline=19322559541795, FrameStartTime=19323132188397, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19323230662121, SyncStart=19323230766892, IssueDrawCommandsStart=19323230913634, SwapBuffers=19323232412983, FrameCompleted=19323245011461, DequeueBufferDuration=5333, QueueBufferDuration=846591, GpuCompleted=19323245011461, SwapBuffersCompleted=19323234818918, DisplayPresentTime=0, CommandSubmissionCompleted=19323232412983,
+ 2026-03-08 17:20:34.224 14351-14646 m140.caw                com.example.campusguide              I  Initial labeling completed.
+ 2026-03-08 17:20:36.360 14351-14351 USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,3.062
+ 2026-03-08 17:20:36.427 14351-14645 m140.few                com.example.campusguide              W  Destroying egl surface
+ 2026-03-08 17:20:37.948 14351-14351 USABILITY               com.example.campusguide              D  Go to accessibility page click,1.588
+ 2026-03-08 17:20:39.594 14351-14351 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,1.646
+ 2026-03-08 17:20:42.367 14351-14351 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,2.772
+ 2026-03-08 17:20:44.243 14351-14351 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,1.877
+ 2026-03-08 17:20:44.353 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 13MB AllocSpace bytes, 222(13MB) LOS objects, 42% free, 31MB/55MB, paused 847us,2.972ms total 221.937ms
+ 2026-03-08 17:20:49.253 14351-14351 USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,5.01
+ 2026-03-08 17:20:53.808 14351-14351 USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,4.555
+ 2026-03-08 17:20:56.082 14351-14351 USABILITY               com.example.campusguide              D  Back button from accessibility page,2.274
+ 2026-03-08 17:20:57.214 14351-14351 USABILITY               com.example.campusguide              D  Back button from profile page,1.132
+ 2026-03-08 17:20:57.475 14351-14351 MapsInitializer         com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:20:57.476 14351-14351 zzcc                    com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:20:57.477 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services package version: 260864038
+ 2026-03-08 17:20:57.478 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services maps renderer version(maps_core): 254515602
+ 2026-03-08 17:20:57.527 14351-14351 m140.cek                com.example.campusguide              I  FpsProfiler MAIN created on main
+ 2026-03-08 17:20:57.556 14351-14351 m140.dvj                com.example.campusguide              I  Map using legacy labeler
+ 2026-03-08 17:20:57.565 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: false
+ 2026-03-08 17:20:57.565 14351-14351 m140.duc                com.example.campusguide              I  requestDrawingConfig for epoch 769 legend ROADMAP
+ 2026-03-08 17:20:57.576 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:57.590 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:57.592 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:20:57.632 14351-14351 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:57.634 14351-14351 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:57.805 14351-14406 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.178 14351-14351 Choreographer           com.example.campusguide              I  Skipped 43 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:20:58.209 14351-14351 m140.dpe                com.example.campusguide              W  ClientArea created with texture coordinates, but has a non-textured style.
+ 2026-03-08 17:20:58.211 14351-14351 m140.dfg                com.example.campusguide              W  ScreenPixelGeometryUnpacker int[] getVertices not supported; float-precision would be lost.
+ 2026-03-08 17:20:58.223 14351-14363 HWUI                    com.example.campusguide              I  Davey! duration=751ms; Flags=0, FrameTimelineVsyncId=72964, IntendedVsync=19347292874139, Vsync=19348009540777, InputEventId=0, HandleInputStart=19348011530582, AnimationStart=19348011532470, PerformTraversalsStart=19348030590695, DrawStart=19348030785974, FrameDeadline=19348026207443, FrameStartTime=19348010629828, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19348033902261, SyncStart=19348034133377, IssueDrawCommandsStart=19348034294506, SwapBuffers=19348038020414, FrameCompleted=19348044473295, DequeueBufferDuration=6657, QueueBufferDuration=1450462, GpuCompleted=19348044473295, SwapBuffersCompleted=19348041852217, DisplayPresentTime=0, CommandSubmissionCompleted=19348038020414,
+ 2026-03-08 17:20:58.224 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.234 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.241 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.259 14351-14351 WindowLayo...ponentImpl com.example.campusguide              D  Register WindowLayoutInfoListener on Context=com.example.campusguide.MainActivity@28b3d5b, of which baseContext=android.app.ContextImpl@d3d1284
+ 2026-03-08 17:20:58.279 14351-14689 m140.fhw                com.example.campusguide              W  onContextLost - The atlas still contained allocations, could be a bug.
+ 2026-03-08 17:20:58.339 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.358 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.363 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.370 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.375 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.383 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.390 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.402 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.410 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.416 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.422 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.426 14351-14694 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:58.429 14351-14694 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:58.436 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.451 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.454 14351-14694 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:58.461 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.464 14351-14694 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:58.475 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.490 14351-14694 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:20:58.493 14351-14694 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:20:58.494 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.511 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.520 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.528 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.539 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.550 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.558 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.572 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.581 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.594 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.602 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.609 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.618 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.627 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.631 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.645 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.658 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.665 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.673 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.679 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.737 14351-14689 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.750 14351-14689 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:20:58.873 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:58.874 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:58.886 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:58.959 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.070 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.070 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.075 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.171 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.204 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.207 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.212 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.248 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.249 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.256 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.290 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.296 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.298 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.310 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.327 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.334 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.357 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.379 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.382 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.387 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.400 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.403 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.406 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.414 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.418 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.422 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.426 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.430 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.432 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.439 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.442 14351-14689 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:20:59.484 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 10MB AllocSpace bytes, 127(15MB) LOS objects, 39% free, 36MB/60MB, paused 1.223ms,6.374ms total 701.727ms
+ 2026-03-08 17:20:59.746 14351-14351 Choreographer           com.example.campusguide              I  Skipped 63 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:21:00.303 14351-14690 m140.caw                com.example.campusguide              I  Initial labeling completed.
+ 2026-03-08 17:21:00.863 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 14MB AllocSpace bytes, 212(10MB) LOS objects, 39% free, 36MB/60MB, paused 565us,3.503ms total 296.269ms
+ 2026-03-08 17:21:06.565 14351-14690 m140.box                com.example.campusguide              I  getExecutor  CREATED  boq@863e504[Network]
+ 2026-03-08 17:21:06.583 14351-14690 GMM-Satell...nnectivity com.example.campusguide              W  WIFI  isActiveNetworkSatellite: false
+ 2026-03-08 17:21:06.606 14351-14690 m140.box                com.example.campusguide              I  getExecutor  CREATED  boq@96548e9[LocFresh]
+ 2026-03-08 17:21:06.702 14351-14704 JavaCronetEngine        com.example.campusguide              W  using the fallback Cronet Engine implementation. Performance will suffer and many HTTP client features, including caching, will not work.
+ 2026-03-08 17:21:06.709 14351-14704 m140.byw                com.example.campusguide              I  Using Paint server URL: https://www.google.com/maps/vt
+ 2026-03-08 17:21:06.722 14351-14704 m140.byj                com.example.campusguide              I  PaintParametersListeningServerChannelManager got a client parameters update event.
+ 2026-03-08 17:21:06.728 14351-14704 m140.btv                com.example.campusguide              I  Updating the server URL. Old URL: https://www.google.com/maps/vt New URL: https://www.google.com/maps/vt
+ 2026-03-08 17:21:06.730 14351-14704 m140.btv                com.example.campusguide              I  Creating a new server channel with URL: https://www.google.com/maps/vt, server channel factory class: class m140.bts
+ 2026-03-08 17:21:06.983 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:21:11.274 14351-14351 USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,14.06
+ 2026-03-08 17:21:11.377 14351-14689 m140.few                com.example.campusguide              W  Destroying egl surface
+ 2026-03-08 17:21:17.892 14351-14351 USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,6.617
+ 2026-03-08 17:21:25.522 14351-14351 USABILITY               com.example.campusguide              D  Set Calendar Date Daily,7.631
+ 2026-03-08 17:21:37.359 14351-14351 VRI[MainActivity]       com.example.campusguide              D  visibilityChanged oldVisibility=true newVisibility=false
+ 2026-03-08 17:21:37.623 14351-14351 WindowOnBackDispatcher  com.example.campusguide              W  sendCancelIfRunning: isInProgress=false callback=android.app.Activity$$ExternalSyntheticLambda0@48b7bd5
+ 2026-03-08 17:21:37.632 14351-14351 ViewRootImpl            com.example.campusguide              D  Skipping stats log for color mode
+ 2026-03-08 17:21:58.099 14351-14370 HWUI                    com.example.campusguide              W  Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+ 2026-03-08 17:21:58.100 14351-14370 HWUI                    com.example.campusguide              W  Failed to initialize 101010-2 format, error = EGL_SUCCESS
+ 2026-03-08 17:21:58.150 14351-14351 USABILITY               com.example.campusguide              D  App Start,32.628
+ 2026-03-08 17:21:58.325 14351-14351 USABILITY               com.example.campusguide              D  App Loaded,0.175
+ 2026-03-08 17:21:59.201 14351-14351 MapsInitializer         com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:21:59.201 14351-14351 zzcc                    com.example.campusguide              D  preferredRenderer: null
+ 2026-03-08 17:21:59.236 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services package version: 260864038
+ 2026-03-08 17:21:59.236 14351-14351 Google Android Maps SDK com.example.campusguide              I  Google Play services maps renderer version(maps_core): 254515602
+ 2026-03-08 17:21:59.298 14351-14351 m140.cek                com.example.campusguide              I  FpsProfiler MAIN created on main
+ 2026-03-08 17:21:59.366 14351-14351 m140.dvj                com.example.campusguide              I  Map using legacy labeler
+ 2026-03-08 17:21:59.380 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: false
+ 2026-03-08 17:21:59.380 14351-14351 m140.duc                com.example.campusguide              I  requestDrawingConfig for epoch 769 legend ROADMAP
+ 2026-03-08 17:21:59.395 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:21:59.403 14351-14351 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:21:59.405 14351-14406 m140.duc                com.example.campusguide              I  Network fetching: true
+ 2026-03-08 17:21:59.421 14351-14351 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:21:59.431 14351-14351 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:21:59.597 14351-14406 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.192 14351-14827 HWUI                    com.example.campusguide              I  Davey! duration=1850ms; Flags=1, FrameTimelineVsyncId=82189, IntendedVsync=19408159538371, Vsync=19408309538365, InputEventId=0, HandleInputStart=19408318022445, AnimationStart=19408318024809, PerformTraversalsStart=19408318025576, DrawStart=19409693311173, FrameDeadline=19408176205037, FrameStartTime=19408316365680, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19409811154981, SyncStart=19409812262595, IssueDrawCommandsStart=19409813193770, SwapBuffers=19409977112076, FrameCompleted=19410011440783, DequeueBufferDuration=7468, QueueBufferDuration=1862087, GpuCompleted=19410011440783, SwapBuffersCompleted=19409994077557, DisplayPresentTime=0, CommandSubmissionCompleted=19409977112076,
+ 2026-03-08 17:22:00.192 14351-14351 Choreographer           com.example.campusguide              I  Skipped 100 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:22:00.269 14351-14351 m140.dpe                com.example.campusguide              W  ClientArea created with texture coordinates, but has a non-textured style.
+ 2026-03-08 17:22:00.271 14351-14351 m140.dfg                com.example.campusguide              W  ScreenPixelGeometryUnpacker int[] getVertices not supported; float-precision would be lost.
+ 2026-03-08 17:22:00.287 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.288 14351-14365 HWUI                    com.example.campusguide              I  Davey! duration=1767ms; Flags=0, FrameTimelineVsyncId=82257, IntendedVsync=19408342871697, Vsync=19410009538297, InputEventId=0, HandleInputStart=19410026691689, AnimationStart=19410026692756, PerformTraversalsStart=19410067873011, DrawStart=19410067944109, FrameDeadline=19410042871629, FrameStartTime=19410024575941, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19410079370066, SyncStart=19410080378312, IssueDrawCommandsStart=19410080726259, SwapBuffers=19410084914773, FrameCompleted=19410111234334, DequeueBufferDuration=19697, QueueBufferDuration=1748907, GpuCompleted=19410111234334, SwapBuffersCompleted=19410100743199, DisplayPresentTime=0, CommandSubmissionCompleted=19410084914773,
+ 2026-03-08 17:22:00.304 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.317 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.375 14351-14351 WindowLayo...ponentImpl com.example.campusguide              D  Register WindowLayoutInfoListener on Context=com.example.campusguide.MainActivity@44bed2b, of which baseContext=android.app.ContextImpl@4cea65
+ 2026-03-08 17:22:00.536 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:22:00.537 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:cdccc993: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+ 2026-03-08 17:22:00.617 14351-14841 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:22:00.624 14351-14841 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:22:00.658 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.659 14351-14841 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:22:00.667 14351-14841 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:22:00.687 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.696 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.699 14351-14841 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:22:00.706 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.707 14351-14841 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:22:00.718 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.726 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.735 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.750 14351-14841 m140.epd                com.example.campusguide              I  Found 47 zoom mappings
+ 2026-03-08 17:22:00.772 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.784 14351-14841 m140.epd                com.example.campusguide              I  Zoom tables loaded
+ 2026-03-08 17:22:00.792 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.809 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.818 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.826 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.858 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.864 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.876 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.884 14351-14838 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.886 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.902 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.912 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.920 14351-14838 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.927 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.940 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.946 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.954 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.963 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.971 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.978 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:00.983 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.005 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.029 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.037 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.049 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.061 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.069 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.080 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.089 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.095 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:01.109 14351-14351 Choreographer           com.example.campusguide              I  Skipped 33 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:22:01.729 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.732 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.748 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.779 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.902 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.904 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.958 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.965 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:01.998 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.034 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.055 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.064 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.072 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.111 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.195 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.231 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.234 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.242 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.246 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.268 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:02.376 14351-14351 Choreographer           com.example.campusguide              I  Skipped 73 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:22:03.073 14351-14351 Choreographer           com.example.campusguide              I  Skipped 33 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:22:03.290 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.339 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.427 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.429 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.449 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.462 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.469 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.476 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.492 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.497 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.502 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.527 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.536 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.551 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:03.563 14351-14838 m140.dvr                com.example.campusguide              W  InternalStyle with id -1 not found in namespace: [GMM-CLIENT-INJECTED-STYLE-NAMESPACE, 1]. Has this style been destroyed?
+ 2026-03-08 17:22:04.056 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 15MB AllocSpace bytes, 172(20MB) LOS objects, 35% free, 43MB/67MB, paused 4.214ms,5.021ms total 3.060s
+ 2026-03-08 17:22:04.569 14351-14839 m140.caw                com.example.campusguide              I  Initial labeling completed.
+ 2026-03-08 17:22:08.922 14351-14351 USABILITY               com.example.campusguide              D  Zoom In,10.596
+ 2026-03-08 17:22:09.250 14351-14839 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:09.879 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 13MB AllocSpace bytes, 283(15MB) LOS objects, 36% free, 42MB/66MB, paused 4.161ms,3.061ms total 688.975ms
+ 2026-03-08 17:22:09.932 14351-14839 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:09.945 14351-14839 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:10.430 14351-14351 USABILITY               com.example.campusguide              D  Zoom In,1.509
+ 2026-03-08 17:22:11.540 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:12.073 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:12.205 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:12.479 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:12.515 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:12.522 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:13.025 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 11MB AllocSpace bytes, 145(10MB) LOS objects, 34% free, 46MB/70MB, paused 1.338ms,3.805ms total 340.504ms
+ 2026-03-08 17:22:13.254 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:13.358 14351-14406 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:13.662 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:22:13.775 14351-14351 USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,3.345
+ 2026-03-08 17:22:14.228 14351-14356 ple.campusguide         com.example.campusguide              I  Compiler allocated 11MB to compile void com.example.campusguide.ui.screens.MapScreenKt.MapScreen(java.lang.String, com.example.campusguide.data.CampusBuilding, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function0, kotlin.jvm.functions.Function1, int, int, com.example.campusguide.ui.directions.TravelMode, androidx.compose.runtime.Composer, int, int)
+ 2026-03-08 17:22:14.474 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:22:14.476 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:5dc4b639: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+ 2026-03-08 17:22:20.112 14351-14351 USABILITY               com.example.campusguide              D  Show Shuttle full schedule,6.337
+ 2026-03-08 17:22:20.242 14351-14351 WindowOnBackDispatcher  com.example.campusguide              W  sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@e97dd21
+ 2026-03-08 17:22:20.306 14351-14370 HWUI                    com.example.campusguide              D  endAllActiveAnimators on 0x7d0d949be130 (UnprojectedRipple) with handle 0x7d0e74964bc0
+ 2026-03-08 17:22:21.074 14351-14351 Choreographer           com.example.campusguide              I  Skipped 56 frames!  The application may be doing too much work on its main thread.
+ 2026-03-08 17:22:21.090 14351-14365 HWUI                    com.example.campusguide              I  Davey! duration=1061ms; Flags=1, FrameTimelineVsyncId=86043, IntendedVsync=19429842870837, Vsync=19429942870833, InputEventId=0, HandleInputStart=19429948188812, AnimationStart=19429948190555, PerformTraversalsStart=19430215686175, DrawStart=19430871891336, FrameDeadline=19429859537503, FrameStartTime=19429946798548, FrameInterval=16666666, WorkloadTarget=16666666, SyncQueued=19430884187594, SyncStart=19430884749191, IssueDrawCommandsStart=19430884961064, SwapBuffers=19430897472234, FrameCompleted=19430904946241, DequeueBufferDuration=6611, QueueBufferDuration=1321707, GpuCompleted=19430904816339, SwapBuffersCompleted=19430904946241, DisplayPresentTime=6842127852496791733, CommandSubmissionCompleted=19430897472234,
+ 2026-03-08 17:22:21.164 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:22:21.165 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:f9a55762: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+ 2026-03-08 17:22:23.170 14351-14357 ple.campusguide         com.example.campusguide              W  Cleared Reference was only reachable from finalizer (only reported once)
+ 2026-03-08 17:22:23.241 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 18MB AllocSpace bytes, 132(6316KB) LOS objects, 34% free, 46MB/70MB, paused 1.627ms,6.594ms total 203.974ms
+ 2026-03-08 17:22:25.518 14351-14351 ple.campusguide         com.example.campusguide              I  hiddenapi: Accessing hidden method Landroid/view/ViewTreeObserver;->dispatchOnScrollChanged()V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app) using reflection: allowed
+ 2026-03-08 17:22:30.261 14351-14351 WindowOnBackDispatcher  com.example.campusguide              W  sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@a47c26a
+ 2026-03-08 17:22:30.341 14351-14370 HWUI                    com.example.campusguide              D  endAllActiveAnimators on 0x7d0d94935470 (UnprojectedRipple) with handle 0x7d0e7495da80
+ 2026-03-08 17:22:30.614 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:22:30.614 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:648d13f2: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+ 2026-03-08 17:22:34.147 14351-14351 USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,14.035
+ 2026-03-08 17:22:34.169 14351-14351 WindowOnBackDispatcher  com.example.campusguide              W  sendCancelIfRunning: isInProgress=false callback=androidx.navigationevent.OnBackInvokedInput$createOnBackAnimationCallback$1@677f79b
+ 2026-03-08 17:22:34.194 14351-14370 HWUI                    com.example.campusguide              D  endAllActiveAnimators on 0x7d0d949d9d60 (UnprojectedRipple) with handle 0x7d0e7491c830
+ 2026-03-08 17:22:34.305 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:22:34.307 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:c44e82: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+ 2026-03-08 17:22:43.532 14351-14351 USABILITY               com.example.campusguide              D  bottom search button click,9.384
+ 2026-03-08 17:22:43.686 14351-14351 InsetsController        com.example.campusguide              D  show(ime(), fromIme=false)
+ 2026-03-08 17:22:43.698 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:513d62c2: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT_BY_INSETS_API fromUser false
+ 2026-03-08 17:22:43.719 14351-14351 InsetsController        com.example.campusguide              D  Setting requestedVisibleTypes to -1 (was -9)
+ 2026-03-08 17:22:43.850 14351-14351 AssistStructure         com.example.campusguide              I  Flattened final assist data: 532 bytes, containing 1 windows, 3 views
+ 2026-03-08 17:22:43.897 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:dd0cec8f: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser false
+ 2026-03-08 17:22:43.898 14351-14351 InsetsController        com.example.campusguide              D  show(ime(), fromIme=false)
+ 2026-03-08 17:22:43.899 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:dd0cec8f: onCancelled at PHASE_CLIENT_REPORT_REQUESTED_VISIBLE_TYPES
+ 2026-03-08 17:22:43.901 14351-14351 RemoteInpu...ectionImpl com.example.campusguide              W  requestCursorUpdates on inactive InputConnection
+ 2026-03-08 17:22:47.551 14351-14351 InteractionJankMonitor  com.example.campusguide              W  Initializing without READ_DEVICE_CONFIG permission. enabled=false, interval=1, missedFrameThreshold=3, frameTimeThreshold=64, package=com.example.campusguide
+ 2026-03-08 17:22:47.772 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:513d62c2: onShown
+ 2026-03-08 17:22:53.375 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 24MB AllocSpace bytes, 17(424KB) LOS objects, 33% free, 48MB/72MB, paused 1.243ms,3.473ms total 259.097ms
+ 2026-03-08 17:23:02.425 14351-14351 USABILITY               com.example.campusguide              D  Building suggestion clicked,18.894
+ 2026-03-08 17:23:02.610 14351-14351 HWUI                    com.example.campusguide              W  Image decoding logging dropped!
+ 2026-03-08 17:23:02.865 14351-14351 InsetsController        com.example.campusguide              D  hide(ime(), fromIme=false)
+ 2026-03-08 17:23:02.866 14351-14351 ImeTracker              com.example.campusguide              I  com.example.campusguide:1dd4e881: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_BY_INSETS_API fromUser false
+ 2026-03-08 17:23:02.867 14351-14351 WindowOnBackDispatcher  com.example.campusguide              W  sendCancelIfRunning: isInProgress=false callback=android.view.ImeBackAnimationController@343edbb
+ 2026-03-08 17:23:02.869 14351-14351 InsetsController        com.example.campusguide              D  Setting requestedVisibleTypes to -9 (was -1)
+ 2026-03-08 17:23:03.695 14351-14351 ImeTracker              com.example.campusguide              I  system_server:fa6b690b: onCancelled at PHASE_CLIENT_ON_CONTROLS_CHANGED
+ 2026-03-08 17:23:08.618 14351-14351 USABILITY               com.example.campusguide              D  Bottom Card Go (Search route),6.193
+ 2026-03-08 17:23:15.624 14351-14351 USABILITY               com.example.campusguide              D  Show route steps,7.006
+ 2026-03-08 17:23:18.398 14351-14351 USABILITY               com.example.campusguide              D  Cancel route button click,2.774
+ 2026-03-08 17:23:18.629 14351-14357 ple.campusguide         com.example.campusguide              I  Background concurrent mark compact GC freed 22MB AllocSpace bytes, 25(1304KB) LOS objects, 32% free, 49MB/73MB, paused 2.155ms,9.362ms total 378.387ms
+]
+
+────────────────────────────────────────
+USER PROFILE
+────────────────────────────────────────
+Age Range: 50s
+Gender: Female
+Technical Expertise: Below average — not used to apps or tech
+Campus Familiarity: Never been to campus
+Accessibility Needs: None
+Satisfaction Score: 3/5
+Comments/Feedback: Does not understand the goal of the app when you open it.

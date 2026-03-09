@@ -1,0 +1,35 @@
+App Loaded,0.056
+Search Bar Profile Button clicked,11.303
+Go to accessibility page click,1.198
+Bold/Unbold check clicked,7.818
+Cycle Color Blind Mode,3.092
+Cycle Color Blind Mode,0.395
+Cycle Color Blind Mode,0.91
+Cycle Color Blind Mode,0.582
+Cycle Color Blind Mode,0.571
+Increase Text size clicked,4.536
+Back button from accessibility page,2.079
+Back button from profile page,4.613
+CALENDAR navigation button clicked,2.028
+Go Ahead in Calendar Date,1.628
+Set Calendar Date Daily,8.969
+POI navigation button clicked,11.582
+MAP navigation button clicked,1.783
+Click on Shuttle Stop marker,8.316
+Show Shuttle full schedule,2.365
+Dismiss Shuttle Stop Info card,10.038
+Zoom In,3.942
+Zoom In,0.651
+Building suggestion clicked,12.058
+Top Bar go click,5.164
+
+
+
+Color scheme/Theme is rather uncomfortable. WOuldnt want to stay the in the app for too long. Doesnt like the aesthetic and would probably like a dark theme better.
+
+User flow was nice, felt comfortable and usual. Follows regular apps style and placement.
+
+score satisfaction 4.8/5 deducted 0.2 points for aesthetic choice. Liked the colorblind cycle as it felt intuitive and fast.
+
+25 years old male tech saavy. Familiar with concordia SGW campus, no accessibility needs.
+

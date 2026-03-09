@@ -1,0 +1,33 @@
+---------------------------- PROCESS STARTED (10332) for package com.example.campusguide ----------------------------
+2026-03-08 17:09:34.137 10332-10332 USABILITY               com.example.campusguide              D  App Loaded,0.012
+2026-03-08 17:10:10.223 10332-10332 USABILITY               com.example.campusguide              D  Map Controls Hidden Toggle,36.086
+2026-03-08 17:10:12.889 10332-10332 USABILITY               com.example.campusguide              D  Map Controls Visible Toggle,2.665
+2026-03-08 17:10:18.399 10332-10332 USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,5.511
+2026-03-08 17:10:22.869 10332-10332 USABILITY               com.example.campusguide              D  Go to accessibility page click,4.47
+2026-03-08 17:10:28.805 10332-10332 USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,5.936
+2026-03-08 17:10:33.548 10332-10332 USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,4.743
+2026-03-08 17:10:38.015 10332-10332 USABILITY               com.example.campusguide              D  Increase Text size clicked,4.467
+2026-03-08 17:10:46.150 10332-10332 USABILITY               com.example.campusguide              D  Back button from accessibility page,8.135
+2026-03-08 17:10:47.648 10332-10332 USABILITY               com.example.campusguide              D  Back button from profile page,1.498
+2026-03-08 17:10:51.545 10332-10332 USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,3.897
+2026-03-08 17:10:55.729 10332-10332 USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,4.184
+2026-03-08 17:11:07.955 10332-10332 USABILITY               com.example.campusguide              D  MAP navigation button clicked,12.226
+2026-03-08 17:11:08.527 10332-10332 USABILITY               com.example.campusguide              D  MAP navigation button clicked,0.572
+2026-03-08 17:11:19.657 10332-10332 USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,11.13
+2026-03-08 17:11:23.201 10332-10332 USABILITY               com.example.campusguide              D  Show Shuttle full schedule,3.544
+2026-03-08 17:11:30.116 10332-10332 USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,6.915
+2026-03-08 17:11:39.139 10332-10332 USABILITY               com.example.campusguide              D  Zoom In,9.023
+2026-03-08 17:11:39.399 10332-10332 USABILITY               com.example.campusguide              D  Zoom In,0.26
+2026-03-08 17:11:56.864 10332-10332 USABILITY               com.example.campusguide              D  Building suggestion clicked,17.465
+2026-03-08 17:12:02.869 10332-10332 USABILITY               com.example.campusguide              D  Top Bar go click,6.005
+---------------------------- PROCESS ENDED (10332) for package com.example.campusguide ----------------------------
+
+Age: 50
+Gender: Female
+Technical expertise: Average tech use
+Campus familiarity: No
+Accessibility Needs: None
+
+Satisfaction score: 9/10
+Comments: All pretty intuitive. Mentioned that she has never used accessibility settings so did not know where to find it.
+Initially thought the map moving buttons were the accessibility settings. Later mentioned that it made sense to be in user because its personal to the user.
