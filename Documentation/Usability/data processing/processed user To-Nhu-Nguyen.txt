@@ -1,0 +1,32 @@
+App Loaded,0.012
+Map Controls Hidden Toggle,36.086
+Map Controls Visible Toggle,2.665
+Search Bar Profile Button clicked,5.511
+Go to accessibility page click,4.47
+Bold/Unbold check clicked,5.936
+Cycle Color Blind Mode,4.743
+Increase Text size clicked,4.467
+Back button from accessibility page,8.135
+Back button from profile page,1.498
+CALENDAR navigation button clicked,3.897
+Go Ahead in Calendar Date,4.184
+MAP navigation button clicked,12.226
+MAP navigation button clicked,0.572
+Click on Shuttle Stop marker,11.13
+Show Shuttle full schedule,3.544
+Dismiss Shuttle Stop Info card,6.915
+Zoom In,9.023
+Zoom In,0.26
+Building suggestion clicked,17.465
+Top Bar go click,6.005
+
+
+Age: 50
+Gender: Female
+Technical expertise: Average tech use
+Campus familiarity: No
+Accessibility Needs: None
+
+Satisfaction score: 9/10
+Comments: All pretty intuitive. Mentioned that she has never used accessibility settings so did not know where to find it.
+Initially thought the map moving buttons were the accessibility settings. Later mentioned that it made sense to be in user because its personal to the user.
