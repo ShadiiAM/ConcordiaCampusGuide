@@ -1,0 +1,23 @@
+---------------------------- PROCESS STARTED (1276) for package com.example.campusguide ----------------------------
+2026-03-08 16:56:14.254  1276-1276  USABILITY               com.example.campusguide              D  App Loaded,0.091
+2026-03-08 16:56:53.384  1276-1276  USABILITY               com.example.campusguide              D  Search Bar Profile Button clicked,39.13
+2026-03-08 16:56:55.282  1276-1276  USABILITY               com.example.campusguide              D  Go to accessibility page click,1.898
+2026-03-08 16:57:00.266  1276-1276  USABILITY               com.example.campusguide              D  Increase Text size clicked,4.984
+2026-03-08 16:57:06.510  1276-1276  USABILITY               com.example.campusguide              D  Cycle Color Blind Mode,6.244
+2026-03-08 16:57:07.642  1276-1276  USABILITY               com.example.campusguide              D  Bold/Unbold check clicked,1.132
+2026-03-08 16:57:09.252  1276-1276  USABILITY               com.example.campusguide              D  Back button from accessibility page,1.61
+2026-03-08 16:57:10.174  1276-1276  USABILITY               com.example.campusguide              D  Back button from profile page,0.922
+2026-03-08 16:57:20.227  1276-1276  USABILITY               com.example.campusguide              D  CALENDAR navigation button clicked,10.053
+2026-03-08 16:57:21.623  1276-1276  USABILITY               com.example.campusguide              D  Go Ahead in Calendar Date,1.396
+2026-03-08 16:57:36.988  1276-1276  USABILITY               com.example.campusguide              D  MAP navigation button clicked,15.365
+2026-03-08 16:57:40.700  1276-1276  USABILITY               com.example.campusguide              D  Click on Shuttle Stop marker,3.712
+2026-03-08 16:57:43.426  1276-1276  USABILITY               com.example.campusguide              D  Show Shuttle full schedule,2.726
+2026-03-08 16:57:58.300  1276-1276  USABILITY               com.example.campusguide              D  Dismiss Shuttle Stop Info card,14.874
+2026-03-08 16:58:10.034  1276-1276  USABILITY               com.example.campusguide              D  Building suggestion clicked,11.734
+2026-03-08 16:58:14.855  1276-1276  USABILITY               com.example.campusguide              D  Bottom Card Go (Search route),4.821
+
+Easy to use and pretty intuitive. Liked how simple it was to use. The use of icons helps guide them through the tasks.
+
+Score 4/5. The general theme and aesthetic seems a bit bland but everything works great and it's easy to follow.
+
+30 year old female with average tech knowledge. Familiar with Concordia SGW campus, no accessibility needs.

@@ -1,0 +1,23 @@
+App Loaded,0.091
+Search Bar Profile Button clicked,39.13
+Go to accessibility page click,1.898
+Increase Text size clicked,4.984
+Cycle Color Blind Mode,6.244
+Bold/Unbold check clicked,1.132
+Back button from accessibility page,1.61
+Back button from profile page,0.922
+CALENDAR navigation button clicked,10.053
+Go Ahead in Calendar Date,1.396
+MAP navigation button clicked,15.365
+Click on Shuttle Stop marker,3.712
+Show Shuttle full schedule,2.726
+Dismiss Shuttle Stop Info card,14.874
+Building suggestion clicked,11.734
+Bottom Card Go (Search route),4.821
+
+
+Easy to use and pretty intuitive. Liked how simple it was to use. The use of icons helps guide them through the tasks.
+
+Score 4/5. The general theme and aesthetic seems a bit bland but everything works great and it's easy to follow.
+
+30 year old female with average tech knowledge. Familiar with Concordia SGW campus, no accessibility needs.

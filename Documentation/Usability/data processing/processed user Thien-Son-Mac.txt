@@ -1,0 +1,33 @@
+App Loaded,2.193
+Search Bar Profile Button clicked,39.598
+Go to accessibility page click,5.344
+Bold/Unbold check clicked,7.18
+Cycle Color Blind Mode,9.368
+Increase Text size clicked,3.994
+Back button from accessibility page,3.71
+Back button from profile page,2.883
+CALENDAR navigation button clicked,8.072
+Go Ahead in Calendar Date,5.087
+MAP navigation button clicked,10.579
+Zoom In,16.979
+Zoom In,8.125
+Click on Shuttle Stop marker,7.04
+Click on Shuttle Stop marker,3.023
+Show Shuttle full schedule,5.627
+Dismiss Shuttle Stop Info card,17.312
+Building suggestion clicked,33.505
+Bottom Card Go (Search route),15.678
+Remove Route bar click,18.587
+
+Age: 50
+Gender: Male
+Technical expertise: tech savvy
+Campus familiarity: familiar
+Accessibility needs: needed bigger text for text visibility
+
+Satisfaction: 9/10
+comments: would be better if accessibility settings were found in the settings wheel icon and not the user icon
+Could not read the shuttle icon text because it was too small. Did not think to go and increase text size more because he knew where the shuttles were on the campus
+Map UI is clean, he likes the clear overlays for the building
+
+

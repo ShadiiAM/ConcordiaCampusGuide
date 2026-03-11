@@ -1,0 +1,44 @@
+Search Bar Profile Button clicked,382.476
+Go to accessibility page click,4.704
+Increase Text size clicked,2.022
+Back button from accessibility page,3.029
+Go to accessibility page click,6.003
+Cycle Color Blind Mode,2.027
+Back button from accessibility page,2.088
+Back button from profile page,1.109
+Search Bar Query submit,4.279
+Search Bar Profile Button clicked,3.062
+Go to accessibility page click,1.588
+Cycle Color Blind Mode,1.646
+Cycle Color Blind Mode,2.772
+Cycle Color Blind Mode,1.877
+Bold/Unbold check clicked,5.01
+Bold/Unbold check clicked,4.555
+Back button from accessibility page,2.274
+Back button from profile page,1.132
+CALENDAR navigation button clicked,14.06
+Go Ahead in Calendar Date,6.617
+Set Calendar Date Daily,7.631
+App Start,32.628
+App Loaded,0.175
+Zoom In,10.596
+Zoom In,1.509
+Click on Shuttle Stop marker,3.345
+Show Shuttle full schedule,6.337
+Dismiss Shuttle Stop Info card,14.035
+bottom search button click,9.384
+Building suggestion clicked,18.894
+Bottom Card Go (Search route),6.193
+Show route steps,7.006
+Cancel route button click,2.774
+
+────────────────────────────────────────
+USER PROFILE
+────────────────────────────────────────
+Age Range: 50s
+Gender: Female
+Technical Expertise: Below average — not used to apps or tech
+Campus Familiarity: Never been to campus
+Accessibility Needs: None
+Satisfaction Score: 3/5
+Comments/Feedback: Does not understand the goal of the app when you open it.
