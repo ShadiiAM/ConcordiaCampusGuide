@@ -1,5 +1,9 @@
 package com.example.campusguide
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -23,7 +27,7 @@ import org.junit.runner.RunWith
 class MapNavigationControlsUITest {
 
     @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     /**
      * Test: Zoom in button is displayed and clickable.
@@ -33,11 +37,15 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+
         // Find the zoom in button and check if it's displayed
-        onView(withContentDescription("Zoom In")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
 
         // Perform a click on the zoom in button
-        onView(withContentDescription("Zoom In")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
     }
 
     /**
@@ -48,11 +56,14 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+
         // Find the zoom out button and check if it's displayed
-        onView(withContentDescription("Zoom Out")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Zoom Out").assertIsDisplayed()
 
         // Perform a click on the zoom out button
-        onView(withContentDescription("Zoom Out")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Zoom Out").performClick()
     }
 
     /**
@@ -63,11 +74,13 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         // Find the up button and check if it's displayed
-        onView(withContentDescription("Up")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Up").assertIsDisplayed()
 
         // Perform a click on the up button
-        onView(withContentDescription("Up")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Up").performClick()
     }
 
     /**
@@ -78,11 +91,13 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         // Find the down button and check if it's displayed
-        onView(withContentDescription("Down")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Down").assertIsDisplayed()
 
         // Perform a click on the down button
-        onView(withContentDescription("Down")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Down").performClick()
     }
 
     /**
@@ -93,11 +108,13 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         // Find the left button and check if it's displayed
-        onView(withContentDescription("Left")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Left").assertIsDisplayed()
 
         // Perform a click on the left button
-        onView(withContentDescription("Left")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
     }
 
     /**
@@ -108,11 +125,13 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         // Find the right button and check if it's displayed
-        onView(withContentDescription("Right")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Right").assertIsDisplayed()
 
         // Perform a click on the right button
-        onView(withContentDescription("Right")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Right").performClick()
     }
 
     /**
@@ -123,11 +142,13 @@ class MapNavigationControlsUITest {
         // Wait for map to load
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         // Find the recenter button and check if it's displayed
-        onView(withContentDescription("Recenter")).check(matches(isDisplayed()))
+        composeTestRule.onNodeWithContentDescription("Recenter").assertIsDisplayed()
 
         // Perform a click on the recenter button
-        onView(withContentDescription("Recenter")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Recenter").performClick()
     }
 
     /**
@@ -139,9 +160,7 @@ class MapNavigationControlsUITest {
         Thread.sleep(2000)
 
         // Find the toggle controls button and check if it's displayed
-        onView(withContentDescription("Toggle Controls")).check(matches(isDisplayed()))
-
-        // Perform a click on the toggle controls button
-        onView(withContentDescription("Toggle Controls")).perform(click())
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
     }
 }

@@ -75,6 +75,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
@@ -118,7 +119,7 @@ fun MapScreen(
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
-    viewModel: ControlsViewModel
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()

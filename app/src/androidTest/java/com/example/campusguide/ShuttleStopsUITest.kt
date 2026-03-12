@@ -2,6 +2,10 @@ package com.example.campusguide
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
@@ -38,6 +42,10 @@ class ShuttleStopsUITest {
 
     private fun waitForMap() {
         composeTestRule.waitUntil(timeoutMillis = 12000) {
+
+            composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+            pause()
+
             composeTestRule
                 .onAllNodesWithContentDescription("Zoom In")
                 .fetchSemanticsNodes()
