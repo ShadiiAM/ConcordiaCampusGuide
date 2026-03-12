@@ -80,17 +80,15 @@ import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.directions.RouteLeg
-import com.example.campusguide.ui.directions.RouteStep
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.isCrossCampusRoute
 import com.example.campusguide.ui.directions.getCrossCampusMessage
 import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
-import com.example.campusguide.ui.directions.recommendedCrossCampusMode
-import com.example.campusguide.ui.directions.formatRouteSummary
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
+import com.example.campusguide.ui.viewmodels.ControlsViewModel
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -120,6 +118,7 @@ fun MapScreen(
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
+    viewModel: ControlsViewModel
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -138,7 +137,7 @@ fun MapScreen(
     var searchJob by remember { mutableStateOf<Job?>(null) }
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
-    var controlsVisible by remember { mutableStateOf(true) }
+    var controlsVisible = viewModel.controlsVisible
     // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
     var showRouteOptionsCard by remember { mutableStateOf(true) }
     var showDirectionsReadyCard by remember { mutableStateOf(true) }
@@ -944,7 +943,7 @@ fun MapScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 IconButton(
-                    onClick = { controlsVisible = !controlsVisible },
+                    onClick = { viewModel.controlsVisible = !controlsVisible },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -957,7 +956,7 @@ fun MapScreen(
             }
         } else {
             IconButton(
-                onClick = { controlsVisible = true },
+                onClick = { viewModel.controlsVisible = true },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 60.dp)
