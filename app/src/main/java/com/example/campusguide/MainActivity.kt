@@ -47,10 +47,12 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
+import com.example.campusguide.ui.viewmodels.ControlsViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +102,7 @@ fun ConcordiaCampusGuideApp() {
     var directionsGoTrigger by remember { mutableStateOf(0) }
     var directionsCancelTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
+    val viewModel = viewModel<ControlsViewModel>()
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -139,6 +142,7 @@ fun ConcordiaCampusGuideApp() {
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(
+                            viewModel= viewModel,
                             searchQuery = "$searchQuery#$searchCounter",
                             topBarSelectedBuilding = topBarSelectedBuilding,
                             onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
