@@ -29,7 +29,7 @@ sonar {
                 "**/ui/theme/**",
                 "**/ui/map/**",
                 "**/MainActivity.kt",
-                "**/GoogleRoutesRepository.kt",
+                "**/ui/directions/GoogleRoutesRepository.kt",
                 // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
                 "**/ShuttleMarkerFactory.kt"
             ).joinToString(",")
@@ -151,7 +151,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Activity entry point — framework lifecycle, not unit testable
         "**/MainActivity*",
         // Requires live network/API calls — not unit testable on JVM
-        "**/GoogleRoutesRepository.kt"
+        "**/ui/directions/GoogleRoutesRepository.kt",
 
     )
 
