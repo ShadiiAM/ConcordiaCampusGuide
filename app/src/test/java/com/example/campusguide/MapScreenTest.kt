@@ -110,6 +110,11 @@ class MapScreenTest {
         }
 
         composeTestRule.waitForIdle()
+
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
+
         // Zoom in button should be visible
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
     }
@@ -125,6 +130,9 @@ class MapScreenTest {
                 }
             }
         }
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithContentDescription("Zoom Out").assertIsDisplayed()
     }
@@ -140,6 +148,9 @@ class MapScreenTest {
                 }
             }
         }
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithContentDescription("Recenter").assertIsDisplayed()
     }
@@ -155,6 +166,9 @@ class MapScreenTest {
                 }
             }
         }
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
 
         composeTestRule.onNodeWithContentDescription("Up").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Down").assertIsDisplayed()
@@ -189,6 +203,9 @@ class MapScreenTest {
             }
         }
 
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+
         // Controls should be visible initially
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
         
@@ -212,16 +229,16 @@ class MapScreenTest {
             }
         }
 
-        // Toggle controls off
-        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
-        composeTestRule.waitForIdle()
-        
-        // Toggle controls back on
+        // Toggle controls on
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         composeTestRule.waitForIdle()
         
         // Controls should be visible again
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
+
+        // Toggle controls back off
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
     }
 
     @Test
@@ -236,7 +253,10 @@ class MapScreenTest {
             }
         }
 
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         composeTestRule.waitForIdle()
+
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
     }
 
@@ -253,6 +273,11 @@ class MapScreenTest {
         }
 
         composeTestRule.waitForIdle()
+
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
+
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
     }
 
@@ -320,6 +345,11 @@ class MapScreenTest {
         }
 
         composeTestRule.waitForIdle()
+
+        // Toggle controls on
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        composeTestRule.waitForIdle()
+
         composeTestRule.onNodeWithContentDescription("Zoom In").assertIsDisplayed()
 
         // Trigger recomposition

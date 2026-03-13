@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.edit
 import com.example.campusguide.R
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
@@ -77,9 +78,21 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
+import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.ui.components.BuildingAutocompleteField
+import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.directions.isCrossCampusRoute
+import com.example.campusguide.ui.directions.getCrossCampusMessage
+import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
+import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.ui.components.ShuttleStopInfoCard
+import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
+import com.example.campusguide.ui.shuttle.ShuttleTracker
+import com.example.campusguide.ui.viewmodels.ControlsViewModel
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -87,12 +100,29 @@ private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
 const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
+data class DirectionsTopBarState(
+    val active: Boolean,
+    val originLabel: String = "Your location",
+    val destinationLabel: String = "",
+    val isCrossCampus: Boolean = false,
+    val selectedMode: TravelMode = TravelMode.DRIVE,
+    val routeSummary: String? = null,
+    val errorMessage: String? = null,
+    val isLoadingRoute: Boolean = false,
+    val showActions: Boolean = false,
+    val currentSteps: RouteLeg? = null
+)
 @Composable
 fun MapScreen(
     searchQuery: String = "",
     topBarSelectedBuilding: CampusBuilding? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
+    onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
+    directionsGoTrigger: Int = 0,
+    directionsCancelTrigger: Int = 0,
+    topBarTravelMode: TravelMode = TravelMode.DRIVE,
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -111,12 +141,16 @@ fun MapScreen(
     var searchJob by remember { mutableStateOf<Job?>(null) }
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
-    var controlsVisible by remember { mutableStateOf(true) }
+    var controlsVisible = viewModel.controlsVisible
+    // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
+    var showRouteOptionsCard by remember { mutableStateOf(true) }
+    var showDirectionsReadyCard by remember { mutableStateOf(true) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
+    var travelMode by rememberSaveable { mutableStateOf(TravelMode.DRIVE) }
     var isPickingOrigin by remember { mutableStateOf(false) }
     var routePolylineRef by remember {
         mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
@@ -125,13 +159,23 @@ fun MapScreen(
     // Track the selected building's LatLng for directions
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
-    // Autocomplete state
-    var crossCampusEnabled by rememberSaveable { mutableStateOf(false) }
+    // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
     var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
     val mapView = remember { MapView(context) }
+    // Track origin and destination buildings for cross-campus detection
+    var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    // Shuttle state (US-3.1)
+    val shuttleTracker = remember { ShuttleTracker() }
+    // Reserved for US-3.2: enables removing/updating markers when switching campuses
+    val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
+    var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
+
+
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -156,6 +200,155 @@ fun MapScreen(
             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
         }
     }
+    fun buildRouteSummary(distanceMeters: Int?, durationSeconds: Int?): String {
+        val dist = distanceMeters?.let {
+            if (it >= 1000) "${"%.1f".format(it / 1000.0)} km" else "$it m"
+        }
+        val dur = durationSeconds?.let {
+            val mins = it / 60
+            if (mins < 60) "$mins min" else "${mins / 60} h ${mins % 60} min"
+        }
+        return listOfNotNull(dur, dist).joinToString(" · ")
+    }
+    // Sync travel mode from top bar selection
+    LaunchedEffect(topBarTravelMode) {
+        travelMode = topBarTravelMode
+        val step = directionsUiState.step
+        if (step is DirectionsStep.ShowingRoute) {
+            directionsUiState = directionsUiState.copy(
+                step = DirectionsStep.PlanRoute(
+                    origin = step.origin,
+                    destination = step.destination,
+                    buildingHit = step.buildingHit,
+                )
+            )
+        }
+    }
+
+// Handle Go button from top bar
+    LaunchedEffect(directionsGoTrigger) {
+        if (directionsGoTrigger == 0) return@LaunchedEffect
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
+        runCatching {
+            repo.getRoute(
+                RouteRequest(
+                    origin = step.origin,
+                    destination = step.destination,
+                    mode = travelMode,
+                )
+            )
+        }.onSuccess { route ->
+            withContext(Dispatchers.Main) {
+                routePolylineRef?.remove()
+                routePolylineRef = googleMap?.addPolyline(
+                    PolylineOptions()
+                        .addAll(route.points)
+                        .color(0xFF1565C0.toInt())
+                        .width(12f)
+                )
+            }
+
+            // Show helpful message for cross-campus routes
+            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+            if (isCrossCampus) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = getCrossCampusMessage(travelMode),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+
+            directionsUiState = directionsUiState.copy(
+                isLoadingRoute = false,
+                step = DirectionsStep.ShowingRoute(
+                    origin = step.origin,
+                    destination = step.destination,
+                    buildingHit = step.buildingHit,
+                    route = route,
+                ),
+            )
+        }.onFailure { e ->
+            // Check if this is a cross-campus route and provide helpful error message
+            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+            val errorMsg = if (isCrossCampus) {
+                getCrossCampusErrorMessage(travelMode)
+            } else {
+                e.message ?: "Failed to get route"
+            }
+
+            directionsUiState = directionsUiState.copy(
+                isLoadingRoute = false,
+                errorMessage = errorMsg,
+            )
+        }
+    }
+
+// Re-show bottom cards whenever the relevant step is entered fresh
+    LaunchedEffect(directionsUiState.step) {
+        when (directionsUiState.step) {
+            is DirectionsStep.PlanRoute     -> showRouteOptionsCard = true
+            is DirectionsStep.ShowingRoute  -> showDirectionsReadyCard = false
+            else -> {}
+        }
+    }
+
+// Handle Cancel from top bar
+    LaunchedEffect(directionsCancelTrigger) {
+        if (directionsCancelTrigger == 0) return@LaunchedEffect
+        routePolylineRef?.remove()
+        routePolylineRef = null
+        directionsUiState = directionsUiState.copy(
+            step = DirectionsStep.PickDestination,
+            errorMessage = null,
+        )
+        originSuggestions = emptyList()
+        destSuggestions = emptyList()
+    }
+
+// Publish top-bar state to MainActivity whenever directions state changes
+    LaunchedEffect(directionsUiState, travelMode, originBuilding, destinationBuilding, originDisplayName) {
+        when (val step = directionsUiState.step) {
+            is DirectionsStep.PlanRoute -> {
+                // Automatically detect cross-campus routes
+                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+
+                onDirectionsTopBarState(
+                    DirectionsTopBarState(
+                        active = true,
+                        originLabel = originDisplayName ?: "Your location",
+                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        isCrossCampus = isCrossCampus,
+                        selectedMode = travelMode,
+                        errorMessage = directionsUiState.errorMessage,
+                        isLoadingRoute = directionsUiState.isLoadingRoute,
+                        showActions = true,
+                    )
+                )
+            }
+            is DirectionsStep.ShowingRoute -> {
+                // Automatically detect cross-campus routes
+                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+
+                onDirectionsTopBarState(
+                    DirectionsTopBarState(
+                        active = true,
+                        originLabel = originDisplayName ?: "Your location",
+                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        isCrossCampus = isCrossCampus,
+                        selectedMode = travelMode,
+                        routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
+                        showActions = false,
+                        currentSteps = step.route.legs.firstOrNull()
+                    )
+                )
+            }
+            else -> {
+                onDirectionsTopBarState(DirectionsTopBarState(active = false))
+            }
+        }
+    }
 
     LaunchedEffect(topBarSelectedBuilding) {
         val building = topBarSelectedBuilding ?: return@LaunchedEffect
@@ -171,6 +364,7 @@ fun MapScreen(
         googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
 
         // Set as To destination and open route panel
+        destinationBuilding = building  // Track for cross-campus detection
         val hit = BuildingHit(
             id = building.buildingCode,
             properties = JSONObject().apply {
@@ -292,7 +486,7 @@ fun MapScreen(
                     try {
                         val geocoder = Geocoder(context, Locale.getDefault())
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NOSONAR: minSdk=33, kept for explicit API clarity
                             suspendCancellableCoroutine { cont ->
                                 geocoder.getFromLocationName(query, 1) { results ->
                                     cont.resume(results.firstOrNull())
@@ -509,6 +703,39 @@ fun MapScreen(
                         // Remove default controls
                         map.uiSettings.isMyLocationButtonEnabled = false
                         map.uiSettings.isZoomControlsEnabled = false
+
+                        // Add shuttle stop markers (US-3.1)
+                        if (shuttleTracker.isOperational()) {
+                            val shuttleIcon = ShuttleMarkerFactory.create(ctx)
+                            shuttleTracker.getShuttleStops().forEach { stop ->
+                                val marker = map.addMarker(
+                                    MarkerOptions()
+                                        .position(stop.latLng)
+                                        .icon(shuttleIcon)
+                                        .anchor(0.5f, 1.0f) // tip of pin points to coordinate
+                                )
+                                if (marker != null) {
+                                    marker.tag = stop
+                                    shuttleMarkerMap[stop.id] = marker
+                                }
+                            }
+                        } else {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+                            }
+                        }
+
+                        // Marker click: handle shuttle stop taps (US-3.1)
+                        // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
+                        map.setOnMarkerClickListener { marker -> // NOSONAR
+                            val stop = marker.tag as? ShuttleStop
+                            if (stop != null) {
+                                selectedShuttleStop = stop
+                                true
+                            } else {
+                                false
+                            }
+                        }
 
                         // Set up polygon click listener
                         map.setOnPolygonClickListener { polygon ->
@@ -739,7 +966,7 @@ fun MapScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 IconButton(
-                    onClick = { controlsVisible = !controlsVisible },
+                    onClick = { viewModel.controlsVisible = !controlsVisible },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -752,7 +979,7 @@ fun MapScreen(
             }
         } else {
             IconButton(
-                onClick = { controlsVisible = true },
+                onClick = { viewModel.controlsVisible = true },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 60.dp)
@@ -799,6 +1026,12 @@ fun MapScreen(
                 onDismiss = { selectedBuildingInfo = null },
                 onDirectionsClick = {
                     val latLng = selectedBuildingLatLng ?: LatLng(45.4972, -73.5789)
+
+                    // Find corresponding CampusBuilding for cross-campus detection
+                    destinationBuilding = ALL_CAMPUS_BUILDINGS.firstOrNull {
+                        it.buildingCode == info.buildingCode
+                    }
+
                     val buildingHit = BuildingHit(
                         id = info.buildingCode,
                         properties = JSONObject().apply {
@@ -819,6 +1052,15 @@ fun MapScreen(
             )
         }
 
+        // Shuttle stop info card (US-3.1)
+        selectedShuttleStop?.let { stop ->
+            ShuttleStopInfoCard(
+                stop = stop,
+                isOperational = shuttleTracker.isOperational(),
+                onDismiss = { selectedShuttleStop = null }
+            )
+        }
+
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -832,16 +1074,9 @@ fun MapScreen(
             is DirectionsStep.ConfirmDestination -> {
                 // Shouldn't normally reach here since we go straight to PlanRoute
             }
-            is DirectionsStep.PlanRoute -> {
-                BottomCard(onDismiss = {
-                    routePolylineRef?.remove()
-                    routePolylineRef = null
-                    directionsUiState = directionsUiState.copy(
-                        step = DirectionsStep.PickDestination,
-                        errorMessage = null,
-                    )
-                    originSuggestions = emptyList()
-                    destSuggestions   = emptyList()
+            is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
+                    // X just hides the card — route state and top bar remain intact
+                    showRouteOptionsCard = false
                 }) {
                     Text(
                         text = "Route options",
@@ -856,16 +1091,18 @@ fun MapScreen(
                         value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
                         placeholder   = "My location or building…",
                         enabled       = !directionsUiState.isLoadingRoute,
+                        testTag       = "origin_building_field",
                         onQueryChange = { query ->
                             originSuggestions = buildingSuggestions(
                                 query        = query,
                                 activeCampus = selectedCampus,
-                                crossCampus  = crossCampusEnabled,
+                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
                             )
                         },
                         onSelected = { building ->
                             originSuggestions = emptyList()
                             originDisplayName = building.buildingName
+                            originBuilding = building  // Track for cross-campus detection
                             directionsUiState = directionsUiState.copy(
                                 step = step.copy(origin = resolveBuildingLatLng(building)),
                             )
@@ -880,16 +1117,18 @@ fun MapScreen(
                         suggestions   = destSuggestions,
                         placeholder   = "Building name or code…",
                         enabled       = !directionsUiState.isLoadingRoute,
+                        testTag       = "destination_building_field",
                         onQueryChange = { query ->
                             destSuggestions = buildingSuggestions(
                                 query        = query,
                                 activeCampus = selectedCampus,
-                                crossCampus  = crossCampusEnabled,
+                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
                             )
                         },
                         onSelected = { building ->
                             val latLng = resolveBuildingLatLng(building)
                             destSuggestions = emptyList()
+                            destinationBuilding = building  // Track for cross-campus detection
                             val hit = BuildingHit(
                                 id = building.buildingCode,
                                 properties = JSONObject().apply {
@@ -909,27 +1148,8 @@ fun MapScreen(
 
                     Spacer(Modifier.height(6.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(
-                            text  = "Cross-campus routing",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Switch(
-                            checked         = crossCampusEnabled,
-                            onCheckedChange = {
-                                crossCampusEnabled = it
-                                originSuggestions  = emptyList()
-                                destSuggestions    = emptyList()
-                            },
-                        )
-                    }
-
-                    Spacer(Modifier.height(12.dp))
+                    // Cross-campus routing is always enabled (US-2.5 AC4)
+                    // No toggle needed - users can select any building from any campus
 
                     Button(
                         modifier = Modifier.fillMaxWidth().testTag("DirectionsGo"),
@@ -945,6 +1165,7 @@ fun MapScreen(
                                         RouteRequest(
                                             origin      = step.origin,
                                             destination = step.destination,
+                                            mode  = travelMode,
                                         )
                                     )
                                 }.onSuccess { route ->
@@ -986,16 +1207,10 @@ fun MapScreen(
                         Text(text = it, color = MaterialTheme.colorScheme.error)
                     }
                 }
-            }
 
-            is DirectionsStep.ShowingRoute -> {
-                BottomCard(onDismiss = {
-                    routePolylineRef?.remove()
-                    routePolylineRef = null
-                    directionsUiState = directionsUiState.copy(
-                        step = DirectionsStep.PickDestination,
-                        errorMessage = null
-                    )
+            is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
+                    // X just hides the card — route and top bar remain intact
+                    showDirectionsReadyCard = false
                 }) {
                     Text(
                         text = "Directions ready",
@@ -1006,6 +1221,39 @@ fun MapScreen(
                     Spacer(Modifier.height(8.dp))
                     Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
                     Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
+
+                    // Display duration and distance if available
+                    step.route.durationSeconds?.let { seconds ->
+                        val minutes = seconds / 60
+                        val displayTime = if (minutes < 60) {
+                            "$minutes min"
+                        } else {
+                            val hours = minutes / 60
+                            val remainingMins = minutes % 60
+                            "${hours}h ${remainingMins}min"
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Duration: $displayTime",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    step.route.distanceMeters?.let { meters ->
+                        val displayDistance = if (meters < 1000) {
+                            "$meters m"
+                        } else {
+                            val km = meters / 1000.0
+                            String.format(java.util.Locale.US, "%.1f km", km)
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = "Distance: $displayDistance",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
 
                     Spacer(Modifier.height(12.dp))
 
@@ -1040,7 +1288,7 @@ fun MapScreen(
                         Text("Clear")
                     }
                 }
-            }
+
         }
     }
 }
@@ -1116,9 +1364,7 @@ private fun getSavedCampus(context: Context): Campus {
 
 private fun saveCampus(context: Context, campus: Campus) {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit()
-        .putString(KEY_SELECTED_CAMPUS, campus.name)
-        .apply()
+    prefs.edit { putString(KEY_SELECTED_CAMPUS, campus.name) }
 }
 
 private fun loadGeoJson(context: Context, rawRes: Int): JSONObject {
@@ -1266,6 +1512,7 @@ private fun highlightBuildingUserIsIn(
             }
         }
     }
+
 }
 
 private fun isLocationEnabled(context: Context): Boolean {

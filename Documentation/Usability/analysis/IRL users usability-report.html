@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usability Performance Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:#0d0f14; --surface:#13161e; --surface2:#1c2030; --border:#252a3a;
+    --text:#e8eaf2; --muted:#6b7394; --accent:#f0c060;
+    --t1:#a05ae8; --t2:#5ab4e8; --t3:#5ae88c; --t4:#e8665a;
+    --samira:#e8665a; --malik:#5ab4e8; --tonhu:#e88c5a;
+    --thiensan:#a05ae8; --anhthi:#5ae88c; --tamar:#e85aab; --ahmed:#5ae8d4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  canvas{touch-action:pan-y;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;}
+
+  header{padding:20px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .header-left h1{font-family:'Fraunces',serif;font-weight:300;font-size:24px;letter-spacing:-1px;line-height:1.1;}
+  .header-left h1 em{font-style:italic;color:var(--accent);}
+  .header-meta{font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:.08em;text-transform:uppercase;}
+  .badge{background:var(--surface2);border:1px solid var(--border);padding:6px 14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+
+  nav{display:flex;padding:0 48px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  nav button{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:16px 20px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+  nav button.active{color:var(--accent);border-bottom-color:var(--accent);}
+  nav button:hover:not(.active){color:var(--text);}
+
+  main{padding:20px 48px;}
+  .section{display:none;} .section.active{display:block;}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:16px;}
+  .kpi{background:var(--surface);padding:14px 18px;}
+  .kpi-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .kpi-value{font-family:'Fraunces',serif;font-size:22px;font-weight:700;line-height:1;}
+  .kpi-unit{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .chart-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+  .chart-full{margin-bottom:16px;}
+  @media(max-width:900px){.chart-row,.chart-row-3{grid-template-columns:1fr;}header,nav,main{padding-left:24px;padding-right:24px;}}
+
+  .panel{background:var(--surface);border:1px solid var(--border);padding:16px;}
+  .panel-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+  .panel-title span{background:var(--surface2);padding:3px 10px;font-size:10px;color:var(--muted);}
+
+  /* TASK PILLS */
+  .task-pill{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border:1px solid;margin-right:4px;}
+  .t1{color:var(--t1);border-color:var(--t1);}
+  .t2{color:var(--t2);border-color:var(--t2);}
+  .t3{color:var(--t3);border-color:var(--t3);}
+  .t4{color:var(--t4);border-color:var(--t4);}
+
+  /* HEATMAP */
+  .heatmap-grid{display:grid;gap:4px;}
+  .heatmap-row{display:grid;gap:4px;align-items:center;}
+  .heatmap-cell{height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;transition:opacity .2s;}
+  .heatmap-cell:hover{opacity:.8;}
+  .cell-val{font-family:'Fraunces',serif;font-size:15px;font-weight:700;line-height:1.2;}
+  .cell-lbl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;opacity:.65;margin-top:2px;}
+  .heatmap-label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .heatmap-header{display:grid;gap:4px;margin-bottom:6px;}
+  .heatmap-header-cell{text-align:center;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px;}
+
+  .legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+  .legend-dot{width:10px;height:10px;border-radius:50%;}
+
+  /* PERSONA TABLE */
+  .persona-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .persona-table th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 12px 10px 0;border-bottom:1px solid var(--border);font-weight:400;}
+  .persona-table td{padding:11px 12px 11px 0;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .persona-table tr:last-child td{border-bottom:none;}
+  .persona-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+  .bar-bg{background:var(--surface2);height:6px;overflow:hidden;width:80px;}
+  .bar-fill{height:100%;transition:width .8s ease;}
+
+  /* RATINGS */
+  .rating{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1px solid;}
+  .rating.good{color:var(--t3);border-color:var(--t3);}
+  .rating.warn{color:var(--accent);border-color:var(--accent);}
+  .rating.bad{color:var(--t4);border-color:var(--t4);}
+  .rating.na{color:var(--muted);border-color:var(--border);}
+
+  /* OUTLIERS */
+  .outlier-list{display:flex;flex-direction:column;gap:8px;}
+  .outlier-item{display:grid;grid-template-columns:140px 1fr auto auto;gap:14px;align-items:center;padding:12px 14px;background:var(--surface2);border-left:3px solid var(--t4);font-size:12px;}
+  .outlier-persona{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .outlier-ms{font-family:'Fraunces',serif;font-size:18px;font-weight:700;text-align:right;color:var(--t4);}
+  .outlier-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid;color:var(--t4);border-color:var(--t4);}
+
+  /* FINDINGS */
+  .finding-list{display:flex;flex-direction:column;gap:12px;}
+  .finding-item{background:var(--surface2);border:1px solid var(--border);border-left:3px solid transparent;padding:16px 20px;}
+  .finding-item.f-critical{border-left-color:var(--t4);}
+  .finding-item.f-high{border-left-color:var(--tonhu);}
+  .finding-item.f-medium{border-left-color:var(--accent);}
+  .finding-item.f-positive{border-left-color:var(--t3);}
+  .finding-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
+  .finding-id{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--muted);min-width:36px;}
+  .finding-title{font-size:13px;color:var(--text);flex:1;}
+  .finding-sev{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;}
+  .sev-critical{color:var(--t4);border-color:var(--t4);}
+  .sev-high{color:var(--tonhu);border-color:var(--tonhu);}
+  .sev-medium{color:var(--accent);border-color:var(--accent);}
+  .sev-positive{color:var(--t3);border-color:var(--t3);}
+  .finding-desc{font-size:12px;color:var(--muted);line-height:1.7;padding-left:48px;}
+  .finding-desc strong{color:var(--text);}
+
+  /* INSIGHTS */
+  .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .insight-card{background:var(--surface2);border:1px solid var(--border);padding:20px;}
+  .insight-icon{font-size:20px;margin-bottom:12px;}
+  .insight-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+  .insight-text{font-size:12px;color:var(--muted);line-height:1.7;}
+  .insight-text strong{color:var(--text);}
+
+  /* TASK OVERVIEW BARS */
+  .task-overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px;}
+  .task-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+  .task-card-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .task-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .task-user-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);}
+  .task-user-row:last-child{border-bottom:none;}
+  .task-user-name{font-size:11px;width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .task-user-bar-bg{flex:1;height:5px;background:var(--surface2);}
+  .task-user-bar-fill{height:100%;}
+  .task-user-time{font-family:'Fraunces',serif;font-size:13px;font-weight:700;min-width:48px;text-align:right;}
+  .task-user-rating{font-size:9px;letter-spacing:.08em;text-transform:uppercase;min-width:44px;text-align:right;}
+
+  /* USER CARDS */
+  .user-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;overflow:hidden;}
+  .user-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .user-card-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+  .user-card-sub{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+  .user-card-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;}
+  .user-card-row:last-child{border-bottom:none;padding-bottom:0;}
+  .user-card-label{color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-size:10px;}
+  .user-card-val{text-align:right;max-width:55%;}
+  .user-card-score{font-family:'Fraunces',serif;font-size:28px;font-weight:700;margin-top:12px;}
+  .user-card-score-lbl{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+  .tag-pill{display:inline-block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border:1px solid;margin-right:4px;margin-top:2px;}
+
+
+  .score-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .score-row:last-child{border-bottom:none;}
+  .score-name{width:140px;font-size:12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .score-bar-bg{flex:1;height:7px;background:var(--surface2);}
+  .score-bar-fill{height:100%;transition:width 1s ease;}
+  .score-val{font-family:'Fraunces',serif;font-size:16px;font-weight:700;min-width:48px;text-align:right;}
+  .score-comment{font-size:10px;color:var(--muted);flex:1;max-width:280px;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Usability <em>Performance</em><br>Report</h1>
+    <div class="header-meta">7 participants · 4 tasks · campus navigation app</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <span class="task-pill t1">T1 Accessibility</span>
+    <span class="task-pill t2">T2 Calendar</span>
+    <span class="task-pill t3">T3 Shuttle</span>
+    <span class="task-pill t4">T4 Directions</span>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('overview',event)">Overview</button>
+  <button onclick="showSection('bytask',event)">By Task</button>
+  <button onclick="showSection('participants',event)">Participants</button>
+  <button onclick="showSection('byuser',event)">By User</button>
+  <button onclick="showSection('hesitations',event)">Hesitations</button>
+  <button onclick="showSection('findings',event)">Findings</button>
+  <button onclick="showSection('insights',event)">Insights</button>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div class="section active" id="overview">
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="task-overview-grid" id="taskOverviewGrid"></div>
+
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">Task Duration per User <span>seconds</span></div>
+      <canvas id="overviewGrouped" style="max-height:200px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Satisfaction Scores <span>/10 normalized</span></div>
+      <canvas id="scoreChart" style="max-height:200px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- BY TASK -->
+<div class="section" id="bytask">
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">T1 — Accessibility Settings <span>bold · red colorblind · text size</span></div>
+      <canvas id="t1chart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">T2 — Calendar to March 9th Daily <span>seconds</span></div>
+      <canvas id="t2chart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">T3 — Shuttle Full Schedule <span>seconds</span></div>
+      <canvas id="t3chart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">T4 — Directions to Hall Building (Drive) <span>seconds</span></div>
+      <canvas id="t4chart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-full">
+    <div class="panel">
+      <div class="panel-title">Task Completion Heatmap — Time per User per Task <span>green = fast · red = slow</span></div>
+      <div class="heatmap-header" id="taskHeatHeader"></div>
+      <div class="heatmap-grid" id="taskHeatGrid"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#5ae88c"></div>Fast (below avg)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f0c060"></div>Average</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e8665a"></div>Slow / hesitant</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PARTICIPANTS -->
+<div class="section" id="participants">
+
+  <!-- Population KPIs -->
+  <div class="kpi-grid" id="popKpiGrid"></div>
+
+  <!-- User cards -->
+  <div class="chart-full">
+    <div class="panel-title" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Participant Profiles</div>
+    <div id="userCardGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+  </div>
+
+  <!-- Population charts -->
+  <div class="chart-row" style="margin-top:16px;">
+    <div class="panel">
+      <div class="panel-title">Gender Distribution <span>n=7</span></div>
+      <canvas id="genderChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Technical Expertise <span>n=7</span></div>
+      <canvas id="techChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">Age Distribution <span>n=7</span></div>
+      <canvas id="ageChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Campus Familiarity <span>n=7</span></div>
+      <canvas id="campusChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-full">
+    <div class="panel">
+      <div class="panel-title">Tech Level vs Satisfaction Score <span>bubble size = session duration</span></div>
+      <canvas id="techScoreChart" style="max-height:220px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- BY USER -->
+<div class="section" id="byuser">
+  <div class="panel chart-full">
+    <div class="panel-title">Satisfaction Scores with Comments</div>
+    <div id="scoreRows"></div>
+  </div>
+  <div class="panel chart-full" style="margin-top:16px">
+    <div class="panel-title">Full User Stats by Task</div>
+    <table class="persona-table" id="personaTable"></table>
+  </div>
+</div>
+
+<!-- HESITATIONS -->
+<div class="section" id="hesitations">
+  <div class="panel chart-full" style="margin-bottom:16px">
+    <div class="panel-title">Events Taking >15 Seconds <span>ranked by duration</span></div>
+    <div class="outlier-list" id="outlierList"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">All Event Durations — Scatter <span>one dot per recorded action</span></div>
+    <canvas id="scatterChart" style="max-height:380px"></canvas>
+  </div>
+</div>
+
+<!-- FINDINGS -->
+<div class="section" id="findings">
+  <div class="finding-list" id="findingList"></div>
+</div>
+
+<!-- INSIGHTS -->
+<div class="section" id="insights">
+  <div class="insight-grid" id="insightGrid"></div>
+</div>
+
+</main>
+
+<script>
+// ─── RAW USER DATA ────────────────────────────────────────────────────────────
+const users = [
+  {
+    id:1,key:'SAMIRA',name:'Samira',age:'50s',gender:'F',
+    tech:'Below average',campus:'Never been',score:3,scoreMax:5,
+    comment:'Does not understand the goal of the app when you open it.',
+    events:[
+      ['Search Bar Profile Button clicked',382.476],['Go to accessibility page click',4.704],
+      ['Increase Text size clicked',2.022],['Back button from accessibility page',3.029],
+      ['Go to accessibility page click',6.003],['Cycle Color Blind Mode',2.027],
+      ['Back button from accessibility page',2.088],['Back button from profile page',1.109],
+      ['Search Bar Query submit',4.279],['Search Bar Profile Button clicked',3.062],
+      ['Go to accessibility page click',1.588],['Cycle Color Blind Mode',1.646],
+      ['Cycle Color Blind Mode',2.772],['Cycle Color Blind Mode',1.877],
+      ['Bold/Unbold check clicked',5.010],['Bold/Unbold check clicked',4.555],
+      ['Back button from accessibility page',2.274],['Back button from profile page',1.132],
+      ['CALENDAR navigation button clicked',14.06],['Go Ahead in Calendar Date',6.617],
+      ['Set Calendar Date Daily',7.631],['App Start',32.628],['App Loaded',0.175],
+      ['Zoom In',10.596],['Zoom In',1.509],['Click on Shuttle Stop marker',3.345],
+      ['Show Shuttle full schedule',6.337],['Dismiss Shuttle Stop Info card',14.035],
+      ['bottom search button click',9.384],['Building suggestion clicked',18.894],
+      ['Bottom Card Go (Search route)',6.193],['Show route steps',7.006],
+      ['Cancel route button click',2.774],
+    ]
+  },
+  {
+    id:2,key:'MALIK',name:'Malik',age:'30',gender:'M',
+    tech:'Very tech-savvy',campus:'SGW 3×',score:4.5,scoreMax:5,
+    comment:'Not obvious to find the accessibility page — it feels hidden.',
+    events:[
+      ['MAP navigation button clicked',1.352],['Map Controls Hidden Toggle',2.906],
+      ['Search Bar Query submit',6.839],['POI navigation button clicked',6.028],
+      ['MAP navigation button clicked',1.234],['Map Controls Hidden Toggle',3.474],
+      ['Search Bar Profile Button clicked',9.374],['Attempted profile button from profile page',1.816],
+      ['Go to accessibility page click',0.931],['Increase Text size clicked',1.679],
+      ['Decrease Text size clicked',1.381],['Cycle Color Blind Mode',0.718],
+      ['Cycle Color Blind Mode',0.527],['Cycle Color Blind Mode',0.534],
+      ['Cycle Color Blind Mode',0.474],['Bold/Unbold check clicked',1.439],
+      ['Bold/Unbold check clicked',0.811],['Back button from accessibility page',1.628],
+      ['Back button from profile page',1.851],['CALENDAR navigation button clicked',5.248],
+      ['Go Ahead in Calendar Date',2.153],['MAP navigation button clicked',6.097],
+      ['Zoom In',6.153],['Zoom In',0.647],['Map Controls Hidden Toggle',2.564],
+      ['Click on Shuttle Stop marker',1.392],['Show Shuttle full schedule',2.760],
+      ['Building suggestion clicked',13.764],['Bottom Card Go (Search route)',3.410],
+    ]
+  },
+  {
+    id:3,key:'TONHU',name:'To-Nhu-Nguyen',age:'50',gender:'F',
+    tech:'Average',campus:'No',score:9,scoreMax:10,
+    comment:'Pretty intuitive. Did not know where accessibility settings were. Initially thought map controls were settings.',
+    events:[
+      ['App Loaded',0.012],['Map Controls Hidden Toggle',36.086],
+      ['Map Controls Visible Toggle',2.665],['Search Bar Profile Button clicked',5.511],
+      ['Go to accessibility page click',4.470],['Bold/Unbold check clicked',5.936],
+      ['Cycle Color Blind Mode',4.743],['Increase Text size clicked',4.467],
+      ['Back button from accessibility page',8.135],['Back button from profile page',1.498],
+      ['CALENDAR navigation button clicked',3.897],['Go Ahead in Calendar Date',4.184],
+      ['MAP navigation button clicked',12.226],['MAP navigation button clicked',0.572],
+      ['Click on Shuttle Stop marker',11.130],['Show Shuttle full schedule',3.544],
+      ['Dismiss Shuttle Stop Info card',6.915],['Zoom In',9.023],['Zoom In',0.260],
+      ['Building suggestion clicked',17.465],['Top Bar go click',6.005],
+    ]
+  },
+  {
+    id:4,key:'THIENSAN',name:'Thien-Son-Mac',age:'50',gender:'M',
+    tech:'Tech-savvy',campus:'Familiar',score:9,scoreMax:10,
+    comment:'Accessibility should be in a settings gear icon. Shuttle text too small. Map UI is clean.',
+    events:[
+      ['App Loaded',2.193],['Search Bar Profile Button clicked',39.598],
+      ['Go to accessibility page click',5.344],['Bold/Unbold check clicked',7.180],
+      ['Cycle Color Blind Mode',9.368],['Increase Text size clicked',3.994],
+      ['Back button from accessibility page',3.710],['Back button from profile page',2.883],
+      ['CALENDAR navigation button clicked',8.072],['Go Ahead in Calendar Date',5.087],
+      ['MAP navigation button clicked',10.579],['Zoom In',16.979],['Zoom In',8.125],
+      ['Click on Shuttle Stop marker',7.040],['Click on Shuttle Stop marker',3.023],
+      ['Show Shuttle full schedule',5.627],['Dismiss Shuttle Stop Info card',17.312],
+      ['Building suggestion clicked',33.505],['Bottom Card Go (Search route)',15.678],
+      ['Remove Route bar click',18.587],
+    ]
+  },
+  {
+    id:5,key:'ANHTHI',name:'Anh-Thi-Mac',age:'25',gender:'F',
+    tech:'Familiar, not savvy',campus:'Visitor 1–2×',score:8,scoreMax:10,
+    comment:'Did not know where the shuttle was — explored all pages. Would like a dedicated settings icon.',
+    events:[
+      ['App Loaded',0.020],['Search Bar Profile Button clicked',14.473],
+      ['Go to accessibility page click',2.158],['Bold/Unbold check clicked',4.209],
+      ['Cycle Color Blind Mode',4.700],['Increase Text size clicked',4.209],
+      ['Back button from accessibility page',3.239],['Back button from profile page',1.448],
+      ['CALENDAR navigation button clicked',2.886],['Go Ahead in Calendar Date',3.307],
+      ['Set Calendar Date Daily',2.737],['Search Bar Query submit',7.997],
+      ['Campus Toggle LOYOLA',4.732],['Campus Toggle SGW',1.907],
+      ['Campus Toggle LOYOLA',1.523],['CALENDAR navigation button clicked',2.365],
+      ['Go Ahead in Calendar Date',2.937],['Set Calendar Date Daily',1.066],
+      ['Set Calendar Date Daily',0.811],['Set Calendar Date Daily',0.159],
+      ['Set Calendar Date Weekly',1.908],['Set Calendar Date Daily',0.820],
+      ['POI navigation button clicked',2.443],['MAP navigation button clicked',1.549],
+      ['CALENDAR navigation button clicked',2.283],['MAP navigation button clicked',1.199],
+      ['Click on Shuttle Stop marker',5.070],['Show Shuttle full schedule',4.735],
+      ['Dismiss Shuttle Stop Info card',11.423],['Building suggestion clicked',7.291],
+      ['Bottom Card Go (Search route)',3.075],
+    ]
+  },
+  {
+    id:6,key:'TAMAR',name:'Tamar Oughourlian',age:'30',gender:'F',
+    tech:'Average',campus:'Familiar SGW',score:4,scoreMax:5,
+    comment:'Easy and intuitive. Icons help guide through tasks. Theme is a bit bland.',
+    events:[
+      ['App Loaded',0.091],['Search Bar Profile Button clicked',39.130],
+      ['Go to accessibility page click',1.898],['Increase Text size clicked',4.984],
+      ['Cycle Color Blind Mode',6.244],['Bold/Unbold check clicked',1.132],
+      ['Back button from accessibility page',1.610],['Back button from profile page',0.922],
+      ['CALENDAR navigation button clicked',10.053],['Go Ahead in Calendar Date',1.396],
+      ['MAP navigation button clicked',15.365],['Click on Shuttle Stop marker',3.712],
+      ['Show Shuttle full schedule',2.726],['Dismiss Shuttle Stop Info card',14.874],
+      ['Building suggestion clicked',11.734],['Bottom Card Go (Search route)',4.821],
+    ]
+  },
+  {
+    id:7,key:'AHMED',name:'Ahmed Gasser',age:'25',gender:'M',
+    tech:'Tech-savvy',campus:'Familiar SGW',score:4.8,scoreMax:5,
+    comment:'Color scheme uncomfortable. Would prefer dark theme. User flow is nice and follows standard patterns.',
+    events:[
+      ['App Loaded',0.056],['Search Bar Profile Button clicked',11.303],
+      ['Go to accessibility page click',1.198],['Bold/Unbold check clicked',7.818],
+      ['Cycle Color Blind Mode',3.092],['Cycle Color Blind Mode',0.395],
+      ['Cycle Color Blind Mode',0.910],['Cycle Color Blind Mode',0.582],
+      ['Cycle Color Blind Mode',0.571],['Increase Text size clicked',4.536],
+      ['Back button from accessibility page',2.079],['Back button from profile page',4.613],
+      ['CALENDAR navigation button clicked',2.028],['Go Ahead in Calendar Date',1.628],
+      ['Set Calendar Date Daily',8.969],['POI navigation button clicked',11.582],
+      ['MAP navigation button clicked',1.783],['Click on Shuttle Stop marker',8.316],
+      ['Show Shuttle full schedule',2.365],['Dismiss Shuttle Stop Info card',10.038],
+      ['Zoom In',3.942],['Zoom In',0.651],
+      ['Building suggestion clicked',12.058],['Top Bar go click',5.164],
+    ]
+  }
+];
+
+// ─── TASK SEGMENTATION ────────────────────────────────────────────────────────
+// T1: Accessibility Settings — from start until LAST "Back button from profile page"
+//     that comes after at least one of the 3 required actions
+// T2: Calendar — from after T1 until last "Set Calendar Date Daily" or "Go Ahead in Calendar Date"
+// T3: Shuttle — from after T2 until "Dismiss Shuttle Stop Info card" or "Show Shuttle full schedule"
+// T4: Directions — from after T3 until "Bottom Card Go" / "Top Bar go click" / "Remove Route bar click"
+
+const T1_END_MARKER   = 'Back button from profile page';
+const T2_A11Y_ACTIONS = ['Bold/Unbold check clicked','Cycle Color Blind Mode','Increase Text size clicked','Decrease Text size clicked'];
+const T2_END_MARKERS  = ['Set Calendar Date Daily','Go Ahead in Calendar Date'];
+const T3_END_MARKERS  = ['Dismiss Shuttle Stop Info card','Show Shuttle full schedule'];
+const T4_END_MARKERS  = ['Bottom Card Go (Search route)','Top Bar go click','Remove Route bar click','Show route steps'];
+
+function segmentUser(u) {
+  const evs = u.events;
+  let t1End = -1, t2End = -1, t3End = -1, t4End = -1;
+
+  // T1: find last "Back button from profile page" that has at least one a11y action before it
+  // We look for the first full pass through accessibility settings
+  // Strategy: find index of last "Back button from profile page" before any calendar action
+  const calIdx = evs.findIndex(([n])=>n==='CALENDAR navigation button clicked');
+  const searchTo = calIdx === -1 ? evs.length : calIdx;
+
+  for (let i = searchTo - 1; i >= 0; i--) {
+    if (evs[i][0] === T1_END_MARKER) {
+      // check that at least one a11y action exists before this
+      const hasA11y = evs.slice(0, i).some(([n]) => T2_A11Y_ACTIONS.includes(n));
+      if (hasA11y) { t1End = i; break; }
+    }
+  }
+  if (t1End === -1) t1End = searchTo - 1; // fallback
+
+  // T2: from after T1 until last calendar date action before shuttle
+  // Find the shuttle section start
+  const shuttleIdx = evs.findIndex(([n], i) => i > t1End && (n === 'Click on Shuttle Stop marker' || n === 'Show Shuttle full schedule'));
+  const t2SearchTo = shuttleIdx === -1 ? evs.length : shuttleIdx;
+
+  for (let i = t2SearchTo - 1; i > t1End; i--) {
+    if (T2_END_MARKERS.includes(evs[i][0])) { t2End = i; break; }
+  }
+  if (t2End === -1) {
+    // Try: last calendar nav before shuttle
+    for (let i = t2SearchTo - 1; i > t1End; i--) {
+      if (evs[i][0] === 'CALENDAR navigation button clicked') { t2End = i; break; }
+    }
+  }
+  if (t2End === -1) t2End = t1End; // no calendar found
+
+  // T3: from after T2 until shuttle end marker
+  for (let i = t2End + 1; i < evs.length; i++) {
+    if (T3_END_MARKERS.includes(evs[i][0])) { t3End = i; break; }
+  }
+  if (t3End === -1) t3End = t2End;
+
+  // T4: from after T3 until directions end marker
+  for (let i = t3End + 1; i < evs.length; i++) {
+    if (T4_END_MARKERS.includes(evs[i][0])) { t4End = i; break; }
+  }
+  if (t4End === -1) t4End = evs.length - 1;
+
+  const sliceTime = (start, end) =>
+    end >= start && end < evs.length
+      ? evs.slice(start, end + 1).reduce((a,[,t])=>a+t, 0)
+      : null;
+
+  return {
+    t1: { events: evs.slice(0, t1End + 1), time: sliceTime(0, t1End) },
+    t2: { events: evs.slice(t1End + 1, t2End + 1), time: sliceTime(t1End + 1, t2End) },
+    t3: { events: evs.slice(t2End + 1, t3End + 1), time: sliceTime(t2End + 1, t3End) },
+    t4: { events: evs.slice(t3End + 1, t4End + 1), time: sliceTime(t3End + 1, t4End) },
+  };
+}
+
+const segments = users.map(u => ({ user: u, ...segmentUser(u) }));
+
+// ─── COLORS & HELPERS ─────────────────────────────────────────────────────────
+const uColors = {
+  SAMIRA:'#e8665a',MALIK:'#5ab4e8',TONHU:'#e88c5a',
+  THIENSAN:'#a05ae8',ANHTHI:'#5ae88c',TAMAR:'#e85aab',AHMED:'#5ae8d4'
+};
+const tColors = { t1:'#a05ae8', t2:'#5ab4e8', t3:'#5ae88c', t4:'#e8665a' };
+const tLabels = { t1:'T1 Accessibility', t2:'T2 Calendar', t3:'T3 Shuttle', t4:'T4 Directions' };
+
+function normScore(u){ return u.scoreMax===5 ? u.score*2 : u.score; }
+function stats(arr){
+  const a=arr.filter(x=>x!=null&&x>0);
+  if(!a.length) return {mean:0,median:0,midpoint:0,std:0,n:0};
+  const n=a.length, mean=a.reduce((s,x)=>s+x,0)/n;
+  const std=Math.sqrt(a.reduce((s,x)=>s+(x-mean)**2,0)/n);
+  const sorted=[...a].sort((x,y)=>x-y);
+  const median=n%2===0?(sorted[n/2-1]+sorted[n/2])/2:sorted[Math.floor(n/2)];
+  const midpoint=(mean+median)/2;
+  return {mean,median,midpoint,std,n};
+}
+function heatColor(val, gMedian, gStd){
+  if(!val) return {bg:'#1a1d28',text:'#3a3f55'};
+  const z = gStd>0 ? (val-gMedian)/gStd : 0;
+  if(z < -0.4) return {bg:'#1a3028',text:'#5ae88c'};
+  if(z >  0.4) return {bg:'#2e1a1a',text:'#e8665a'};
+  return {bg:'#2a2810',text:'#f0c060'};
+}
+function firstName(u){ return u.name.split('-')[0]; }
+
+Chart.defaults.color='#6b7394';
+Chart.defaults.borderColor='#252a3a';
+Chart.defaults.font.family="'DM Mono',monospace";
+Chart.defaults.font.size=11;
+document.addEventListener('wheel',e=>{if(e.target.tagName==='CANVAS')e.stopPropagation();},{passive:true,capture:true});
+
+// ─── COMPUTE TASK TIMES ───────────────────────────────────────────────────────
+const taskKeys = ['t1','t2','t3','t4'];
+// Per task, times across all users
+const taskTimes = {};
+taskKeys.forEach(tk => {
+  taskTimes[tk] = segments.map(s => s[tk].time || 0);
+});
+const taskStats = {};
+taskKeys.forEach(tk => { taskStats[tk] = stats(taskTimes[tk]); });
+
+// ─── KPI GRID ─────────────────────────────────────────────────────────────────
+const totalTaskTimes = segments.map(s => taskKeys.reduce((a,tk)=>a+(s[tk].time||0),0));
+const sortedTotals = [...totalTaskTimes].sort((a,b)=>a-b);
+const meanTotalTaskTime = totalTaskTimes.reduce((a,b)=>a+b,0)/totalTaskTimes.length;
+const medianTotalTaskTime = sortedTotals.length%2===0
+  ? (sortedTotals[sortedTotals.length/2-1]+sortedTotals[sortedTotals.length/2])/2
+  : sortedTotals[Math.floor(sortedTotals.length/2)];
+const midpointTotalTaskTime = (meanTotalTaskTime + medianTotalTaskTime) / 2;
+const fastestUser = segments[totalTaskTimes.indexOf(Math.min(...totalTaskTimes))].user;
+const slowestUser = segments[totalTaskTimes.indexOf(Math.max(...totalTaskTimes))].user;
+
+const kpiDefs = [
+  { label:'Participants', value:'7', unit:'mixed profiles & tech levels' },
+  { label:'Avg Satisfaction', value: (users.reduce((a,u)=>a+normScore(u),0)/users.length).toFixed(1)+'/10', unit:'normalized across all scores' },
+  { label:'Avg Total Task Time', value: midpointTotalTaskTime.toFixed(0)+'s', unit:'midpoint of mean & median across tasks', color:'var(--accent)' },
+  { label:'Slowest Task Overall', value:'T1 Accessibility', unit:`midpoint ${taskStats.t1.midpoint.toFixed(0)}s — inflated by outlier`, color:'var(--t1)' },
+  { label:'Fastest Task Overall', value:'T4 Directions', unit:`midpoint ${taskStats.t4.midpoint.toFixed(0)}s`, color:'var(--t4)' },
+  { label:'Events > 15s', value: String(segments.flatMap(s=>s.user.events.filter(([,t])=>t>15)).length), unit:'hesitation events across all sessions', color:'var(--accent)' },
+];
+const kpiGrid = document.getElementById('kpiGrid');
+kpiDefs.forEach(k=>{
+  const d=document.createElement('div'); d.className='kpi';
+  d.innerHTML=`<div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color||'var(--text)'}">${k.value}</div><div class="kpi-unit">${k.unit}</div>`;
+  kpiGrid.appendChild(d);
+});
+
+// ─── TASK OVERVIEW CARDS ──────────────────────────────────────────────────────
+const taskDescriptions = {
+  t1:'Bold · Red colorblind mode · Increase text size',
+  t2:'Navigate calendar to March 9th daily view',
+  t3:'Open shuttle stop and view full schedule',
+  t4:'Get driving directions to Hall Building'
+};
+const tocGrid = document.getElementById('taskOverviewGrid');
+
+// Per-task cards
+taskKeys.forEach(tk=>{
+  const times = taskTimes[tk];
+  const maxT = Math.max(...times);
+  const avgT = taskStats[tk].midpoint;
+  const card = document.createElement('div'); card.className='task-card';
+  card.innerHTML=`
+    <div class="task-card-title">
+      <div class="task-card-dot" style="background:${tColors[tk]}"></div>
+      <span style="color:${tColors[tk]}">${tLabels[tk]}</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:10px;letter-spacing:.04em">${taskDescriptions[tk]}</div>
+    ${segments.map((s)=>{
+      const t = s[tk].time || 0;
+      const pct = maxT>0?(t/maxT*100).toFixed(0):0;
+      const rating = t < avgT*0.7 ? 'fast' : t > avgT*1.4 ? 'slow' : 'avg';
+      const rc = rating==='fast'?'var(--t3)':rating==='slow'?'var(--t4)':'var(--accent)';
+      return `<div class="task-user-row">
+        <div class="task-user-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${uColors[s.user.key]};margin-right:6px;vertical-align:middle"></span>${firstName(s.user)}</div>
+        <div class="task-user-bar-bg"><div class="task-user-bar-fill" style="width:${pct}%;background:${uColors[s.user.key]}88"></div></div>
+        <div class="task-user-time" style="color:${uColors[s.user.key]}">${t.toFixed(1)}s</div>
+        <div class="task-user-rating" style="color:${rc}">${rating}</div>
+      </div>`;
+    }).join('')}`;
+  tocGrid.appendChild(card);
+});
+
+// Total time card
+const maxTotal = Math.max(...totalTaskTimes);
+const avgTotal = midpointTotalTaskTime;
+const totalCard = document.createElement('div'); totalCard.className='task-card';
+totalCard.innerHTML=`
+  <div class="task-card-title">
+    <div class="task-card-dot" style="background:var(--accent)"></div>
+    <span style="color:var(--accent)">Total — All Tasks Combined</span>
+  </div>
+  <div style="font-size:10px;color:var(--muted);margin-bottom:10px;letter-spacing:.04em">T1 + T2 + T3 + T4 · sum of all four task durations</div>
+  ${segments.map((s,i)=>{
+    const t = totalTaskTimes[i];
+    const pct = maxTotal>0?(t/maxTotal*100).toFixed(0):0;
+    const rating = t < avgTotal*0.7 ? 'fast' : t > avgTotal*1.4 ? 'slow' : 'avg';
+    const rc = rating==='fast'?'var(--t3)':rating==='slow'?'var(--t4)':'var(--accent)';
+    return `<div class="task-user-row">
+      <div class="task-user-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${uColors[s.user.key]};margin-right:6px;vertical-align:middle"></span>${firstName(s.user)}</div>
+      <div class="task-user-bar-bg"><div class="task-user-bar-fill" style="width:${pct}%;background:${uColors[s.user.key]}88"></div></div>
+      <div class="task-user-time" style="color:${uColors[s.user.key]};font-family:'Fraunces',serif">${t.toFixed(1)}s</div>
+      <div class="task-user-rating" style="color:${rc}">${rating}</div>
+    </div>`;
+  }).join('')}`;
+tocGrid.appendChild(totalCard);
+
+
+// ─── OVERVIEW GROUPED BAR ─────────────────────────────────────────────────────
+new Chart('overviewGrouped',{
+  type:'bar',
+  data:{
+    labels:users.map(u=>firstName(u)),
+    datasets:taskKeys.map(tk=>({
+      label:tLabels[tk],
+      data:segments.map(s=>(s[tk].time||0).toFixed(1)),
+      backgroundColor:tColors[tk]+'88',
+      borderColor:tColors[tk],
+      borderWidth:1,borderRadius:0,
+    }))
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:10,padding:14,color:'#6b7394',font:{size:10}}}},
+    scales:{
+      x:{stacked:false,grid:{display:false}},
+      y:{title:{display:true,text:'Seconds',color:'#6b7394'},grid:{color:'#252a3a'}}
+    }
+  }
+});
+
+// ─── SCORE CHART ──────────────────────────────────────────────────────────────
+new Chart('scoreChart',{
+  type:'bar',
+  data:{
+    labels:users.map(u=>firstName(u)),
+    datasets:[{
+      label:'Score /10',
+      data:users.map(u=>normScore(u)),
+      backgroundColor:users.map(u=>uColors[u.key]+'99'),
+      borderColor:users.map(u=>uColors[u.key]),
+      borderWidth:1,borderRadius:0,
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{display:false}},
+      y:{min:0,max:10,title:{display:true,text:'Score /10',color:'#6b7394'},grid:{color:'#252a3a'}}
+    }
+  }
+});
+
+// ─── PER-TASK CHARTS ──────────────────────────────────────────────────────────
+taskKeys.forEach(tk=>{
+  new Chart(`${tk}chart`,{
+    type:'bar',
+    data:{
+      labels:users.map(u=>firstName(u)),
+      datasets:[{
+        label:'Duration (s)',
+        data:segments.map(s=>(s[tk].time||0).toFixed(1)),
+        backgroundColor:users.map(u=>uColors[u.key]+'99'),
+        borderColor:users.map(u=>uColors[u.key]),
+        borderWidth:1,borderRadius:0,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{display:false}},
+        y:{title:{display:true,text:'Seconds',color:'#6b7394'},grid:{color:'#252a3a'}}
+      }
+    }
+  });
+});
+
+// ─── TASK HEATMAP ─────────────────────────────────────────────────────────────
+const tgTemplate = `130px repeat(4, 1fr)`;
+const tHead = document.getElementById('taskHeatHeader');
+tHead.style.gridTemplateColumns = tgTemplate;
+tHead.innerHTML = `<div></div>` + taskKeys.map(tk=>`<div class="heatmap-header-cell" style="color:${tColors[tk]}">${tLabels[tk]}</div>`).join('');
+
+const tGrid = document.getElementById('taskHeatGrid');
+segments.forEach(s=>{
+  const row = document.createElement('div');
+  row.className='heatmap-row';
+  row.style.gridTemplateColumns=tgTemplate;
+  const lbl=document.createElement('div');
+  lbl.className='heatmap-label';
+  lbl.innerHTML=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${uColors[s.user.key]};margin-right:8px;vertical-align:middle"></span>${firstName(s.user)}`;
+  row.appendChild(lbl);
+  taskKeys.forEach(tk=>{
+    const val = s[tk].time || 0;
+    const g = taskStats[tk];
+    const {bg,text}=heatColor(val,g.midpoint,g.std);
+    const cell=document.createElement('div');
+    cell.className='heatmap-cell';
+    cell.style.background=bg;
+    cell.title=`${s.user.name} · ${tLabels[tk]}: ${val.toFixed(1)}s`;
+    cell.innerHTML=`<div class="cell-val" style="color:${text}">${val.toFixed(1)}s</div><div class="cell-lbl" style="color:${text}">total</div>`;
+    row.appendChild(cell);
+  });
+  tGrid.appendChild(row);
+});
+
+// ─── SCORE ROWS ───────────────────────────────────────────────────────────────
+const scoreContainer = document.getElementById('scoreRows');
+users.forEach(u=>{
+  const norm=normScore(u);
+  const row=document.createElement('div'); row.className='score-row';
+  row.innerHTML=`
+    <div class="score-name"><span style="width:8px;height:8px;border-radius:50%;background:${uColors[u.key]};display:inline-block;flex-shrink:0"></span>${firstName(u)}</div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:${norm/10*100}%;background:${uColors[u.key]}"></div></div>
+    <div class="score-val" style="color:${uColors[u.key]}">${norm.toFixed(1)}</div>
+    <div class="score-comment">${u.comment}</div>`;
+  scoreContainer.appendChild(row);
+});
+
+// ─── PERSONA DETAIL TABLE ─────────────────────────────────────────────────────
+const pTable=document.getElementById('personaTable');
+pTable.innerHTML=`<tr>
+  <th>User</th><th>Age/Gender</th><th>Tech</th>
+  <th style="color:${tColors.t1}">T1 Accessibility</th>
+  <th style="color:${tColors.t2}">T2 Calendar</th>
+  <th style="color:${tColors.t3}">T3 Shuttle</th>
+  <th style="color:${tColors.t4}">T4 Directions</th>
+  <th style="color:var(--accent)">Total (Tasks)</th>
+  <th>Score</th>
+</tr>`;
+segments.forEach(s=>{
+  const u=s.user;
+  const norm=normScore(u);
+  const rating=norm>=8?'<span class="rating good">High</span>':norm>=6?'<span class="rating warn">Mid</span>':'<span class="rating bad">Low</span>';
+  const taskCell=(tk)=>{
+    const t=s[tk].time||0;
+    const avg=taskStats[tk].midpoint;
+    const cl=t<avg*0.7?'good':t>avg*1.4?'bad':'warn';
+    return `<td><span class="rating ${cl}">${t.toFixed(1)}s</span></td>`;
+  };
+  const totalTaskTime = taskKeys.reduce((a,tk)=>a+(s[tk].time||0),0);
+  const allAvgTotal = midpointTotalTaskTime;
+  const totalCl = totalTaskTime < allAvgTotal*0.7 ? 'good' : totalTaskTime > allAvgTotal*1.4 ? 'bad' : 'warn';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><span class="persona-dot" style="background:${uColors[u.key]}"></span>${firstName(u)}</td>
+    <td style="color:var(--muted)">${u.age} ${u.gender}</td>
+    <td style="color:var(--muted);font-size:11px">${u.tech}</td>
+    ${taskCell('t1')}${taskCell('t2')}${taskCell('t3')}${taskCell('t4')}
+    <td><span class="rating ${totalCl}" style="font-family:'Fraunces',serif;font-size:13px">${totalTaskTime.toFixed(1)}s</span></td>
+    <td>${rating}</td>`;
+  pTable.appendChild(tr);
+});
+
+// ─── HESITATIONS ──────────────────────────────────────────────────────────────
+const hesItems=[];
+users.forEach(u=>{
+  u.events.forEach(([name,time])=>{
+    if(time>15) hesItems.push({user:u,name,time});
+  });
+});
+hesItems.sort((a,b)=>b.time-a.time);
+const oList=document.getElementById('outlierList');
+if(!hesItems.length){
+  oList.innerHTML='<div style="color:var(--muted);padding:20px;font-size:12px">No hesitation events.</div>';
+} else {
+  hesItems.forEach(o=>{
+    const sev=o.time>60?'Critical':o.time>30?'High':'Moderate';
+    // which task does this event belong to?
+    const seg=segments.find(s=>s.user.id===o.user.id);
+    let taskLabel='—';
+    if(seg){
+      if(seg.t1.events.some(([n,t])=>n===o.name&&t===o.time)) taskLabel=tLabels.t1;
+      else if(seg.t2.events.some(([n,t])=>n===o.name&&t===o.time)) taskLabel=tLabels.t2;
+      else if(seg.t3.events.some(([n,t])=>n===o.name&&t===o.time)) taskLabel=tLabels.t3;
+      else if(seg.t4.events.some(([n,t])=>n===o.name&&t===o.time)) taskLabel=tLabels.t4;
+    }
+    const item=document.createElement('div'); item.className='outlier-item';
+    item.style.borderLeftColor=uColors[o.user.key];
+    item.innerHTML=`
+      <div>
+        <div style="color:${uColors[o.user.key]};font-size:13px">${firstName(o.user)}</div>
+        <div class="outlier-persona">${taskLabel}</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">${o.name}</div>
+      <div class="outlier-ms" style="color:${uColors[o.user.key]}">${o.time.toFixed(1)}s</div>
+      <div class="outlier-tag" style="color:${uColors[o.user.key]};border-color:${uColors[o.user.key]}">${sev}</div>`;
+    oList.appendChild(item);
+  });
+}
+
+// ─── SCATTER ──────────────────────────────────────────────────────────────────
+// Cap y-axis at 95th percentile so the 382s outlier doesn't crush everything else
+// Outlier points are still plotted but clipped — noted in the chart label
+const allEventTimes = users.flatMap(u=>u.events.map(([,t])=>t)).sort((a,b)=>a-b);
+const p95 = allEventTimes[Math.floor(allEventTimes.length*0.95)];
+const scatterCap = Math.ceil(p95 / 5) * 5; // round up to nearest 5
+
+new Chart('scatterChart',{
+  type:'scatter',
+  data:{datasets:users.map(u=>({
+    label:firstName(u),
+    data:u.events.map(([,t],i)=>({x:i+1,y:t})),
+    backgroundColor:uColors[u.key]+'cc',
+    pointRadius:5,pointHoverRadius:8,showLine:false,
+  }))},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{boxWidth:8,padding:12,color:'#6b7394',font:{size:10}}},
+      tooltip:{callbacks:{label:ctx=>{
+        const u=users.find(u=>firstName(u)===ctx.dataset.label);
+        const ev=u?.events[ctx.dataIndex];
+        return ev?[`${ctx.dataset.label}`,`${ev[0]}`,`${ev[1].toFixed(1)}s`]:[];
+      }}}
+    },
+    scales:{
+      x:{title:{display:true,text:'Event index within session',color:'#6b7394'},grid:{color:'#252a3a'}},
+      y:{
+        min:0, max:scatterCap,
+        title:{display:true,text:`Duration (s) — capped at ${scatterCap}s, 1 outlier clipped`,color:'#6b7394'},
+        grid:{color:'#252a3a'}
+      }
+    }
+  }
+});
+
+// ─── FINDINGS ─────────────────────────────────────────────────────────────────
+const findings=[
+  {id:'F1',cls:'f-critical',sev:'Critical',sevcls:'sev-critical',task:'T1',
+   title:'T1 — Profile entry point caused the largest time loss',
+   desc:`<strong>Samira</strong> spent <strong>382 seconds</strong> before even tapping the profile button — before Task 1 could begin. <strong>Tamar</strong> and <strong>Thien-Son-Mac</strong> also waited ~39s. This pre-task hesitation inflated T1 times dramatically for lower-familiarity users. <strong>Recommendation:</strong> make the profile/settings entry point more prominent on the main screen.`},
+  {id:'F2',cls:'f-critical',sev:'Critical',sevcls:'sev-critical',task:'T1',
+   title:'T1 — Accessibility settings location is consistently non-obvious',
+   desc:`5 of 7 users flagged that accessibility settings inside the profile icon was unexpected. Users expected a <strong>gear/settings icon</strong>. Multiple users revisited the accessibility page multiple times (Samira 3 visits, Malik explored, Tamar, Ahmed). <strong>Recommendation:</strong> relocate or duplicate accessibility settings to a dedicated settings icon in the nav bar.`},
+  {id:'F3',cls:'f-high',sev:'High',sevcls:'sev-high',task:'T1',
+   title:'T1 — Map controls mistaken for accessibility settings',
+   desc:`<strong>To-Nhu-Nguyen</strong> spent <strong>36s</strong> toggling map pan/zoom controls before the profile button — the single largest non-Samira hesitation in the dataset. She explicitly noted the map controls looked like they might be settings. <strong>Recommendation:</strong> visually differentiate map control UI from settings-type elements.`},
+  {id:'F4',cls:'f-high',sev:'High',sevcls:'sev-high',task:'T3',
+   title:'T3 — Shuttle discoverability was poor for campus newcomers',
+   desc:`<strong>Anh-Thi-Mac</strong> (unfamiliar with campus) navigated through every page to find the shuttle stop. <strong>Samira</strong> also spent significant time around the shuttle. Users familiar with the campus had no issues. <strong>Recommendation:</strong> add a transit/shuttle shortcut in the bottom nav or POI categories.`},
+  {id:'F5',cls:'f-high',sev:'High',sevcls:'sev-high',task:'T3',
+   title:'T3 — Shuttle stop info card dismiss was slow for some users',
+   desc:`<strong>Thien-Son-Mac</strong> took <strong>17.3s</strong> to dismiss the shuttle info card, and <strong>Tamar</strong> took <strong>14.9s</strong>. This suggests the dismiss action may not be obvious. <strong>Recommendation:</strong> add a clearly labelled close button to the shuttle stop info card.`},
+  {id:'F6',cls:'f-medium',sev:'Medium',sevcls:'sev-medium',task:'T4',
+   title:'T4 — Building search required significant exploration for some users',
+   desc:`<strong>Thien-Son-Mac</strong> spent <strong>33.5s</strong> on building suggestion and <strong>18.6s</strong> on route bar removal — suggesting back-and-forth behavior. <strong>Samira</strong>'s T4 was also notably slower. <strong>Recommendation:</strong> ensure the search-to-route flow is linear and provides clear confirmation states.`},
+  {id:'F7',cls:'f-medium',sev:'Medium',sevcls:'sev-medium',task:'T2',
+   title:'T2 — Calendar was generally well understood',
+   desc:`T2 was the smoothest task overall for most users. <strong>Anh-Thi-Mac</strong> explored campus toggles before settling, adding ~20s of extra exploration time. <strong>Ahmed</strong> took 9s on Set Calendar Date Daily — possibly reading the options. No major usability failures in this task.`},
+  {id:'F8',cls:'f-positive',sev:'Positive',sevcls:'sev-positive',task:'All',
+   title:'Overall — Satisfaction is high despite friction points',
+   desc:`Average satisfaction is <strong>7.9/10</strong>. Tech-savvy users (Malik, Ahmed) completed all 4 tasks efficiently. The core flows are functional and follow standard app conventions — issues are fixable friction points, not fundamental design failures.`},
+];
+const fList=document.getElementById('findingList');
+findings.forEach(f=>{
+  const item=document.createElement('div'); item.className=`finding-item ${f.cls}`;
+  item.innerHTML=`
+    <div class="finding-header">
+      <div class="finding-id">${f.id}</div>
+      <div class="finding-title">${f.title}</div>
+      <span class="task-pill ${f.task==='T1'?'t1':f.task==='T2'?'t2':f.task==='T3'?'t3':f.task==='T4'?'t4':''}" style="font-size:9px;padding:2px 8px">${f.task}</span>
+      <div class="finding-sev ${f.sevcls}">${f.sev}</div>
+    </div>
+    <div class="finding-desc">${f.desc}</div>`;
+  fList.appendChild(item);
+});
+
+// ─── INSIGHTS ─────────────────────────────────────────────────────────────────
+const insights=[
+  {icon:'⏱️',title:'T1 dominated session time for low-tech users',
+   text:`For <strong>Samira</strong>, Task 1 (Accessibility) alone accounted for the vast majority of her session — most of it spent just finding the profile button before the task even started. For <strong>Malik</strong>, T1 was his fastest task at ~14s total.`},
+  {icon:'🏎️',title:'Malik was fastest across all 4 tasks',
+   text:`<strong>Malik</strong> completed every task well below average — his tech savviness and prior campus familiarity gave him a clear edge. His only complaint was that accessibility was hard to <em>find</em>, not hard to <em>use</em> once found.`},
+  {icon:'🗓️',title:'T2 Calendar was the most consistent task',
+   text:`Calendar interaction showed the least spread across users. Even Samira navigated it without major issues once she found the Calendar tab. The date-navigation pattern was widely understood.`},
+  {icon:'🚌',title:'T3 Shuttle exposed campus-familiarity divide',
+   text:`Users who knew the campus (Malik, Thien-Son-Mac, Ahmed) found the shuttle quickly. Users unfamiliar with campus (Samira, Anh-Thi-Mac) struggled to locate it at all. The shuttle is a map-exploration task, not a search task — this hurts discovery.`},
+  {icon:'🗺️',title:'T4 Directions was smooth for most users',
+   text:`Building search and route initiation worked well overall. <strong>Thien-Son-Mac</strong> was the exception — he removed the route and retried, adding ~18s. Two different completion methods (Top Bar vs Bottom Card) both worked, suggesting good redundancy in the UI.`},
+  {icon:'🎨',title:'Aesthetic feedback was unprompted and consistent',
+   text:`<strong>Tamar</strong> and <strong>Ahmed</strong> both commented on the visual design without being asked. Tamar found it bland; Ahmed specifically requested a <strong>dark mode</strong>. This is worth addressing as a P3 improvement — it affects long-term app retention.`},
+];
+const iGrid=document.getElementById('insightGrid');
+insights.forEach(ins=>{
+  const card=document.createElement('div'); card.className='insight-card';
+  card.innerHTML=`<div class="insight-icon">${ins.icon}</div><div class="insight-title">${ins.title}</div><div class="insight-text">${ins.text}</div>`;
+  iGrid.appendChild(card);
+});
+
+// ─── PARTICIPANTS SECTION ─────────────────────────────────────────────────────
+
+// Tech levels taken directly from user profile data — no assumptions
+const techMap = {
+  SAMIRA:   { level:'Below average — not used to apps or tech', score:1 },
+  MALIK:    { level:'Very tech-savvy',                          score:5 },
+  TONHU:    { level:'Average tech use',                         score:3 },
+  THIENSAN: { level:'Tech savvy',                               score:4 },
+  ANHTHI:   { level:'Familiar but not savvy',                   score:2 },
+  TAMAR:    { level:'Average tech knowledge',                   score:3 },
+  AHMED:    { level:'Tech savvy',                               score:4 },
+};
+const campusMap = {
+  SAMIRA:   'Never been to campus',
+  MALIK:    'Been to SGW campus 3 times',
+  TONHU:    'No',
+  THIENSAN: 'Familiar',
+  ANHTHI:   'Visitor (has been 1–2 times)',
+  TAMAR:    'Familiar with Concordia SGW',
+  AHMED:    'Familiar with Concordia SGW',
+};
+const accessMap = {
+  SAMIRA:   'None', MALIK:'None', TONHU:'None',
+  THIENSAN: 'Needed bigger text for text visibility',
+  ANHTHI:   'None', TAMAR:'None', AHMED:'None',
+};
+
+// Population KPIs — derived from actual data
+const popKpis = [
+  { label:'Total Participants', value:'7', unit:'usability test sessions' },
+  { label:'Gender Split', value:'4F / 3M', unit:'female majority' },
+  { label:'Age Range', value:'25–50s', unit:'Samira, To-Nhu, Thien-Son in 50s' },
+  { label:'Tech Savvy (score ≥4)', value:'3', unit:'Malik, Thien-Son, Ahmed' },
+  { label:'Campus Familiar', value:'3', unit:'Malik, Thien-Son, Tamar, Ahmed' },
+  { label:'Accessibility Need', value:'1', unit:'Thien-Son — larger text' },
+];
+const popKpiEl = document.getElementById('popKpiGrid');
+popKpis.forEach(k=>{
+  const d=document.createElement('div'); d.className='kpi';
+  d.innerHTML=`<div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-unit">${k.unit}</div>`;
+  popKpiEl.appendChild(d);
+});
+
+// User Cards — full comment always visible
+const cardGrid = document.getElementById('userCardGrid');
+users.forEach(u => {
+  const color = uColors[u.key];
+  const tech = techMap[u.key];
+  const campus = campusMap[u.key];
+  const access = accessMap[u.key];
+  const norm = normScore(u);
+  const totalT = u.events.reduce((a,[,t])=>a+t,0);
+
+  const techColor = tech.score >= 4 ? 'var(--t3)' : tech.score <= 1 ? 'var(--t4)' : 'var(--accent)';
+  const campusColor = campus.includes('Familiar') || campus.includes('3 times') ? 'var(--t3)' : campus.includes('Never') || campus === 'No' ? 'var(--t4)' : 'var(--accent)';
+  const scoreColor = norm >= 8 ? 'var(--t3)' : norm >= 6 ? 'var(--accent)' : 'var(--t4)';
+
+  const card = document.createElement('div');
+  card.className = 'user-card';
+  card.innerHTML = `
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color}"></div>
+    <div class="user-card-name" style="color:${color}">${u.name}</div>
+    <div class="user-card-sub">User ${u.id} · ${u.age} · ${u.gender === 'F' ? 'Female' : 'Male'}</div>
+
+    <div class="user-card-row">
+      <span class="user-card-label">Tech Level</span>
+      <span class="user-card-val" style="color:${techColor};font-size:11px;text-align:right;">${tech.level}</span>
+    </div>
+    <div class="user-card-row">
+      <span class="user-card-label">Campus</span>
+      <span class="user-card-val" style="color:${campusColor};font-size:11px;text-align:right;">${campus}</span>
+    </div>
+    <div class="user-card-row">
+      <span class="user-card-label">Accessibility Needs</span>
+      <span class="user-card-val" style="font-size:11px;text-align:right;">${access}</span>
+    </div>
+    <div class="user-card-row">
+      <span class="user-card-label">Session</span>
+      <span class="user-card-val" style="font-family:'Fraunces',serif;font-size:14px">${totalT.toFixed(0)}s</span>
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+      <div style="flex-shrink:0;">
+        <div class="user-card-score-lbl">Satisfaction</div>
+        <div class="user-card-score" style="color:${scoreColor}">${norm.toFixed(1)}<span style="font-size:14px;color:var(--muted)">/10</span></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-left:2px solid ${color};font-size:11px;color:var(--muted);line-height:1.6;">"${u.comment}"</div>`;
+  cardGrid.appendChild(card);
+});
+
+// ── POPULATION CHARTS ────────────────────────────────────────────────────────
+const chartBg = (colors) => colors.map(c=>c+'cc');
+
+// Gender doughnut
+new Chart('genderChart', {
+  type:'doughnut',
+  data:{
+    labels:['Female (4)','Male (3)'],
+    datasets:[{ data:[4,3], backgroundColor:['#e85aab','#5ab4e8'], borderColor:'#0d0f14', borderWidth:3 }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ position:'right', labels:{ color:'#6b7394', boxWidth:12, padding:16 } }
+    },
+    cutout:'62%'
+  }
+});
+
+// Tech expertise bar — using actual profile labels
+new Chart('techChart', {
+  type:'bar',
+  data:{
+    labels:['Below average\n(not used to apps)','Familiar but\nnot savvy','Average tech\nknowledge','Tech savvy','Very\ntech-savvy'],
+    datasets:[{
+      label:'Users',
+      data:[1,1,2,2,1],
+      backgroundColor:['#e8665a','#e88c5a','#f0c060','#5ae88c','#5ab4e8'],
+      borderWidth:0, borderRadius:0,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:{ grid:{display:false}, ticks:{font:{size:9}, maxRotation:0} },
+      y:{ grid:{color:'#252a3a'}, ticks:{stepSize:1}, title:{display:true,text:'# Users',color:'#6b7394'} }
+    }
+  }
+});
+
+// Age distribution
+new Chart('ageChart', {
+  type:'bar',
+  data:{
+    labels:['20s (25)','30s (30)','50s (50)','50s (50s)'],
+    datasets:[{
+      label:'Users',
+      data:[2,2,2,1],
+      backgroundColor:['#5ae8d4','#5ab4e8','#a05ae8','#e88c5a'],
+      borderWidth:0, borderRadius:0,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:{ grid:{display:false}, ticks:{font:{size:10}} },
+      y:{ grid:{color:'#252a3a'}, ticks:{stepSize:1}, title:{display:true,text:'# Users',color:'#6b7394'} }
+    }
+  }
+});
+
+// Campus familiarity doughnut
+new Chart('campusChart', {
+  type:'doughnut',
+  data:{
+    labels:['Familiar / Visited 3×+','Visitor 1–2×','No / Never been'],
+    datasets:[{
+      data:[3,1,3],
+      backgroundColor:['#5ae88c','#f0c060','#e8665a'],
+      borderColor:'#0d0f14', borderWidth:3
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ position:'right', labels:{ color:'#6b7394', boxWidth:12, padding:14, font:{size:10} } }
+    },
+    cutout:'62%'
+  }
+});
+
+// Tech level vs Satisfaction scatter/bubble
+// x = tech score (1–5), y = satisfaction /10, r = session duration (normalized)
+const maxSession = Math.max(...users.map(u=>u.events.reduce((a,[,t])=>a+t,0)));
+new Chart('techScoreChart', {
+  type:'bubble',
+  data:{
+    datasets: users.map(u=>{
+      const ts = u.events.reduce((a,[,t])=>a+t,0);
+      return {
+        label: firstName(u),
+        data:[{ x: techMap[u.key].score, y: normScore(u), r: 6 + (ts/maxSession)*22 }],
+        backgroundColor: uColors[u.key]+'99',
+        borderColor: uColors[u.key],
+        borderWidth:1,
+      };
+    })
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{ labels:{ boxWidth:8, padding:12, color:'#6b7394', font:{size:10} } },
+      tooltip:{
+        callbacks:{
+          label: ctx => {
+            const u = users[ctx.datasetIndex];
+            const ts = u.events.reduce((a,[,t])=>a+t,0);
+            return [`${u.name}`, `Tech: ${techMap[u.key].level}`, `Score: ${normScore(u)}/10`, `Session: ${ts.toFixed(0)}s`];
+          }
+        }
+      }
+    },
+    scales:{
+      x:{
+        min:0, max:6,
+        title:{display:true,text:'Technical Expertise (1=Low → 5=High)',color:'#6b7394'},
+        grid:{color:'#252a3a'},
+        ticks:{
+          callback:v=>(['','Below average','Familiar, not savvy','Average','Tech savvy','Very tech-savvy',''][v]||''),
+          font:{size:9}, maxRotation:15
+        }
+      },
+      y:{
+        min:0, max:10,
+        title:{display:true,text:'Satisfaction Score /10',color:'#6b7394'},
+        grid:{color:'#252a3a'}
+      }
+    }
+  }
+});
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function showSection(id,e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  const scrollY=window.scrollY;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(e) e.target.classList.add('active');
+  window.scrollTo(0,scrollY);
+}
+</script>
+</body>
+</html>

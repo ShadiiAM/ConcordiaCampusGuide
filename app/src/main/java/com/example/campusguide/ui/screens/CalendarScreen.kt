@@ -77,21 +77,16 @@ fun CalendarScreen() {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().padding(top =50.dp)) {
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
-        )
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top=620.dp), //look for Better way soon
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
 
             val radius = 60.dp
@@ -100,7 +95,7 @@ fun CalendarScreen() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(120.dp)
                     .drawBehind {
                         val r = radius.toPx()
                         val s = stroke.toPx()
@@ -132,96 +127,99 @@ fun CalendarScreen() {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                Row(modifier = Modifier .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Go back in date",
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clickable {
-                                when (viewMode) {
-                                    CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
-                                    CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, -1) }
-                                    CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, -1) }
+                    Row(modifier = Modifier .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Go back in date",
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clickable {
+                                    when (viewMode) {
+                                        CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, -1) }
+                                        CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, -1) }
+                                        CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, -1) }
+                                    }
                                 }
-                            }
-                    )
+                        )
 
-                    Text(formattedDate(date, viewMode), fontSize = 35.sp)
+                        Text(formattedDate(date, viewMode), fontSize = 35.sp)
 
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Go ahead in date",
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clickable {
-                                when (viewMode) {
-                                    CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
-                                    CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, 1) }
-                                    CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, 1) }
-                                }                            }
-                    )                }
-
-                Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
-                    Button(
-                        onClick = {
-                            viewMode = CalendarViewMode.DAILY
-                                  },
-                        modifier = Modifier
-                            .height(24.dp)
-                            .defaultMinSize(minHeight = 1.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                        shape = RoundedCornerShape(
-                            topStart = 16.dp,
-                            bottomStart = 16.dp,
-                            topEnd = 5.dp,
-                            bottomEnd = 5.dp ),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.LightGray, // background color
-                            contentColor = Color.Black)
-                    )
-                    {
-                        AccessibleText(text = "Daily", baseFontSizeSp = 15f)
-                    }
-
-                    Button( modifier = Modifier
-                        .height(24.dp)
-                        .defaultMinSize(minHeight = 1.dp)
-                        .padding(horizontal = 2.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                        onClick = { viewMode = CalendarViewMode.WEEKLY },
-                        shape = RoundedCornerShape(5.dp),
-                        colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
-                            contentColor = Color.Black ) )
-                    {
-                        AccessibleText(
-                            text = "Weekly",
-                            baseFontSizeSp = 15f
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = "Go ahead in date",
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clickable {
+                                    when (viewMode) {
+                                        CalendarViewMode.DAILY -> date = (date.clone() as Calendar).apply { add(Calendar.DAY_OF_MONTH, 1) }
+                                        CalendarViewMode.WEEKLY -> date = (date.clone() as Calendar).apply { add(Calendar.WEEK_OF_YEAR, 1) }
+                                        CalendarViewMode.MONTHLY -> date = (date.clone() as Calendar).apply { add(Calendar.MONTH, 1) }
+                                    }                            }
                         )
                     }
 
-                    Button(
-                        onClick = { viewMode = CalendarViewMode.MONTHLY },
-                        modifier = Modifier
-                            .height(24.dp)
-                            .defaultMinSize(minHeight = 1.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
-                        shape = RoundedCornerShape(
-                            topStart = 5.dp,
-                            bottomStart = 5.dp,
-                            topEnd = 16.dp,
-                            bottomEnd = 16.dp ),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PurpleGrey80, // background color
-                            contentColor = Color.Black)
-                    )
-                    {
-                        AccessibleText(text = "Monthly", baseFontSizeSp = 15f)
-                    }
-                }}
-            }
-        }
+                    Row(modifier = Modifier .fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.Center) {
+                        Button(
+                            onClick = {
+                                viewMode = CalendarViewMode.DAILY
+                                      },
+                            modifier = Modifier
+                                .height(24.dp)
+                                .defaultMinSize(minHeight = 1.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 16.dp,
+                                bottomStart = 16.dp,
+                                topEnd = 5.dp,
+                                bottomEnd = 5.dp ),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.LightGray, // background color
+                                contentColor = Color.Black)
+                        )
+                        {
+                            AccessibleText(text = "Daily", baseFontSizeSp = 15f)
+                        }
 
+                        Button( modifier = Modifier
+                            .height(24.dp)
+                            .defaultMinSize(minHeight = 1.dp)
+                            .padding(horizontal = 2.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                            onClick = { viewMode = CalendarViewMode.WEEKLY },
+                            shape = RoundedCornerShape(5.dp),
+                            colors = ButtonDefaults.buttonColors( containerColor = PurpleGrey80,
+                                contentColor = Color.Black ) )
+                        {
+                            AccessibleText(
+                                text = "Weekly",
+                                baseFontSizeSp = 15f
+                            )
+                        }
+
+                        Button(
+                            onClick = { viewMode = CalendarViewMode.MONTHLY },
+                            modifier = Modifier
+                                .height(24.dp)
+                                .defaultMinSize(minHeight = 1.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                            shape = RoundedCornerShape(
+                                topStart = 5.dp,
+                                bottomStart = 5.dp,
+                                topEnd = 16.dp,
+                                bottomEnd = 16.dp ),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PurpleGrey80, // background color
+                                contentColor = Color.Black)
+                        )
+                        {
+                            AccessibleText(text = "Monthly", baseFontSizeSp = 15f)
+                        }
+                    }
+                }
+            }
+            // Bottom spacer to leave some space under the card
+            androidx.compose.foundation.layout.Spacer(Modifier.height(6.dp))
+        }
     }
 }
 

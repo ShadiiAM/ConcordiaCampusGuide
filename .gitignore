@@ -105,5 +105,7 @@ secrets.properties
 # Test outputs
 /test-results/
 /test-reports/
+/test-recordings/
 
+# Claude AI documentation (local only)
 .claude/

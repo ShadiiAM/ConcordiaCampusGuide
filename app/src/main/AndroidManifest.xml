@@ -20,7 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ConcordiaCampusGuide">
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
         <!-- Google Maps API key (loaded safely from local.properties) -->
         <meta-data

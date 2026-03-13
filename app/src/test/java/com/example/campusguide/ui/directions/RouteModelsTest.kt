@@ -15,17 +15,17 @@ class RouteModelsTest {
         
         assertEquals(origin, request.origin)
         assertEquals(destination, request.destination)
-        assertEquals(TravelMode.WALKING, request.mode)
+        assertEquals("DRIVE", request.travelMode)
     }
 
     @Test
     fun routeRequest_createsWithCustomMode() {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
-        
-        val request = RouteRequest(origin, destination, TravelMode.WALKING)
-        
-        assertEquals(TravelMode.WALKING, request.mode)
+
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
+        assertEquals("WALK", request.travelMode)
+
     }
 
     @Test
@@ -67,13 +67,13 @@ class RouteModelsTest {
 
     @Test
     fun travelMode_walking() {
-        assertEquals(TravelMode.WALKING, TravelMode.valueOf("WALKING"))
+        assertEquals(TravelMode.WALK, TravelMode.valueOf("WALK"))
     }
 
     @Test
     fun travelMode_enumProperties() {
-        val mode = TravelMode.WALKING
-        assertEquals("WALKING", mode.name)
+        val mode = TravelMode.WALK
+        assertEquals("WALK", mode.name)
     }
 
     @Test
@@ -156,12 +156,13 @@ class RouteModelsTest {
     fun routeRequest_componentAccess() {
         val origin = LatLng(45.4972, -73.5789)
         val destination = LatLng(45.4582, -73.6402)
-        val request = RouteRequest(origin, destination, TravelMode.WALKING)
-        
+        val request = RouteRequest(origin, destination, TravelMode.WALK)
+
         val (o, d, m) = request
         assertEquals(origin, o)
         assertEquals(destination, d)
-        assertEquals(TravelMode.WALKING, m)
+        assertEquals(TravelMode.WALK, m)
+        assertEquals("WALK", request.travelMode)
     }
 
     @Test
@@ -171,5 +172,282 @@ class RouteModelsTest {
         
         val (p) = result
         assertEquals(points, p)
+    }
+
+    @Test
+    fun travelMode_allModes_exist() {
+        assertNotNull(TravelMode.DRIVE)
+        assertNotNull(TravelMode.WALK)
+        assertNotNull(TravelMode.TRANSIT)
+    }
+
+    @Test
+    fun travelMode_driving() {
+        assertEquals(TravelMode.DRIVE, TravelMode.valueOf("DRIVE"))
+        assertEquals("DRIVE", TravelMode.DRIVE.name)
+    }
+
+    @Test
+    fun travelMode_transit() {
+        assertEquals(TravelMode.TRANSIT, TravelMode.valueOf("TRANSIT"))
+        assertEquals("TRANSIT", TravelMode.TRANSIT.name)
+    }
+
+    @Test
+    fun routeRequest_withDrivingMode() {
+        val origin = LatLng(45.4972, -73.5789)
+        val destination = LatLng(45.4582, -73.6402)
+
+        val request = RouteRequest(origin, destination, TravelMode.DRIVE)
+
+        assertEquals(TravelMode.DRIVE, request.mode)
+    }
+
+    @Test
+    fun routeResult_withDurationAndDistance() {
+        val points = listOf(LatLng(45.4972, -73.5789))
+
+        val result = RouteResult(
+            points = points,
+            durationSeconds = 480,
+            distanceMeters = 650
+        )
+
+        assertEquals(points, result.points)
+        assertEquals(480, result.durationSeconds)
+        assertEquals(650, result.distanceMeters)
+        assertTrue(result.legs.isEmpty())
+    }
+
+    @Test
+    fun routeResult_withNullDurationAndDistance() {
+        val points = listOf(LatLng(45.4972, -73.5789))
+
+        val result = RouteResult(points = points)
+
+        assertNull(result.durationSeconds)
+        assertNull(result.distanceMeters)
+        assertTrue(result.legs.isEmpty())
+    }
+
+    @Test
+    fun routeResult_copyWithDuration() {
+        val points = listOf(LatLng(45.4972, -73.5789))
+        val result1 = RouteResult(points)
+        val result2 = result1.copy(durationSeconds = 300)
+
+        assertNull(result1.durationSeconds)
+        assertEquals(300, result2.durationSeconds)
+    }
+
+    @Test
+    fun routeLeg_createsCorrectly() {
+        val leg = RouteLeg(
+            durationSeconds = 480,
+            distanceMeters = 650,
+            steps = emptyList()
+        )
+
+        assertEquals(480, leg.durationSeconds)
+        assertEquals(650, leg.distanceMeters)
+        assertTrue(leg.steps.isEmpty())
+    }
+
+    @Test
+    fun routeLeg_withSteps() {
+        val step = RouteStep(
+            durationSeconds = 240,
+            distanceMeters = 325
+        )
+
+        val leg = RouteLeg(
+            durationSeconds = 480,
+            distanceMeters = 650,
+            steps = listOf(step)
+        )
+
+        assertEquals(1, leg.steps.size)
+        assertEquals(step, leg.steps[0])
+    }
+
+    @Test
+    fun routeStep_createsCorrectly() {
+        val step = RouteStep(
+            durationSeconds = 240,
+            distanceMeters = 325,
+            navigationInstruction = "Turn left"
+        )
+
+        assertEquals(240, step.durationSeconds)
+        assertEquals(325, step.distanceMeters)
+        assertEquals("Turn left", step.navigationInstruction)
+        assertNull(step.transitDetails)
+    }
+
+    @Test
+    fun routeStep_withTransitDetails() {
+        val transitDetails = TransitDetails(
+            headsign = "Downtown",
+            stopCount = 5
+        )
+
+        val step = RouteStep(
+            durationSeconds = 600,
+            distanceMeters = 2000,
+            transitDetails = transitDetails
+        )
+
+        assertNotNull(step.transitDetails)
+        assertEquals("Downtown", step.transitDetails?.headsign)
+        assertEquals(5, step.transitDetails?.stopCount)
+    }
+
+    @Test
+    fun transitDetails_createsCorrectly() {
+        val transitDetails = TransitDetails(
+            headsign = "Côte-Vertu",
+            stopCount = 8
+        )
+
+        assertEquals("Côte-Vertu", transitDetails.headsign)
+        assertEquals(8, transitDetails.stopCount)
+        assertNull(transitDetails.stopDetails)
+        assertNull(transitDetails.localizedValues)
+        assertNull(transitDetails.transitLine)
+    }
+
+    @Test
+    fun transitStop_createsCorrectly() {
+        val stop = TransitStop(
+            name = "Metro Guy-Concordia",
+            location = LatLng(45.4972, -73.5789)
+        )
+
+        assertEquals("Metro Guy-Concordia", stop.name)
+        assertNotNull(stop.location)
+        assertEquals(45.4972, stop.location?.latitude ?: 0.0, 0.0001)
+    }
+
+    @Test
+    fun transitStopDetails_createsCorrectly() {
+        val departureStop = TransitStop(name = "Stop A", location = LatLng(45.4972, -73.5789))
+        val arrivalStop = TransitStop(name = "Stop B", location = LatLng(45.5000, -73.5800))
+
+        val stopDetails = TransitStopDetails(
+            arrivalStop = arrivalStop,
+            departureStop = departureStop
+        )
+
+        assertEquals("Stop A", stopDetails.departureStop?.name)
+        assertEquals("Stop B", stopDetails.arrivalStop?.name)
+    }
+
+    @Test
+    fun transitLocalizedValues_createsCorrectly() {
+        val values = TransitLocalizedValues(
+            departureTime = "3:30 PM",
+            arrivalTime = "3:45 PM"
+        )
+
+        assertEquals("3:30 PM", values.departureTime)
+        assertEquals("3:45 PM", values.arrivalTime)
+    }
+
+    @Test
+    fun transitLine_createsCorrectly() {
+        val vehicle = TransitVehicle(name = "Metro", type = "SUBWAY")
+        val line = TransitLine(
+            name = "Orange Line",
+            shortName = "2",
+            color = "#FF6600",
+            vehicle = vehicle
+        )
+
+        assertEquals("Orange Line", line.name)
+        assertEquals("2", line.shortName)
+        assertEquals("#FF6600", line.color)
+        assertEquals("Metro", line.vehicle?.name)
+        assertEquals("SUBWAY", line.vehicle?.type)
+    }
+
+    @Test
+    fun transitVehicle_createsCorrectly() {
+        val vehicle = TransitVehicle(
+            name = "Bus",
+            type = "BUS"
+        )
+
+        assertEquals("Bus", vehicle.name)
+        assertEquals("BUS", vehicle.type)
+    }
+
+    @Test
+    fun routeResult_withCompleteData() {
+        val points = listOf(
+            LatLng(45.4972, -73.5789),
+            LatLng(45.5000, -73.5800)
+        )
+
+        val step = RouteStep(
+            durationSeconds = 240,
+            distanceMeters = 325,
+            navigationInstruction = "Walk north"
+        )
+
+        val leg = RouteLeg(
+            durationSeconds = 480,
+            distanceMeters = 650,
+            steps = listOf(step)
+        )
+
+        val result = RouteResult(
+            points = points,
+            durationSeconds = 480,
+            distanceMeters = 650,
+            legs = listOf(leg)
+        )
+
+        assertEquals(2, result.points.size)
+        assertEquals(480, result.durationSeconds)
+        assertEquals(650, result.distanceMeters)
+        assertEquals(1, result.legs.size)
+        assertEquals(1, result.legs[0].steps.size)
+        assertEquals("Walk north", result.legs[0].steps[0].navigationInstruction)
+    }
+
+    @Test
+    fun transitDetails_withAllFields() {
+        val departureStop = TransitStop("Station A", LatLng(45.49, -73.57))
+        val arrivalStop = TransitStop("Station B", LatLng(45.50, -73.58))
+        val stopDetails = TransitStopDetails(
+            arrivalStop = arrivalStop,
+            departureStop = departureStop
+        )
+
+        val localizedValues = TransitLocalizedValues(
+            arrivalTime = "2:45 PM",
+            departureTime = "2:30 PM"
+        )
+
+        val vehicle = TransitVehicle("Metro", "SUBWAY")
+        val transitLine = TransitLine("Green Line", "1", "#00AA00", vehicle)
+
+        val transitDetails = TransitDetails(
+            stopDetails = stopDetails,
+            localizedValues = localizedValues,
+            headsign = "Angrignon",
+            transitLine = transitLine,
+            stopCount = 3
+        )
+
+        assertNotNull(transitDetails.stopDetails)
+        assertEquals("Station A", transitDetails.stopDetails?.departureStop?.name)
+        assertEquals("Station B", transitDetails.stopDetails?.arrivalStop?.name)
+        assertEquals("2:30 PM", transitDetails.localizedValues?.departureTime)
+        assertEquals("2:45 PM", transitDetails.localizedValues?.arrivalTime)
+        assertEquals("Angrignon", transitDetails.headsign)
+        assertEquals("Green Line", transitDetails.transitLine?.name)
+        assertEquals("1", transitDetails.transitLine?.shortName)
+        assertEquals(3, transitDetails.stopCount)
     }
 }

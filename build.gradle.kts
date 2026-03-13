@@ -30,22 +30,30 @@ sonar {
         property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
 
         // Exclusions
-        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**")
+        property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**,**/ShuttleMarkerFactory.kt")
         property("sonar.coverage.exclusions",
+            // Generated files and tests
             "**/R.class," +
             "**/R\$*.class," +
             "**/BuildConfig.*," +
             "**/*Test*.*," +
-            "**/ui/theme/**," +              // Theme files (UI styling - no business logic)
-            "**/ui/components/**," +          // components mostly UI
-            "**/ui/screens/**," +             // Full screen composables (pure UI)
-            "**/MapsActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
-            "**/MainActivity.kt," +           // UI-heavy activity with Compose setContent (see TESTING.md)
-            "**/GeoJsonOverlay.kt," +         // Map rendering with Dispatchers.Main (see TESTING.md)
-            "**/CampusToggle.kt,"  +            // Pure UI composable (see TESTING.md)
-            "**/ui/accessibility/**," +         // Accessibility UI components
-            "**/AccessibilityScreen.kt," +        // Accessibility screen UI
-            "**/ui/components/BuildingDetailsBottomSheet.kt" //UI activity with screen composables
+
+            // UI packages (Compose UI - cannot unit test, requires instrumented tests)
+            "**/ui/theme/**," +                   // Theme files (UI styling - no business logic)
+            "**/ui/components/**," +              // UI components (includes DirectionsTopBar, CampusToggle, etc.)
+            "**/ui/screens/**," +                 // Screen composables (includes MapScreen, CalendarScreen, etc.)
+            "**/ui/accessibility/**," +           // Accessibility UI components
+            "**/ui/map/**," +                     // Map rendering layer (Canvas/Paint/Android Context)
+
+            // Activities (UI-heavy with Compose setContent - see .claude/TESTING_GUIDE.md)
+            "**/MapsActivity.kt," +
+            "**/MainActivity.kt," +
+
+            // Map rendering (requires Dispatchers.Main - see .claude/TESTING_GUIDE.md)
+            "**/GeoJsonOverlay.kt," +
+
+            // ShuttleMarkerFactory: Canvas/Paint bitmap rendering, requires Android Context
+            "**/ShuttleMarkerFactory.kt"
         )
 
         // Lower coverage threshold for UI-heavy codebase
