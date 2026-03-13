@@ -53,6 +53,9 @@ import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.shuttle.ShuttleTracker
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng as GmsLatLng
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,7 +98,10 @@ fun ConcordiaCampusGuideApp() {
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var searchCounter by rememberSaveable { mutableStateOf(0) }
     var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.data.CampusBuilding>>(emptyList()) }
+    var shuttleStops by remember { mutableStateOf<List<com.example.campusguide.data.ShuttleStop>>(emptyList()) }
+    var shuttleUserLatLng by remember { mutableStateOf<com.google.android.gms.maps.model.LatLng?>(null) }
     var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
+    var shuttleShowBothStops by remember { mutableStateOf(false) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
@@ -149,10 +155,13 @@ fun ConcordiaCampusGuideApp() {
                             onBottomSearchClick = {
                                 try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
                             },
-                            onDirectionsTopBarState = { state -> directionsTopBarState = state },  // ← add
-                            directionsGoTrigger = directionsGoTrigger,                              // ← add
-                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                            onDirectionsTopBarState = { state -> directionsTopBarState = state },
+
+                            directionsGoTrigger = directionsGoTrigger,
+                            directionsCancelTrigger = directionsCancelTrigger,
                             topBarTravelMode = topBarTravelMode,
+                            shuttleShowBothStops = shuttleShowBothStops,
+                            onShuttleShowBothStopsConsumed = { shuttleShowBothStops = false },
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -186,23 +195,39 @@ fun ConcordiaCampusGuideApp() {
                             modifier = Modifier.padding(top = 35.dp),
                             focusRequester = searchFocusRequester,
                             onSearchQueryChange = { query ->
-                                topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
-                                    query = query,
-                                    activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                    crossCampus = true,
-                                )
+                                if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {                                    topBarSuggestions = emptyList()
+                                    val tracker = ShuttleTracker()
+                                    shuttleStops = tracker.getShuttleStops()
+                                    val fused = LocationServices.getFusedLocationProviderClient(context)
+                                    val fineGranted = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.ACCESS_FINE_LOCATION
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                    if (fineGranted) {
+                                        fused.lastLocation.addOnSuccessListener { loc ->
+                                            shuttleUserLatLng = loc?.let { GmsLatLng(it.latitude, it.longitude) }
+                                        }
+                                    }
+                                } else {
+                                    shuttleStops = emptyList()
+                                    shuttleUserLatLng = null
+                                    topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
+                                        query = query,
+                                        activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                        crossCampus = true,
+                                    )
+                                }
                             },
                             onSearchSubmit = { query ->
-                                // Check if query matches a campus building first
+                                if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {
+                                    return@SearchBarWithProfile
+                                }
                                 val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
                                     .firstOrNull { it.matches(query) }
                                 if (matchedBuilding != null) {
-                                    // Use building directly, skip geocoder
                                     topBarSelectedBuilding = matchedBuilding
                                     topBarSuggestions = emptyList()
                                     currentDestination.value = AppDestinations.MAP
                                 } else {
-                                    // Fall back to geocoder search
                                     searchQuery = query
                                     searchCounter++
                                     topBarSuggestions = emptyList()
@@ -217,6 +242,13 @@ fun ConcordiaCampusGuideApp() {
                                 topBarSelectedBuilding = building
                                 topBarSuggestions = emptyList()
                                 searchQuery = ""
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                            shuttleStops = shuttleStops,
+                            shuttleUserLatLng = shuttleUserLatLng,
+                            onShuttleStopSelected = { _ ->
+                                shuttleStops = emptyList()
+                                shuttleShowBothStops = true
                                 currentDestination.value = AppDestinations.MAP
                             },
                         )
