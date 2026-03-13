@@ -101,7 +101,6 @@ fun ConcordiaCampusGuideApp() {
     var shuttleStops by remember { mutableStateOf<List<com.example.campusguide.data.ShuttleStop>>(emptyList()) }
     var shuttleUserLatLng by remember { mutableStateOf<com.google.android.gms.maps.model.LatLng?>(null) }
     var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
-    var selectedShuttleStopForDirections by remember { mutableStateOf<com.example.campusguide.data.ShuttleStop?>(null) }
     var shuttleShowBothStops by remember { mutableStateOf(false) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
