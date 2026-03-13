@@ -93,6 +93,11 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.directions.RouteResult
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -112,6 +117,11 @@ data class DirectionsTopBarState(
     val showActions: Boolean = false,
     val currentSteps: RouteLeg? = null
 )
+
+data class ShuttleRouteResult(
+    val stop: ShuttleStop,
+    val route: RouteResult?,
+)
 @Composable
 fun MapScreen(
     searchQuery: String = "",
@@ -122,7 +132,9 @@ fun MapScreen(
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
-    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
+    shuttleShowBothStops: Boolean = false,
+    onShuttleShowBothStopsConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -163,6 +175,8 @@ fun MapScreen(
     var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
+    var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
+    var destShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
     val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
@@ -175,7 +189,8 @@ fun MapScreen(
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
-
+    var shuttleRouteResults by remember { mutableStateOf<List<ShuttleRouteResult>>(emptyList()) }
+    var showShuttleResultsCard by remember { mutableStateOf(false) }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -381,6 +396,28 @@ fun MapScreen(
             )
         )
         onTopBarBuildingConsumed()
+    }
+    LaunchedEffect(shuttleShowBothStops) {
+        if (!shuttleShowBothStops) return@LaunchedEffect
+        val stops = shuttleTracker.getShuttleStops()
+        if (stops.isEmpty()) return@LaunchedEffect
+        val results = mutableListOf<ShuttleRouteResult>()
+        stops.forEach { stop ->
+            runCatching {
+                repo.getRoute(RouteRequest(
+                    origin = defaultOrigin,
+                    destination = stop.latLng,
+                    mode = travelMode,
+                ))
+            }.onSuccess { route ->
+                results.add(ShuttleRouteResult(stop, route))
+            }.onFailure {
+                results.add(ShuttleRouteResult(stop, null))
+            }
+        }
+        shuttleRouteResults = results
+        showShuttleResultsCard = true
+        onShuttleShowBothStopsConsumed()
     }
 
     // Get user location for default origin
@@ -1066,6 +1103,139 @@ fun MapScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
 
+        // Shuttle results card (US-3.3)
+        if (showShuttleResultsCard && shuttleRouteResults.isNotEmpty()) {
+            val nearestId = NearestShuttleStopFinder.find(
+                defaultOrigin,
+                shuttleRouteResults.map { it.stop }
+            )?.stop?.id
+
+            BottomCard(onDismiss = { showShuttleResultsCard = false }) {
+                Text(
+                    text = "Directions",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(Color(0xFF1565C0), CircleShape))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Your location", style = MaterialTheme.typography.bodySmall)
+                }
+                Spacer(Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.error, CircleShape))
+                    Spacer(Modifier.width(8.dp))
+                    Text("shuttle stop", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Spacer(Modifier.height(12.dp))
+                shuttleRouteResults.forEach { result ->
+                    val isNearest = result.stop.id == nearestId
+                    val isCrossCampus = result.stop.campus == Campus.LOYOLA
+                    val duration = result.route?.durationSeconds?.let {
+                        val m = it / 60
+                        if (m < 60) "$m min" else "${m/60} h ${m%60} min"
+                    }
+                    val distance = result.route?.distanceMeters?.let {
+                        if (it < 1000) "$it m" else "${"%.1f".format(it/1000.0)} km"
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showShuttleResultsCard = false
+                                result.route?.let { route ->
+                                    routePolylineRef?.remove()
+                                    routePolylineRef = googleMap?.addPolyline(
+                                        PolylineOptions()
+                                            .addAll(route.points)
+                                            .color(0xFF1565C0.toInt())
+                                            .width(12f)
+                                    )
+                                }
+                                directionsUiState = directionsUiState.copy(
+                                    step = DirectionsStep.ShowingRoute(
+                                        origin = defaultOrigin,
+                                        destination = result.stop.latLng,
+                                        buildingHit = BuildingHit(
+                                            id = result.stop.id,
+                                            properties = JSONObject().apply {
+                                                put("building-name", result.stop.name)
+                                                put("building-code", result.stop.id)
+                                                put("address", result.stop.description)
+                                            }
+                                        ),
+                                        route = result.route ?: return@clickable,
+                                    )
+                                )
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_directions_bus),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (isNearest) {
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.border(
+                                            1.5.dp, MaterialTheme.colorScheme.primary,
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                    ) {
+                                        Text("Nearest",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                if (isCrossCampus) {
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.border(
+                                            1.5.dp, MaterialTheme.colorScheme.outline,
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                    ) {
+                                        Text("Cross-campus",
+                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                Text(result.stop.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Medium)
+                            }
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            if (duration != null) Text(duration,
+                                style = MaterialTheme.typography.labelSmall)
+                            if (distance != null) Text(distance,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                    HorizontalDivider(thickness = 0.5.dp)
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { showShuttleResultsCard = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Cancel") }
+            }
+        }
+
         // Directions overlay
         when (val step = directionsUiState.step) {
             is DirectionsStep.PickDestination -> {
@@ -1093,10 +1263,24 @@ fun MapScreen(
                         enabled       = !directionsUiState.isLoadingRoute,
                         testTag       = "origin_building_field",
                         onQueryChange = { query ->
-                            originSuggestions = buildingSuggestions(
-                                query        = query,
-                                activeCampus = selectedCampus,
-                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
+                            if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {
+                                originShuttleSuggestions = shuttleTracker.getShuttleStops()
+                                originSuggestions = emptyList()
+                            } else {
+                                originShuttleSuggestions = emptyList()
+                                originSuggestions = buildingSuggestions(
+                                    query = query,
+                                    activeCampus = selectedCampus,
+                                    crossCampus = true,
+                                )
+                            }
+                        },
+                        shuttleStops = originShuttleSuggestions,
+                        onShuttleStopSelected = { stop ->
+                            originShuttleSuggestions = emptyList()
+                            originDisplayName = stop.name
+                            directionsUiState = directionsUiState.copy(
+                                step = step.copy(origin = stop.latLng)
                             )
                         },
                         onSelected = { building ->
@@ -1117,12 +1301,35 @@ fun MapScreen(
                         suggestions   = destSuggestions,
                         placeholder   = "Building name or code…",
                         enabled       = !directionsUiState.isLoadingRoute,
-                        testTag       = "destination_building_field",
-                        onQueryChange = { query ->
-                            destSuggestions = buildingSuggestions(
-                                query        = query,
-                                activeCampus = selectedCampus,
-                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
+                        testTag       = "destination_building_field",onQueryChange = { query ->
+                            if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {
+                                destShuttleSuggestions = shuttleTracker.getShuttleStops()
+                                destSuggestions = emptyList()
+                            } else {
+                                destShuttleSuggestions = emptyList()
+                                destSuggestions = buildingSuggestions(
+                                    query = query,
+                                    activeCampus = selectedCampus,
+                                    crossCampus = true,
+                                )
+                            }
+                        },
+                        shuttleStops = destShuttleSuggestions,
+                        onShuttleStopSelected = { stop ->
+                            destShuttleSuggestions = emptyList()
+                            val hit = BuildingHit(
+                                id = stop.id,
+                                properties = JSONObject().apply {
+                                    put("building-code", stop.id)
+                                    put("building-name", stop.name)
+                                    put("address", stop.description)
+                                }
+                            )
+                            directionsUiState = directionsUiState.copy(
+                                step = step.copy(
+                                    destination = stop.latLng,
+                                    buildingHit = hit,
+                                )
                             )
                         },
                         onSelected = { building ->

@@ -29,7 +29,7 @@ sonar {
                 "**/ui/theme/**",
                 "**/ui/map/**",
                 "**/MainActivity.kt",
-                // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
+                "**/ui/directions/**",                // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
                 "**/ShuttleMarkerFactory.kt"
             ).joinToString(",")
         )
@@ -151,7 +151,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Theme definitions — pure styling constants, no logic to test
         "**/ui/theme/**",
         // Activity entry point — framework lifecycle, not unit testable
-        "**/MainActivity*"
+        "**/MainActivity*",
+        // Requires live network/API calls — not unit testable on JVM
+        "**/ui/directions/**"
     )
 
     val buildDir = layout.buildDirectory.get().asFile
