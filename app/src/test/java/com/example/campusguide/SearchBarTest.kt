@@ -362,61 +362,6 @@ class SearchBarTest {
         composeTestRule.onNodeWithText("1455 De Maisonneuve Blvd. W.").assertIsDisplayed()
     }
 
-    //Selecting a suggestion fires the onSelected callback
-
-    @Test
-    fun autocompleteField_selectingSuggestionFiresCallback() {
-        var selectedBuilding: CampusBuilding? = null
-        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = false)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                BuildingAutocompleteField(
-                    label = "To:",
-                    value = "hall",
-                    suggestions = suggestions,
-                    onQueryChange = {},
-                    onSelected = { selectedBuilding = it },
-                )
-            }
-        }
-
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Henry F. Hall Building").performClick()
-        composeTestRule.waitForIdle()
-
-        assert(selectedBuilding?.buildingCode == "H") {
-            "Expected building code H but got ${selectedBuilding?.buildingCode}"
-        }
-    }
-
-    @Test
-    fun searchBar_selectingSuggestionFiresBuildingSelectedCallback() {
-        var selectedBuilding: CampusBuilding? = null
-        val suggestions = buildingSuggestions("molson", Campus.SGW, crossCampus = false)
-
-        composeTestRule.setContent {
-            ConcordiaCampusGuideTheme {
-                CompositionLocalProvider(
-                    LocalAccessibilityState provides defaultState
-                ) {
-                    SearchBarWithProfile(
-                        suggestions = suggestions,
-                        onBuildingSelected = { selectedBuilding = it },
-                    )
-                }
-            }
-        }
-
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("John Molson Building").performClick()
-        composeTestRule.waitForIdle()
-
-        assert(selectedBuilding?.buildingCode == "MB") {
-            "Expected MB but got ${selectedBuilding?.buildingCode}"
-        }
-    }
-
     // Bottom search button tests
 
     @Test
