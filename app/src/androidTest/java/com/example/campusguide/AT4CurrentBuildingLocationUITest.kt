@@ -62,6 +62,10 @@ class AT4CurrentBuildingLocationUITest {
         Thread.sleep(12000)
 
         composeTestRule
+            .onNodeWithContentDescription("Toggle Controls")
+            .performClick()
+
+        composeTestRule
             .onNodeWithContentDescription("Recenter")
             .performClick()
 

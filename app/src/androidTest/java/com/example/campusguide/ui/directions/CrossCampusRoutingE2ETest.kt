@@ -39,11 +39,11 @@ class CrossCampusRoutingE2ETest {
      */
     private fun searchAndSelectFromMainBar(query: String, expectedSuggestion: String) {
         composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onAllNodesWithTag("search_text_field").fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodesWithTag("searchBar").fetchSemanticsNodes().isNotEmpty()
         }
-        composeTestRule.onNodeWithTag("search_text_field").performClick()
+        composeTestRule.onNodeWithTag("searchBar").performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("search_text_field").performTextInput(query)
+        composeTestRule.onNodeWithTag("searchBar").performTextInput(query)
 
         composeTestRule.waitUntil(timeoutMillis = 3000) {
             composeTestRule.onAllNodesWithText(expectedSuggestion, substring = true)

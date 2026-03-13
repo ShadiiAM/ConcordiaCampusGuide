@@ -51,6 +51,12 @@ class AT2BuildingPolygonsUITest {
 
         Thread.sleep(2000)
 
+        composeTestRule
+            .onNodeWithContentDescription("Toggle Controls")
+            .performClick()
+
+        Thread.sleep(2000)
+
         composeTestRule.onNodeWithContentDescription("Left").performClick()
         composeTestRule.onNodeWithContentDescription("Left").performClick()
 

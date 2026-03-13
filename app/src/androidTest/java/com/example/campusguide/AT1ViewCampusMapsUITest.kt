@@ -45,6 +45,12 @@ class AT1ViewCampusMapsUITest {
             .check(matches(isDisplayed()))
             .check(matches(isEnabled()))
 
+        composeTestRule
+            .onNodeWithContentDescription("Toggle Controls")
+            .performClick()
+
+        Thread.sleep(2000)
+
         // map is usable and can move
         composeTestRule.onNodeWithContentDescription("Right").performClick()
         composeTestRule.onNodeWithContentDescription("Right").performClick()

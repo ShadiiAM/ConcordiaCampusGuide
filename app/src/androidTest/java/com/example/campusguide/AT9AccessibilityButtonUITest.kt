@@ -65,16 +65,18 @@ class AT9AccessibilityButtonUITest {
 
         Thread.sleep(2000)
 
-        composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
 
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         Thread.sleep(2000)
+        composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
 
+
+        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
+        Thread.sleep(2000)
         composeTestRule.onNodeWithTag("mapControls").assertDoesNotExist()
 
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         Thread.sleep(2000)
-
         composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
