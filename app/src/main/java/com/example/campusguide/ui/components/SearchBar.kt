@@ -54,7 +54,99 @@ import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
 
-
+@Composable
+private fun ShuttleStopDropdown(
+    stops: List<ShuttleStop>,
+    userLatLng: LatLng?,
+    onStopSelected: (ShuttleStop) -> Unit,
+) {
+    if (stops.isEmpty()) return
+    val nearestId = userLatLng?.let {
+        NearestShuttleStopFinder.find(it, stops)?.stop?.id
+    }
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .heightIn(max = 300.dp),
+        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 6.dp,
+        shadowElevation = 6.dp,
+    ) {
+        LazyColumn {
+            items(stops, key = { it.id }) { stop ->
+                val distance = userLatLng?.let {
+                    NearestShuttleStopFinder.distanceBetween(it, stop.latLng)
+                }
+                val isNearest = stop.id == nearestId
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onStopSelected(stop) }
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (isNearest) {
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.border(
+                                            width = 1.5.dp,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                    ) {
+                                        Text(
+                                            text = "Nearest",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                    Spacer(Modifier.width(6.dp))
+                                }
+                                Text(
+                                    text = stop.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            Text(
+                                text = stop.description,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    if (distance != null) {
+                        Text(
+                            text = NearestShuttleStopFinder.formatDistance(distance),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                HorizontalDivider(thickness = 0.5.dp)
+            }
+        }
+    }
+}
 @Composable
 fun SearchBarWithProfile(
     modifier: Modifier = Modifier,
@@ -193,97 +285,14 @@ fun SearchBarWithProfile(
                 }
             }
         }
-        if (shuttleStops.isNotEmpty()) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .heightIn(max = 300.dp),
-                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 6.dp,
-                shadowElevation = 6.dp,
-            ) {
-                LazyColumn {
-                    items(shuttleStops, key = { it.id }) { stop ->
-                        val distance = shuttleUserLatLng?.let {
-                            NearestShuttleStopFinder.distanceBetween(it, stop.latLng)
-                        }
-                        val nearestStop = shuttleUserLatLng?.let {
-                            NearestShuttleStopFinder.find(it, shuttleStops)?.stop
-                        }
-                        val isNearest = stop.id == nearestStop?.id
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    searchQuery = ""
-                                    onShuttleStopSelected(stop)
-                                }
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Column {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        if (isNearest) {
-                                            Surface(
-                                                shape = RoundedCornerShape(4.dp),
-                                                color = MaterialTheme.colorScheme.surface,
-                                                modifier = Modifier.border(
-                                                    width = 1.5.dp,
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    shape = RoundedCornerShape(4.dp)
-                                                )
-                                            ) {
-                                                Text(
-                                                    text = "Nearest",
-                                                    color = MaterialTheme.colorScheme.primary,
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                                )
-                                            }
-                                            Spacer(Modifier.width(6.dp))
-                                        }
-                                        Text(
-                                            text = stop.name,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                    Text(
-                                        text = stop.description,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                            if (distance != null) {
-                                Text(
-                                    text = NearestShuttleStopFinder.formatDistance(distance),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                        HorizontalDivider(thickness = 0.5.dp)
-                    }
-                }
+        ShuttleStopDropdown(
+            stops = shuttleStops,
+            userLatLng = shuttleUserLatLng,
+            onStopSelected = { stop ->
+                searchQuery = ""
+                onShuttleStopSelected(stop)
             }
-        }
+        )
 
     }
 }
