@@ -19,6 +19,7 @@ import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.screens.MapScreen
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -406,6 +407,8 @@ class SearchBarTest {
             campus = Campus.SGW,
         )
 
+        var capturedState: DirectionsTopBarState? = null
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 CompositionLocalProvider(
@@ -414,15 +417,19 @@ class SearchBarTest {
                     MapScreen(
                         topBarSelectedBuilding = hallBuilding,
                         onTopBarBuildingConsumed = {},
+                        onDirectionsTopBarState = { capturedState = it },
                     )
                 }
             }
         }
 
         composeTestRule.waitForIdle()
-        // Route panel should open with Hall Building as destination
-        composeTestRule.onNodeWithText("Route options").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Henry F. Hall Building").assertIsDisplayed()
+        // Route panel state should be published with Hall Building as destination
+        assertTrue("Directions top bar should be active", capturedState?.active == true)
+        assertTrue(
+            "Destination label should contain building name",
+            capturedState?.destinationLabel?.contains("Henry F. Hall Building") == true
+        )
     }
 
     @Test
@@ -434,6 +441,8 @@ class SearchBarTest {
             campus = Campus.SGW,
         )
 
+        var capturedState: DirectionsTopBarState? = null
+
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 CompositionLocalProvider(
@@ -442,14 +451,16 @@ class SearchBarTest {
                     MapScreen(
                         topBarSelectedBuilding = hallBuilding,
                         onTopBarBuildingConsumed = {},
+                        onDirectionsTopBarState = { capturedState = it },
                     )
                 }
             }
         }
 
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("From:").assertIsDisplayed()
-        composeTestRule.onNodeWithText("To:").assertIsDisplayed()
+        assertTrue("Directions top bar should be active", capturedState?.active == true)
+        assertTrue("Origin label should be set", capturedState?.originLabel?.isNotEmpty() == true)
+        assertTrue("Destination label should be set", capturedState?.destinationLabel?.isNotEmpty() == true)
     }
 
     @Test
