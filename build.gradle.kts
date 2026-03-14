@@ -56,6 +56,13 @@ sonar {
             "**/ShuttleMarkerFactory.kt"
         )
 
+        // Disable C/C++/ObjC analysis — AGP 9.x removed getCDirectories() from SourceProvider,
+        // which causes a NoSuchMethodError when the SonarQube plugin tries to scan C sources.
+        // This project has no native C/C++/ObjC code so disabling these analyzers is correct.
+        property("sonar.c.file.suffixes", "-")
+        property("sonar.cpp.file.suffixes", "-")
+        property("sonar.objc.file.suffixes", "-")
+
         // Lower coverage threshold for UI-heavy codebase
         // Industry standard: UI code 30-50%, Business logic 80%+
         property("sonar.coverage.newCode.minimumCoverage", "50")
