@@ -1094,7 +1094,23 @@ fun MapScreen(
             ShuttleStopInfoCard(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
-                onDismiss = { selectedShuttleStop = null }
+                onDismiss = { selectedShuttleStop = null },
+                onDirectionsClick = {
+                    val hit = BuildingHit(
+                        id = stop.id,
+                        properties = JSONObject().apply {
+                            put("building-name", stop.name)
+                        }
+                    )
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PlanRoute(
+                            origin = defaultOrigin,
+                            destination = stop.latLng,
+                            buildingHit = hit
+                        )
+                    )
+                    selectedShuttleStop = null
+                }
             )
         }
 
