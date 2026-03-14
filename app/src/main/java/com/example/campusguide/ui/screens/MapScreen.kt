@@ -1096,11 +1096,17 @@ fun MapScreen(
                 isOperational = shuttleTracker.isOperational(),
                 onDismiss = { selectedShuttleStop = null },
                 onDirectionsClick = {
+                    val hit = BuildingHit(
+                        id = stop.id,
+                        properties = JSONObject().apply {
+                            put("building-name", stop.name)
+                        }
+                    )
                     directionsUiState = directionsUiState.copy(
                         step = DirectionsStep.PlanRoute(
                             origin = defaultOrigin,
                             destination = stop.latLng,
-                            buildingHit = null
+                            buildingHit = hit
                         )
                     )
                     selectedShuttleStop = null
