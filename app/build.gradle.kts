@@ -174,6 +174,25 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     }
 }
 
+sonar {
+    properties {
+        // Source paths (relative to this module's base dir)
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+
+        // JaCoCo coverage
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // JUnit test results
+        property("sonar.junit.reportPaths", "build/test-results/testDebugUnitTest")
+
+        // Android lint report
+        property("sonar.androidLint.reportPaths", "build/reports/lint-results-debug.xml")
+    }
+}
+
 dependencies {
     // Core
     implementation(libs.androidx.core.ktx)

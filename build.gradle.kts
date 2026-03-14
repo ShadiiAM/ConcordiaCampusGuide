@@ -15,22 +15,7 @@ sonar {
         property("sonar.projectName", "ConcordiaCampusGuide")
         property("sonar.sourceEncoding", "UTF-8")
 
-        // Source paths
-        property("sonar.sources", "app/src/main/java")
-        property("sonar.tests", "app/src/test/java")
-        property("sonar.java.binaries", "app/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
-
-        // JaCoCo coverage
-        property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-
-        // JUnit test results
-        property("sonar.junit.reportPaths", "app/build/test-results/testDebugUnitTest")
-
-        // Android lint report
-        property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
-
-        // Exclusions
+        // Exclusions (project-level — apply to all modules)
         property("sonar.exclusions", "**/R.class,**/R\$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*,**/databinding/**,**/ShuttleMarkerFactory.kt")
         property("sonar.coverage.exclusions",
             // Generated files and tests
@@ -60,18 +45,6 @@ sonar {
         // Lower coverage threshold for UI-heavy codebase
         // Industry standard: UI code 30-50%, Business logic 80%+
         property("sonar.coverage.newCode.minimumCoverage", "50")
-    }
-}
-
-// SonarQube Gradle plugin 7.x auto-propagates to all sub-projects, but its Android model
-// introspection calls SourceProvider.getCDirectories() which was removed in AGP 9.x.
-// Skipping the :app sub-project analysis here prevents that introspection — all analysis
-// config is supplied explicitly in the root sonar block above, so no coverage is lost.
-subprojects {
-    sonar {
-        properties {
-            property("sonar.skip", "true")
-        }
     }
 }
 
