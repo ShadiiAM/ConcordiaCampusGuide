@@ -63,6 +63,18 @@ sonar {
     }
 }
 
+// SonarQube Gradle plugin 7.x auto-propagates to all sub-projects, but its Android model
+// introspection calls SourceProvider.getCDirectories() which was removed in AGP 9.x.
+// Skipping the :app sub-project analysis here prevents that introspection — all analysis
+// config is supplied explicitly in the root sonar block above, so no coverage is lost.
+subprojects {
+    sonar {
+        properties {
+            property("sonar.skip", "true")
+        }
+    }
+}
+
 // Ensure jacocoTestReport runs before sonar task
 tasks.named("sonar") {
     dependsOn(":app:jacocoTestReport")
