@@ -115,7 +115,8 @@ data class DirectionsTopBarState(
     val errorMessage: String? = null,
     val isLoadingRoute: Boolean = false,
     val showActions: Boolean = false,
-    val currentSteps: RouteLeg? = null
+    val currentSteps: RouteLeg? = null,
+    val isPickingOrigin: Boolean = false,
 )
 
 data class ShuttleRouteResult(
@@ -131,6 +132,8 @@ fun MapScreen(
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
+    originPickTrigger: Int = 0,
+    myLocationTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
     shuttleShowBothStops: Boolean = false,
@@ -320,10 +323,29 @@ fun MapScreen(
         )
         originSuggestions = emptyList()
         destSuggestions = emptyList()
+        isPickingOrigin = false
+    }
+
+// Handle origin pick mode trigger from top bar
+    LaunchedEffect(originPickTrigger) {
+        if (originPickTrigger == 0) return@LaunchedEffect
+        isPickingOrigin = true
+    }
+
+// Handle "My Location" trigger from top bar
+    LaunchedEffect(myLocationTrigger) {
+        if (myLocationTrigger == 0) return@LaunchedEffect
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(
+            step = step.copy(origin = defaultOrigin)
+        )
+        originDisplayName = null
+        originBuilding = null
+        isPickingOrigin = false
     }
 
 // Publish top-bar state to MainActivity whenever directions state changes
-    LaunchedEffect(directionsUiState, travelMode, originBuilding, destinationBuilding, originDisplayName) {
+    LaunchedEffect(directionsUiState, travelMode, originBuilding, destinationBuilding, originDisplayName, isPickingOrigin) {
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
@@ -339,6 +361,7 @@ fun MapScreen(
                         errorMessage = directionsUiState.errorMessage,
                         isLoadingRoute = directionsUiState.isLoadingRoute,
                         showActions = true,
+                        isPickingOrigin = isPickingOrigin,
                     )
                 )
             }
@@ -814,6 +837,19 @@ fun MapScreen(
                             }
                         }
 
+                        // General map tap: pick origin when in picking mode (non-polygon areas)
+                        map.setOnMapClickListener { latLng ->
+                            if (isPickingOrigin) {
+                                val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@setOnMapClickListener
+                                directionsUiState = directionsUiState.copy(
+                                    step = step.copy(origin = latLng),
+                                    errorMessage = null
+                                )
+                                originDisplayName = null
+                                isPickingOrigin = false
+                            }
+                        }
+
                         // Load active campus
                         scope.launch(Dispatchers.IO) {
                             val activeCampus = getSavedCampus(ctx)
@@ -1260,176 +1296,9 @@ fun MapScreen(
             is DirectionsStep.ConfirmDestination -> {
                 // Shouldn't normally reach here since we go straight to PlanRoute
             }
-            is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
-                    // X just hides the card — route state and top bar remain intact
-                    showRouteOptionsCard = false
-                }) {
-                    Text(
-                        text = "Route options",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-
-                    Spacer(Modifier.height(12.dp))
-
-                    BuildingAutocompleteField(
-                        label         = "From:",
-                        value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
-                        placeholder   = "My location or building…",
-                        enabled       = !directionsUiState.isLoadingRoute,
-                        testTag       = "origin_building_field",
-                        onQueryChange = { query ->
-                            if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {
-                                originShuttleSuggestions = shuttleTracker.getShuttleStops()
-                                originSuggestions = emptyList()
-                            } else {
-                                originShuttleSuggestions = emptyList()
-                                originSuggestions = buildingSuggestions(
-                                    query = query,
-                                    activeCampus = selectedCampus,
-                                    crossCampus = true,
-                                )
-                            }
-                        },
-                        shuttleStops = originShuttleSuggestions,
-                        onShuttleStopSelected = { stop ->
-                            originShuttleSuggestions = emptyList()
-                            originDisplayName = stop.name
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(origin = stop.latLng)
-                            )
-                        },
-                        onSelected = { building ->
-                            originSuggestions = emptyList()
-                            originDisplayName = building.buildingName
-                            originBuilding = building  // Track for cross-campus detection
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(origin = resolveBuildingLatLng(building)),
-                            )
-                        },
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    BuildingAutocompleteField(
-                        label         = "To:",
-                        value         = buildingTitle(step.buildingHit, step.destination),
-                        suggestions   = destSuggestions,
-                        placeholder   = "Building name or code…",
-                        enabled       = !directionsUiState.isLoadingRoute,
-                        testTag       = "destination_building_field",onQueryChange = { query ->
-                            if ("shuttle".startsWith(query.trim().lowercase()) && query.trim().isNotEmpty()) {
-                                destShuttleSuggestions = shuttleTracker.getShuttleStops()
-                                destSuggestions = emptyList()
-                            } else {
-                                destShuttleSuggestions = emptyList()
-                                destSuggestions = buildingSuggestions(
-                                    query = query,
-                                    activeCampus = selectedCampus,
-                                    crossCampus = true,
-                                )
-                            }
-                        },
-                        shuttleStops = destShuttleSuggestions,
-                        onShuttleStopSelected = { stop ->
-                            destShuttleSuggestions = emptyList()
-                            val hit = BuildingHit(
-                                id = stop.id,
-                                properties = JSONObject().apply {
-                                    put("building-code", stop.id)
-                                    put("building-name", stop.name)
-                                    put("address", stop.description)
-                                }
-                            )
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(
-                                    destination = stop.latLng,
-                                    buildingHit = hit,
-                                )
-                            )
-                        },
-                        onSelected = { building ->
-                            val latLng = resolveBuildingLatLng(building)
-                            destSuggestions = emptyList()
-                            destinationBuilding = building  // Track for cross-campus detection
-                            val hit = BuildingHit(
-                                id = building.buildingCode,
-                                properties = JSONObject().apply {
-                                    put("building-code", building.buildingCode)
-                                    put("building-name", building.buildingName)
-                                    put("address",       building.address)
-                                },
-                            )
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(
-                                    destination = latLng,
-                                    buildingHit = hit,
-                                ),
-                            )
-                        },
-                    )
-
-                    Spacer(Modifier.height(6.dp))
-
-                    // Cross-campus routing is always enabled (US-2.5 AC4)
-                    // No toggle needed - users can select any building from any campus
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth().testTag("DirectionsGo"),
-                        enabled  = !directionsUiState.isLoadingRoute,
-                        onClick  = {
-                            directionsUiState = directionsUiState.copy(
-                                isLoadingRoute = true,
-                                errorMessage   = null,
-                            )
-                            scope.launch {
-                                runCatching {
-                                    repo.getRoute(
-                                        RouteRequest(
-                                            origin      = step.origin,
-                                            destination = step.destination,
-                                            mode  = travelMode,
-                                        )
-                                    )
-                                }.onSuccess { route ->
-                                    val map = googleMap
-                                    if (map != null) {
-                                        withContext(Dispatchers.Main) {
-                                            routePolylineRef?.remove()
-                                            routePolylineRef = map.addPolyline(
-                                                PolylineOptions()
-                                                    .addAll(route.points)
-                                                    .color(0xFF1565C0.toInt())
-                                                    .width(12f)
-                                            )
-                                        }
-                                    }
-                                    directionsUiState = directionsUiState.copy(
-                                        isLoadingRoute = false,
-                                        step = DirectionsStep.ShowingRoute(
-                                            origin      = step.origin,
-                                            destination = step.destination,
-                                            buildingHit = step.buildingHit,
-                                            route       = route,
-                                        ),
-                                    )
-                                }.onFailure { e ->
-                                    directionsUiState = directionsUiState.copy(
-                                        isLoadingRoute = false,
-                                        errorMessage   = e.message ?: "Failed to get route",
-                                    )
-                                }
-                            }
-                        },
-                    ) {
-                        Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")
-                    }
-
-                    directionsUiState.errorMessage?.let {
-                        Spacer(Modifier.height(8.dp))
-                        Text(text = it, color = MaterialTheme.colorScheme.error)
-                    }
-                }
+            is DirectionsStep.PlanRoute -> {
+                // Route options are handled entirely in the DirectionsTopBar above the map
+            }
 
             is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
                     // X just hides the card — route and top bar remain intact
