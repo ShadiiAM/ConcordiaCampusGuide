@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -109,8 +108,8 @@ fun ConcordiaCampusGuideApp() {
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
     var directionsGoTrigger by remember { mutableStateOf(0) }
     var directionsCancelTrigger by remember { mutableStateOf(0) }
-    var originPickTrigger by remember { mutableIntStateOf(0) }
-    var myLocationTrigger by remember { mutableIntStateOf(0) }
+    var originPickTrigger by remember { mutableStateOf(0) }
+    var myLocationTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     val viewModel = viewModel<ControlsViewModel>()
 

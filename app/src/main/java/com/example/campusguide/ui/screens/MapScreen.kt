@@ -158,6 +158,7 @@ fun MapScreen(
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible = viewModel.controlsVisible
     // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
+    var showRouteOptionsCard by remember { mutableStateOf(true) }
     var showDirectionsReadyCard by remember { mutableStateOf(true) }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -174,7 +175,11 @@ fun MapScreen(
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
+    var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
+    var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
+    var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
+    var destShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
     val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
@@ -301,6 +306,7 @@ fun MapScreen(
 // Re-show bottom cards whenever the relevant step is entered fresh
     LaunchedEffect(directionsUiState.step) {
         when (directionsUiState.step) {
+            is DirectionsStep.PlanRoute     -> showRouteOptionsCard = true
             is DirectionsStep.ShowingRoute  -> showDirectionsReadyCard = false
             else -> {}
         }
@@ -315,6 +321,8 @@ fun MapScreen(
             step = DirectionsStep.PickDestination,
             errorMessage = null,
         )
+        originSuggestions = emptyList()
+        destSuggestions = emptyList()
         isPickingOrigin = false
     }
 
