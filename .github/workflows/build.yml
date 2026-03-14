@@ -74,7 +74,7 @@ jobs:
           echo "=== Sample coverage from report ==="
           grep -A5 'sourcefilename="MainActivity.kt"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -20 || echo "MainActivity not found in report"
       - name: Analyze with SonarCloud
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@02ef91109b2d589e757aefcfb2854c2783fd7b19 # v4.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
