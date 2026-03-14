@@ -57,6 +57,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    useLibrary("org.apache.http.legacy")
+
+
     buildTypes {
         debug {
             enableUnitTestCoverage = true
@@ -203,9 +206,14 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 }
 
 dependencies {
+    // Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -213,48 +221,45 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
-    implementation(libs.play.services.maps)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.play.services.location)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.navigation.testing)
-    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.material3)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    testImplementation(libs.junit)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.test.core)
-    testImplementation(libs.androidx.test.ext.junit)
-    testImplementation(libs.androidx.compose.ui.test.junit4)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.inline)
-    testImplementation("org.robolectric:robolectric:4.11.1")
-    testImplementation("org.mockito:mockito-core:5.8.0")
-    testImplementation("org.mockito:mockito-core:5.11.0")
+
+    // Maps - PICK ONE version only
+    implementation(libs.play.services.maps)               // remove play.services.maps.v1820 duplicate
+    implementation(libs.play.services.location)           // remove play.services.location.v1750 duplicate
+    implementation("com.google.maps.android:maps-compose:4.4.1")  // remove 4.3.3 duplicate
+    implementation(libs.maps.utils.ktx)
+
+    // Network
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.uiautomator)
+
+    // Unit Tests
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.12.2")       // remove 4.11.1 duplicate
+    testImplementation("org.mockito:mockito-core:5.11.0")          // remove 5.8.0 duplicate
     testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.json:json:20240303")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+
+    // Instrumented (E2E) Tests - THIS is where your error comes from
+    androidTestImplementation("androidx.test:runner:1.6.1")        // ← was MISSING
+    androidTestImplementation("androidx.test:rules:1.6.1")         // ← move from implementation
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7") // ← move from implementation
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation("androidx.test:rules:1.6.1")
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    testImplementation("org.json:json:20240303")
-    testImplementation("org.robolectric:robolectric:4.12.2")
-    testImplementation("androidx.test:core:1.6.1")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-
-
-    implementation(libs.play.services.maps.v1820)
-    implementation(libs.maps.utils.ktx)
-    implementation(libs.play.services.location.v1750)
-    implementation("com.google.maps.android:maps-compose:4.3.3")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    // DataStore for persisting accessibility preferences
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }

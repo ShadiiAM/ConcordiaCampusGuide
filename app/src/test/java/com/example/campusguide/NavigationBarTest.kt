@@ -78,7 +78,6 @@ class NavigationBarTest {
                         rememberSaveable { mutableStateOf(AppDestinations.MAP) },
                         {
                             SearchBarWithProfile(
-                                modifier = Modifier.testTag("searchBar")
                             )
                         })
                 }

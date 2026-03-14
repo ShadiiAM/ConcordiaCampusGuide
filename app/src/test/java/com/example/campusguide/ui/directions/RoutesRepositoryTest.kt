@@ -1333,10 +1333,13 @@ class GoogleRoutesRepositoryTest {
             fail("Expected RuntimeException to be thrown")
         } catch (e: RuntimeException) {
             assertNotNull(e.message)
+            val msg = e.message!!
+
             assertTrue(
-                e.message?.contains("Network timed out") == true ||
-                e.message?.contains("Network error") == true ||
-                e.message?.contains("Unable to resolve host") == true
+                "Unexpected error message: '$msg'",
+                msg.contains("Network timed out") ||
+                        msg.contains("Network error") ||
+                        msg.contains("Unable to resolve host")
             )
         }
     }

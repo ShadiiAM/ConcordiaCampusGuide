@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -158,7 +159,8 @@ private fun AccessibilityItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .testTag("goToAccessibility"),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Accessibility icon in circle

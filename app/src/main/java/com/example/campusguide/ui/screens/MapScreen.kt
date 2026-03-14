@@ -40,7 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
@@ -175,6 +178,7 @@ fun MapScreen(
     var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
     var destShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
+    val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
     var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
@@ -685,11 +689,27 @@ fun MapScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()
+        .semantics {
+            stateDescription =
+                if (selectedCampus == Campus.LOYOLA)
+                    "Loyola map shown"
+                else
+                    "SGW map shown"
+        }) {
+
+        DisposableEffect(Unit) {
+            onDispose {
+                googleMap?.clear()
+                mapView.onStop()
+                mapView.onDestroy()
+            }
+        }
+
         // Map View
         AndroidView(
             factory = { ctx ->
-                MapView(ctx).apply {
+                mapView.apply {
                     onCreate(null)
                     getMapAsync { map ->
                         googleMap = map
@@ -834,7 +854,8 @@ fun MapScreen(
                     }
                 }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .testTag("mapView"),
             update = { mapView ->
                 mapView.onResume()
             }
@@ -880,6 +901,7 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .testTag("mapControls").semantics { contentDescription = "Map Controls" }
                     .padding(end = 16.dp, bottom = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1337,7 +1359,7 @@ fun MapScreen(
                     // No toggle needed - users can select any building from any campus
 
                     Button(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().testTag("DirectionsGo"),
                         enabled  = !directionsUiState.isLoadingRoute,
                         onClick  = {
                             directionsUiState = directionsUiState.copy(
@@ -1356,13 +1378,15 @@ fun MapScreen(
                                 }.onSuccess { route ->
                                     val map = googleMap
                                     if (map != null) {
-                                        routePolylineRef?.remove()
-                                        routePolylineRef = map.addPolyline(
-                                            PolylineOptions()
-                                                .addAll(route.points)
-                                                .color(0xFF1565C0.toInt())
-                                                .width(12f)
-                                        )
+                                        withContext(Dispatchers.Main) {
+                                            routePolylineRef?.remove()
+                                            routePolylineRef = map.addPolyline(
+                                                PolylineOptions()
+                                                    .addAll(route.points)
+                                                    .color(0xFF1565C0.toInt())
+                                                    .width(12f)
+                                            )
+                                        }
                                     }
                                     directionsUiState = directionsUiState.copy(
                                         isLoadingRoute = false,

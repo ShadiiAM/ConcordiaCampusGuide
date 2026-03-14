@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -185,12 +186,17 @@ class GoogleRoutesRepository(
         }
     }
 
-    private fun Throwable.toUserFriendlyMessage(): String = when (this) {
+    private fun Throwable.toUserFriendlyMessage(): String = when(this) {
         is UnknownHostException ->
             "Unable to resolve host (DNS). Your emulator/device can’t reach Google right now. " +
-                "Check Wi‑Fi, Private DNS settings, VPN/firewall, or try a cold boot/wipe of the emulator."
+                    "Check Wi‑Fi, Private DNS settings, VPN/firewall, or try a cold boot/wipe of the emulator."
+
         is SocketTimeoutException ->
             "Network timed out while contacting Google. Check your internet/VPN/firewall and try again."
+
+        is SocketException ->
+            "Network error: unable to reach server. Check your connection."
+
         is IOException -> message ?: "Network error while calling Routes API."
         else -> message ?: "Unexpected error while calling Routes API."
     }

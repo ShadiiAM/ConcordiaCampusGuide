@@ -59,6 +59,7 @@ import com.google.android.gms.maps.model.LatLng as GmsLatLng
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             val scope = rememberCoroutineScope()
@@ -144,7 +145,8 @@ fun ConcordiaCampusGuideApp() {
             )
         }
         else -> {
-            NavigationBar(currentDestination) { modifier ->
+            NavigationBar((currentDestination), { modifier ->
+
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(
@@ -255,6 +257,7 @@ fun ConcordiaCampusGuideApp() {
                     }
                 }
             }
+            )
         }
     }
 }
