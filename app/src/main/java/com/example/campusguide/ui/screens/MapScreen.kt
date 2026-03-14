@@ -790,7 +790,20 @@ fun MapScreen(
                         map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
-                                selectedShuttleStop = stop
+                                if (isPickingOrigin) {
+                                    val step = directionsUiState.step as? DirectionsStep.PlanRoute
+                                    if (step != null) {
+                                        directionsUiState = directionsUiState.copy(
+                                            step = step.copy(origin = stop.latLng),
+                                            errorMessage = null
+                                        )
+                                        originDisplayName = stop.name
+                                        originBuilding = null
+                                        isPickingOrigin = false
+                                    }
+                                } else {
+                                    selectedShuttleStop = stop
+                                }
                                 true
                             } else {
                                 false
@@ -823,6 +836,8 @@ fun MapScreen(
                                             step = step.copy(origin = latLng),
                                             errorMessage = null
                                         )
+                                        originDisplayName = buildingInfo?.buildingName ?: buildingInfo?.buildingCode
+                                        originBuilding = null
                                         isPickingOrigin = false
                                     }
                                 }
@@ -845,7 +860,8 @@ fun MapScreen(
                                     step = step.copy(origin = latLng),
                                     errorMessage = null
                                 )
-                                originDisplayName = null
+                                originDisplayName = latLngShort(latLng)
+                                originBuilding = null
                                 isPickingOrigin = false
                             }
                         }
