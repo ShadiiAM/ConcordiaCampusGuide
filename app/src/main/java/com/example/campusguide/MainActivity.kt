@@ -194,10 +194,6 @@ fun ConcordiaCampusGuideApp() {
                                 directionsCancelTrigger++
                                 topBarTravelMode = TravelMode.DRIVE
                             },
-                            onBackClick = {
-                                // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                directionsTopBarState = directionsTopBarState.copy(active = false)
-                            },
                         )
                     } else {
                         SearchBarWithProfile(
