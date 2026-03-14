@@ -27,7 +27,8 @@ private val ShuttleBlue = Color(0xFF1565C0)
 fun ShuttleStopInfoCard(
     stop: ShuttleStop,
     isOperational: Boolean = true,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDirectionsClick: (() -> Unit)? = null
 ) {
     var showSchedule by remember { mutableStateOf(false) }
 
@@ -110,12 +111,26 @@ fun ShuttleStopInfoCard(
         },
         confirmButton = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (onDirectionsClick != null) {
+                    Button(
+                        onClick = {
+                            onDismiss()
+                            onDirectionsClick()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    ) {
+                        Text("Directions")
+                    }
+                }
                 if (isOperational) {
                     Button(
                         onClick = { showSchedule = true },
                         colors = ButtonDefaults.buttonColors(containerColor = ShuttleBlue)
                     ) {
-                        Text("View full schedule")
+                        Text("View schedule")
                     }
                 }
                 TextButton(onClick = onDismiss) { Text("OK") }
