@@ -55,6 +55,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Default placeholder so processDebugUnitTestManifest never fails without local.properties.
+        // The Secrets plugin overrides this with the real value from local.properties for the app build.
+        manifestPlaceholders["MAPS_API_KEY"] = ""
     }
 
     useLibrary("org.apache.http.legacy")
