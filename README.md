@@ -1,4 +1,3 @@
-test
 # SOEN 390 W26 Project
 
 ## Team Name
