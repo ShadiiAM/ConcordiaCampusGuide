@@ -65,14 +65,12 @@ jobs:
           path: app/build/reports/jacoco/
       - name: Debug Sonar Paths
         run: |
-          echo "=== Checking class files ==="
-          find app/build -name "*.class" -path "*debug*" | head -30
-          echo ""
+          echo "=== sonar.java.binaries path 1 ==="
+          ls -la app/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes/ | head -10 || echo "PATH 1 MISSING"
+          echo "=== sonar.java.binaries path 2 ==="
+          ls -la app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/ | head -10 || echo "PATH 2 MISSING"
           echo "=== JaCoCo XML Report ==="
-          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
-          echo ""
-          echo "=== Sample coverage from report ==="
-          grep -A5 'sourcefilename="MainActivity.kt"' app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml | head -20 || echo "MainActivity not found in report"
+          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml || echo "JACOCO XML MISSING"
       - name: Analyze with SonarCloud
         uses: SonarSource/sonarcloud-github-action@ffc3010689be73b8e5ae0c57ce35968afd7909e8 # v5.0.0
         env:
