@@ -150,10 +150,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     sourceDirectories.setFrom(files(mainSrc))
     classDirectories.setFrom(files(kotlinTree, javaTree))
 
-    // Collect all test task execution data — glob covers any AGP version's output path
+    // Collect all test task execution data
     executionData.setFrom(fileTree(buildDir) {
-        include("**/*.exec")
-        include("**/*.ec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include("jacoco/testDebugUnitTest.exec")
     })
 
     doFirst {
