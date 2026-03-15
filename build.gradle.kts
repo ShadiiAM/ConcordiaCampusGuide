@@ -42,9 +42,10 @@ sonar {
             "**/ShuttleMarkerFactory.kt"
         )
 
-        // Coverage
-        property("sonar.java.binaries", "app/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        // Coverage — absolute paths so the scanner resolves them correctly regardless of working dir
+        val appBuildDir = project(":app").layout.buildDirectory.get().asFile
+        property("sonar.java.binaries", "$appBuildDir/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+        property("sonar.coverage.jacoco.xmlReportPaths", "$appBuildDir/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
 
         // Lower coverage threshold for UI-heavy codebase
         // Industry standard: UI code 30-50%, Business logic 80%+

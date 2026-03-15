@@ -43,20 +43,11 @@ jobs:
         run: ./gradlew assembleDebug testDebugUnitTest jacocoTestReport lintDebug --stacktrace
       - name: Verify JaCoCo report exists
         run: |
-          echo "=== Checking for JaCoCo XML report ==="
-          find . -name "*.xml" -path "*/jacoco/*" -type f
+          echo "=== JaCoCo execution data files (.exec/.ec) ==="
+          find app/build -name "*.exec" -o -name "*.ec" | sort
           echo ""
-          echo "=== JaCoCo report directory contents ==="
-          ls -la app/build/reports/jacoco/jacocoTestReport/ || echo "Report directory not found"
-          echo ""
-          echo "=== JaCoCo execution data files ==="
-          find . -name "*.exec" -type f
-          echo ""
-          echo "=== Kotlin class files (sample) ==="
-          find app/build -name "*.class" -path "*debug*" | head -20
-          echo ""
-          echo "=== JaCoCo XML report content preview ==="
-          head -50 app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml || echo "Could not read report"
+          echo "=== JaCoCo XML report ==="
+          ls -la app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml || echo "MISSING"
       - name: Upload JaCoCo Report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
