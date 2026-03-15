@@ -16,12 +16,30 @@ data class CampusBuilding(
     /** Shown in the text field after selection: "Henry F. Hall Building (H)" */
     val displayName: String get() = "$buildingName ($buildingCode)"
 
-    /** True if the query matches the code prefix OR any word in the name */
-    fun matches(query: String): Boolean {
+    /** True if the building is relevant for the given query. */
+    fun matches(query: String): Boolean = score(query) > 0
+
+    /**
+     * Relevance score for ranking search results.
+     * Higher = better match. Returns 0 if not relevant.
+     */
+    fun score(query: String): Int {
         val q = query.trim().lowercase()
-        if (q.isEmpty()) return false
-        return buildingCode.lowercase().startsWith(q)
-                || buildingName.lowercase().contains(q)
+        if (q.isEmpty()) return 0
+        val code = buildingCode.lowercase()
+        val name = buildingName.lowercase()
+        val addr = address.lowercase()
+        val nameWords = name.split(Regex("\\s+"))
+        return when {
+            code == q                                        -> 100  // exact code  e.g. "h"  → H
+            code.startsWith(q)                               -> 80   // code prefix e.g. "fb" → FB
+            name == q                                        -> 70   // exact full name
+            name.startsWith(q)                               -> 60   // name starts with query
+            nameWords.any { it.startsWith(q) }               -> 50   // any word in name starts with query
+            name.contains(q)                                 -> 30   // substring anywhere in name
+            addr.contains(q)                                 -> 10   // match in address
+            else                                             -> 0
+        }
     }
 }
 
@@ -101,13 +119,23 @@ val ALL_CAMPUS_BUILDINGS: List<CampusBuilding> = listOf(
  * Returns up to [max] buildings matching [query].
  * Scoped to [activeCampus] unless [crossCampus] is true.
  */
+/**
+ * Returns up to [max] buildings matching [query], ranked by relevance.
+ * Scoped to [activeCampus] unless [crossCampus] is true.
+ */
 fun buildingSuggestions(
     query: String,
     activeCampus: Campus,
     crossCampus: Boolean,
-    max: Int = 6,
+    max: Int = 8,
 ): List<CampusBuilding> {
+    val q = query.trim()
+    if (q.isEmpty()) return emptyList()
     val pool = if (crossCampus) ALL_CAMPUS_BUILDINGS
     else ALL_CAMPUS_BUILDINGS.filter { it.campus == activeCampus }
-    return pool.filter { it.matches(query) }.take(max)
+    return pool
+        .mapNotNull { b -> val s = b.score(q); if (s > 0) b to s else null }
+        .sortedByDescending { (_, s) -> s }
+        .map { (b, _) -> b }
+        .take(max)
 }

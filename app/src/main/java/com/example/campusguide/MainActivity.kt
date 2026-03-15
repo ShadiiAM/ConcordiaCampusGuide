@@ -108,6 +108,8 @@ fun ConcordiaCampusGuideApp() {
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
     var directionsGoTrigger by remember { mutableStateOf(0) }
     var directionsCancelTrigger by remember { mutableStateOf(0) }
+    var originPickTrigger by remember { mutableStateOf(0) }
+    var myLocationTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     val viewModel = viewModel<ControlsViewModel>()
 
@@ -161,6 +163,8 @@ fun ConcordiaCampusGuideApp() {
 
                             directionsGoTrigger = directionsGoTrigger,
                             directionsCancelTrigger = directionsCancelTrigger,
+                            originPickTrigger = originPickTrigger,
+                            myLocationTrigger = myLocationTrigger,
                             topBarTravelMode = topBarTravelMode,
                             shuttleShowBothStops = shuttleShowBothStops,
                             onShuttleShowBothStopsConsumed = { shuttleShowBothStops = false },
@@ -182,14 +186,13 @@ fun ConcordiaCampusGuideApp() {
                             showActions = directionsTopBarState.showActions,
                             isLoadingRoute = directionsTopBarState.isLoadingRoute,
                             currentSteps = directionsTopBarState.currentSteps,
+                            isPickingOrigin = directionsTopBarState.isPickingOrigin,
+                            onOriginClick = { originPickTrigger++ },
+                            onMyLocationClick = { myLocationTrigger++ },
                             onGoClick = { directionsGoTrigger++ },
                             onCancelClick = {
                                 directionsCancelTrigger++
                                 topBarTravelMode = TravelMode.DRIVE
-                            },
-                            onBackClick = {
-                                // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                directionsTopBarState = directionsTopBarState.copy(active = false)
                             },
                         )
                     } else {

@@ -6,41 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
-    id("org.sonarqube")
-}
-
-sonar {
-    properties {
-        property("sonar.sources", "src/main/java")
-        property("sonar.tests", "src/test/java")
-        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-        // Exclude UI-only files that cannot be meaningfully unit tested:
-        // Compose screens, Compose components, Canvas/bitmap factories,
-        // accessibility overlays, theme definitions, and the Activity entry point.
-        // Exclude UI-only files from coverage: Compose screens/components/theme/accessibility
-        // cannot be exercised by JVM unit tests — they require the Android rendering pipeline.
-        property(
-            "sonar.coverage.exclusions",
-            listOf(
-                "**/ui/screens/**",
-                "**/ui/components/**",
-                "**/ui/accessibility/**",
-                "**/ui/theme/**",
-                "**/ui/map/**",
-                "**/MainActivity.kt",
-                "**/ui/directions/**",                // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
-                "**/ShuttleMarkerFactory.kt"
-            ).joinToString(",")
-        )
-        // ShuttleMarkerFactory uses Canvas/Paint and requires Android Context — it has no
-        // business logic and is already exercised by E2E tests. Fully exclude from analysis
-        // so SonarQube does not count its lines against coverage.
-        property(
-            "sonar.exclusions",
-            "**/ShuttleMarkerFactory.kt"
-        )
-    }
 }
 
 android {
@@ -55,6 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Default placeholder so processDebugUnitTestManifest never fails without local.properties.
+        // The Secrets plugin overrides this with the real value from local.properties for the app build.
+        manifestPlaceholders["MAPS_API_KEY"] = ""
     }
 
     useLibrary("org.apache.http.legacy")
@@ -65,7 +34,7 @@ android {
             enableUnitTestCoverage = true
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -202,6 +171,25 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         } else {
             println("✗ WARNING: JaCoCo XML report was NOT generated at expected location: ${xmlReport.absolutePath}")
         }
+    }
+}
+
+sonar {
+    properties {
+        // Source paths (relative to this module's base dir)
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java")
+        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+
+        // JaCoCo coverage
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // JUnit test results
+        property("sonar.junit.reportPaths", "build/test-results/testDebugUnitTest")
+
+        // Android lint report
+        property("sonar.androidLint.reportPaths", "build/reports/lint-results-debug.xml")
     }
 }
 
