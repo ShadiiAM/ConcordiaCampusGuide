@@ -47,6 +47,9 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.ui.directions.TravelMode
@@ -110,6 +113,8 @@ fun ConcordiaCampusGuideApp() {
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     val viewModel = viewModel<ControlsViewModel>()
     val shuttleViewModel = viewModel<ShuttleViewModel>()
+    val focusManager = LocalFocusManager.current
+    var ignoreNextFocusClear = remember { mutableStateOf(false) }
 
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -146,19 +151,44 @@ fun ConcordiaCampusGuideApp() {
             )
         }
         else -> {
-            NavigationBar((currentDestination), { modifier ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent(PointerEventPass.Initial)
+                                if (event.changes.any { it.pressed }) {
+                                    withTimeoutOrNull(500L) {
+                                        awaitPointerEvent()
+                                    }
+                                    if (!ignoreNextFocusClear.value) {
+                                        focusManager.clearFocus()
+                                    }
 
-                Box(modifier = modifier.fillMaxSize()) {
+                                    ignoreNextFocusClear.value = false
+                                }
+                            }
+                        }
+                    }
+            ) {
+                NavigationBar((currentDestination), { modifier ->
+
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(
-                            viewModel= viewModel,
+                            viewModel = viewModel,
                             searchQuery = "$searchQuery#$searchCounter",
                             topBarSelectedBuilding = topBarSelectedBuilding,
                             onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
                             onBottomSearchClick = {
-                                try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
+                                try {
+                                    searchFocusRequester.requestFocus()
+                                } catch (_: IllegalStateException) {
+                                }
                             },
-                            onDirectionsTopBarState = { state -> directionsTopBarState = state },
+                            onDirectionsTopBarState = { state ->
+                                directionsTopBarState = state
+                            },
 
                             directionsGoTrigger = directionsGoTrigger,
                             directionsCancelTrigger = directionsCancelTrigger,
@@ -168,7 +198,8 @@ fun ConcordiaCampusGuideApp() {
                             shuttleShowBothStops = shuttleViewModel.shuttleShowBothStops,
                             onShuttleShowBothStopsConsumed = { shuttleViewModel.consumeShowBothStops() },
 
-                        )
+                            )
+
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
                     }
@@ -200,17 +231,19 @@ fun ConcordiaCampusGuideApp() {
                             modifier = Modifier.padding(top = 35.dp),
                             focusRequester = searchFocusRequester,
                             onSearchQueryChange = { query ->
-                                topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
-                                    query = query,
-                                    activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                    crossCampus = true,
-                                )
+                                topBarSuggestions =
+                                    com.example.campusguide.data.buildingSuggestions(
+                                        query = query,
+                                        activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                        crossCampus = true,
+                                    )
                                 // Additionally show shuttle stops if query matches
                                 shuttleViewModel.handleSearchQuery(query, context)
                             },
                             onSearchSubmit = { query ->
-                                val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-                                    .firstOrNull { it.matches(query) }
+                                val matchedBuilding =
+                                    com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
+                                        .firstOrNull { it.matches(query) }
                                 if (matchedBuilding != null) {
                                     topBarSelectedBuilding = matchedBuilding
                                     topBarSuggestions = emptyList()
@@ -238,11 +271,12 @@ fun ConcordiaCampusGuideApp() {
                                 shuttleViewModel.onShuttleStopSelected()
                                 currentDestination.value = AppDestinations.MAP
                             },
+                            ignoreFocusClear = { ignoreNextFocusClear.value = true }
                         )
                     }
                 }
-            }
-            )
+                )
+        }
         }
     }
 }

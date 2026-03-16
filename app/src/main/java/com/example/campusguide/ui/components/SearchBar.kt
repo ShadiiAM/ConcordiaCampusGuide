@@ -51,6 +51,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.focus.onFocusChanged
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
@@ -160,8 +162,12 @@ fun SearchBarWithProfile(
     shuttleStops: List<ShuttleStop> = emptyList(),
     shuttleUserLatLng: LatLng? = null,
     onShuttleStopSelected: (ShuttleStop) -> Unit = {},
+    ignoreFocusClear: () -> Unit = {},
 ) {
     val textFocusRequester = focusRequester ?: remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     var searchQuery by rememberSaveable { mutableStateOf("") }
     Column(modifier = modifier.fillMaxWidth()) {
         Surface(
@@ -204,7 +210,13 @@ fun SearchBarWithProfile(
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("searchBar")
-                            .focusRequester(textFocusRequester),
+                            .focusRequester(textFocusRequester)
+                            .onFocusChanged { focusState ->
+                                isFocused = focusState.isFocused
+                                if (focusState.isFocused) {
+                                    ignoreFocusClear()
+                                }
+                            },
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
@@ -241,12 +253,15 @@ fun SearchBarWithProfile(
             }
         }
 
-        if (suggestions.isNotEmpty()) {
+        if (suggestions.isNotEmpty() && isFocused) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .heightIn(max = 260.dp),
+                    .heightIn(max = 260.dp)
+                    .onFocusChanged {
+                        ignoreFocusClear()
+                    },
                 shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 6.dp,
@@ -261,6 +276,7 @@ fun SearchBarWithProfile(
                                 .clickable {
                                     searchQuery = ""
                                     onBuildingSelected(building)
+                                    ignoreFocusClear()
                                 }
                                 .padding(horizontal = 16.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -288,14 +304,16 @@ fun SearchBarWithProfile(
                 }
             }
         }
-        ShuttleStopDropdown(
-            stops = shuttleStops,
-            userLatLng = shuttleUserLatLng,
-            onStopSelected = { stop ->
-                searchQuery = ""
-                onShuttleStopSelected(stop)
-            }
-        )
+        if(isFocused){
+            ShuttleStopDropdown(
+                stops = shuttleStops,
+                userLatLng = shuttleUserLatLng,
+                onStopSelected = { stop ->
+                    searchQuery = ""
+                    onShuttleStopSelected(stop)
+                }
+            )
+        }
 
     }
 }
