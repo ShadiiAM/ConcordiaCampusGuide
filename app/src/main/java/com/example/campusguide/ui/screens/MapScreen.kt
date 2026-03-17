@@ -39,6 +39,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.BottomCard
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.models.BuildingInfo
@@ -114,6 +116,14 @@ fun MapScreen(
     searchQuery: String = "",
     topBarSelectedBuilding: CampusBuilding? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
+    onIndoorOverlayChanged: (String?) -> Unit = {},
+    requestedIndoorBuildingCode: String? = null,
+    indoorSearchFocusNodeTrigger: com.example.campusguide.indoor.IndoorNode? = null,
+    indoorSetStartTrigger: com.example.campusguide.indoor.IndoorNode? = null,
+    indoorSetDestTrigger: com.example.campusguide.indoor.IndoorNode? = null,
+    onIndoorTriggerConsumed: () -> Unit = {},
+    onIndoorTopCardActiveChanged: (Boolean) -> Unit = {},
+    onIndoorTopCardactiveChanged: (Boolean) -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
@@ -157,7 +167,6 @@ fun MapScreen(
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
-    var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
@@ -171,7 +180,22 @@ fun MapScreen(
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
+    // Indoor navigation state (US-5.1 – US-5.6)
+    var indoorBuildingCode by remember { mutableStateOf<String?>(null) }
 
+    // Sync the requested indoor building code from the top bar into the map overlay state.
+    LaunchedEffect(requestedIndoorBuildingCode) {
+        if (requestedIndoorBuildingCode == null) {
+            indoorBuildingCode = null
+        } else if (requestedIndoorBuildingCode != indoorBuildingCode) {
+            indoorBuildingCode = requestedIndoorBuildingCode
+        }
+    }
+
+    // Publish whether the indoor overlay is open (and which building)
+    LaunchedEffect(indoorBuildingCode) {
+        onIndoorOverlayChanged(indoorBuildingCode)
+    }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -299,7 +323,6 @@ fun MapScreen(
             step = DirectionsStep.PickDestination,
             errorMessage = null,
         )
-        originSuggestions = emptyList()
         destSuggestions = emptyList()
     }
 
@@ -1026,6 +1049,10 @@ fun MapScreen(
                         )
                     )
                     selectedBuildingInfo = null
+                },
+                onExploreIndoors = {
+                    indoorBuildingCode = info.buildingCode
+                    selectedBuildingInfo = null
                 }
             )
         }
@@ -1044,6 +1071,29 @@ fun MapScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
 
+        // Indoor map overlay (US-5.1 - US-5.6)
+        indoorBuildingCode?.let { code ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(10f)
+            ) {
+                IndoorMapScreen(
+                    buildingCode = code,
+                    // Respond to top search actions while indoors are open
+                    focusNode = indoorSearchFocusNodeTrigger,
+                    setStartNode = indoorSetStartTrigger,
+                    setDestNode = indoorSetDestTrigger,
+                    onTopCardActiveChanged = { active ->
+                        onIndoorTopCardActiveChanged(active)
+                        onIndoorTopCardactiveChanged(active)
+                    },
+                    onTriggersConsumed = onIndoorTriggerConsumed,
+                    onClose = { indoorBuildingCode = null }
+                )
+            }
+        }
+
         // Directions overlay
         when (val step = directionsUiState.step) {
             is DirectionsStep.PickDestination -> {
@@ -1053,264 +1103,199 @@ fun MapScreen(
                 // Shouldn't normally reach here since we go straight to PlanRoute
             }
             is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
-                    // X just hides the card — route state and top bar remain intact
-                    showRouteOptionsCard = false
-                }) {
-                    Text(
-                        text = "Route options",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                // X just hides the card — route state and top bar remain intact
+                showRouteOptionsCard = false
+            }) {
+                Text(
+                    text = "Route options",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
 
-                    Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-                    BuildingAutocompleteField(
-                        label         = "From:",
-                        value = originDisplayName ?: latLngShort(step.origin),                        suggestions   = originSuggestions,
-                        placeholder   = "My location or building…",
-                        enabled       = !directionsUiState.isLoadingRoute,
-                        testTag       = "origin_building_field",
-                        onQueryChange = { query ->
-                            originSuggestions = buildingSuggestions(
-                                query        = query,
-                                activeCampus = selectedCampus,
-                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
-                            )
-                        },
-                        onSelected = { building ->
-                            originSuggestions = emptyList()
-                            originDisplayName = building.buildingName
-                            originBuilding = building  // Track for cross-campus detection
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(origin = resolveBuildingLatLng(building)),
-                            )
-                        },
-                    )
 
-                    Spacer(Modifier.height(8.dp))
+                BuildingAutocompleteField(
+                    label         = "To:",
+                    value         = buildingTitle(step.buildingHit, step.destination),
+                    suggestions   = destSuggestions,
+                    placeholder   = "Building name or code…",
+                    enabled       = !directionsUiState.isLoadingRoute,
+                    testTag       = "destination_building_field",
+                    onQueryChange = { query ->
+                        destSuggestions = buildingSuggestions(
+                            query        = query,
+                            activeCampus = selectedCampus,
+                            crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
+                        )
+                    },
+                    onSelected = { building ->
+                        val latLng = resolveBuildingLatLng(building)
+                        destSuggestions = emptyList()
+                        destinationBuilding = building  // Track for cross-campus detection
+                        val hit = BuildingHit(
+                            id = building.buildingCode,
+                            properties = JSONObject().apply {
+                                put("building-code", building.buildingCode)
+                                put("building-name", building.buildingName)
+                                put("address",       building.address)
+                            },
+                        )
+                        directionsUiState = directionsUiState.copy(
+                            step = step.copy(
+                                destination = latLng,
+                                buildingHit = hit,
+                            ),
+                        )
+                    },
+                )
 
-                    BuildingAutocompleteField(
-                        label         = "To:",
-                        value         = buildingTitle(step.buildingHit, step.destination),
-                        suggestions   = destSuggestions,
-                        placeholder   = "Building name or code…",
-                        enabled       = !directionsUiState.isLoadingRoute,
-                        testTag       = "destination_building_field",
-                        onQueryChange = { query ->
-                            destSuggestions = buildingSuggestions(
-                                query        = query,
-                                activeCampus = selectedCampus,
-                                crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
-                            )
-                        },
-                        onSelected = { building ->
-                            val latLng = resolveBuildingLatLng(building)
-                            destSuggestions = emptyList()
-                            destinationBuilding = building  // Track for cross-campus detection
-                            val hit = BuildingHit(
-                                id = building.buildingCode,
-                                properties = JSONObject().apply {
-                                    put("building-code", building.buildingCode)
-                                    put("building-name", building.buildingName)
-                                    put("address",       building.address)
-                                },
-                            )
-                            directionsUiState = directionsUiState.copy(
-                                step = step.copy(
-                                    destination = latLng,
-                                    buildingHit = hit,
-                                ),
-                            )
-                        },
-                    )
+                Spacer(Modifier.height(6.dp))
 
-                    Spacer(Modifier.height(6.dp))
+                // Cross-campus routing is always enabled (US-2.5 AC4)
+                // No toggle needed - users can select any building from any campus
 
-                    // Cross-campus routing is always enabled (US-2.5 AC4)
-                    // No toggle needed - users can select any building from any campus
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled  = !directionsUiState.isLoadingRoute,
-                        onClick  = {
-                            directionsUiState = directionsUiState.copy(
-                                isLoadingRoute = true,
-                                errorMessage   = null,
-                            )
-                            scope.launch {
-                                runCatching {
-                                    repo.getRoute(
-                                        RouteRequest(
-                                            origin      = step.origin,
-                                            destination = step.destination,
-                                            mode  = travelMode,
-                                        )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled  = !directionsUiState.isLoadingRoute,
+                    onClick  = {
+                        directionsUiState = directionsUiState.copy(
+                            isLoadingRoute = true,
+                            errorMessage   = null,
+                        )
+                        scope.launch {
+                            runCatching {
+                                repo.getRoute(
+                                    RouteRequest(
+                                        origin      = step.origin,
+                                        destination = step.destination,
+                                        mode  = travelMode,
                                     )
-                                }.onSuccess { route ->
-                                    val map = googleMap
-                                    if (map != null) {
-                                        routePolylineRef?.remove()
-                                        routePolylineRef = map.addPolyline(
-                                            PolylineOptions()
-                                                .addAll(route.points)
-                                                .color(0xFF1565C0.toInt())
-                                                .width(12f)
-                                        )
-                                    }
-                                    directionsUiState = directionsUiState.copy(
-                                        isLoadingRoute = false,
-                                        step = DirectionsStep.ShowingRoute(
-                                            origin      = step.origin,
-                                            destination = step.destination,
-                                            buildingHit = step.buildingHit,
-                                            route       = route,
-                                        ),
-                                    )
-                                }.onFailure { e ->
-                                    directionsUiState = directionsUiState.copy(
-                                        isLoadingRoute = false,
-                                        errorMessage   = e.message ?: "Failed to get route",
+                                )
+                            }.onSuccess { route ->
+                                val map = googleMap
+                                if (map != null) {
+                                    routePolylineRef?.remove()
+                                    routePolylineRef = map.addPolyline(
+                                        PolylineOptions()
+                                            .addAll(route.points)
+                                            .color(0xFF1565C0.toInt())
+                                            .width(12f)
                                     )
                                 }
+                                directionsUiState = directionsUiState.copy(
+                                    isLoadingRoute = false,
+                                    step = DirectionsStep.ShowingRoute(
+                                        origin      = step.origin,
+                                        destination = step.destination,
+                                        buildingHit = step.buildingHit,
+                                        route       = route,
+                                    ),
+                                )
+                            }.onFailure { e ->
+                                directionsUiState = directionsUiState.copy(
+                                    isLoadingRoute = false,
+                                    errorMessage   = e.message ?: "Failed to get route",
+                                )
                             }
-                        },
-                    ) {
-                        Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")
-                    }
-
-                    directionsUiState.errorMessage?.let {
-                        Spacer(Modifier.height(8.dp))
-                        Text(text = it, color = MaterialTheme.colorScheme.error)
-                    }
+                        }
+                    },
+                ) {
+                    Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")
                 }
+
+                directionsUiState.errorMessage?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text(text = it, color = MaterialTheme.colorScheme.error)
+                }
+            }
 
             is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
-                    // X just hides the card — route and top bar remain intact
-                    showDirectionsReadyCard = false
-                }) {
+                // X just hides the card — route and top bar remain intact
+                showDirectionsReadyCard = false
+            }) {
+                Text(
+                    text = "Directions ready",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(Modifier.height(8.dp))
+                Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
+                Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
+
+                // Display duration and distance if available
+                step.route.durationSeconds?.let { seconds ->
+                    val minutes = seconds / 60
+                    val displayTime = if (minutes < 60) {
+                        "$minutes min"
+                    } else {
+                        val hours = minutes / 60
+                        val remainingMins = minutes % 60
+                        "${hours}h ${remainingMins}min"
+                    }
+                    Spacer(Modifier.height(4.dp))
                     Text(
-                        text = "Directions ready",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Duration: $displayTime",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
                     )
-
-                    Spacer(Modifier.height(8.dp))
-                    Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
-                    Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
-
-                    // Display duration and distance if available
-                    step.route.durationSeconds?.let { seconds ->
-                        val minutes = seconds / 60
-                        val displayTime = if (minutes < 60) {
-                            "$minutes min"
-                        } else {
-                            val hours = minutes / 60
-                            val remainingMins = minutes % 60
-                            "${hours}h ${remainingMins}min"
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Duration: $displayTime",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    step.route.distanceMeters?.let { meters ->
-                        val displayDistance = if (meters < 1000) {
-                            "$meters m"
-                        } else {
-                            val km = meters / 1000.0
-                            String.format(java.util.Locale.US, "%.1f km", km)
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Distance: $displayDistance",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            directionsUiState = directionsUiState.copy(
-                                step = DirectionsStep.PlanRoute(
-                                    origin = step.origin,
-                                    destination = step.destination,
-                                    buildingHit = step.buildingHit
-                                )
-                            )
-                        }
-                    ) {
-                        Text("Edit")
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            routePolylineRef?.remove()
-                            routePolylineRef = null
-                            directionsUiState = directionsUiState.copy(
-                                step = DirectionsStep.PickDestination,
-                                errorMessage = null
-                            )
-                        }
-                    ) {
-                        Text("Clear")
-                    }
                 }
 
-        }
-    }
-}
-
-@Composable
-private fun BottomCard(
-    onDismiss: (() -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                if (onDismiss != null) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close directions"
-                            )
-                        }
+                step.route.distanceMeters?.let { meters ->
+                    val displayDistance = if (meters < 1000) {
+                        "$meters m"
+                    } else {
+                        val km = meters / 1000.0
+                        String.format(java.util.Locale.US, "%.1f km", km)
                     }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Distance: $displayDistance",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
-                content()
+
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        directionsUiState = directionsUiState.copy(
+                            step = DirectionsStep.PlanRoute(
+                                origin = step.origin,
+                                destination = step.destination,
+                                buildingHit = step.buildingHit
+                            )
+                        )
+                    }
+                ) {
+                    Text("Edit")
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        routePolylineRef?.remove()
+                        routePolylineRef = null
+                        directionsUiState = directionsUiState.copy(
+                            step = DirectionsStep.PickDestination,
+                            errorMessage = null
+                        )
+                    }
+                ) {
+                    Text("Clear")
+                }
             }
+
         }
     }
 }
+
+// BottomCard is shared (see ui/components/BottomCard.kt)
 
 private fun buildingTitle(
     hit: BuildingHit?,

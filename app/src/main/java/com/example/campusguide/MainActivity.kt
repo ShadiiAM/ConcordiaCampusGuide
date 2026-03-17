@@ -53,9 +53,14 @@ import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.indoor.IndoorGraphRegistry
+import com.example.campusguide.indoor.IndoorRoomSearchService
+import com.example.campusguide.ui.components.TopSearchSuggestion
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        IndoorGraphRegistry.init(this)
         enableEdgeToEdge()
         setContent {
             val scope = rememberCoroutineScope()
@@ -89,12 +94,12 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun ConcordiaCampusGuideApp() {
-    var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    val currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var searchCounter by rememberSaveable { mutableStateOf(0) }
-    var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.data.CampusBuilding>>(emptyList()) }
+    var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.ui.components.TopSearchSuggestion>>(emptyList()) }
     var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
@@ -102,6 +107,13 @@ fun ConcordiaCampusGuideApp() {
     var directionsGoTrigger by remember { mutableStateOf(0) }
     var directionsCancelTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
+
+    // Indoor overlay + search triggers
+    var openIndoorBuildingCode by remember { mutableStateOf<String?>(null) }
+    var indoorTopCardActive by remember { mutableStateOf(false) }
+    var indoorFocusNodeTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
+    var indoorSetStartTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
+    var indoorSetDestTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
     val viewModel = viewModel<ControlsViewModel>()
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -138,7 +150,19 @@ fun ConcordiaCampusGuideApp() {
             )
         }
         else -> {
-            NavigationBar(currentDestination) { modifier ->
+            NavigationBar(
+                currentDestination = currentDestination,
+                onDestinationSelected = { destination ->
+                    if (destination == AppDestinations.MAP) {
+                        openIndoorBuildingCode = null
+                        indoorTopCardActive = false
+                        indoorFocusNodeTrigger = null
+                        indoorSetStartTrigger = null
+                        indoorSetDestTrigger = null
+                    }
+                    currentDestination.value = destination
+                }
+            ) { modifier ->
                 Box(modifier = modifier.fillMaxSize()) {
                     when (currentDestination.value) {
                         AppDestinations.MAP -> MapScreen(
@@ -153,6 +177,17 @@ fun ConcordiaCampusGuideApp() {
                             directionsGoTrigger = directionsGoTrigger,                              // ← add
                             directionsCancelTrigger = directionsCancelTrigger,                      // ← add
                             topBarTravelMode = topBarTravelMode,
+                            onIndoorOverlayChanged = { openIndoorBuildingCode = it },
+                            requestedIndoorBuildingCode = openIndoorBuildingCode,
+                            indoorSearchFocusNodeTrigger = indoorFocusNodeTrigger,
+                            indoorSetStartTrigger = indoorSetStartTrigger,
+                            indoorSetDestTrigger = indoorSetDestTrigger,
+                            onIndoorTriggerConsumed = {
+                                indoorFocusNodeTrigger = null
+                                indoorSetStartTrigger = null
+                                indoorSetDestTrigger = null
+                            },
+                            onIndoorTopCardActiveChanged = { active -> indoorTopCardActive = active },
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -181,33 +216,101 @@ fun ConcordiaCampusGuideApp() {
                                 directionsTopBarState = directionsTopBarState.copy(active = false)
                             },
                         )
-                    } else {
+                    } else if (!(openIndoorBuildingCode != null && indoorTopCardActive)) {
                         SearchBarWithProfile(
                             modifier = Modifier.padding(top = 35.dp),
                             focusRequester = searchFocusRequester,
                             onSearchQueryChange = { query ->
-                                topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
-                                    query = query,
-                                    activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                    crossCampus = true,
-                                )
+                                val indoorCode = openIndoorBuildingCode
+                                if (indoorCode != null) {
+                                    topBarSuggestions = IndoorRoomSearchService.search(
+                                        query = query,
+                                        scope = IndoorRoomSearchService.Scope.Building,
+                                        buildingCode = indoorCode,
+                                    ).map {
+                                        TopSearchSuggestion.Indoor(
+                                            node = it.node,
+                                            buildingCode = it.buildingCode,
+                                            primaryLabel = it.primaryLabel,
+                                            secondaryLabel = it.typeLabel,
+                                            tertiaryLabel = it.locationLabel,
+                                        )
+                                    }
+                                } else {
+                                    val building = com.example.campusguide.data.buildingSuggestions(
+                                        query = query,
+                                        activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                        crossCampus = true,
+                                    ).map { com.example.campusguide.ui.components.TopSearchSuggestion.Building(it) }
+
+                                    val indoor = IndoorRoomSearchService.search(
+                                        query = query,
+                                        scope = IndoorRoomSearchService.Scope.Global,
+                                    ).map {
+                                        TopSearchSuggestion.Indoor(
+                                            node = it.node,
+                                            buildingCode = it.buildingCode,
+                                            primaryLabel = it.primaryLabel,
+                                            secondaryLabel = it.typeLabel,
+                                            tertiaryLabel = it.locationLabel,
+                                        )
+                                    }
+
+                                    topBarSuggestions = indoor + building
+                                }
                             },
                             onSearchSubmit = { query ->
-                                // Check if query matches a campus building first
-                                val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-                                    .firstOrNull { it.matches(query) }
-                                if (matchedBuilding != null) {
-                                    // Use building directly, skip geocoder
-                                    topBarSelectedBuilding = matchedBuilding
-                                    topBarSuggestions = emptyList()
-                                    currentDestination.value = AppDestinations.MAP
+                                val indoorCode = openIndoorBuildingCode
+                                if (indoorCode != null) {
+                                    // Submit behaves like query-change for indoors: show suggestions; selection drives focusing.
+                                    topBarSuggestions = IndoorRoomSearchService.search(
+                                        query = query,
+                                        scope = IndoorRoomSearchService.Scope.Building,
+                                        buildingCode = indoorCode,
+                                    ).map {
+                                        TopSearchSuggestion.Indoor(
+                                            node = it.node,
+                                            buildingCode = it.buildingCode,
+                                            primaryLabel = it.primaryLabel,
+                                            secondaryLabel = it.typeLabel,
+                                            tertiaryLabel = it.locationLabel,
+                                        )
+                                    }
                                 } else {
-                                    // Fall back to geocoder search
-                                    searchQuery = query
-                                    searchCounter++
-                                    topBarSuggestions = emptyList()
-                                    if (currentDestination.value != AppDestinations.MAP) {
+                                    // Prefer indoor matches if any exist
+                                    val indoor = IndoorRoomSearchService.search(
+                                        query = query,
+                                        scope = IndoorRoomSearchService.Scope.Global,
+                                    )
+                                    if (indoor.isNotEmpty()) {
+                                        topBarSuggestions = indoor.map {
+                                            TopSearchSuggestion.Indoor(
+                                                node = it.node,
+                                                buildingCode = it.buildingCode,
+                                                primaryLabel = it.primaryLabel,
+                                                secondaryLabel = it.typeLabel,
+                                                tertiaryLabel = it.locationLabel,
+                                            )
+                                        }
                                         currentDestination.value = AppDestinations.MAP
+                                    } else {
+                                        // Check if query matches a campus building first
+                                        val matchedBuilding = ALL_CAMPUS_BUILDINGS
+                                            .firstOrNull { it.matches(query) }
+                                        if (matchedBuilding != null) {
+                                            // Use building directly, skip geocoder
+                                            topBarSelectedBuilding = matchedBuilding
+                                            topBarSuggestions = emptyList()
+                                            currentDestination.value = AppDestinations.MAP
+                                        } else {
+                                            // Fall back to geocoder search
+                                            searchQuery = query
+                                            searchCounter++
+                                            topBarSuggestions = emptyList()
+                                            if (currentDestination.value != AppDestinations.MAP) {
+                                                currentDestination.value = AppDestinations.MAP
+                                            }
+                                        }
                                     }
                                 }
                             },
@@ -217,6 +320,32 @@ fun ConcordiaCampusGuideApp() {
                                 topBarSelectedBuilding = building
                                 topBarSuggestions = emptyList()
                                 searchQuery = ""
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                            onIndoorResultSelected = { indoor ->
+                                // Default click on an indoor suggestion sets destination.
+                                if (openIndoorBuildingCode == null) {
+                                    openIndoorBuildingCode = indoor.buildingCode
+                                }
+                                indoorSetDestTrigger = indoor.node
+                                topBarSuggestions = emptyList()
+                                searchQuery = ""
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                            onIndoorSetAsStart = { indoor ->
+                                if (openIndoorBuildingCode == null) {
+                                    openIndoorBuildingCode = indoor.buildingCode
+                                }
+                                indoorSetStartTrigger = indoor.node
+                                topBarSuggestions = emptyList()
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                            onIndoorSetAsDestination = { indoor ->
+                                if (openIndoorBuildingCode == null) {
+                                    openIndoorBuildingCode = indoor.buildingCode
+                                }
+                                indoorSetDestTrigger = indoor.node
+                                topBarSuggestions = emptyList()
                                 currentDestination.value = AppDestinations.MAP
                             },
                         )

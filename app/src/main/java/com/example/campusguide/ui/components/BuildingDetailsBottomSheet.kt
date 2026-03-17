@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.map.models.BuildingInfo
 import java.util.Calendar
@@ -81,7 +82,8 @@ private fun String.cleanText(): String {
 fun BuildingDetailsBottomSheet(
     buildingInfo: BuildingInfo,
     onDismiss: () -> Unit,
-    onDirectionsClick: (() -> Unit)? = null
+    onDirectionsClick: (() -> Unit)? = null,
+    onExploreIndoors: (() -> Unit)? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -220,6 +222,31 @@ fun BuildingDetailsBottomSheet(
                 ) {
                     AccessibleText(
                         text = "Directions",
+                        baseFontSizeSp = 15f,
+                        fallbackColor = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Explore Indoors Button (US-5.1).  Shown only for buildings with floor maps
+            val hasIndoorMap = IndoorGraphRegistry.hasIndoorMap(buildingInfo.buildingCode)
+            if (hasIndoorMap && onExploreIndoors != null) {
+                Button(
+                    onClick = onExploreIndoors,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics {
+                            contentDescription = "Explore indoor map for this building"
+                        },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF912338),
+                        contentColor = Color.White
+                    )
+                ) {
+                    AccessibleText(
+                        text = "🏢 Explore Indoors",
                         baseFontSizeSp = 15f,
                         fallbackColor = Color.White
                     )

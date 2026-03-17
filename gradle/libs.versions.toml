@@ -25,6 +25,7 @@ material3 = "1.4.0"
 foundation = "1.10.2"
 navigationTesting = "2.9.7"
 foundationVersion = "1.10.3"
+composeTesting = "1.0.0-alpha11"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,6 +60,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+androidx-compose-testing = { group = "androidx.xr.compose", name = "compose-testing", version.ref = "composeTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -53,6 +54,13 @@ fun DirectionsTopBar(
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
+    showTravelModes: Boolean = true,
+    goLabel: String = "Go",
+    cancelLabel: String = "Cancel",
+    onOriginClick: (() -> Unit)? = null,
+    onDestinationClick: (() -> Unit)? = null,
+    goEnabled: Boolean = true,
+    extraContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val purple = Color(0xFF6B4D8A)
 
@@ -87,7 +95,16 @@ fun DirectionsTopBar(
                 )
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = if (onOriginClick != null) {
+                            Modifier
+                                .clickable(onClick = onOriginClick)
+                                .semantics { contentDescription = "Change start position" }
+                        } else {
+                            Modifier
+                        }
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
@@ -102,6 +119,15 @@ fun DirectionsTopBar(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
+                        if (onOriginClick != null) {
+                            Spacer(Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
                     }
                     repeat(3) {
                         Box(
@@ -112,7 +138,16 @@ fun DirectionsTopBar(
                         )
                         Spacer(Modifier.height(2.dp))
                     }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = if (onDestinationClick != null) {
+                            Modifier
+                                .clickable(onClick = onDestinationClick)
+                                .semantics { contentDescription = "Change destination" }
+                        } else {
+                            Modifier
+                        }
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_poi),
                             contentDescription = null,
@@ -127,6 +162,15 @@ fun DirectionsTopBar(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
+                        if (onDestinationClick != null) {
+                            Spacer(Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
                     }
                 }
                 Icon(
@@ -156,8 +200,8 @@ fun DirectionsTopBar(
                 }
             }
 
-            // Travel mode chips — hidden while viewing step details
-            if (!showStepDetails) {
+            // Travel mode chips. Hidden while viewing step details
+            if (!showStepDetails && showTravelModes) {
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -396,6 +440,8 @@ fun DirectionsTopBar(
                 }
             }
 
+            extraContent?.invoke(this)
+
             // Cancel — shown during planning, step details, or when a route is loaded; Go — only during planning
             if (showActions || showStepDetails || routeSummary != null) {
                 Spacer(Modifier.height(10.dp))
@@ -409,7 +455,7 @@ fun DirectionsTopBar(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onCancelClick)
                     ) {
-                        Text("Cancel", modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
+                        Text(cancelLabel, modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
                             style = MaterialTheme.typography.labelLarge)
                     }
                     if (showActions) {
@@ -419,11 +465,11 @@ fun DirectionsTopBar(
                             color = purple,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .clickable(enabled = !isLoadingRoute, onClick = onGoClick)
+                                .clickable(enabled = !isLoadingRoute && goEnabled, onClick = onGoClick)
                                 .semantics { contentDescription = "Start navigation" }
                         ) {
                             Text(
-                                text = if (isLoadingRoute) "…" else "Go",
+                                text = if (isLoadingRoute) "…" else goLabel,
                                 modifier = Modifier.padding(horizontal = 22.dp, vertical = 8.dp),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = Color.White,

@@ -220,6 +220,7 @@ dependencies {
     implementation(libs.androidx.navigation.testing)
     implementation(libs.androidx.foundation)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation(libs.androidx.compose.testing)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
