@@ -60,6 +60,7 @@ fun DirectionsTopBar(
     onOriginClick: (() -> Unit)? = null,
     onDestinationClick: (() -> Unit)? = null,
     goEnabled: Boolean = true,
+    showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val purple = Color(0xFF6B4D8A)
@@ -173,14 +174,16 @@ fun DirectionsTopBar(
                         }
                     }
                 }
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close directions",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable(onClick = handleBack)
-                )
+                if (showCloseIcon) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close directions",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable(onClick = handleBack)
+                    )
+                }
             }
 
             // Cross-campus badge
@@ -200,7 +203,7 @@ fun DirectionsTopBar(
                 }
             }
 
-            // Travel mode chips. Hidden while viewing step details
+            // Travel mode chips — hidden while viewing step details
             if (!showStepDetails && showTravelModes) {
                 Spacer(Modifier.height(10.dp))
                 Row(

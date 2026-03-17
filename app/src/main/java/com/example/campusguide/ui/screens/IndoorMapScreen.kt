@@ -261,7 +261,12 @@ fun IndoorMapScreen(
                     topCardEditMode = null
                     topCardQuery = ""
                 },
-                onBackClick = onClose,
+                onBackClick = {
+                    viewModel.clearSelection()
+                    selectionMode = SelectionMode.ORIGIN
+                    topCardEditMode = null
+                    topCardQuery = ""
+                },
                 onOriginClick = {
                     selectionMode = SelectionMode.ORIGIN
                     topCardEditMode = SelectionMode.ORIGIN
@@ -272,6 +277,7 @@ fun IndoorMapScreen(
                     topCardEditMode = SelectionMode.DESTINATION
                     topCardQuery = ""
                 },
+                showCloseIcon = false,
                 extraContent = {
                     val editMode = topCardEditMode
                     if (editMode != null) {
@@ -346,6 +352,9 @@ fun IndoorMapScreen(
                 },
             )
         }
+
+        // Route card overlays above the map + bottom bar, like the main map cards.
+        // Removed in favor of DirectionsTopBar controls.
     }
 
     infoNode?.let { node ->
@@ -625,7 +634,7 @@ private fun FloorMapContent(
     Box(
         modifier = modifier
             .onSizeChanged { containerSize = it }
-            // pointerInput lives here BEFORE the graphicsLayer transform,
+            // pointerInput lives here — BEFORE the graphicsLayer transform,
             // so tapOffset is in raw screen/container coordinates.
             .pointerInput(graph, scale, offset, containerSize) {
                 detectTapGestures(
@@ -633,7 +642,7 @@ private fun FloorMapContent(
                         val imgPx = screenToImage(tapOffset, scale, offset, containerSize, graph)
                         Log.d("IndoorCoords", "TAP  x=${imgPx.x.toInt()}  y=${imgPx.y.toInt()}")
                         val hit = findNearestNode(imgPx, graph.nodes, threshold = 60f / scale)
-                        // Ignore hallway nodes, they should not be tappable
+                        // Ignore hallway nodes — they should not be tappable
                         if (hit != null && hit.type != IndoorNodeType.HALLWAY) {
                             latestOnNodeTapped(hit)
                         }
@@ -670,7 +679,7 @@ private fun FloorMapContent(
                 modifier           = Modifier.fillMaxSize()
             )
 
-            // Canvas for nodes and path overlay, must match image's ContentScale.Fit layout
+            // Canvas for nodes and path overlay — must match image's ContentScale.Fit layout
             Canvas(modifier = Modifier.fillMaxSize()) {
                 // Fit the image into canvas: compute draw rect matching ContentScale.Fit
                 val imgAspect  = graph.imageWidth.toFloat() / graph.imageHeight
@@ -709,6 +718,10 @@ private fun FloorMapContent(
                     val isOrigin = node.id == originNode?.id
                     val isDest   = node.id == destNode?.id
 
+                    // If a node is on the path but is a hallway, don't highlight it as part
+                    // of the route — keep the regular hallway color and don't draw the
+                    // white inner circle. Also, don't draw a marker for hallway nodes that
+                    // are only on the path (we want the path to be just a line through hallways).
                     val isHallway = node.type == IndoorNodeType.HALLWAY
 
                     val color = when {
