@@ -21,7 +21,9 @@ object IndoorPathfinder {
         graph: IndoorFloorGraph,
         originId: String,
         destinationId: String,
-        requireAccessible: Boolean = false
+        requireAccessible: Boolean = false,
+        avoidStairs: Boolean = requireAccessible,
+        avoidEscalators: Boolean = requireAccessible,
     ): IndoorPath {
         if (originId == destinationId) {
             val node = graph.nodeMap[originId] ?: return IndoorPath(emptyList(), 0f)
@@ -29,7 +31,12 @@ object IndoorPathfinder {
         }
 
         // Build adjacency list (undirected), respecting accessibility filter
-        val adjacency = buildAdjacency(graph, requireAccessible)
+        val adjacency = buildAdjacency(
+            graph = graph,
+            requireAccessible = requireAccessible,
+            avoidStairs = avoidStairs,
+            avoidEscalators = avoidEscalators,
+        )
 
         // Dijkstra
         val dist = mutableMapOf<String, Float>().withDefault { Float.MAX_VALUE }
@@ -76,15 +83,30 @@ object IndoorPathfinder {
 
     private fun buildAdjacency(
         graph: IndoorFloorGraph,
-        requireAccessible: Boolean
+        requireAccessible: Boolean,
+        avoidStairs: Boolean,
+        avoidEscalators: Boolean,
     ): Map<String, List<Pair<String, Float>>> {
         val adj = mutableMapOf<String, MutableList<Pair<String, Float>>>()
+        val nodeMap = graph.nodeMap
 
         for (edge in graph.edges) {
             if (requireAccessible && !edge.isAccessible) continue
+            if (avoidStairs && edgeTouchesType(edge, IndoorNodeType.STAIRCASE, nodeMap)) continue
+            if (avoidEscalators && edgeTouchesType(edge, IndoorNodeType.ESCALATOR, nodeMap)) continue
             adj.getOrPut(edge.fromId) { mutableListOf() }.add(edge.toId to edge.weight)
             adj.getOrPut(edge.toId)   { mutableListOf() }.add(edge.fromId to edge.weight)
         }
         return adj
+    }
+
+    private fun edgeTouchesType(
+        edge: IndoorEdge,
+        type: IndoorNodeType,
+        nodeMap: Map<String, IndoorNode>,
+    ): Boolean {
+        val fromType = nodeMap[edge.fromId]?.type
+        val toType = nodeMap[edge.toId]?.type
+        return fromType == type || toType == type
     }
 }

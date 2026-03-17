@@ -1,5 +1,6 @@
 package com.example.campusguide.indoor
 
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -7,6 +8,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CrossFloorRouterTest {
+
+    @After
+    fun tearDown() {
+        TestIndoorRegistry.clear()
+    }
 
     private fun floor1(): IndoorFloorGraph {
         return IndoorFloorGraph(
@@ -340,5 +346,286 @@ class CrossFloorRouterTest {
 
         assertNotNull(result)
         assertEquals("E1", result!!.transferNodeDest.id)
+    }
+
+    @Test
+    fun route_prefersEscalator_whenNoAccessibilityConstraints() {
+        val origin = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 1, "H"),
+                IndoorNode("H-1-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 1, "H"),
+                IndoorNode("H-1-STAIR1", "Stair 1", 0f, 0f, IndoorNodeType.STAIRCASE, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-H1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ESC1", 1.2f, true),
+                IndoorEdge("H-1-H1", "H-1-STAIR1", 1f, false)
+            )
+        )
+        val destination = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 2,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-2-201", "201", 0f, 0f, IndoorNodeType.ROOM, 2, "H"),
+                IndoorNode("H-2-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 2, "H"),
+                IndoorNode("H-2-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 2, "H"),
+                IndoorNode("H-2-STAIR1", "Stair 1", 0f, 0f, IndoorNodeType.STAIRCASE, 2, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-2-ESC1", "H-2-H1", 1.2f, true),
+                IndoorEdge("H-2-STAIR1", "H-2-H1", 1f, false),
+                IndoorEdge("H-2-H1", "H-2-201", 1f, true)
+            )
+        )
+
+        val result = CrossFloorRouter.route(
+            originFloorGraph = origin,
+            destinationFloorGraph = destination,
+            originId = "H-1-101",
+            destinationId = "H-2-201",
+            requireAccessible = false,
+            avoidStairs = false,
+            avoidEscalators = false,
+            preferEscalators = true,
+        )
+
+        assertNotNull(result)
+        assertEquals("H-2-ESC1", result!!.transferNodeDest.id)
+    }
+
+    @Test
+    fun route_avoidsEscalator_whenAvoidEscalatorsEnabled() {
+        val origin = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 1, "H"),
+                IndoorNode("H-1-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 1, "H"),
+                IndoorNode("H-1-ELEV1", "Elev 1", 0f, 0f, IndoorNodeType.ELEVATOR, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-H1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ESC1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ELEV1", 2f, true)
+            )
+        )
+        val destination = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 2,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-2-201", "201", 0f, 0f, IndoorNodeType.ROOM, 2, "H"),
+                IndoorNode("H-2-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 2, "H"),
+                IndoorNode("H-2-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 2, "H"),
+                IndoorNode("H-2-ELEV1", "Elev 1", 0f, 0f, IndoorNodeType.ELEVATOR, 2, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-2-ESC1", "H-2-H1", 1f, true),
+                IndoorEdge("H-2-ELEV1", "H-2-H1", 2f, true),
+                IndoorEdge("H-2-H1", "H-2-201", 1f, true)
+            )
+        )
+
+        val result = CrossFloorRouter.route(
+            originFloorGraph = origin,
+            destinationFloorGraph = destination,
+            originId = "H-1-101",
+            destinationId = "H-2-201",
+            requireAccessible = false,
+            avoidStairs = false,
+            avoidEscalators = true,
+            preferEscalators = true,
+        )
+
+        assertNotNull(result)
+        assertEquals("H-2-ELEV1", result!!.transferNodeDest.id)
+    }
+
+    @Test
+    fun route_usesElevator_whenEscalatorAndStairsUnavailable_andAccessibilityOff() {
+        val origin = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 1, "H"),
+                IndoorNode("H-1-ELEV1", "Elev 1", 0f, 0f, IndoorNodeType.ELEVATOR, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-H1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ELEV1", 2f, true)
+            )
+        )
+        val destination = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 2,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-2-201", "201", 0f, 0f, IndoorNodeType.ROOM, 2, "H"),
+                IndoorNode("H-2-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 2, "H"),
+                IndoorNode("H-2-ELEV1", "Elev 1", 0f, 0f, IndoorNodeType.ELEVATOR, 2, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-2-ELEV1", "H-2-H1", 2f, true),
+                IndoorEdge("H-2-H1", "H-2-201", 1f, true)
+            )
+        )
+
+        val result = CrossFloorRouter.route(
+            originFloorGraph = origin,
+            destinationFloorGraph = destination,
+            originId = "H-1-101",
+            destinationId = "H-2-201",
+            requireAccessible = false,
+            avoidStairs = false,
+            avoidEscalators = false,
+            preferEscalators = true,
+        )
+
+        assertNotNull(result)
+        assertEquals("H-2-ELEV1", result!!.transferNodeDest.id)
+        assertTrue(result.floorChangeInstruction.contains("elevator", ignoreCase = true))
+    }
+
+    @Test
+    fun route_returnsNull_whenAccessibilityOn_andNoElevatorAvailable() {
+        val origin = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 1, "H"),
+                IndoorNode("H-1-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-H1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ESC1", 1f, true)
+            )
+        )
+        val destination = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 2,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-2-201", "201", 0f, 0f, IndoorNodeType.ROOM, 2, "H"),
+                IndoorNode("H-2-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 2, "H"),
+                IndoorNode("H-2-ESC1", "Esc 1", 0f, 0f, IndoorNodeType.ESCALATOR, 2, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-2-ESC1", "H-2-H1", 1f, true),
+                IndoorEdge("H-2-H1", "H-2-201", 1f, true)
+            )
+        )
+
+        val result = CrossFloorRouter.route(
+            originFloorGraph = origin,
+            destinationFloorGraph = destination,
+            originId = "H-1-101",
+            destinationId = "H-2-201",
+            requireAccessible = true,
+            avoidStairs = true,
+            avoidEscalators = true,
+            preferEscalators = true,
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun route_multiHop_usesIntermediateFloorEscalator_whenDirectTransferMissing() {
+        val floor1 = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 1, "H"),
+                IndoorNode("H-1-ESC_A", "Esc A", 0f, 0f, IndoorNodeType.ESCALATOR, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-H1", 1f, true),
+                IndoorEdge("H-1-H1", "H-1-ESC_A", 1f, true)
+            )
+        )
+
+        val floor2 = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 2,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-2-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 2, "H"),
+                IndoorNode("H-2-ESC_A", "Esc A", 0f, 0f, IndoorNodeType.ESCALATOR, 2, "H"),
+                IndoorNode("H-2-ESC_B", "Esc B", 0f, 0f, IndoorNodeType.ESCALATOR, 2, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-2-ESC_A", "H-2-H1", 1f, true),
+                IndoorEdge("H-2-H1", "H-2-ESC_B", 1f, true)
+            )
+        )
+
+        val floor8 = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 8,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-8-851", "851", 0f, 0f, IndoorNodeType.ROOM, 8, "H"),
+                IndoorNode("H-8-H1", "H1", 0f, 0f, IndoorNodeType.HALLWAY, 8, "H"),
+                IndoorNode("H-8-ESC_B", "Esc B", 0f, 0f, IndoorNodeType.ESCALATOR, 8, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-8-ESC_B", "H-8-H1", 1f, true),
+                IndoorEdge("H-8-H1", "H-8-851", 1f, true)
+            )
+        )
+
+        TestIndoorRegistry.seed(floor1, floor2, floor8)
+
+        val result = CrossFloorRouter.route(
+            originFloorGraph = floor1,
+            destinationFloorGraph = floor8,
+            originId = "H-1-101",
+            destinationId = "H-8-851",
+            requireAccessible = false,
+            avoidStairs = false,
+            avoidEscalators = false,
+            preferEscalators = true,
+        )
+
+        assertNotNull(result)
+        result!!
+        assertTrue(result.floorChangeInstruction.contains("escalator", ignoreCase = true))
+        assertTrue(result.legOrigin.nodes.any { it.floor == 2 })
+        assertEquals("H-8-ESC_B", result.transferNodeDest.id)
     }
 }

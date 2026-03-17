@@ -256,6 +256,39 @@ class IndoorNavigationViewModelTest {
         assertEquals(IndoorNavState.NoPath, vm.navState)
     }
 
+    @Test
+    fun computePath_withAccessibilityConstraint_andOnlyStairPath_setsNoAccessiblePath() {
+        val constrainedGraph = IndoorFloorGraph(
+            buildingCode = "H",
+            floor = 1,
+            floorPlanDrawableRes = 0,
+            imageWidth = 100,
+            imageHeight = 100,
+            nodes = listOf(
+                IndoorNode("H-1-101", "101", 0f, 0f, IndoorNodeType.ROOM, 1, "H"),
+                IndoorNode("H-1-S1", "Stair", 0f, 0f, IndoorNodeType.STAIRCASE, 1, "H"),
+                IndoorNode("H-1-102", "102", 0f, 0f, IndoorNodeType.ROOM, 1, "H")
+            ),
+            edges = listOf(
+                IndoorEdge("H-1-101", "H-1-S1", 1f, false),
+                IndoorEdge("H-1-S1", "H-1-102", 1f, false)
+            )
+        )
+        TestIndoorRegistry.seed(constrainedGraph)
+        val vm = IndoorNavigationViewModel()
+        vm.openBuilding("H")
+        vm.setRoutingPreferences(avoidStairs = true, avoidEscalators = false)
+        vm.selectOrigin(constrainedGraph.nodes.first { it.id == "H-1-101" })
+        vm.selectDestination(constrainedGraph.nodes.first { it.id == "H-1-102" })
+
+        vm.computePath()
+
+        val state = vm.navState
+        assertTrue(state is IndoorNavState.NoAccessiblePath)
+        state as IndoorNavState.NoAccessiblePath
+        assertTrue(state.hasNonAccessibleAlternative)
+    }
+
     private fun graphFloor1(): IndoorFloorGraph {
         return IndoorFloorGraph(
             buildingCode = "H",

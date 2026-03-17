@@ -50,6 +50,7 @@ import com.example.campusguide.indoor.IndoorFloorGraph
 import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.indoor.IndoorNodeType
 import com.example.campusguide.indoor.IndoorRoomSearchService
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.viewmodels.IndoorNavState
 import com.example.campusguide.ui.viewmodels.IndoorNavigationViewModel
 
@@ -86,11 +87,21 @@ fun IndoorMapScreen(
     onClose: () -> Unit = {},
     viewModel: IndoorNavigationViewModel = viewModel()
 ) {
+    val accessibilityState = LocalAccessibilityState.current
+
     // Open the requested building once
     LaunchedEffect(buildingCode) {
         viewModel.openBuilding(buildingCode)
-        // Inherit global accessibility preference
-        viewModel.requireAccessible = false
+    }
+
+    LaunchedEffect(accessibilityState.avoidStairs, accessibilityState.avoidEscalators) {
+        viewModel.setRoutingPreferences(
+            avoidStairs = accessibilityState.avoidStairs,
+            avoidEscalators = accessibilityState.avoidEscalators,
+        )
+        if (viewModel.canRoute && viewModel.navState != IndoorNavState.Idle) {
+            viewModel.computePath()
+        }
     }
 
     val graph = viewModel.currentGraph
@@ -446,6 +457,14 @@ private fun NavStateBanner(navState: IndoorNavState) {
     val (text, color) = when (navState) {
         IndoorNavState.Idle     -> null to null
         IndoorNavState.NoPath   -> "No path found — try disabling accessibility filter" to Color(0xFFB71C1C)
+        is IndoorNavState.NoAccessiblePath -> {
+            val suffix = if (navState.hasNonAccessibleAlternative) {
+                " Disable accessibility toggles to view a non-accessible route."
+            } else {
+                ""
+            }
+            "Accessible route not available.$suffix" to Color(0xFFB71C1C)
+        }
         is IndoorNavState.SameFloor  -> {
             val n = navState.path.nodes.size
             "Route found — $n step${if (n != 1) "s" else ""}" to Color(0xFF1B5E20)

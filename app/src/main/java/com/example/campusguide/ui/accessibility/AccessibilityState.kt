@@ -15,6 +15,8 @@ class AccessibilityState(
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
     colorBlindMode: ColorBlindMode = ColorBlindMode.NONE,
+    initialAvoidStairs: Boolean = false,
+    initialAvoidEscalators: Boolean = false,
     // Callback invoked whenever the state changes; default is no-op
     private val onStateChanged: (AccessibilityState) -> Unit = {}
 ) {
@@ -28,6 +30,12 @@ class AccessibilityState(
         private set
 
     var colorBlindMode by mutableStateOf(colorBlindMode)
+        private set
+
+    var avoidStairs by mutableStateOf(initialAvoidStairs)
+        private set
+
+    var avoidEscalators by mutableStateOf(initialAvoidEscalators)
         private set
 
     private fun notifyChanged() {
@@ -65,11 +73,27 @@ class AccessibilityState(
         notifyChanged()
     }
 
+    fun updateAvoidStairs(enabled: Boolean) {
+        if (avoidStairs != enabled) {
+            avoidStairs = enabled
+            notifyChanged()
+        }
+    }
+
+    fun updateAvoidEscalators(enabled: Boolean) {
+        if (avoidEscalators != enabled) {
+            avoidEscalators = enabled
+            notifyChanged()
+        }
+    }
+
     fun setFrom(other: AccessibilityState) {
         textSizeOffsetSp = other.textSizeOffsetSp
         isBoldEnabled = other.isBoldEnabled
         textColor = other.textColor
         colorBlindMode = other.colorBlindMode
+        avoidStairs = other.avoidStairs
+        avoidEscalators = other.avoidEscalators
         notifyChanged()
     }
 }
@@ -86,6 +110,8 @@ fun rememberAccessibilityState(
     initialBoldEnabled: Boolean = false,
     initialTextColor: Color = Color.Unspecified,
     colorBlindMode: ColorBlindMode = ColorBlindMode.NONE,
+    initialAvoidStairs: Boolean = false,
+    initialAvoidEscalators: Boolean = false,
     onStateChanged: (AccessibilityState) -> Unit = {}
 ): AccessibilityState {
     return remember {
@@ -94,6 +120,8 @@ fun rememberAccessibilityState(
             initialBoldEnabled = initialBoldEnabled,
             initialTextColor = initialTextColor,
             colorBlindMode = colorBlindMode,
+            initialAvoidStairs = initialAvoidStairs,
+            initialAvoidEscalators = initialAvoidEscalators,
             onStateChanged = onStateChanged
         )
     }

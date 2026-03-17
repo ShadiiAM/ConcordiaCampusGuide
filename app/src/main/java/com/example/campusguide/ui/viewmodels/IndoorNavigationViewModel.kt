@@ -18,6 +18,7 @@ import com.example.campusguide.indoor.IndoorPathfinder
 sealed class IndoorNavState {
     object Idle : IndoorNavState()
     object NoPath : IndoorNavState()
+    data class NoAccessiblePath(val hasNonAccessibleAlternative: Boolean) : IndoorNavState()
 
     /** A same-floor path was found. */
     data class SameFloor(val path: IndoorPath) : IndoorNavState()
@@ -64,6 +65,10 @@ class IndoorNavigationViewModel : ViewModel() {
 
     // ── Accessibility (US-5.4) ──────────────────────────────────────────────
     var requireAccessible by mutableStateOf(false)
+    var avoidStairs by mutableStateOf(false)
+        private set
+    var avoidEscalators by mutableStateOf(false)
+        private set
 
     // ── Nav state ───────────────────────────────────────────────────────────
     var navState by mutableStateOf<IndoorNavState>(IndoorNavState.Idle)
@@ -104,6 +109,15 @@ class IndoorNavigationViewModel : ViewModel() {
 
     fun setHighlightedAsDestination() {
         highlightedNode?.let { selectDestination(it) }
+    }
+
+    fun setRoutingPreferences(
+        avoidStairs: Boolean,
+        avoidEscalators: Boolean,
+    ) {
+        this.avoidStairs = avoidStairs
+        this.avoidEscalators = avoidEscalators
+        this.requireAccessible = avoidStairs || avoidEscalators
     }
 
     fun selectOrigin(node: IndoorNode) {
@@ -148,8 +162,32 @@ class IndoorNavigationViewModel : ViewModel() {
             val graph = IndoorGraphRegistry.get(buildingCode, origin.floor)
                 ?: run { navState = IndoorNavState.NoPath; return }
 
-            val path = IndoorPathfinder.findPath(graph, origin.id, dest.id, requireAccessible)
-            navState = if (path.isEmpty) IndoorNavState.NoPath else IndoorNavState.SameFloor(path)
+            val path = IndoorPathfinder.findPath(
+                graph = graph,
+                originId = origin.id,
+                destinationId = dest.id,
+                requireAccessible = requireAccessible,
+                avoidStairs = avoidStairs,
+                avoidEscalators = avoidEscalators,
+            )
+            if (!path.isEmpty) {
+                navState = IndoorNavState.SameFloor(path)
+                return
+            }
+
+            if (requireAccessible) {
+                val fallback = IndoorPathfinder.findPath(
+                    graph = graph,
+                    originId = origin.id,
+                    destinationId = dest.id,
+                    requireAccessible = false,
+                    avoidStairs = false,
+                    avoidEscalators = false,
+                )
+                navState = IndoorNavState.NoAccessiblePath(hasNonAccessibleAlternative = !fallback.isEmpty)
+            } else {
+                navState = IndoorNavState.NoPath
+            }
         } else {
             // Cross-floor path (US-5.6)
             val originGraph = IndoorGraphRegistry.get(buildingCode, origin.floor)
@@ -162,9 +200,31 @@ class IndoorNavigationViewModel : ViewModel() {
                 destinationFloorGraph = destGraph,
                 originId              = origin.id,
                 destinationId         = dest.id,
-                requireAccessible     = requireAccessible
+                requireAccessible     = requireAccessible,
+                avoidStairs           = avoidStairs,
+                avoidEscalators       = avoidEscalators,
+                preferEscalators      = !requireAccessible && !avoidEscalators,
             )
-            navState = if (result == null) IndoorNavState.NoPath else IndoorNavState.CrossFloor(result)
+            if (result != null) {
+                navState = IndoorNavState.CrossFloor(result)
+                return
+            }
+
+            if (requireAccessible) {
+                val fallback = CrossFloorRouter.route(
+                    originFloorGraph = originGraph,
+                    destinationFloorGraph = destGraph,
+                    originId = origin.id,
+                    destinationId = dest.id,
+                    requireAccessible = false,
+                    avoidStairs = false,
+                    avoidEscalators = false,
+                    preferEscalators = true,
+                )
+                navState = IndoorNavState.NoAccessiblePath(hasNonAccessibleAlternative = fallback != null)
+            } else {
+                navState = IndoorNavState.NoPath
+            }
         }
     }
 }
