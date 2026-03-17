@@ -268,12 +268,14 @@ fun IndoorMapScreen(
                 onGoClick = { if (viewModel.canRoute) viewModel.computePath() },
                 onCancelClick = {
                     viewModel.clearSelection()
+                    viewModel.clearHighlight()
                     selectionMode = SelectionMode.ORIGIN
                     topCardEditMode = null
                     topCardQuery = ""
                 },
                 onBackClick = {
                     viewModel.clearSelection()
+                    viewModel.clearHighlight()
                     selectionMode = SelectionMode.ORIGIN
                     topCardEditMode = null
                     topCardQuery = ""
@@ -605,7 +607,7 @@ private fun FloorMapContent(
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     // Auto-center on highlighted node (search focus). We do this in screen space.
-    LaunchedEffect(highlightedNode?.id, highlightedNode?.floor, containerSize, scale) {
+    LaunchedEffect(highlightedNode?.id, highlightedNode?.floor, containerSize) {
         val hn = highlightedNode
         if (hn == null) return@LaunchedEffect
         if (hn.floor != graph.floor) return@LaunchedEffect
