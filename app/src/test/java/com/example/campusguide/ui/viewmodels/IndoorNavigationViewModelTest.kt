@@ -289,6 +289,40 @@ class IndoorNavigationViewModelTest {
         assertTrue(state.hasNonAccessibleAlternative)
     }
 
+    @Test
+    fun setRoutingPreferences_updatesFlagsAndRequireAccessible() {
+        val vm = IndoorNavigationViewModel()
+
+        vm.setRoutingPreferences(avoidStairs = true, avoidEscalators = false)
+        assertTrue(vm.requireAccessible)
+        assertTrue(vm.avoidStairs)
+        assertEquals(false, vm.avoidEscalators)
+
+        vm.setRoutingPreferences(avoidStairs = false, avoidEscalators = false)
+        assertEquals(false, vm.requireAccessible)
+    }
+
+    @Test
+    fun consumeClearTrigger_clearsOnlyOncePerVersion() {
+        TestIndoorRegistry.seed(graphFloor1())
+        val vm = IndoorNavigationViewModel()
+        vm.openBuilding("H")
+        vm.selectOrigin(graphFloor1().nodes.first { it.id == "H-1-101" })
+        vm.selectDestination(graphFloor1().nodes.first { it.id == "H-1-102" })
+        vm.focusNode(graphFloor1().nodes.first { it.id == "H-1-101" })
+
+        val first = vm.consumeClearTrigger(1)
+        val second = vm.consumeClearTrigger(1)
+        val zero = vm.consumeClearTrigger(0)
+
+        assertTrue(first)
+        assertEquals(false, second)
+        assertEquals(false, zero)
+        assertNull(vm.originNode)
+        assertNull(vm.destinationNode)
+        assertNull(vm.highlightedNode)
+    }
+
     private fun graphFloor1(): IndoorFloorGraph {
         return IndoorFloorGraph(
             buildingCode = "H",
