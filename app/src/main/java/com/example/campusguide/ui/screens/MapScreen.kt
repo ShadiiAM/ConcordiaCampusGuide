@@ -51,7 +51,6 @@ import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
-import com.example.campusguide.ui.components.BottomCard
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.models.BuildingInfo
@@ -76,18 +75,22 @@ import java.io.InputStreamReader
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.directions.isCrossCampusRoute
 import com.example.campusguide.ui.directions.getCrossCampusMessage
 import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.indoor.CrossFloorRouter
+import com.example.campusguide.indoor.IndoorGraphRegistry
+import com.example.campusguide.indoor.IndoorNode
+import com.example.campusguide.indoor.IndoorNodeType
+import com.example.campusguide.indoor.IndoorPathfinder
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
@@ -97,7 +100,6 @@ private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
-const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
 data class DirectionsTopBarState(
     val active: Boolean,
@@ -107,17 +109,31 @@ data class DirectionsTopBarState(
     val selectedMode: TravelMode = TravelMode.DRIVE,
     val routeSummary: String? = null,
     val errorMessage: String? = null,
+    val legLabels: List<String> = emptyList(),
+    val legFallbackMessage: String? = null,
     val isLoadingRoute: Boolean = false,
     val showActions: Boolean = false,
-    val currentSteps: RouteLeg? = null
+    val currentSteps: RouteLeg? = null,
+    val goEnabled: Boolean = true,
+    val showTravelModes: Boolean = true,
+    val goLabel: String = "Go",
+    val cancelLabel: String = "Cancel",
+    val indoorOriginNode: IndoorNode? = null,
+    val indoorDestinationNode: IndoorNode? = null,
 )
 @Composable
 fun MapScreen(
     searchQuery: String = "",
     topBarSelectedBuilding: CampusBuilding? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
+    topBarDirectionsDestinationBuilding: CampusBuilding? = null,
+    onTopBarDirectionsDestinationConsumed: () -> Unit = {},
+    hasExistingDestinationSelection: Boolean = false,
     onIndoorOverlayChanged: (String?) -> Unit = {},
     requestedIndoorBuildingCode: String? = null,
+    indoorOutdoorRouteRequest: IndoorOutdoorRouteRequest? = null,
+    onIndoorOutdoorRouteRequested: (IndoorOutdoorRouteRequest) -> Unit = {},
+    onIndoorOutdoorRouteRequestConsumed: () -> Unit = {},
     indoorSearchFocusNodeTrigger: com.example.campusguide.indoor.IndoorNode? = null,
     indoorSetStartTrigger: com.example.campusguide.indoor.IndoorNode? = null,
     indoorSetDestTrigger: com.example.campusguide.indoor.IndoorNode? = null,
@@ -149,9 +165,6 @@ fun MapScreen(
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible = viewModel.controlsVisible
-    // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
-    var showRouteOptionsCard by remember { mutableStateOf(true) }
-    var showDirectionsReadyCard by remember { mutableStateOf(true) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -163,16 +176,31 @@ fun MapScreen(
         mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
     }
     var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
+    var routeRequestGeneration by remember { mutableIntStateOf(0) }
     // Track the selected building's LatLng for directions
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
-    var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
     var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var legLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+    var legFallbackMessage by remember { mutableStateOf<String?>(null) }
+    var topBarOriginOverride by remember { mutableStateOf<String?>(null) }
+    var topBarDestinationOverride by remember { mutableStateOf<String?>(null) }
+    var isIndoorOutdoorFlow by remember { mutableStateOf(false) }
+    var indoorOutdoorFallbackParts by remember { mutableStateOf<List<String>>(emptyList()) }
+    var indoorFlowStartNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var indoorFlowStartAccessNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var indoorFlowEndAccessNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var indoorFlowEndNode by remember { mutableStateOf<IndoorNode?>(null) }
+
+    var mapTapFocusNodeTrigger by remember { mutableStateOf<IndoorNode?>(null) }
+    var mapTapSetStartNodeTrigger by remember { mutableStateOf<IndoorNode?>(null) }
+    var mapTapSetDestNodeTrigger by remember { mutableStateOf<IndoorNode?>(null) }
+    var indoorTriggerVersion by remember { mutableIntStateOf(0) }
 
     // Shuttle state (US-3.1)
     val shuttleTracker = remember { ShuttleTracker() }
@@ -182,19 +210,55 @@ fun MapScreen(
 
     // Indoor navigation state (US-5.1 – US-5.6)
     var indoorBuildingCode by remember { mutableStateOf<String?>(null) }
+    var indoorDirectionsState by remember { mutableStateOf<DirectionsTopBarState?>(null) }
+    var latestIndoorOriginNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var latestIndoorDestinationNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var suppressIndoorStateUpdates by remember { mutableStateOf(false) }
 
     // Sync the requested indoor building code from the top bar into the map overlay state.
     LaunchedEffect(requestedIndoorBuildingCode) {
         if (requestedIndoorBuildingCode == null) {
+            suppressIndoorStateUpdates = true
             indoorBuildingCode = null
+            indoorDirectionsState = null
+            latestIndoorOriginNode = null
+            latestIndoorDestinationNode = null
+            mapTapFocusNodeTrigger = null
+            mapTapSetStartNodeTrigger = null
+            mapTapSetDestNodeTrigger = null
         } else if (requestedIndoorBuildingCode != indoorBuildingCode) {
+            suppressIndoorStateUpdates = false
             indoorBuildingCode = requestedIndoorBuildingCode
+            // Clear indoor directions state when opening indoor map fresh
+            // to prevent stale state from previous attempts
+            indoorDirectionsState = null
         }
     }
 
     // Publish whether the indoor overlay is open (and which building)
     LaunchedEffect(indoorBuildingCode) {
+        if (indoorBuildingCode != null) {
+            suppressIndoorStateUpdates = false
+        }
         onIndoorOverlayChanged(indoorBuildingCode)
+    }
+
+    LaunchedEffect(
+        indoorDirectionsState?.indoorOriginNode,
+        indoorDirectionsState?.indoorDestinationNode,
+    ) {
+        indoorDirectionsState?.indoorOriginNode?.let { latestIndoorOriginNode = it }
+        indoorDirectionsState?.indoorDestinationNode?.let { latestIndoorDestinationNode = it }
+    }
+
+    LaunchedEffect(indoorSearchFocusNodeTrigger, indoorSetStartTrigger, indoorSetDestTrigger) {
+        if (
+            indoorSearchFocusNodeTrigger != null ||
+            indoorSetStartTrigger != null ||
+            indoorSetDestTrigger != null
+        ) {
+            indoorTriggerVersion++
+        }
     }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
@@ -230,6 +294,148 @@ fun MapScreen(
         }
         return listOfNotNull(dur, dist).joinToString(" · ")
     }
+
+    fun findCampusBuilding(buildingCode: String): CampusBuilding? =
+        ALL_CAMPUS_BUILDINGS.firstOrNull { it.buildingCode.equals(buildingCode, ignoreCase = true) }
+
+    fun findAccessNode(buildingCode: String): IndoorNode? {
+        val floors = IndoorGraphRegistry.floorsFor(buildingCode)
+        val nodes = floors
+            .mapNotNull { IndoorGraphRegistry.get(buildingCode, it) }
+            .flatMap { it.nodes }
+
+        fun firstOf(type: IndoorNodeType): IndoorNode? = nodes.firstOrNull { it.type == type }
+
+        return firstOf(IndoorNodeType.ENTRY)
+            ?: firstOf(IndoorNodeType.ELEVATOR)
+            ?: firstOf(IndoorNodeType.RAMP)
+            ?: firstOf(IndoorNodeType.STAIRCASE)
+            ?: firstOf(IndoorNodeType.ESCALATOR)
+            ?: nodes.firstOrNull { it.type != IndoorNodeType.HALLWAY }
+    }
+
+    fun hasIndoorLegPath(from: IndoorNode, to: IndoorNode): Boolean {
+        if (from.buildingCode != to.buildingCode) return false
+        if (from.id == to.id) return true
+
+        val requireAccessible = accessibilityState.avoidStairs || accessibilityState.avoidEscalators
+        return if (from.floor == to.floor) {
+            val graph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
+            val path = IndoorPathfinder.findPath(
+                graph = graph,
+                originId = from.id,
+                destinationId = to.id,
+                requireAccessible = requireAccessible,
+                avoidStairs = accessibilityState.avoidStairs,
+                avoidEscalators = accessibilityState.avoidEscalators,
+            )
+            !path.isEmpty && path.totalWeight != Float.MAX_VALUE
+        } else {
+            val originGraph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
+            val destinationGraph = IndoorGraphRegistry.get(to.buildingCode, to.floor) ?: return false
+            CrossFloorRouter.route(
+                originFloorGraph = originGraph,
+                destinationFloorGraph = destinationGraph,
+                originId = from.id,
+                destinationId = to.id,
+                requireAccessible = requireAccessible,
+                avoidStairs = accessibilityState.avoidStairs,
+                avoidEscalators = accessibilityState.avoidEscalators,
+                preferEscalators = !accessibilityState.avoidEscalators,
+            ) != null
+        }
+    }
+
+    LaunchedEffect(indoorOutdoorRouteRequest) {
+        val request = indoorOutdoorRouteRequest ?: return@LaunchedEffect
+        onIndoorOutdoorRouteRequestConsumed()
+
+        indoorDirectionsState = null
+        mapTapFocusNodeTrigger = null
+        mapTapSetStartNodeTrigger = null
+        mapTapSetDestNodeTrigger = null
+        val startNode = request.startNode
+        val destinationNode = request.destinationNode
+        val startBuilding = findCampusBuilding(startNode.buildingCode)
+        val endBuilding = findCampusBuilding(destinationNode.buildingCode)
+
+        if (startBuilding == null || endBuilding == null) {
+            isIndoorOutdoorFlow = false
+            indoorFlowStartNode = null
+            indoorFlowStartAccessNode = null
+            indoorFlowEndAccessNode = null
+            indoorFlowEndNode = null
+            legLabels = emptyList()
+            legFallbackMessage = "Unable to resolve one of the selected buildings. Fallback: route to destination building only."
+            topBarOriginOverride = startNode.label
+            topBarDestinationOverride = destinationNode.label
+            directionsUiState = directionsUiState.copy(
+                step = DirectionsStep.PickDestination,
+                isLoadingRoute = false,
+                errorMessage = "Could not build multi-leg route for selected indoor rooms",
+            )
+            return@LaunchedEffect
+        }
+
+        originBuilding = startBuilding
+        destinationBuilding = endBuilding
+        topBarOriginOverride = startNode.label
+        topBarDestinationOverride = destinationNode.label
+        isIndoorOutdoorFlow = true
+        indoorFlowStartNode = startNode
+        indoorFlowEndNode = destinationNode
+
+        val startAccess = findAccessNode(startNode.buildingCode)
+        val endAccess = findAccessNode(destinationNode.buildingCode)
+        indoorFlowStartAccessNode = startAccess
+        indoorFlowEndAccessNode = endAccess
+
+        val startIndoorOk = startAccess != null && hasIndoorLegPath(startNode, startAccess)
+        val endIndoorOk = endAccess != null && hasIndoorLegPath(endAccess, destinationNode)
+
+        val plannedLegs = buildList {
+            add("Indoor leg 1: ${startNode.label} → ${startAccess?.label ?: "building access point"}")
+            add("Outdoor leg: ${startBuilding.buildingCode} → ${endBuilding.buildingCode}")
+            add("Indoor leg 2: ${endAccess?.label ?: "building access point"} → ${destinationNode.label}")
+        }
+
+        val fallbackParts = mutableListOf<String>()
+        if (!startIndoorOk) {
+            fallbackParts.add("Start indoor leg unavailable")
+        }
+        if (!endIndoorOk) {
+            fallbackParts.add("Destination indoor leg unavailable")
+        }
+
+        val outdoorOrigin = resolveBuildingLatLng(startBuilding)
+        val outdoorDestination = resolveBuildingLatLng(endBuilding)
+
+        legLabels = plannedLegs
+        indoorOutdoorFallbackParts = fallbackParts
+        legFallbackMessage = if (fallbackParts.isEmpty()) {
+            null
+        } else {
+            "${fallbackParts.joinToString(". ")}. Outdoor leg will fallback to destination building if needed."
+        }
+
+        val hit = BuildingHit(
+            id = endBuilding.buildingCode,
+            properties = JSONObject().apply {
+                put("building-code", endBuilding.buildingCode)
+                put("building-name", endBuilding.buildingName)
+                put("address", endBuilding.address)
+            }
+        )
+        directionsUiState = directionsUiState.copy(
+            isLoadingRoute = false,
+            errorMessage = null,
+            step = DirectionsStep.PlanRoute(
+                origin = outdoorOrigin,
+                destination = outdoorDestination,
+                buildingHit = hit,
+            ),
+        )
+    }
     // Sync travel mode from top bar selection
     LaunchedEffect(topBarTravelMode) {
         travelMode = topBarTravelMode
@@ -248,7 +454,34 @@ fun MapScreen(
 // Handle Go button from top bar
     LaunchedEffect(directionsGoTrigger) {
         if (directionsGoTrigger == 0) return@LaunchedEffect
-        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        val requestGeneration = routeRequestGeneration
+        val indoorState = indoorDirectionsState
+        val indoorOrigin = indoorState?.indoorOriginNode ?: if (indoorState == null) latestIndoorOriginNode else null
+        val indoorDestination = indoorState?.indoorDestinationNode ?: if (indoorState == null) latestIndoorDestinationNode else null
+
+        if (
+            indoorBuildingCode != null &&
+            indoorOrigin != null &&
+            indoorDestination != null &&
+            !indoorOrigin.buildingCode.equals(indoorDestination.buildingCode, ignoreCase = true)
+        ) {
+            mapTapFocusNodeTrigger = null
+            mapTapSetStartNodeTrigger = null
+            mapTapSetDestNodeTrigger = null
+            onIndoorOutdoorRouteRequested(
+                IndoorOutdoorRouteRequest(
+                    startNode = indoorOrigin,
+                    destinationNode = indoorDestination,
+                )
+            )
+            indoorBuildingCode = null
+            return@LaunchedEffect
+        }
+
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute
+        if (step == null) {
+            return@LaunchedEffect
+        }
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
         runCatching {
             repo.getRoute(
@@ -259,6 +492,7 @@ fun MapScreen(
                 )
             )
         }.onSuccess { route ->
+            if (requestGeneration != routeRequestGeneration) return@onSuccess
             withContext(Dispatchers.Main) {
                 routePolylineRef?.remove()
                 routePolylineRef = googleMap?.addPolyline(
@@ -290,6 +524,56 @@ fun MapScreen(
                 ),
             )
         }.onFailure { e ->
+            if (requestGeneration != routeRequestGeneration) return@onFailure
+            if (isIndoorOutdoorFlow) {
+                val fallbackRoute = runCatching {
+                    repo.getRoute(
+                        RouteRequest(
+                            origin = defaultOrigin,
+                            destination = step.destination,
+                            mode = TravelMode.DRIVE,
+                        )
+                    )
+                }.getOrNull()
+
+                if (fallbackRoute != null) {
+                    if (requestGeneration != routeRequestGeneration) return@onFailure
+                    withContext(Dispatchers.Main) {
+                        routePolylineRef?.remove()
+                        routePolylineRef = googleMap?.addPolyline(
+                            PolylineOptions()
+                                .addAll(fallbackRoute.points)
+                                .color(0xFF1565C0.toInt())
+                                .width(12f)
+                        )
+                    }
+
+                    val destinationCode = step.buildingHit?.id ?: destinationBuilding?.buildingCode ?: "destination"
+                    legLabels = buildList {
+                        addAll(legLabels)
+                        add("Fallback outdoor leg: Current location → $destinationCode")
+                    }
+                    val prefix = if (indoorOutdoorFallbackParts.isNotEmpty()) {
+                        "${indoorOutdoorFallbackParts.joinToString(". ")}. "
+                    } else {
+                        ""
+                    }
+                    legFallbackMessage = prefix + "Primary outdoor leg failed. Showing fallback route to destination building."
+
+                    directionsUiState = directionsUiState.copy(
+                        isLoadingRoute = false,
+                        errorMessage = null,
+                        step = DirectionsStep.ShowingRoute(
+                            origin = defaultOrigin,
+                            destination = step.destination,
+                            buildingHit = step.buildingHit,
+                            route = fallbackRoute,
+                        ),
+                    )
+                    return@onFailure
+                }
+            }
+
             // Check if this is a cross-campus route and provide helpful error message
             val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
             val errorMsg = if (isCrossCampus) {
@@ -305,29 +589,101 @@ fun MapScreen(
         }
     }
 
-// Re-show bottom cards whenever the relevant step is entered fresh
-    LaunchedEffect(directionsUiState.step) {
-        when (directionsUiState.step) {
-            is DirectionsStep.PlanRoute     -> showRouteOptionsCard = true
-            is DirectionsStep.ShowingRoute  -> showDirectionsReadyCard = false
-            else -> {}
-        }
-    }
-
 // Handle Cancel from top bar
     LaunchedEffect(directionsCancelTrigger) {
         if (directionsCancelTrigger == 0) return@LaunchedEffect
+        suppressIndoorStateUpdates = true
+        routeRequestGeneration++
         routePolylineRef?.remove()
         routePolylineRef = null
+        onIndoorTriggerConsumed()
+        onIndoorOverlayChanged(null)
+        onIndoorTopCardActiveChanged(false)
+        onIndoorTopCardactiveChanged(false)
+        indoorBuildingCode = null
+        selectedBuildingInfo = null
+        indoorDirectionsState = null
+        latestIndoorOriginNode = null
+        latestIndoorDestinationNode = null
+        isIndoorOutdoorFlow = false
+        indoorOutdoorFallbackParts = emptyList()
+        indoorFlowStartNode = null
+        indoorFlowStartAccessNode = null
+        indoorFlowEndAccessNode = null
+        indoorFlowEndNode = null
+        mapTapFocusNodeTrigger = null
+        mapTapSetStartNodeTrigger = null
+        mapTapSetDestNodeTrigger = null
+        legLabels = emptyList()
+        legFallbackMessage = null
+        topBarOriginOverride = null
+        topBarDestinationOverride = null
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
             errorMessage = null,
         )
-        destSuggestions = emptyList()
     }
 
 // Publish top-bar state to MainActivity whenever directions state changes
-    LaunchedEffect(directionsUiState, travelMode, originBuilding, destinationBuilding, originDisplayName) {
+    LaunchedEffect(
+        directionsUiState,
+        travelMode,
+        originBuilding,
+        destinationBuilding,
+        originDisplayName,
+        legLabels,
+        legFallbackMessage,
+        topBarOriginOverride,
+        topBarDestinationOverride,
+        indoorBuildingCode,
+        indoorDirectionsState,
+    ) {
+        val indoorOriginNode = indoorDirectionsState?.indoorOriginNode
+        val indoorDestinationNode = indoorDirectionsState?.indoorDestinationNode
+        val hasCrossBuildingIndoorSelection =
+            indoorOriginNode != null &&
+                    indoorDestinationNode != null &&
+                    !indoorOriginNode.buildingCode.equals(indoorDestinationNode.buildingCode, ignoreCase = true)
+
+        if (indoorBuildingCode != null) {
+            val isRouteInProgress =
+                (isIndoorOutdoorFlow && hasCrossBuildingIndoorSelection && directionsUiState.step is DirectionsStep.ShowingRoute) ||
+                        (indoorDirectionsState?.routeSummary != null && hasCrossBuildingIndoorSelection)
+
+            if (isRouteInProgress) {
+                onDirectionsTopBarState(DirectionsTopBarState(active = false))
+                return@LaunchedEffect
+            }
+
+            val indoorState = indoorDirectionsState
+            if (indoorState != null) {
+                onDirectionsTopBarState(indoorState)
+            } else {
+                onDirectionsTopBarState(
+                    DirectionsTopBarState(
+                        active = false,
+                        originLabel = "Tap a room to set start",
+                        destinationLabel = "Tap a room to set destination",
+                        showActions = true,
+                        goEnabled = false,
+                        showTravelModes = true,
+                        goLabel = "Go",
+                        cancelLabel = "Cancel",
+                    )
+                )
+            }
+            return@LaunchedEffect
+        }
+
+        if (
+            indoorDirectionsState != null &&
+            directionsUiState.step is DirectionsStep.PickDestination &&
+            hasCrossBuildingIndoorSelection
+        ) {
+            onDirectionsTopBarState(indoorDirectionsState!!.copy(active = true))
+            return@LaunchedEffect
+        }
+
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
@@ -336,13 +692,19 @@ fun MapScreen(
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
                         active = true,
-                        originLabel = originDisplayName ?: "Your location",
-                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        originLabel = topBarOriginOverride ?: (originDisplayName ?: "Your location"),
+                        destinationLabel = topBarDestinationOverride ?: buildingTitle(step.buildingHit, step.destination),
                         isCrossCampus = isCrossCampus,
                         selectedMode = travelMode,
                         errorMessage = directionsUiState.errorMessage,
+                        legLabels = legLabels,
+                        legFallbackMessage = legFallbackMessage,
                         isLoadingRoute = directionsUiState.isLoadingRoute,
                         showActions = true,
+                        goEnabled = true,
+                        showTravelModes = true,
+                        goLabel = "Go",
+                        cancelLabel = "Cancel",
                     )
                 )
             }
@@ -353,24 +715,63 @@ fun MapScreen(
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
                         active = true,
-                        originLabel = originDisplayName ?: "Your location",
-                        destinationLabel = buildingTitle(step.buildingHit, step.destination),
+                        originLabel = topBarOriginOverride ?: (originDisplayName ?: "Your location"),
+                        destinationLabel = topBarDestinationOverride ?: buildingTitle(step.buildingHit, step.destination),
                         isCrossCampus = isCrossCampus,
                         selectedMode = travelMode,
                         routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
+                        legLabels = legLabels,
+                        legFallbackMessage = legFallbackMessage,
                         showActions = false,
-                        currentSteps = step.route.legs.firstOrNull()
+                        currentSteps = step.route.legs.firstOrNull(),
+                        goEnabled = true,
+                        showTravelModes = true,
+                        goLabel = "Go",
+                        cancelLabel = "Cancel",
                     )
                 )
             }
             else -> {
-                onDirectionsTopBarState(DirectionsTopBarState(active = false))
+                val keepActive = legLabels.isNotEmpty() || !legFallbackMessage.isNullOrBlank()
+                onDirectionsTopBarState(
+                    if (keepActive) {
+                        DirectionsTopBarState(
+                            active = true,
+                            originLabel = topBarOriginOverride ?: "Your location",
+                            destinationLabel = topBarDestinationOverride ?: "Destination",
+                            selectedMode = travelMode,
+                            errorMessage = directionsUiState.errorMessage,
+                            legLabels = legLabels,
+                            legFallbackMessage = legFallbackMessage,
+                            showActions = false,
+                            goEnabled = true,
+                            showTravelModes = true,
+                            goLabel = "Go",
+                            cancelLabel = "Cancel",
+                        )
+                    } else {
+                        DirectionsTopBarState(active = false)
+                    }
+                )
             }
         }
     }
 
     LaunchedEffect(topBarSelectedBuilding) {
         val building = topBarSelectedBuilding ?: return@LaunchedEffect
+        isIndoorOutdoorFlow = false
+        indoorOutdoorFallbackParts = emptyList()
+        indoorFlowStartNode = null
+        indoorFlowStartAccessNode = null
+        indoorFlowEndAccessNode = null
+        indoorFlowEndNode = null
+        mapTapFocusNodeTrigger = null
+        mapTapSetStartNodeTrigger = null
+        mapTapSetDestNodeTrigger = null
+        legLabels = emptyList()
+        legFallbackMessage = null
+        topBarOriginOverride = null
+        topBarDestinationOverride = null
         val latLng = resolveBuildingLatLng(building)
 
         // Drop pin on the building
@@ -400,6 +801,57 @@ fun MapScreen(
             )
         )
         onTopBarBuildingConsumed()
+    }
+
+    LaunchedEffect(topBarDirectionsDestinationBuilding) {
+        val building = topBarDirectionsDestinationBuilding ?: return@LaunchedEffect
+        val latLng = resolveBuildingLatLng(building)
+
+        destinationBuilding = building
+        val hit = BuildingHit(
+            id = building.buildingCode,
+            properties = JSONObject().apply {
+                put("building-code", building.buildingCode)
+                put("building-name", building.buildingName)
+                put("address", building.address)
+            }
+        )
+
+        when (val step = directionsUiState.step) {
+            is DirectionsStep.PlanRoute -> {
+                directionsUiState = directionsUiState.copy(
+                    errorMessage = null,
+                    step = step.copy(
+                        destination = latLng,
+                        buildingHit = hit,
+                    )
+                )
+            }
+            is DirectionsStep.ShowingRoute -> {
+                routePolylineRef?.remove()
+                routePolylineRef = null
+                directionsUiState = directionsUiState.copy(
+                    errorMessage = null,
+                    step = DirectionsStep.PlanRoute(
+                        origin = step.origin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    ),
+                )
+            }
+            else -> {
+                directionsUiState = directionsUiState.copy(
+                    errorMessage = null,
+                    step = DirectionsStep.PlanRoute(
+                        origin = defaultOrigin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    ),
+                )
+            }
+        }
+
+        onTopBarDirectionsDestinationConsumed()
     }
 
     // Get user location for default origin
@@ -560,61 +1012,53 @@ fun MapScreen(
                     Campus.LOYOLA -> LatLng(45.4582, -73.6402)
                 }
 
-                when (campus) {
-                    Campus.SGW -> loyOverlay?.setBuildingsVisible(false)
-                    Campus.LOYOLA -> sgwOverlay?.setBuildingsVisible(false)
-                }
-
                 map.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(targetLocation, CAMPUS_ZOOM_LEVEL),
                     CAMERA_ANIMATION_DURATION_MS,
                     null
                 )
 
-                val targetAttached = when (campus) {
-                    Campus.SGW -> sgwAttached
-                    Campus.LOYOLA -> loyAttached
-                }
-
-                if (targetAttached) {
-                    when (campus) {
-                        Campus.SGW -> sgwOverlay?.setBuildingsVisible(true)
-                        Campus.LOYOLA -> loyOverlay?.setBuildingsVisible(true)
+                suspend fun ensureOverlayAttached(c: Campus) {
+                    val alreadyAttached = when (c) {
+                        Campus.SGW -> sgwAttached
+                        Campus.LOYOLA -> loyAttached
                     }
-                } else {
-                    launch(Dispatchers.IO) {
-                        val json = loadGeoJson(
+                    if (alreadyAttached) return
+
+                    val json = withContext(Dispatchers.IO) {
+                        loadGeoJson(
                             context,
-                            when (campus) {
+                            when (c) {
                                 Campus.SGW -> R.raw.sgw_buildings
                                 Campus.LOYOLA -> R.raw.loy_buildings
                             }
                         )
+                    }
 
-                        when (campus) {
-                            Campus.SGW -> sgwOverlay?.attachToMapAsync(map, json)
-                            Campus.LOYOLA -> loyOverlay?.attachToMapAsync(map, json)
+                    when (c) {
+                        Campus.SGW -> sgwOverlay?.attachToMapAsync(map, json)
+                        Campus.LOYOLA -> loyOverlay?.attachToMapAsync(map, json)
+                    }
+
+                    when (c) {
+                        Campus.SGW -> {
+                            sgwAttached = true
+                            sgwOverlay?.setAllStyles(defaultOverlayStyle)
+                            sgwOverlay?.setMarkersVisible(false)
                         }
-
-                        withContext(Dispatchers.Main) {
-                            when (campus) {
-                                Campus.SGW -> {
-                                    sgwAttached = true
-                                    sgwOverlay?.setAllStyles(defaultOverlayStyle)
-                                    sgwOverlay?.setMarkersVisible(false)
-                                }
-                                Campus.LOYOLA -> {
-                                    loyAttached = true
-                                    loyOverlay?.setAllStyles(defaultOverlayStyle)
-                                    loyOverlay?.setMarkersVisible(false)
-                                }
-                            }
-                            val current = getSavedCampus(context)
-                            sgwOverlay?.setBuildingsVisible(current == Campus.SGW)
-                            loyOverlay?.setBuildingsVisible(current == Campus.LOYOLA)
+                        Campus.LOYOLA -> {
+                            loyAttached = true
+                            loyOverlay?.setAllStyles(defaultOverlayStyle)
+                            loyOverlay?.setMarkersVisible(false)
                         }
                     }
                 }
+
+                ensureOverlayAttached(Campus.SGW)
+                ensureOverlayAttached(Campus.LOYOLA)
+
+                sgwOverlay?.setBuildingsVisible(true)
+                loyOverlay?.setBuildingsVisible(true)
             }
         }
     }
@@ -742,13 +1186,13 @@ fun MapScreen(
 
                         // Set up polygon click listener
                         map.setOnPolygonClickListener { polygon ->
-                            val currentCampus = getSavedCampus(ctx)
-                            val activeOverlay = when (currentCampus) {
-                                Campus.SGW -> sgwOverlay
-                                Campus.LOYOLA -> loyOverlay
-                            }
+                            val overlayAndFeature = listOfNotNull(sgwOverlay, loyOverlay)
+                                .firstNotNullOfOrNull { overlay ->
+                                    overlay.getPolygonId(polygon)?.let { featureId -> overlay to featureId }
+                                } ?: return@setOnPolygonClickListener
 
-                            val featureId = activeOverlay?.getPolygonId(polygon) ?: return@setOnPolygonClickListener
+                            val activeOverlay = overlayAndFeature.first
+                            val featureId = overlayAndFeature.second
                             val props = activeOverlay.getBuildingProps()[featureId] ?: return@setOnPolygonClickListener
                             val buildingInfo = BuildingInfo.fromJson(props)
 
@@ -767,10 +1211,50 @@ fun MapScreen(
                                             errorMessage = null
                                         )
                                         isPickingOrigin = false
+                                    } else {
+                                        selectedBuildingInfo = buildingInfo
+                                        selectedBuildingLatLng = latLng
                                     }
                                 }
                                 is DirectionsStep.ShowingRoute -> {
-                                    // ignore taps while showing route
+                                    selectedBuildingInfo = null
+                                    val tappedBuildingCode = buildingInfo?.buildingCode
+
+                                    // Clear indoor directions state BEFORE opening new building
+                                    // to prevent merge logic from resurrecting stale destination nodes
+                                    indoorDirectionsState = null
+                                    indoorBuildingCode = tappedBuildingCode
+
+                                    mapTapFocusNodeTrigger = null
+                                    mapTapSetStartNodeTrigger = null
+                                    mapTapSetDestNodeTrigger = null
+
+                                    if (isIndoorOutdoorFlow && tappedBuildingCode != null) {
+                                        val isStartBuilding = tappedBuildingCode.equals(indoorFlowStartNode?.buildingCode, ignoreCase = true)
+                                        val isEndBuilding = tappedBuildingCode.equals(indoorFlowEndNode?.buildingCode, ignoreCase = true)
+
+                                        when {
+                                            isStartBuilding && indoorFlowStartNode != null && indoorFlowStartAccessNode != null -> {
+                                                mapTapSetStartNodeTrigger = indoorFlowStartNode
+                                                mapTapSetDestNodeTrigger = indoorFlowStartAccessNode
+                                            }
+
+                                            isEndBuilding && indoorFlowEndAccessNode != null && indoorFlowEndNode != null -> {
+                                                mapTapSetStartNodeTrigger = indoorFlowEndAccessNode
+                                                mapTapSetDestNodeTrigger = indoorFlowEndNode
+                                            }
+
+                                            isStartBuilding && indoorFlowStartNode != null -> {
+                                                mapTapFocusNodeTrigger = indoorFlowStartNode
+                                            }
+
+                                            isEndBuilding && indoorFlowEndNode != null -> {
+                                                mapTapFocusNodeTrigger = indoorFlowEndNode
+                                            }
+                                        }
+
+                                        indoorTriggerVersion++
+                                    }
                                 }
                                 else -> {
                                     // PickDestination or ConfirmDestination: show bottom sheet
@@ -1026,6 +1510,12 @@ fun MapScreen(
                 buildingInfo = info,
                 onDismiss = { selectedBuildingInfo = null },
                 onDirectionsClick = {
+                    isIndoorOutdoorFlow = false
+                    indoorOutdoorFallbackParts = emptyList()
+                    legLabels = emptyList()
+                    legFallbackMessage = null
+                    topBarOriginOverride = null
+                    topBarDestinationOverride = null
                     val latLng = selectedBuildingLatLng ?: LatLng(45.4972, -73.5789)
 
                     // Find corresponding CampusBuilding for cross-campus detection
@@ -1051,6 +1541,8 @@ fun MapScreen(
                     selectedBuildingInfo = null
                 },
                 onExploreIndoors = {
+                    // Clear indoor directions state to prevent stale nodes from previous route
+                    indoorDirectionsState = null
                     indoorBuildingCode = info.buildingCode
                     selectedBuildingInfo = null
                 }
@@ -1071,8 +1563,40 @@ fun MapScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
 
-        // Indoor map overlay (US-5.1 - US-5.6)
+        // Indoor map overlay (US-5.1 – US-5.6)
         indoorBuildingCode?.let { code ->
+            val hasAnyMapTapPairTrigger =
+                mapTapSetStartNodeTrigger != null || mapTapSetDestNodeTrigger != null
+            val hasCompleteMapTapPairTrigger =
+                mapTapSetStartNodeTrigger != null && mapTapSetDestNodeTrigger != null
+            val hasIncompleteMapTapPairTrigger =
+                hasAnyMapTapPairTrigger && !hasCompleteMapTapPairTrigger
+
+            val effectiveFocusNode = mapTapFocusNodeTrigger ?: indoorSearchFocusNodeTrigger
+            val effectiveSetStartNode = if (hasCompleteMapTapPairTrigger) {
+                mapTapSetStartNodeTrigger
+            } else if (hasIncompleteMapTapPairTrigger) {
+                null
+            } else {
+                indoorSetStartTrigger
+            }
+            val effectiveSetDestNode = if (hasCompleteMapTapPairTrigger) {
+                mapTapSetDestNodeTrigger
+            } else if (hasIncompleteMapTapPairTrigger) {
+                null
+            } else {
+                indoorSetDestTrigger
+            }
+
+            val consumeMapTapTriggers =
+                mapTapFocusNodeTrigger != null ||
+                        hasCompleteMapTapPairTrigger
+            val consumeTopBarTriggers =
+                (mapTapFocusNodeTrigger == null && indoorSearchFocusNodeTrigger != null) ||
+                        (!hasCompleteMapTapPairTrigger &&
+                                !hasIncompleteMapTapPairTrigger &&
+                                (indoorSetStartTrigger != null || indoorSetDestTrigger != null))
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -1081,221 +1605,72 @@ fun MapScreen(
                 IndoorMapScreen(
                     buildingCode = code,
                     // Respond to top search actions while indoors are open
-                    focusNode = indoorSearchFocusNodeTrigger,
-                    setStartNode = indoorSetStartTrigger,
-                    setDestNode = indoorSetDestTrigger,
+                    focusNode = effectiveFocusNode,
+                    setStartNode = effectiveSetStartNode,
+                    setDestNode = effectiveSetDestNode,
+                    resetVersion = directionsCancelTrigger,
+                    triggerVersion = indoorTriggerVersion,
+                    hasExistingDestinationSelection = hasExistingDestinationSelection,
+                    goTrigger = directionsGoTrigger,
+                    clearTrigger = directionsCancelTrigger,
+                    onDirectionsTopBarState = { state ->
+                        if (!suppressIndoorStateUpdates) {
+                            if (state.active) {
+                                val previous = indoorDirectionsState
+                                indoorDirectionsState = if (previous != null) {
+                                    val mergedOriginNode = state.indoorOriginNode ?: previous.indoorOriginNode
+                                    val mergedDestinationNode = state.indoorDestinationNode ?: previous.indoorDestinationNode
+                                    state.copy(
+                                        originLabel = if (state.indoorOriginNode == null && previous.indoorOriginNode != null) {
+                                            previous.originLabel
+                                        } else {
+                                            state.originLabel
+                                        },
+                                        destinationLabel = if (state.indoorDestinationNode == null && previous.indoorDestinationNode != null) {
+                                            previous.destinationLabel
+                                        } else {
+                                            state.destinationLabel
+                                        },
+                                        indoorOriginNode = mergedOriginNode,
+                                        indoorDestinationNode = mergedDestinationNode,
+                                        goEnabled = state.goEnabled || (mergedOriginNode != null && mergedDestinationNode != null),
+                                        showTravelModes = false,
+                                    )
+                                } else {
+                                    state.copy(showTravelModes = false)
+                                }
+                            } else if (indoorDirectionsState == null) {
+                                indoorDirectionsState = state
+                            }
+                        }
+                    },
                     onTopCardActiveChanged = { active ->
                         onIndoorTopCardActiveChanged(active)
                         onIndoorTopCardactiveChanged(active)
                     },
-                    onTriggersConsumed = onIndoorTriggerConsumed,
-                    onClose = { indoorBuildingCode = null }
-                )
-            }
-        }
-
-        // Directions overlay
-        when (val step = directionsUiState.step) {
-            is DirectionsStep.PickDestination -> {
-                // Normal map mode, nothing extra
-            }
-            is DirectionsStep.ConfirmDestination -> {
-                // Shouldn't normally reach here since we go straight to PlanRoute
-            }
-            is DirectionsStep.PlanRoute -> if (showRouteOptionsCard) BottomCard(onDismiss = {
-                // X just hides the card — route state and top bar remain intact
-                showRouteOptionsCard = false
-            }) {
-                Text(
-                    text = "Route options",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-
-                BuildingAutocompleteField(
-                    label         = "To:",
-                    value         = buildingTitle(step.buildingHit, step.destination),
-                    suggestions   = destSuggestions,
-                    placeholder   = "Building name or code…",
-                    enabled       = !directionsUiState.isLoadingRoute,
-                    testTag       = "destination_building_field",
-                    onQueryChange = { query ->
-                        destSuggestions = buildingSuggestions(
-                            query        = query,
-                            activeCampus = selectedCampus,
-                            crossCampus  = true,  // Always allow cross-campus (US-2.5 AC4)
-                        )
+                    onCrossBuildingRouteRequested = { request ->
+                        onIndoorOutdoorRouteRequested(request)
                     },
-                    onSelected = { building ->
-                        val latLng = resolveBuildingLatLng(building)
-                        destSuggestions = emptyList()
-                        destinationBuilding = building  // Track for cross-campus detection
-                        val hit = BuildingHit(
-                            id = building.buildingCode,
-                            properties = JSONObject().apply {
-                                put("building-code", building.buildingCode)
-                                put("building-name", building.buildingName)
-                                put("address",       building.address)
-                            },
-                        )
-                        directionsUiState = directionsUiState.copy(
-                            step = step.copy(
-                                destination = latLng,
-                                buildingHit = hit,
-                            ),
-                        )
-                    },
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                // Cross-campus routing is always enabled (US-2.5 AC4)
-                // No toggle needed - users can select any building from any campus
-
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled  = !directionsUiState.isLoadingRoute,
-                    onClick  = {
-                        directionsUiState = directionsUiState.copy(
-                            isLoadingRoute = true,
-                            errorMessage   = null,
-                        )
-                        scope.launch {
-                            runCatching {
-                                repo.getRoute(
-                                    RouteRequest(
-                                        origin      = step.origin,
-                                        destination = step.destination,
-                                        mode  = travelMode,
-                                    )
-                                )
-                            }.onSuccess { route ->
-                                val map = googleMap
-                                if (map != null) {
-                                    routePolylineRef?.remove()
-                                    routePolylineRef = map.addPolyline(
-                                        PolylineOptions()
-                                            .addAll(route.points)
-                                            .color(0xFF1565C0.toInt())
-                                            .width(12f)
-                                    )
-                                }
-                                directionsUiState = directionsUiState.copy(
-                                    isLoadingRoute = false,
-                                    step = DirectionsStep.ShowingRoute(
-                                        origin      = step.origin,
-                                        destination = step.destination,
-                                        buildingHit = step.buildingHit,
-                                        route       = route,
-                                    ),
-                                )
-                            }.onFailure { e ->
-                                directionsUiState = directionsUiState.copy(
-                                    isLoadingRoute = false,
-                                    errorMessage   = e.message ?: "Failed to get route",
-                                )
-                            }
+                    onTriggersConsumed = {
+                        if (consumeMapTapTriggers) {
+                            mapTapFocusNodeTrigger = null
+                            mapTapSetStartNodeTrigger = null
+                            mapTapSetDestNodeTrigger = null
+                        }
+                        if (consumeTopBarTriggers) {
+                            onIndoorTriggerConsumed()
                         }
                     },
-                ) {
-                    Text(if (directionsUiState.isLoadingRoute) "Loading…" else "Go")
-                }
-
-                directionsUiState.errorMessage?.let {
-                    Spacer(Modifier.height(8.dp))
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
-                }
-            }
-
-            is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
-                // X just hides the card — route and top bar remain intact
-                showDirectionsReadyCard = false
-            }) {
-                Text(
-                    text = "Directions ready",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
+                    onClose = {
+                        indoorBuildingCode = null
+                    }
                 )
-
-                Spacer(Modifier.height(8.dp))
-                Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
-                Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
-
-                // Display duration and distance if available
-                step.route.durationSeconds?.let { seconds ->
-                    val minutes = seconds / 60
-                    val displayTime = if (minutes < 60) {
-                        "$minutes min"
-                    } else {
-                        val hours = minutes / 60
-                        val remainingMins = minutes % 60
-                        "${hours}h ${remainingMins}min"
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Duration: $displayTime",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                step.route.distanceMeters?.let { meters ->
-                    val displayDistance = if (meters < 1000) {
-                        "$meters m"
-                    } else {
-                        val km = meters / 1000.0
-                        String.format(java.util.Locale.US, "%.1f km", km)
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = "Distance: $displayDistance",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        directionsUiState = directionsUiState.copy(
-                            step = DirectionsStep.PlanRoute(
-                                origin = step.origin,
-                                destination = step.destination,
-                                buildingHit = step.buildingHit
-                            )
-                        )
-                    }
-                ) {
-                    Text("Edit")
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        routePolylineRef?.remove()
-                        routePolylineRef = null
-                        directionsUiState = directionsUiState.copy(
-                            step = DirectionsStep.PickDestination,
-                            errorMessage = null
-                        )
-                    }
-                ) {
-                    Text("Clear")
-                }
             }
-
         }
+
+        // Single-card UX: top DirectionsTopBar only.
     }
 }
-
-// BottomCard is shared (see ui/components/BottomCard.kt)
 
 private fun buildingTitle(
     hit: BuildingHit?,

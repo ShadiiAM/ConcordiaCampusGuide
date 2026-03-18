@@ -6,7 +6,7 @@
   "imageName": "hall_floor_1.png",
   "nodes": [
     {
-      "id": "H-1-H-ENTRY-MAIN",
+      "id": "H-1-ENTRY-MAIN",
       "label": "MAIN ENTRY",
       "x": 839.56,
       "y": 2726.44,
@@ -109,7 +109,7 @@
   "edges": [
     {
       "fromId": "H-1-H2",
-      "toId": "H-1-H-ENTRY-MAIN",
+      "toId": "H-1-ENTRY-MAIN",
       "weight": 282.2,
       "isAccessible": true
     },

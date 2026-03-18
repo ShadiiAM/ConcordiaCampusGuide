@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.ui.components.BottomCard
-import com.example.campusguide.ui.components.DirectionsTopBar
+import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.indoor.IndoorFloorGraph
 import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.indoor.IndoorNodeType
@@ -82,17 +82,23 @@ fun IndoorMapScreen(
     focusNode: com.example.campusguide.indoor.IndoorNode? = null,
     setStartNode: com.example.campusguide.indoor.IndoorNode? = null,
     setDestNode: com.example.campusguide.indoor.IndoorNode? = null,
+    resetVersion: Int = 0,
+    triggerVersion: Int = 0,
+    hasExistingDestinationSelection: Boolean = false,
+    goTrigger: Int = 0,
+    clearTrigger: Int = 0,
+    onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     onTopCardActiveChanged: (Boolean) -> Unit = {},
+    onCrossBuildingRouteRequested: (IndoorOutdoorRouteRequest) -> Unit = {},
     onTriggersConsumed: () -> Unit = {},
     onClose: () -> Unit = {},
-    viewModel: IndoorNavigationViewModel = viewModel()
+    providedViewModel: IndoorNavigationViewModel? = null,
 ) {
+    val clearVersion = maxOf(resetVersion, clearTrigger)
+    val viewModel = providedViewModel ?: viewModel<IndoorNavigationViewModel>(
+        key = "indoor-nav-$clearVersion",
+    )
     val accessibilityState = LocalAccessibilityState.current
-
-    // Open the requested building once
-    LaunchedEffect(buildingCode) {
-        viewModel.openBuilding(buildingCode)
-    }
 
     LaunchedEffect(accessibilityState.avoidStairs, accessibilityState.avoidEscalators) {
         viewModel.setRoutingPreferences(
@@ -117,26 +123,47 @@ fun IndoorMapScreen(
     var topCardEditMode by remember { mutableStateOf<SelectionMode?>(null) }
     var topCardQuery by remember { mutableStateOf("") }
 
+    LaunchedEffect(resetVersion, clearTrigger) {
+        if (viewModel.consumeClearTrigger(clearVersion)) {
+            selectionMode = SelectionMode.ORIGIN
+            topCardEditMode = null
+            topCardQuery = ""
+        }
+    }
+
     // Tapped-node info bottom sheet
     var infoNode by remember { mutableStateOf<IndoorNode?>(null) }
 
-    // React to top-search actions while indoors are open.
-    LaunchedEffect(focusNode, setStartNode, setDestNode) {
-        when {
-            focusNode != null -> viewModel.focusNode(focusNode)
-            setStartNode != null -> {
-                viewModel.focusNode(setStartNode)
-                viewModel.selectOrigin(setStartNode)
-                topCardEditMode = null
-            }
-            setDestNode != null -> {
-                viewModel.focusNode(setDestNode)
-                viewModel.selectDestination(setDestNode)
-                // Destination-first flow: next prompt should ask for start.
-                selectionMode = SelectionMode.ORIGIN
-                topCardEditMode = null
-            }
+    // Keep building state stable across overlay open/close and apply incoming triggers atomically.
+    LaunchedEffect(buildingCode, focusNode, setStartNode, setDestNode, triggerVersion) {
+        val requestedBuilding = buildingCode.uppercase()
+        if (viewModel.buildingCode != requestedBuilding) {
+            viewModel.openBuilding(requestedBuilding)
         }
+
+        if (setStartNode != null && setDestNode != null) {
+            viewModel.selectOrigin(setStartNode)
+            viewModel.selectDestination(setDestNode)
+            viewModel.focusNode(setDestNode)
+            if (viewModel.canRoute) {
+                viewModel.computePath()
+            }
+            topCardEditMode = null
+            selectionMode = SelectionMode.ORIGIN
+        } else if (focusNode != null) {
+            viewModel.focusNode(focusNode)
+        } else if (setStartNode != null) {
+            viewModel.focusNode(setStartNode)
+            viewModel.selectOrigin(setStartNode)
+            topCardEditMode = null
+        } else if (setDestNode != null) {
+            viewModel.focusNode(setDestNode)
+            viewModel.selectDestination(setDestNode)
+            // Destination-first flow: next prompt should ask for start.
+            selectionMode = SelectionMode.ORIGIN
+            topCardEditMode = null
+        }
+
         if (focusNode != null || setStartNode != null || setDestNode != null) {
             onTriggersConsumed()
         }
@@ -151,14 +178,63 @@ fun IndoorMapScreen(
         }
     }
 
-    val inlineSuggestions = remember(topCardQuery, graph?.buildingCode, buildingCode) {
+    LaunchedEffect(goTrigger) {
+        if (goTrigger == 0) return@LaunchedEffect
+        if (viewModel.canRoute) {
+            viewModel.computePath()
+        }
+    }
+
+    LaunchedEffect(originNode, destNode, navState, viewModel.canRoute) {
+        val hasComputedRoute = navState is IndoorNavState.SameFloor || navState is IndoorNavState.CrossFloor
+        val error = when (navState) {
+            IndoorNavState.NoPath -> "No path found — try disabling accessibility filter"
+            is IndoorNavState.NoAccessiblePath -> {
+                if (navState.hasNonAccessibleAlternative) {
+                    "Accessible route not available. Disable accessibility toggles to view a non-accessible route."
+                } else {
+                    "Accessible route not available."
+                }
+            }
+            else -> null
+        }
+
+        val summary = when (navState) {
+            is IndoorNavState.SameFloor -> {
+                val n = navState.path.nodes.size
+                "Route found · $n step${if (n != 1) "s" else ""}"
+            }
+            is IndoorNavState.CrossFloor -> navState.result.floorChangeInstruction
+            else -> null
+        }
+
+        onDirectionsTopBarState(
+            DirectionsTopBarState(
+                active = topCardActive,
+                originLabel = formatIndoorTopCardLabel(originNode) ?: "Tap a room to set start",
+                destinationLabel = formatIndoorTopCardLabel(destNode) ?: "Tap a room to set destination",
+                routeSummary = summary,
+                errorMessage = error,
+                isLoadingRoute = false,
+                showActions = !hasComputedRoute,
+                currentSteps = null,
+                goEnabled = viewModel.canRoute,
+                showTravelModes = false,
+                goLabel = "Go",
+                cancelLabel = "Cancel",
+                indoorOriginNode = originNode,
+                indoorDestinationNode = destNode,
+            )
+        )
+    }
+
+    val inlineSuggestions = remember(topCardQuery) {
         if (topCardQuery.isBlank()) {
             emptyList()
         } else {
             IndoorRoomSearchService.search(
                 query = topCardQuery,
-                scope = IndoorRoomSearchService.Scope.Building,
-                buildingCode = graph?.buildingCode ?: buildingCode,
+                scope = IndoorRoomSearchService.Scope.Global,
                 limit = 8,
             )
         }
@@ -230,8 +306,13 @@ fun IndoorMapScreen(
                     onNodeTapped      = { node ->
                         // Default first map tap (before top card appears) sets destination.
                         if (!topCardActive) {
-                            viewModel.selectDestination(node)
-                            selectionMode = SelectionMode.ORIGIN
+                            if (hasExistingDestinationSelection) {
+                                viewModel.selectOrigin(node)
+                                selectionMode = SelectionMode.DESTINATION
+                            } else {
+                                viewModel.selectDestination(node)
+                                selectionMode = SelectionMode.ORIGIN
+                            }
                         } else {
                             when (selectionMode) {
                                 SelectionMode.ORIGIN -> {
@@ -250,124 +331,7 @@ fun IndoorMapScreen(
             }
         }
 
-        // Only show the directions top bar when the user has started composing a route
-        // (i.e. origin or destination selected) or when a navigation result/state is active.
-        if (topCardActive) {
-            DirectionsTopBar(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-                    .statusBarsPadding(),
-                originLabel = formatIndoorTopCardLabel(originNode) ?: "Tap a room to set start",
-                destinationLabel = formatIndoorTopCardLabel(destNode) ?: "Tap a room to set destination",
-                showActions = true,
-                goEnabled = viewModel.canRoute,
-                showTravelModes = false,
-                goLabel = "Route",
-                cancelLabel = "Clear",
-                onGoClick = { if (viewModel.canRoute) viewModel.computePath() },
-                onCancelClick = {
-                    viewModel.clearSelection()
-                    viewModel.clearHighlight()
-                    selectionMode = SelectionMode.ORIGIN
-                    topCardEditMode = null
-                    topCardQuery = ""
-                },
-                onBackClick = {
-                    viewModel.clearSelection()
-                    viewModel.clearHighlight()
-                    selectionMode = SelectionMode.ORIGIN
-                    topCardEditMode = null
-                    topCardQuery = ""
-                },
-                onOriginClick = {
-                    selectionMode = SelectionMode.ORIGIN
-                    topCardEditMode = SelectionMode.ORIGIN
-                    topCardQuery = ""
-                },
-                onDestinationClick = {
-                    selectionMode = SelectionMode.DESTINATION
-                    topCardEditMode = SelectionMode.DESTINATION
-                    topCardQuery = ""
-                },
-                showCloseIcon = false,
-                extraContent = {
-                    val editMode = topCardEditMode
-                    if (editMode != null) {
-                        Spacer(Modifier.height(10.dp))
-                        OutlinedTextField(
-                            value = topCardQuery,
-                            onValueChange = { topCardQuery = it },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            label = {
-                                Text(
-                                    if (editMode == SelectionMode.ORIGIN)
-                                        "Search start classroom"
-                                    else
-                                        "Search destination classroom"
-                                )
-                            },
-                            placeholder = {
-                                Text(
-                                    if (editMode == SelectionMode.ORIGIN)
-                                        "e.g. H.937"
-                                    else
-                                        "e.g. H.831"
-                                )
-                            }
-                        )
-
-                        if (inlineSuggestions.isNotEmpty()) {
-                            Spacer(Modifier.height(6.dp))
-                            Surface(
-                                shape = RoundedCornerShape(12.dp),
-                                tonalElevation = 2.dp,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                LazyColumn(
-                                    modifier = Modifier.heightIn(max = 220.dp)
-                                ) {
-                                    items(inlineSuggestions) { suggestion ->
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    if (editMode == SelectionMode.ORIGIN) {
-                                                        viewModel.selectOrigin(suggestion.node)
-                                                    } else {
-                                                        viewModel.selectDestination(suggestion.node)
-                                                        // Destination-first flow should prompt for start next.
-                                                        selectionMode = SelectionMode.ORIGIN
-                                                    }
-                                                    viewModel.focusNode(suggestion.node)
-                                                    topCardEditMode = null
-                                                    topCardQuery = ""
-                                                }
-                                                .padding(horizontal = 12.dp, vertical = 10.dp)
-                                        ) {
-                                            Text(
-                                                text = suggestion.primaryLabel,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                fontWeight = FontWeight.Medium,
-                                            )
-                                            Text(
-                                                text = "${suggestion.typeLabel} · ${suggestion.locationLabel}",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-            )
-        }
-
-        // Route card overlays above the map + bottom bar, like the main map cards.
-        // Removed in favor of DirectionsTopBar controls.
+        // Single directions card is provided by MainActivity/MapScreen.
     }
 
     infoNode?.let { node ->

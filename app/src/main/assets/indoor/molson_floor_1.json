@@ -4,6 +4,98 @@
   "imageWidth": 1024,
   "imageHeight": 1024,
   "imageName": "molson_floor_1.png",
-  "nodes": [],
-  "edges": []
+  "nodes": [
+    {
+      "id": "MB-1-MB3",
+      "label": "HALLWAY-JUNCTION",
+      "x": 495.47,
+      "y": 142.75,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    },
+    {
+      "id": "MB-1-MB4",
+      "label": "HALLWAY-JUNCTION",
+      "x": 492.79,
+      "y": 326.64,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    },
+    {
+      "id": "MB-1-MB5",
+      "label": "HALLWAY-JUNCTION",
+      "x": 482.08,
+      "y": 597.11,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    },
+    {
+      "id": "MB-1-MB6",
+      "label": "HALLWAY-JUNCTION",
+      "x": 636.5,
+      "y": 606.04,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    },
+    {
+      "id": "MB-1-MAIN-ENTRY",
+      "label": "MAIN-ENTRY",
+      "x": 439.23,
+      "y": 125.79,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    },
+    {
+      "id": "MB-1-102",
+      "label": "ROOM",
+      "x": 643.64,
+      "y": 561.4,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "MB",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "MB-1-MB3",
+      "toId": "MB-1-MAIN-ENTRY",
+      "weight": 58.74,
+      "isAccessible": true
+    },
+    {
+      "fromId": "MB-1-MB3",
+      "toId": "MB-1-MB4",
+      "weight": 183.91,
+      "isAccessible": true
+    },
+    {
+      "fromId": "MB-1-MB4",
+      "toId": "MB-1-MB5",
+      "weight": 270.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "MB-1-MB6",
+      "toId": "MB-1-MB5",
+      "weight": 154.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "MB-1-MB6",
+      "toId": "MB-1-102",
+      "weight": 45.21,
+      "isAccessible": true
+    }
+  ]
 }

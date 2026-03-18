@@ -78,6 +78,8 @@ class IndoorNavigationViewModel : ViewModel() {
     var highlightedNode by mutableStateOf<IndoorNode?>(null)
         private set
 
+    private var lastHandledClearVersion by mutableIntStateOf(0)
+
     val canRoute: Boolean
         get() = originNode != null && destinationNode != null
 
@@ -137,6 +139,18 @@ class IndoorNavigationViewModel : ViewModel() {
         destinationNode = null
         navState = IndoorNavState.Idle
         // Keep highlight; callers can clear it explicitly.
+    }
+
+    /**
+     * Applies an external clear trigger exactly once per version.
+     * Returns true when a clear was applied.
+     */
+    fun consumeClearTrigger(version: Int): Boolean {
+        if (version == 0 || version == lastHandledClearVersion) return false
+        lastHandledClearVersion = version
+        clearSelection()
+        clearHighlight()
+        return true
     }
 
     fun swapOriginDestination() {

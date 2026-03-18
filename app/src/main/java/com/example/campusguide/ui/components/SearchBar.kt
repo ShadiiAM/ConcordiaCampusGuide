@@ -49,6 +49,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.example.campusguide.data.CampusBuilding
 import androidx.compose.foundation.lazy.items
 
@@ -226,6 +227,7 @@ fun SearchBarWithProfile(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
+                                            searchQuery = ""
                                             onIndoorResultSelected(suggestion)
                                         }
                                         .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -247,6 +249,22 @@ fun SearchBarWithProfile(
                                             style = MaterialTheme.typography.labelSmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+                                        Row(
+                                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            TextButton(onClick = {
+                                                searchQuery = ""
+                                                onIndoorSetAsStart(suggestion)
+                                            }) {
+                                                Text("Set as start")
+                                            }
+                                            TextButton(onClick = {
+                                                searchQuery = ""
+                                                onIndoorSetAsDestination(suggestion)
+                                            }) {
+                                                Text("Set as destination")
+                                            }
+                                        }
                                     }
                                 }
                             }
