@@ -6,41 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     jacoco
-    id("org.sonarqube")
-}
-
-sonar {
-    properties {
-        property("sonar.sources", "src/main/java")
-        property("sonar.tests", "src/test/java")
-        property("sonar.java.binaries", "build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-        // Exclude UI-only files that cannot be meaningfully unit tested:
-        // Compose screens, Compose components, Canvas/bitmap factories,
-        // accessibility overlays, theme definitions, and the Activity entry point.
-        // Exclude UI-only files from coverage: Compose screens/components/theme/accessibility
-        // cannot be exercised by JVM unit tests — they require the Android rendering pipeline.
-        property(
-            "sonar.coverage.exclusions",
-            listOf(
-                "**/ui/screens/**",
-                "**/ui/components/**",
-                "**/ui/accessibility/**",
-                "**/ui/theme/**",
-                "**/ui/map/**",
-                "**/MainActivity.kt",
-                // ShuttleMarkerFactory: Canvas/Paint/Android Context — untestable via JVM unit tests
-                "**/ShuttleMarkerFactory.kt"
-            ).joinToString(",")
-        )
-        // ShuttleMarkerFactory uses Canvas/Paint and requires Android Context — it has no
-        // business logic and is already exercised by E2E tests. Fully exclude from analysis
-        // so SonarQube does not count its lines against coverage.
-        property(
-            "sonar.exclusions",
-            "**/ShuttleMarkerFactory.kt"
-        )
-    }
 }
 
 android {
@@ -55,14 +20,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Default placeholder so processDebugUnitTestManifest never fails without local.properties.
+        // The Secrets plugin overrides this with the real value from local.properties for the app build.
+        manifestPlaceholders["MAPS_API_KEY"] = ""
     }
+
+    useLibrary("org.apache.http.legacy")
+
 
     buildTypes {
         debug {
             enableUnitTestCoverage = true
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -148,7 +120,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Theme definitions — pure styling constants, no logic to test
         "**/ui/theme/**",
         // Activity entry point — framework lifecycle, not unit testable
-        "**/MainActivity*"
+        "**/MainActivity*",
+        // Requires live network/API calls — not unit testable on JVM
+        "**/ui/directions/**"
     )
 
     val buildDir = layout.buildDirectory.get().asFile
@@ -197,6 +171,25 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         } else {
             println("✗ WARNING: JaCoCo XML report was NOT generated at expected location: ${xmlReport.absolutePath}")
         }
+    }
+}
+
+sonar {
+    properties {
+        // Source paths — absolute so the scanner resolves correctly regardless of working dir
+        property("sonar.sources", "${project.projectDir}/src/main/java")
+        property("sonar.tests", "${project.projectDir}/src/test/java")
+        property("sonar.java.binaries", "${project.projectDir}/build/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes")
+
+        // JaCoCo coverage
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+
+        // JUnit test results
+        property("sonar.junit.reportPaths", "${project.projectDir}/build/test-results/testDebugUnitTest")
+
+        // Android lint report
+        property("sonar.androidLint.reportPaths", "${project.projectDir}/build/reports/lint-results-debug.xml")
     }
 }
 
@@ -250,12 +243,46 @@ dependencies {
     androidTestImplementation("androidx.navigation:navigation-testing:2.7.7")
     androidTestImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
+    implementation(libs.androidx.material3)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    // Maps - PICK ONE version only
+    implementation(libs.play.services.maps)               // remove play.services.maps.v1820 duplicate
+    implementation(libs.play.services.location)           // remove play.services.location.v1750 duplicate
+    implementation("com.google.maps.android:maps-compose:4.4.1")  // remove 4.3.3 duplicate
+    implementation(libs.maps.utils.ktx)
+
+    // Network
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation(libs.androidx.uiautomator)
+
+    // Unit Tests
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.12.2")       // remove 4.11.1 duplicate
+    testImplementation("org.mockito:mockito-core:5.11.0")          // remove 5.8.0 duplicate
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.json:json:20240303")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+
+    // Instrumented (E2E) Tests - THIS is where your error comes from
+    androidTestImplementation("androidx.test:runner:1.6.1")        // ← was MISSING
+    androidTestImplementation("androidx.test:rules:1.6.1")         // ← move from implementation
+    androidTestImplementation("androidx.navigation:navigation-testing:2.7.7") // ← move from implementation
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
     // Debug
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

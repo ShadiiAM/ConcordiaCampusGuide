@@ -22,6 +22,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.ShuttleStop
+import androidx.compose.foundation.border
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun BuildingAutocompleteField(
@@ -34,6 +37,8 @@ fun BuildingAutocompleteField(
     placeholder: String = "Building name or code…",
     enabled: Boolean = true,
     testTag: String = "",
+    shuttleStops: List<com.example.campusguide.data.ShuttleStop> = emptyList(),
+    onShuttleStopSelected: (com.example.campusguide.data.ShuttleStop) -> Unit = {},
 ) {
     var query by remember(value) { mutableStateOf(value) }
     var isFocused by remember { mutableStateOf(false) }
@@ -152,6 +157,58 @@ fun BuildingAutocompleteField(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
+                            }
+                        }
+                        HorizontalDivider(thickness = 0.5.dp)
+                    }
+                }
+            }
+        }
+        if (shuttleStops.isNotEmpty()) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 48.dp)
+                    .heightIn(max = 230.dp),
+                shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp,
+                shadowElevation = 6.dp,
+            ) {
+                LazyColumn {
+                    items(shuttleStops, key = { it.id }) { stop ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    query = stop.name
+                                    onShuttleStopSelected(stop)
+                                    focusManager.clearFocus()
+                                }
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.border(
+                                    1.5.dp,
+                                    MaterialTheme.colorScheme.primary,
+                                    RoundedCornerShape(6.dp)
+                                )
+                            ) {
+                                Text(
+                                    text = "Shuttle",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                                )
+                            }
+                            Spacer(Modifier.width(10.dp))
+                            Column {
+                                Text(stop.name, style = MaterialTheme.typography.bodySmall)
+                                Text(stop.description, style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                         HorizontalDivider(thickness = 0.5.dp)

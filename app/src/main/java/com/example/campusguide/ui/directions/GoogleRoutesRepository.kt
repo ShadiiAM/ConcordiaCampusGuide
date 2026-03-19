@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -185,12 +186,17 @@ class GoogleRoutesRepository(
         }
     }
 
-    private fun Throwable.toUserFriendlyMessage(): String = when (this) {
+    private fun Throwable.toUserFriendlyMessage(): String = when(this) {
         is UnknownHostException ->
             "Unable to resolve host (DNS). Your emulator/device can’t reach Google right now. " +
-                "Check Wi‑Fi, Private DNS settings, VPN/firewall, or try a cold boot/wipe of the emulator."
+                    "Check Wi‑Fi, Private DNS settings, VPN/firewall, or try a cold boot/wipe of the emulator."
+
         is SocketTimeoutException ->
             "Network timed out while contacting Google. Check your internet/VPN/firewall and try again."
+
+        is SocketException ->
+            "Network error: unable to reach server. Check your connection."
+
         is IOException -> message ?: "Network error while calling Routes API."
         else -> message ?: "Unexpected error while calling Routes API."
     }
@@ -212,12 +218,13 @@ private data class Waypoint(
 )
 
 @Serializable
-private data class Location(
+data class Location(
+
     val latLng: LatLngLiteral,
 )
 
 @Serializable
-private data class LatLngLiteral(
+data class LatLngLiteral(
     val latitude: Double,
     val longitude: Double,
 )
@@ -228,7 +235,7 @@ private data class ComputeRoutesResponse(
 )
 
 @Serializable
-private data class Route(
+data class Route(
     val polyline: RoutePolyline? = null,
     val duration: String? = null,  // e.g., "123s"
     val distanceMeters: Int? = null,
@@ -236,20 +243,20 @@ private data class Route(
 )
 
 @Serializable
-private data class RoutePolyline(
+data class RoutePolyline(
     @SerialName("encodedPolyline")
     val encodedPolyline: String? = null,
 )
 
 @Serializable
-private data class ApiRouteLeg(
+data class ApiRouteLeg(
     val duration: String? = null,
     val distanceMeters: Int? = null,
     val steps: List<ApiRouteStep>? = null,
 )
 
 @Serializable
-private data class ApiRouteStep(
+data class ApiRouteStep(
     val distanceMeters: Int? = null,
     val staticDuration: String? = null,
     val navigationInstruction: NavigationInstruction? = null,
@@ -257,12 +264,12 @@ private data class ApiRouteStep(
 )
 
 @Serializable
-private data class NavigationInstruction(
+data class NavigationInstruction(
     val instructions: String? = null,
 )
 
 @Serializable
-private data class ApiTransitDetails(
+data class ApiTransitDetails(
     val stopDetails: ApiTransitStopDetails? = null,
     val localizedValues: ApiTransitLocalizedValues? = null,
     val headsign: String? = null,
@@ -271,30 +278,30 @@ private data class ApiTransitDetails(
 )
 
 @Serializable
-private data class ApiTransitStopDetails(
+data class ApiTransitStopDetails(
     val arrivalStop: ApiTransitStop? = null,
     val departureStop: ApiTransitStop? = null,
 )
 
 @Serializable
-private data class ApiTransitStop(
+data class ApiTransitStop(
     val name: String? = null,
     val location: Location? = null,
 )
 
 @Serializable
-private data class ApiTransitLocalizedValues(
+data class ApiTransitLocalizedValues(
     val arrivalTime: LocalizedText? = null,
     val departureTime: LocalizedText? = null,
 )
 
 @Serializable
-private data class LocalizedText(
+data class LocalizedText(
     val text: String? = null,
 )
 
 @Serializable
-private data class ApiTransitLine(
+data class ApiTransitLine(
     val name: String? = null,
     val shortName: String? = null,
     val color: String? = null,
@@ -302,7 +309,7 @@ private data class ApiTransitLine(
 )
 
 @Serializable
-private data class ApiTransitVehicle(
+data class ApiTransitVehicle(
     val name: String? = null,
     val type: String? = null,
 )

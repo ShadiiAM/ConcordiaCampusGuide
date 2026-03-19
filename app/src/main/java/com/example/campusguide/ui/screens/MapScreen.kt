@@ -41,7 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
@@ -95,6 +98,11 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.sp
+import com.example.campusguide.ui.directions.RouteResult
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -120,6 +128,12 @@ data class DirectionsTopBarState(
     val cancelLabel: String = "Cancel",
     val indoorOriginNode: IndoorNode? = null,
     val indoorDestinationNode: IndoorNode? = null,
+    val isPickingOrigin: Boolean = false,
+)
+
+data class ShuttleRouteResult(
+    val stop: ShuttleStop,
+    val route: RouteResult?,
 )
 @Composable
 fun MapScreen(
@@ -144,8 +158,12 @@ fun MapScreen(
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
+    originPickTrigger: Int = 0,
+    myLocationTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
-    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
+    shuttleShowBothStops: Boolean = false,
+    onShuttleShowBothStopsConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -182,7 +200,10 @@ fun MapScreen(
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
+    var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
+    var destShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
+    val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
     var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
@@ -260,6 +281,8 @@ fun MapScreen(
             indoorTriggerVersion++
         }
     }
+    var shuttleRouteResults by remember { mutableStateOf<List<ShuttleRouteResult>>(emptyList()) }
+    var showShuttleResultsCard by remember { mutableStateOf(false) }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -684,6 +707,31 @@ fun MapScreen(
             return@LaunchedEffect
         }
 
+        originSuggestions = emptyList()
+        destSuggestions = emptyList()
+        isPickingOrigin = false
+    }
+
+// Handle origin pick mode trigger from top bar
+    LaunchedEffect(originPickTrigger) {
+        if (originPickTrigger == 0) return@LaunchedEffect
+        isPickingOrigin = true
+    }
+
+// Handle "My Location" trigger from top bar
+    LaunchedEffect(myLocationTrigger) {
+        if (myLocationTrigger == 0) return@LaunchedEffect
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(
+            step = step.copy(origin = defaultOrigin)
+        )
+        originDisplayName = null
+        originBuilding = null
+        isPickingOrigin = false
+    }
+
+// Publish top-bar state to MainActivity whenever directions state changes
+    LaunchedEffect(directionsUiState, travelMode, originBuilding, destinationBuilding, originDisplayName, isPickingOrigin) {
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
@@ -705,6 +753,7 @@ fun MapScreen(
                         showTravelModes = true,
                         goLabel = "Go",
                         cancelLabel = "Cancel",
+                        isPickingOrigin = isPickingOrigin,
                     )
                 )
             }
@@ -801,6 +850,28 @@ fun MapScreen(
             )
         )
         onTopBarBuildingConsumed()
+    }
+    LaunchedEffect(shuttleShowBothStops) {
+        if (!shuttleShowBothStops) return@LaunchedEffect
+        val stops = shuttleTracker.getShuttleStops()
+        if (stops.isEmpty()) return@LaunchedEffect
+        val results = mutableListOf<ShuttleRouteResult>()
+        stops.forEach { stop ->
+            runCatching {
+                repo.getRoute(RouteRequest(
+                    origin = defaultOrigin,
+                    destination = stop.latLng,
+                    mode = travelMode,
+                ))
+            }.onSuccess { route ->
+                results.add(ShuttleRouteResult(stop, route))
+            }.onFailure {
+                results.add(ShuttleRouteResult(stop, null))
+            }
+        }
+        shuttleRouteResults = results
+        showShuttleResultsCard = true
+        onShuttleShowBothStopsConsumed()
     }
 
     LaunchedEffect(topBarDirectionsDestinationBuilding) {
@@ -1115,11 +1186,27 @@ fun MapScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()
+        .semantics {
+            stateDescription =
+                if (selectedCampus == Campus.LOYOLA)
+                    "Loyola map shown"
+                else
+                    "SGW map shown"
+        }) {
+
+        DisposableEffect(Unit) {
+            onDispose {
+                googleMap?.clear()
+                mapView.onStop()
+                mapView.onDestroy()
+            }
+        }
+
         // Map View
         AndroidView(
             factory = { ctx ->
-                MapView(ctx).apply {
+                mapView.apply {
                     onCreate(null)
                     getMapAsync { map ->
                         googleMap = map
@@ -1177,7 +1264,20 @@ fun MapScreen(
                         map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
-                                selectedShuttleStop = stop
+                                if (isPickingOrigin) {
+                                    val step = directionsUiState.step as? DirectionsStep.PlanRoute
+                                    if (step != null) {
+                                        directionsUiState = directionsUiState.copy(
+                                            step = step.copy(origin = stop.latLng),
+                                            errorMessage = null
+                                        )
+                                        originDisplayName = stop.name
+                                        originBuilding = null
+                                        isPickingOrigin = false
+                                    }
+                                } else {
+                                    selectedShuttleStop = stop
+                                }
                                 true
                             } else {
                                 false
@@ -1210,6 +1310,8 @@ fun MapScreen(
                                             step = step.copy(origin = latLng),
                                             errorMessage = null
                                         )
+                                        originDisplayName = buildingInfo?.buildingName ?: buildingInfo?.buildingCode
+                                        originBuilding = null
                                         isPickingOrigin = false
                                     } else {
                                         selectedBuildingInfo = buildingInfo
@@ -1264,6 +1366,20 @@ fun MapScreen(
                             }
                         }
 
+                        // General map tap: pick origin when in picking mode (non-polygon areas)
+                        map.setOnMapClickListener { latLng ->
+                            if (isPickingOrigin) {
+                                val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@setOnMapClickListener
+                                directionsUiState = directionsUiState.copy(
+                                    step = step.copy(origin = latLng),
+                                    errorMessage = null
+                                )
+                                originDisplayName = latLngShort(latLng)
+                                originBuilding = null
+                                isPickingOrigin = false
+                            }
+                        }
+
                         // Load active campus
                         scope.launch(Dispatchers.IO) {
                             val activeCampus = getSavedCampus(ctx)
@@ -1304,7 +1420,8 @@ fun MapScreen(
                     }
                 }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .testTag("mapView"),
             update = { mapView ->
                 mapView.onResume()
             }
@@ -1350,6 +1467,7 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .testTag("mapControls").semantics { contentDescription = "Map Controls" }
                     .padding(end = 16.dp, bottom = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1554,7 +1672,23 @@ fun MapScreen(
             ShuttleStopInfoCard(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
-                onDismiss = { selectedShuttleStop = null }
+                onDismiss = { selectedShuttleStop = null },
+                onDirectionsClick = {
+                    val hit = BuildingHit(
+                        id = stop.id,
+                        properties = JSONObject().apply {
+                            put("building-name", stop.name)
+                        }
+                    )
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PlanRoute(
+                            origin = defaultOrigin,
+                            destination = stop.latLng,
+                            buildingHit = hit
+                        )
+                    )
+                    selectedShuttleStop = null
+                }
             )
         }
 
@@ -1579,6 +1713,143 @@ fun MapScreen(
                 null
             } else {
                 indoorSetStartTrigger
+        // Shuttle results card (US-3.3)
+        if (showShuttleResultsCard && shuttleRouteResults.isNotEmpty()) {
+            val nearestId = NearestShuttleStopFinder.find(
+                defaultOrigin,
+                shuttleRouteResults.map { it.stop }
+            )?.stop?.id
+
+            BottomCard(onDismiss = { showShuttleResultsCard = false }) {
+                Text(
+                    text = "Directions",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(Color(0xFF1565C0), CircleShape))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Your location", style = MaterialTheme.typography.bodySmall)
+                }
+                Spacer(Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.error, CircleShape))
+                    Spacer(Modifier.width(8.dp))
+                    Text("shuttle stop", style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Spacer(Modifier.height(12.dp))
+                shuttleRouteResults.forEach { result ->
+                    val isNearest = result.stop.id == nearestId
+                    val isCrossCampus = result.stop.campus == Campus.LOYOLA
+                    val duration = result.route?.durationSeconds?.let {
+                        val m = it / 60
+                        if (m < 60) "$m min" else "${m/60} h ${m%60} min"
+                    }
+                    val distance = result.route?.distanceMeters?.let {
+                        if (it < 1000) "$it m" else "${"%.1f".format(it/1000.0)} km"
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showShuttleResultsCard = false
+                                result.route?.let { route ->
+                                    routePolylineRef?.remove()
+                                    routePolylineRef = googleMap?.addPolyline(
+                                        PolylineOptions()
+                                            .addAll(route.points)
+                                            .color(0xFF1565C0.toInt())
+                                            .width(12f)
+                                    )
+                                }
+                                directionsUiState = directionsUiState.copy(
+                                    step = DirectionsStep.ShowingRoute(
+                                        origin = defaultOrigin,
+                                        destination = result.stop.latLng,
+                                        buildingHit = BuildingHit(
+                                            id = result.stop.id,
+                                            properties = JSONObject().apply {
+                                                put("building-name", result.stop.name)
+                                                put("building-code", result.stop.id)
+                                                put("address", result.stop.description)
+                                            }
+                                        ),
+                                        route = result.route ?: return@clickable,
+                                    )
+                                )
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_directions_bus),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (isNearest) {
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.border(
+                                            1.5.dp, MaterialTheme.colorScheme.primary,
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                    ) {
+                                        Text("Nearest",
+                                            color = MaterialTheme.colorScheme.primary,
+                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                if (isCrossCampus) {
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = MaterialTheme.colorScheme.surface,
+                                        modifier = Modifier.border(
+                                            1.5.dp, MaterialTheme.colorScheme.outline,
+                                            RoundedCornerShape(4.dp)
+                                        )
+                                    ) {
+                                        Text("Cross-campus",
+                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                                    }
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                Text(result.stop.name,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    fontWeight = FontWeight.Medium)
+                            }
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            if (duration != null) Text(duration,
+                                style = MaterialTheme.typography.labelSmall)
+                            if (distance != null) Text(distance,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                    HorizontalDivider(thickness = 0.5.dp)
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { showShuttleResultsCard = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text("Cancel") }
+            }
+        }
+
+        // Directions overlay
+        when (val step = directionsUiState.step) {
+            is DirectionsStep.PickDestination -> {
+                // Normal map mode, nothing extra
             }
             val effectiveSetDestNode = if (hasCompleteMapTapPairTrigger) {
                 mapTapSetDestNodeTrigger
@@ -1642,6 +1913,33 @@ fun MapScreen(
                             } else if (indoorDirectionsState == null) {
                                 indoorDirectionsState = state
                             }
+            is DirectionsStep.PlanRoute -> {
+                // Route options are handled entirely in the DirectionsTopBar above the map
+            }
+
+            is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
+                    // X just hides the card — route and top bar remain intact
+                    showDirectionsReadyCard = false
+                }) {
+                    Text(
+                        text = "Directions ready",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
+                    Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
+
+                    // Display duration and distance if available
+                    step.route.durationSeconds?.let { seconds ->
+                        val minutes = seconds / 60
+                        val displayTime = if (minutes < 60) {
+                            "$minutes min"
+                        } else {
+                            val hours = minutes / 60
+                            val remainingMins = minutes % 60
+                            "${hours}h ${remainingMins}min"
                         }
                     },
                     onTopCardActiveChanged = { active ->
