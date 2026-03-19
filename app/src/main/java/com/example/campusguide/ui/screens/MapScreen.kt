@@ -121,6 +121,12 @@ data class DirectionsTopBarState(
     val indoorOriginNode: IndoorNode? = null,
     val indoorDestinationNode: IndoorNode? = null,
 )
+
+data class ShuttleRouteResult(
+    val stop: ShuttleStop,
+    val route: com.example.campusguide.ui.directions.RouteResult?,
+)
+
 @Composable
 fun MapScreen(
     searchQuery: String = "",
@@ -145,7 +151,9 @@ fun MapScreen(
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
-    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
+    shuttleShowBothStops: Boolean = false,
+    onShuttleShowBothStopsConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -207,6 +215,8 @@ fun MapScreen(
     // Reserved for US-3.2: enables removing/updating markers when switching campuses
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
+    var shuttleRouteResults by remember { mutableStateOf<List<ShuttleRouteResult>>(emptyList()) }
+    var showShuttleRouteDialog by remember { mutableStateOf(false) }
 
     // Indoor navigation state (US-5.1 – US-5.6)
     var indoorBuildingCode by remember { mutableStateOf<String?>(null) }
@@ -852,6 +862,39 @@ fun MapScreen(
         }
 
         onTopBarDirectionsDestinationConsumed()
+    }
+
+    LaunchedEffect(shuttleShowBothStops) {
+        if (!shuttleShowBothStops) return@LaunchedEffect
+        val stops = shuttleTracker.getShuttleStops()
+        if (stops.isEmpty()) {
+            onShuttleShowBothStopsConsumed()
+            scope.launch {
+                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+            }
+            return@LaunchedEffect
+        }
+
+        val results = mutableListOf<ShuttleRouteResult>()
+        stops.forEach { stop ->
+            runCatching {
+                repo.getRoute(
+                    RouteRequest(
+                        origin = defaultOrigin,
+                        destination = stop.latLng,
+                        mode = travelMode,
+                    )
+                )
+            }.onSuccess { route ->
+                results.add(ShuttleRouteResult(stop = stop, route = route))
+            }.onFailure {
+                results.add(ShuttleRouteResult(stop = stop, route = null))
+            }
+        }
+
+        shuttleRouteResults = results
+        showShuttleRouteDialog = results.isNotEmpty()
+        onShuttleShowBothStopsConsumed()
     }
 
     // Get user location for default origin
@@ -1555,6 +1598,59 @@ fun MapScreen(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
                 onDismiss = { selectedShuttleStop = null }
+            )
+        }
+
+        if (showShuttleRouteDialog && shuttleRouteResults.isNotEmpty()) {
+            AlertDialog(
+                onDismissRequest = { showShuttleRouteDialog = false },
+                title = { Text("Choose shuttle stop") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        shuttleRouteResults.forEach { result ->
+                            val duration = result.route?.durationSeconds?.let {
+                                val minutes = it / 60
+                                if (minutes < 60) "$minutes min" else "${minutes / 60} h ${minutes % 60} min"
+                            } ?: "Route unavailable"
+
+                            TextButton(
+                                onClick = {
+                                    showShuttleRouteDialog = false
+                                    result.route?.let { route ->
+                                        routePolylineRef?.remove()
+                                        routePolylineRef = googleMap?.addPolyline(
+                                            PolylineOptions()
+                                                .addAll(route.points)
+                                                .color(0xFF1565C0.toInt())
+                                                .width(12f)
+                                        )
+                                        directionsUiState = directionsUiState.copy(
+                                            step = DirectionsStep.ShowingRoute(
+                                                origin = defaultOrigin,
+                                                destination = result.stop.latLng,
+                                                route = route,
+                                                buildingHit = BuildingHit(
+                                                    id = result.stop.id,
+                                                    properties = JSONObject().apply {
+                                                        put("building-name", result.stop.name)
+                                                    }
+                                                )
+                                            )
+                                        )
+                                    }
+                                },
+                                enabled = result.route != null,
+                            ) {
+                                Text("${result.stop.name} • $duration")
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showShuttleRouteDialog = false }) {
+                        Text("Close")
+                    }
+                }
             )
         }
 

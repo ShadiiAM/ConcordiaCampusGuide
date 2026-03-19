@@ -72,6 +72,7 @@ import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.viewmodels.ShuttleViewModel
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.components.TopSearchSuggestion
@@ -148,6 +149,7 @@ fun ConcordiaCampusGuideApp() {
     var pendingIndoorDestination by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
     var indoorOutdoorRouteRequest by remember { mutableStateOf<IndoorOutdoorRouteRequest?>(null) }
     val viewModel = viewModel<ControlsViewModel>()
+    val shuttleViewModel = viewModel<ShuttleViewModel>()
 
     val clearDirectionsAndIndoorState = {
         directionsTopBarState = DirectionsTopBarState(active = false)
@@ -272,6 +274,8 @@ fun ConcordiaCampusGuideApp() {
                             },
                             onIndoorTopCardActiveChanged = { active -> indoorTopCardActive = active },
                             hasExistingDestinationSelection = preservedIndoorDestination != null,
+                            shuttleShowBothStops = shuttleViewModel.shuttleShowBothStops,
+                            onShuttleShowBothStopsConsumed = { shuttleViewModel.consumeShowBothStops() },
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -515,6 +519,7 @@ fun ConcordiaCampusGuideApp() {
 
                                     topBarSuggestions = indoor + building
                                 }
+                                shuttleViewModel.handleSearchQuery(query, context)
                             },
                             onSearchSubmit = { query ->
                                 val indoorCode = openIndoorBuildingCode
@@ -624,6 +629,12 @@ fun ConcordiaCampusGuideApp() {
                                     indoorSetDestTrigger = indoor.node
                                 }
                                 topBarSuggestions = emptyList()
+                                currentDestination.value = AppDestinations.MAP
+                            },
+                            shuttleStops = shuttleViewModel.shuttleStops,
+                            shuttleUserLatLng = shuttleViewModel.shuttleUserLatLng,
+                            onShuttleStopSelected = { _ ->
+                                shuttleViewModel.onShuttleStopSelected()
                                 currentDestination.value = AppDestinations.MAP
                             },
                         )
