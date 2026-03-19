@@ -22,9 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.data.CampusBuilding
-import com.example.campusguide.data.ShuttleStop
 import androidx.compose.foundation.border
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun BuildingAutocompleteField(

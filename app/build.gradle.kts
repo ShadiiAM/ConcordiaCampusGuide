@@ -224,6 +224,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.uiautomator)
+    implementation(libs.androidx.compose.runtime)
 
     // Unit Tests
     testImplementation("junit:junit:4.13.2")

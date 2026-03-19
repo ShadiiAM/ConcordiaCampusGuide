@@ -27,6 +27,7 @@ navigationTesting = "2.9.7"
 rules = "1.7.0"
 foundationVersion = "1.10.3"
 uiautomator = "2.3.0"
+runtime = "1.10.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +64,7 @@ androidx-navigation-testing = { group = "androidx.navigation", name = "navigatio
 androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

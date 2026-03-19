@@ -6,14 +6,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.components.SearchBarWithProfilePreview
-import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.buildingSuggestions
@@ -250,7 +247,7 @@ class SearchBarTest {
                 ) {
                     SearchBarWithProfile(
                         suggestions = suggestions,
-                        onBuildingSelected = {},
+                        onSuggestionSelected = {},
                     )
                 }
             }
@@ -271,7 +268,7 @@ class SearchBarTest {
                 ) {
                     SearchBarWithProfile(
                         suggestions = suggestions,
-                        onBuildingSelected = {},
+                        onSuggestionSelected = {},
                     )
                 }
             }
@@ -293,7 +290,7 @@ class SearchBarTest {
                 ) {
                     SearchBarWithProfile(
                         suggestions = suggestions,
-                        onBuildingSelected = {},
+                        onSuggestionSelected = {},
                     )
                 }
             }
@@ -415,7 +412,7 @@ class SearchBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     MapScreen(
-                        topBarSelectedBuilding = hallBuilding,
+                        topBarSelectedSuggestion = hallBuilding,
                         onTopBarBuildingConsumed = {},
                         onDirectionsTopBarState = { capturedState = it },
                     )
@@ -449,7 +446,7 @@ class SearchBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     MapScreen(
-                        topBarSelectedBuilding = hallBuilding,
+                        topBarSelectedSuggestion = hallBuilding,
                         onTopBarBuildingConsumed = {},
                         onDirectionsTopBarState = { capturedState = it },
                     )
@@ -471,7 +468,7 @@ class SearchBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     MapScreen(
-                        topBarSelectedBuilding = null,
+                        topBarSelectedSuggestion = null,
                         onTopBarBuildingConsumed = {},
                     )
                 }

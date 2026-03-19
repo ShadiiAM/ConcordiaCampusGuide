@@ -42,7 +42,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -80,9 +79,6 @@ import kotlin.coroutines.resume
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
-import com.example.campusguide.data.buildingSuggestions
-import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.isCrossCampusRoute
@@ -97,7 +93,11 @@ import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.data.ALL_SUGGESTIONS
+import com.example.campusguide.data.Suggestion
+import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.RouteResult
+import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -126,7 +126,7 @@ data class ShuttleRouteResult(
 @Composable
 fun MapScreen(
     searchQuery: String = "",
-    topBarSelectedBuilding: CampusBuilding? = null,
+    topBarSelectedSuggestion: Suggestion? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
@@ -135,13 +135,14 @@ fun MapScreen(
     originPickTrigger: Int = 0,
     myLocationTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
-    viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
-    shuttleShowBothStops: Boolean = false,
-    onShuttleShowBothStopsConsumed: () -> Unit = {},
+    viewModel: ControlsViewModel = viewModel<ControlsViewModel>()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val accessibilityState = LocalAccessibilityState.current
+    val userLocationViewModel: UserLocationViewModel = viewModel()
+    val userLatLng by userLocationViewModel.userLatLng.collectAsState()
+
 
     // State management
     var googleMap by remember { mutableStateOf<GoogleMap?>(null) }
@@ -179,12 +180,11 @@ fun MapScreen(
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
     var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
-    var destShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
     val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
-    var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var destinationBuilding by remember { mutableStateOf<Suggestion?>(null) }
 
     // Shuttle state (US-3.1)
     val shuttleTracker = remember { ShuttleTracker() }
@@ -268,7 +268,8 @@ fun MapScreen(
             }
 
             // Show helpful message for cross-campus routes
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+            val isCrossCampus = isCrossCampusRoute(originBuilding,
+                destinationBuilding, step.origin)
             if (isCrossCampus) {
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -289,7 +290,8 @@ fun MapScreen(
             )
         }.onFailure { e ->
             // Check if this is a cross-campus route and provide helpful error message
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+            val isCrossCampus = isCrossCampusRoute(originBuilding,
+                destinationBuilding, step.origin)
             val errorMsg = if (isCrossCampus) {
                 getCrossCampusErrorMessage(travelMode)
             } else {
@@ -324,6 +326,10 @@ fun MapScreen(
         originSuggestions = emptyList()
         destSuggestions = emptyList()
         isPickingOrigin = false
+
+        searchMarker?.remove()
+        searchMarker = null
+
     }
 
 // Handle origin pick mode trigger from top bar
@@ -349,7 +355,8 @@ fun MapScreen(
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+                val isCrossCampus = isCrossCampusRoute(originBuilding,
+                    destinationBuilding, step.origin)
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -367,7 +374,8 @@ fun MapScreen(
             }
             is DirectionsStep.ShowingRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+                val isCrossCampus = isCrossCampusRoute(originBuilding,
+                    destinationBuilding, step.origin)
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -388,59 +396,70 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(topBarSelectedBuilding) {
-        val building = topBarSelectedBuilding ?: return@LaunchedEffect
-        val latLng = resolveBuildingLatLng(building)
+    LaunchedEffect(topBarSelectedSuggestion) {
 
-        // Drop pin on the building
-        searchMarker?.remove()
-        searchMarker = googleMap?.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .title(building.buildingName)
-        )
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+        when (topBarSelectedSuggestion) {
+            is CampusBuilding -> {
+                val building = topBarSelectedSuggestion ?: return@LaunchedEffect
+                val latLng = resolveBuildingLatLng(building)
 
-        // Set as To destination and open route panel
-        destinationBuilding = building  // Track for cross-campus detection
-        val hit = BuildingHit(
-            id = building.buildingCode,
-            properties = JSONObject().apply {
-                put("building-code", building.buildingCode)
-                put("building-name", building.buildingName)
-                put("address", building.address)
+                // Drop pin on the building
+                searchMarker?.remove()
+                searchMarker = googleMap?.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title(building.buildingName)
+                )
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+                // Set as To destination and open route panel
+                destinationBuilding = building  // Track for cross-campus detection
+                val hit = BuildingHit(
+                    id = building.buildingCode,
+                    properties = JSONObject().apply {
+                        put("building-code", building.buildingCode)
+                        put("building-name", building.buildingName)
+                        put("address", building.address)
+                    }
+                )
+                directionsUiState = directionsUiState.copy(
+                    step = DirectionsStep.PlanRoute(
+                        origin = defaultOrigin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    )
+                )
             }
-        )
-        directionsUiState = directionsUiState.copy(
-            step = DirectionsStep.PlanRoute(
-                origin = defaultOrigin,
-                destination = latLng,
-                buildingHit = hit,
-            )
-        )
-        onTopBarBuildingConsumed()
-    }
-    LaunchedEffect(shuttleShowBothStops) {
-        if (!shuttleShowBothStops) return@LaunchedEffect
-        val stops = shuttleTracker.getShuttleStops()
-        if (stops.isEmpty()) return@LaunchedEffect
-        val results = mutableListOf<ShuttleRouteResult>()
-        stops.forEach { stop ->
-            runCatching {
-                repo.getRoute(RouteRequest(
-                    origin = defaultOrigin,
-                    destination = stop.latLng,
-                    mode = travelMode,
-                ))
-            }.onSuccess { route ->
-                results.add(ShuttleRouteResult(stop, route))
-            }.onFailure {
-                results.add(ShuttleRouteResult(stop, null))
+
+            is ShuttleStop -> {
+                val Stop = topBarSelectedSuggestion
+                val latLng = Stop.latLng
+
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+                // Set as To destination and open route panel
+                destinationBuilding = Stop  // Track for cross-campus detection
+                val hit = BuildingHit(
+                    id = Stop.id,
+                    properties = JSONObject().apply {
+                        put("building-code", Stop.id)
+                        put("building-name", Stop.name)
+                        put("address", Stop.description)
+                    }
+                )
+                directionsUiState = directionsUiState.copy(
+                    step = DirectionsStep.PlanRoute(
+                        origin = defaultOrigin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    )
+                )
+            }
+            else -> {
+                return@LaunchedEffect
             }
         }
-        shuttleRouteResults = results
-        showShuttleResultsCard = true
-        onShuttleShowBothStopsConsumed()
+        onTopBarBuildingConsumed()
     }
 
     // Get user location for default origin
@@ -449,19 +468,7 @@ fun MapScreen(
         val coarseGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!fineGranted && !coarseGranted) return@LaunchedEffect
 
-        val fused = LocationServices.getFusedLocationProviderClient(context)
-        runCatching {
-            fused.lastLocation
-                .addOnSuccessListener { loc ->
-                    if (loc != null) {
-                        defaultOrigin = LatLng(loc.latitude, loc.longitude)
-                    }
-                }
-        }.onFailure {
-            scope.launch {
-                snackbarHostState.showSnackbar("Could not retrieve your location")
-            }
-        }
+        userLocationViewModel.fetchUserLocation(context)
     }
 
     // Location services
@@ -918,7 +925,8 @@ fun MapScreen(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 10.dp),
+                .padding(start = 16.dp, bottom = 10.dp)
+                .ignoreFocusClearOnTouch(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1117,9 +1125,9 @@ fun MapScreen(
                     val latLng = selectedBuildingLatLng ?: LatLng(45.4972, -73.5789)
 
                     // Find corresponding CampusBuilding for cross-campus detection
-                    destinationBuilding = ALL_CAMPUS_BUILDINGS.firstOrNull {
-                        it.buildingCode == info.buildingCode
-                    }
+                    destinationBuilding = ALL_SUGGESTIONS.firstOrNull {
+                        (it.suggestion as? CampusBuilding)?.buildingCode == info.buildingCode
+                    }?.suggestion as? CampusBuilding
 
                     val buildingHit = BuildingHit(
                         id = info.buildingCode,

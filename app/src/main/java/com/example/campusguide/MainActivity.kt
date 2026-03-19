@@ -10,6 +10,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,12 +55,16 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
+import com.example.campusguide.data.SuggestionData
+import com.example.campusguide.data.fullSuggestions
+import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.components.FocusClearWrapper
+import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
-import com.example.campusguide.ui.viewmodels.ShuttleViewModel
+import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -101,8 +109,8 @@ fun ConcordiaCampusGuideApp() {
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var searchCounter by rememberSaveable { mutableStateOf(0) }
-    var topBarSuggestions by remember { mutableStateOf<List<com.example.campusguide.data.CampusBuilding>>(emptyList()) }
-    var topBarSelectedBuilding by remember { mutableStateOf<com.example.campusguide.data.CampusBuilding?>(null) }
+    var topBarSuggestions by remember { mutableStateOf<List<SuggestionData>>(emptyList()) }
+    var topBarSelectedSuggestion by remember { mutableStateOf<com.example.campusguide.data.Suggestion?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
@@ -112,9 +120,8 @@ fun ConcordiaCampusGuideApp() {
     var myLocationTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     val viewModel = viewModel<ControlsViewModel>()
-    val shuttleViewModel = viewModel<ShuttleViewModel>()
-    val focusManager = LocalFocusManager.current
-    var ignoreNextFocusClear = remember { mutableStateOf(false) }
+    val userLocationViewModel = viewModel<UserLocationViewModel>()
+    val userLatLng by userLocationViewModel.userLatLng.collectAsState()
 
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -136,6 +143,11 @@ fun ConcordiaCampusGuideApp() {
     }
 
 
+    LaunchedEffect(Unit) {
+        userLocationViewModel.fetchUserLocation(context)
+    }
+
+
     when {
         showAccessibility -> {
             AccessibilityScreen(
@@ -151,26 +163,11 @@ fun ConcordiaCampusGuideApp() {
             )
         }
         else -> {
+            FocusClearWrapper {
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(Unit) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent(PointerEventPass.Initial)
-                                if (event.changes.any { it.pressed }) {
-                                    withTimeoutOrNull(500L) {
-                                        awaitPointerEvent()
-                                    }
-                                    if (!ignoreNextFocusClear.value) {
-                                        focusManager.clearFocus()
-                                    }
-
-                                    ignoreNextFocusClear.value = false
-                                }
-                            }
-                        }
-                    }
             ) {
                 NavigationBar((currentDestination), { modifier ->
 
@@ -178,8 +175,8 @@ fun ConcordiaCampusGuideApp() {
                         AppDestinations.MAP -> MapScreen(
                             viewModel = viewModel,
                             searchQuery = "$searchQuery#$searchCounter",
-                            topBarSelectedBuilding = topBarSelectedBuilding,
-                            onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
+                            topBarSelectedSuggestion = topBarSelectedSuggestion,
+                            onTopBarBuildingConsumed = { topBarSelectedSuggestion = null },
                             onBottomSearchClick = {
                                 try {
                                     searchFocusRequester.requestFocus()
@@ -195,10 +192,7 @@ fun ConcordiaCampusGuideApp() {
                             originPickTrigger = originPickTrigger,
                             myLocationTrigger = myLocationTrigger,
                             topBarTravelMode = topBarTravelMode,
-                            shuttleShowBothStops = shuttleViewModel.shuttleShowBothStops,
-                            onShuttleShowBothStopsConsumed = { shuttleViewModel.consumeShowBothStops() },
-
-                            )
+                        )
 
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -228,24 +222,23 @@ fun ConcordiaCampusGuideApp() {
                         )
                     } else {
                         SearchBarWithProfile(
-                            modifier = Modifier.padding(top = 35.dp),
+                            modifier = Modifier.padding(top = 35.dp)
+                                .ignoreFocusClearOnTouch(),
                             focusRequester = searchFocusRequester,
                             onSearchQueryChange = { query ->
                                 topBarSuggestions =
-                                    com.example.campusguide.data.buildingSuggestions(
+                                    fullSuggestions(
                                         query = query,
-                                        activeCampus = com.example.campusguide.ui.components.Campus.SGW,
+                                        activeCampus = Campus.SGW,
                                         crossCampus = true,
                                     )
-                                // Additionally show shuttle stops if query matches
-                                shuttleViewModel.handleSearchQuery(query, context)
                             },
                             onSearchSubmit = { query ->
                                 val matchedBuilding =
-                                    com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-                                        .firstOrNull { it.matches(query) }
+                                    com.example.campusguide.data.ALL_SUGGESTIONS
+                                        .firstOrNull { it.suggestion.matches(query) }
                                 if (matchedBuilding != null) {
-                                    topBarSelectedBuilding = matchedBuilding
+                                    topBarSelectedSuggestion = matchedBuilding.suggestion
                                     topBarSuggestions = emptyList()
                                     currentDestination.value = AppDestinations.MAP
                                 } else {
@@ -259,23 +252,18 @@ fun ConcordiaCampusGuideApp() {
                             },
                             onProfileClick = { showProfile = true },
                             suggestions = topBarSuggestions,
-                            onBuildingSelected = { building ->
-                                topBarSelectedBuilding = building
+                            onSuggestionSelected = { suggestion ->
+                                topBarSelectedSuggestion = suggestion
                                 topBarSuggestions = emptyList()
                                 searchQuery = ""
                                 currentDestination.value = AppDestinations.MAP
                             },
-                            shuttleStops = shuttleViewModel.shuttleStops,
-                            shuttleUserLatLng = shuttleViewModel.shuttleUserLatLng,
-                            onShuttleStopSelected = { _ ->
-                                shuttleViewModel.onShuttleStopSelected()
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            ignoreFocusClear = { ignoreNextFocusClear.value = true }
+                            UserLatLng = userLatLng
                         )
                     }
                 }
                 )
+            }
         }
         }
     }
