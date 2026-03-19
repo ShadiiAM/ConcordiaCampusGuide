@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng
 
 
 sealed class Suggestion(
-    val campus: Campus
+    open val campus: Campus
 
 ) {
 
@@ -61,11 +61,11 @@ class CampusBuilding(
 }
 
 
-class ShuttleStop(
+data class ShuttleStop(
     val id: String,
     val name: String,
     val description: String = "Concordia Shuttle Service",
-    campus: Campus,
+    override val campus: Campus,
     val latLng: LatLng,
     ) : Suggestion(campus) {
 

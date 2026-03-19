@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.fullSuggestions
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.screens.MapScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
-import com.example.campusguide.data.buildingSuggestions
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.components.FocusClearWrapper
 
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +41,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
+                    FocusClearWrapper {
                     MapScreen()
+                        }
                 }
             }
         }
@@ -54,7 +58,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen(searchQuery = "Concordia")
+                    FocusClearWrapper {
+                        MapScreen(searchQuery = "Concordia")
+                    }
                 }
             }
         }
@@ -71,8 +77,10 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
-                    mapReadyCalled = true // parameter removed; just mark as called
+                    FocusClearWrapper {
+                        MapScreen()
+                        mapReadyCalled = true // parameter removed; just mark as called
+                    }
                 }
             }
         }
@@ -88,7 +96,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
+                    FocusClearWrapper {
                     MapScreen()
+                    }
                 }
             }
         }
@@ -104,7 +114,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -126,7 +138,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -144,7 +158,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -162,7 +178,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -183,7 +201,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -198,7 +218,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -224,7 +246,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -248,7 +272,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -267,7 +293,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -288,7 +316,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -304,7 +334,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen(searchQuery = "Concordia#1")
+                    FocusClearWrapper {
+                        MapScreen(searchQuery = "Concordia#1")
+                    }
                 }
             }
         }
@@ -319,7 +351,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen(searchQuery = "")
+                    FocusClearWrapper {
+                        MapScreen(searchQuery = "")
+                    }
                 }
             }
         }
@@ -338,7 +372,9 @@ class MapScreenTest {
                 ) {
                     // Force recomposition by reading the key
                     key(recomposeKey) {
-                        MapScreen()
+                        FocusClearWrapper {
+                            MapScreen()
+                        }
                     }
                 }
             }
@@ -366,7 +402,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides AccessibilityState(initialOffsetSp = 20f)
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -382,7 +420,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -400,7 +440,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
@@ -413,35 +455,37 @@ class MapScreenTest {
     //Suggestions scoped to active campus by default
     @Test
     fun suggestions_scopedToSGWByDefault() {
-        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = false)
+        val suggestions = fullSuggestions("hall", Campus.SGW, crossCampus = false)
+
+
 
         // SGW results should appear
-        assert(suggestions.any { it.buildingCode == "H" }) {
+        assert(suggestions.any { (it.suggestion as? CampusBuilding)?.buildingCode == "H" }) {
             "Expected Hall Building (SGW) in suggestions"
         }
         // Loyola results shouldn't appear
-        assert(suggestions.none { it.campus == Campus.LOYOLA }) {
+        assert(suggestions.none { it.suggestion.campus == Campus.LOYOLA }) {
             "Expected no Loyola buildings when campus is SGW and crossCampus is false"
         }
     }
 
     @Test
     fun suggestions_scopedToLoyolaWhenLoyolaSelected() {
-        val suggestions = buildingSuggestions("vanier", Campus.LOYOLA, crossCampus = false)
+        val suggestions = fullSuggestions("vanier", Campus.LOYOLA, crossCampus = false)
 
-        assert(suggestions.any { it.buildingCode == "VL" }) {
+        assert(suggestions.any { (it.suggestion as? CampusBuilding)?.buildingCode == "VL" }) {
             "Expected Vanier Library (Loyola) in suggestions"
         }
-        assert(suggestions.none { it.campus == Campus.SGW }) {
+        assert(suggestions.none { it.suggestion.campus == Campus.SGW }) {
             "Expected no SGW buildings when campus is Loyola and crossCampus is false"
         }
     }
 
     @Test
     fun suggestions_sgwBuildingNotShownOnLoyolaCampus() {
-        val suggestions = buildingSuggestions("hall", Campus.LOYOLA, crossCampus = false)
+        val suggestions = fullSuggestions("hall", Campus.LOYOLA, crossCampus = false)
 
-        assert(suggestions.none { it.buildingCode == "H" }) {
+        assert(suggestions.none { (it.suggestion as? CampusBuilding)?.buildingCode == "H" }) {
             "Hall Building (SGW) should not appear when Loyola campus is selected"
         }
     }
@@ -450,10 +494,10 @@ class MapScreenTest {
 
     @Test
     fun suggestions_crossCampusShowsBothCampuses() {
-        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = true)
+        val suggestions = fullSuggestions("hall", Campus.SGW, crossCampus = true)
 
         // Should include SGW buildings
-        assert(suggestions.any { it.campus == Campus.SGW }) {
+        assert(suggestions.any { it.suggestion.campus == Campus.SGW }) {
             "Expected SGW buildings when crossCampus is true"
         }
     }
@@ -461,9 +505,9 @@ class MapScreenTest {
     @Test
     fun suggestions_crossCampusShowsLoyolaBuildings() {
         // "ha" matches Hingston Hall wings at Loyola
-        val suggestions = buildingSuggestions("ha", Campus.SGW, crossCampus = true)
+        val suggestions = fullSuggestions("ha", Campus.SGW, crossCampus = true)
 
-        assert(suggestions.any { it.campus == Campus.LOYOLA }) {
+        assert(suggestions.any { it.suggestion.campus == Campus.LOYOLA }) {
             "Expected Loyola buildings when crossCampus is true"
         }
     }
@@ -475,7 +519,9 @@ class MapScreenTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    MapScreen()
+                    FocusClearWrapper {
+                        MapScreen()
+                    }
                 }
             }
         }
