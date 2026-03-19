@@ -81,14 +81,11 @@ private enum class DirectionsEditMode {
     INDOOR_ORIGIN,
     INDOOR_DESTINATION,
 }
-import com.example.campusguide.ui.viewmodels.ShuttleViewModel
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         IndoorGraphRegistry.init(this)
-
         enableEdgeToEdge()
         setContent {
             val scope = rememberCoroutineScope()
@@ -134,8 +131,6 @@ fun ConcordiaCampusGuideApp() {
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
     var directionsGoTrigger by remember { mutableStateOf(0) }
     var directionsCancelTrigger by remember { mutableStateOf(0) }
-    var originPickTrigger by remember { mutableStateOf(0) }
-    var myLocationTrigger by remember { mutableStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     var directionsEditMode by rememberSaveable { mutableStateOf<DirectionsEditMode?>(null) }
     var directionsDestinationSuggestions by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
@@ -153,8 +148,6 @@ fun ConcordiaCampusGuideApp() {
     var pendingIndoorDestination by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
     var indoorOutdoorRouteRequest by remember { mutableStateOf<IndoorOutdoorRouteRequest?>(null) }
     val viewModel = viewModel<ControlsViewModel>()
-    val shuttleViewModel = viewModel<ShuttleViewModel>()
-
 
     val clearDirectionsAndIndoorState = {
         directionsTopBarState = DirectionsTopBarState(active = false)
@@ -243,8 +236,6 @@ fun ConcordiaCampusGuideApp() {
                     currentDestination.value = destination
                 }
             ) { modifier ->
-            NavigationBar((currentDestination), { modifier ->
-
                 Box(modifier = modifier.fillMaxSize()) {
                     val preservedIndoorDestination = directionsTopBarState.indoorDestinationNode ?: pendingIndoorDestination
 
@@ -259,12 +250,9 @@ fun ConcordiaCampusGuideApp() {
                             onBottomSearchClick = {
                                 try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
                             },
-                            onDirectionsTopBarState = { state -> directionsTopBarState = state },
-
-                            directionsGoTrigger = directionsGoTrigger,
-                            directionsCancelTrigger = directionsCancelTrigger,
-                            originPickTrigger = originPickTrigger,
-                            myLocationTrigger = myLocationTrigger,
+                            onDirectionsTopBarState = { state -> directionsTopBarState = state },  // ← add
+                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
                             topBarTravelMode = topBarTravelMode,
                             onIndoorOverlayChanged = { openIndoorBuildingCode = it },
                             requestedIndoorBuildingCode = openIndoorBuildingCode,
@@ -284,9 +272,6 @@ fun ConcordiaCampusGuideApp() {
                             },
                             onIndoorTopCardActiveChanged = { active -> indoorTopCardActive = active },
                             hasExistingDestinationSelection = preservedIndoorDestination != null,
-                            shuttleShowBothStops = shuttleViewModel.shuttleShowBothStops,
-                            onShuttleShowBothStopsConsumed = { shuttleViewModel.consumeShowBothStops() },
-
                         )
                         AppDestinations.CALENDAR -> CalendarScreen()
                         AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
@@ -309,9 +294,6 @@ fun ConcordiaCampusGuideApp() {
                             goEnabled = directionsTopBarState.goEnabled,
                             goLabel = directionsTopBarState.goLabel,
                             cancelLabel = directionsTopBarState.cancelLabel,
-                            isPickingOrigin = directionsTopBarState.isPickingOrigin,
-                            onOriginClick = { originPickTrigger++ },
-                            onMyLocationClick = { myLocationTrigger++ },
                             onGoClick = { directionsGoTrigger++ },
                             onCancelClick = {
                                 directionsCancelTrigger++
@@ -567,26 +549,6 @@ fun ConcordiaCampusGuideApp() {
                                                 tertiaryLabel = it.locationLabel,
                                             )
                                         }
-                                topBarSuggestions = com.example.campusguide.data.buildingSuggestions(
-                                    query = query,
-                                    activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                    crossCampus = true,
-                                )
-                                // Additionally show shuttle stops if query matches
-                                shuttleViewModel.handleSearchQuery(query, context)
-                            },
-                            onSearchSubmit = { query ->
-                                val matchedBuilding = com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-                                    .firstOrNull { it.matches(query) }
-                                if (matchedBuilding != null) {
-                                    topBarSelectedBuilding = matchedBuilding
-                                    topBarSuggestions = emptyList()
-                                    currentDestination.value = AppDestinations.MAP
-                                } else {
-                                    searchQuery = query
-                                    searchCounter++
-                                    topBarSuggestions = emptyList()
-                                    if (currentDestination.value != AppDestinations.MAP) {
                                         currentDestination.value = AppDestinations.MAP
                                     } else {
                                         // Check if query matches a campus building first
@@ -662,17 +624,12 @@ fun ConcordiaCampusGuideApp() {
                                     indoorSetDestTrigger = indoor.node
                                 }
                                 topBarSuggestions = emptyList()
-                            shuttleStops = shuttleViewModel.shuttleStops,
-                            shuttleUserLatLng = shuttleViewModel.shuttleUserLatLng,
-                            onShuttleStopSelected = { _ ->
-                                shuttleViewModel.onShuttleStopSelected()
                                 currentDestination.value = AppDestinations.MAP
                             },
                         )
                     }
                 }
             }
-            )
         }
     }
 }
