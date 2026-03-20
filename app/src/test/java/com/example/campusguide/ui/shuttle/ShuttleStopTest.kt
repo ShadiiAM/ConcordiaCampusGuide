@@ -1,6 +1,7 @@
 package com.example.campusguide.ui.shuttle
 
 import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.data.Suggestion
 import com.example.campusguide.data.SuggestionData
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
@@ -38,10 +39,8 @@ class ShuttleStopTest {
         val stop1 = ShuttleStop("sgw_shuttle", "SGW Shuttle Stop", "Concordia Shuttle Service", Campus.SGW, latlng)
         val stop2 = ShuttleStop("sgw_shuttle", "SGW Shuttle Stop", "Concordia Shuttle Service", Campus.SGW, latlng)
 
-        val data1 = SuggestionData(suggestion = stop1)
-        val data2 = SuggestionData(suggestion = stop2)
 
-        assertEquals(data1, data2)
+        assertEquals(stop1, stop2)
     }
 
     @Test

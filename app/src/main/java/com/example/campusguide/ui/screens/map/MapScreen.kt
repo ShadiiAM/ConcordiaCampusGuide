@@ -1,7 +1,6 @@
-package com.example.campusguide.ui.screens
+package com.example.campusguide.ui.screens.map
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
 import android.os.Build
-import android.os.Looper
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -29,7 +25,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
@@ -46,21 +41,18 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.edit
 import com.example.campusguide.R
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
-import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.models.BuildingInfo
 import com.example.campusguide.ui.directions.DirectionsStep
 import com.example.campusguide.ui.directions.DirectionsUiState
 import com.example.campusguide.ui.directions.GoogleRoutesRepository
 import com.example.campusguide.ui.directions.RouteRequest
 import com.example.campusguide.ui.map.utils.BuildingHit
-import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -71,12 +63,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.ui.directions.RouteLeg
@@ -89,21 +77,21 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
-import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import com.example.campusguide.AppDestinations
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
-import com.example.campusguide.ui.directions.RouteResult
+import com.example.campusguide.ui.screens.AccessibilityScreen
+import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
+import com.google.android.gms.maps.model.Dash
+import com.google.android.gms.maps.model.Gap
+import com.google.android.gms.maps.model.Polyline
+import com.google.maps.android.ktx.model.polylineOptions
 
-private const val PREFS_NAME = "campus_preferences"
-private const val KEY_SELECTED_CAMPUS = "selected_campus"
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
-const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
 data class DirectionsTopBarState(
     val active: Boolean,
@@ -117,11 +105,6 @@ data class DirectionsTopBarState(
     val showActions: Boolean = false,
     val currentSteps: RouteLeg? = null,
     val isPickingOrigin: Boolean = false,
-)
-
-data class ShuttleRouteResult(
-    val stop: ShuttleStop,
-    val route: RouteResult?,
 )
 @Composable
 fun MapScreen(
@@ -141,8 +124,6 @@ fun MapScreen(
     val scope = rememberCoroutineScope()
     val accessibilityState = LocalAccessibilityState.current
     val userLocationViewModel: UserLocationViewModel = viewModel()
-    val userLatLng by userLocationViewModel.userLatLng.collectAsState()
-
 
     // State management
     var googleMap by remember { mutableStateOf<GoogleMap?>(null) }
@@ -158,18 +139,16 @@ fun MapScreen(
     var showProfile by remember { mutableStateOf(false) }
     var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible = viewModel.controlsVisible
-    // Controls bottom card visibility. X hides the card — it does NOT cancel the route.
-    var showRouteOptionsCard by remember { mutableStateOf(true) }
-    var showDirectionsReadyCard by remember { mutableStateOf(true) }
+    var polylineFormatting = polylineOptions {  }
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
     var travelMode by rememberSaveable { mutableStateOf(TravelMode.DRIVE) }
     var isPickingOrigin by remember { mutableStateOf(false) }
     var routePolylineRef by remember {
-        mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
+        mutableStateOf<Polyline?>(null)
     }
     var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
     // Track the selected building's LatLng for directions
@@ -179,7 +158,6 @@ fun MapScreen(
     var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
-    var originShuttleSuggestions by remember { mutableStateOf<List<ShuttleStop>>(emptyList()) }
 
     val mapView = remember { MapView(context) }
     // Track origin and destination buildings for cross-campus detection
@@ -192,8 +170,6 @@ fun MapScreen(
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
-    var shuttleRouteResults by remember { mutableStateOf<List<ShuttleRouteResult>>(emptyList()) }
-    var showShuttleResultsCard by remember { mutableStateOf(false) }
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -241,6 +217,7 @@ fun MapScreen(
                 )
             )
         }
+
     }
 
 // Handle Go button from top bar
@@ -257,13 +234,40 @@ fun MapScreen(
                 )
             )
         }.onSuccess { route ->
+
+            when(travelMode) {
+                TravelMode.DRIVE ->
+                {
+                    polylineFormatting =
+                        PolylineOptions()
+                            .color(0xFF1565C0.toInt())
+                            .width(18f)
+                }
+                TravelMode.WALK -> {
+
+                    polylineFormatting =
+                        PolylineOptions()
+                            .color(0xFF1565C0.toInt())
+                            .width(14f)
+                            .pattern(listOf(Dash(20f), Gap(10f)))
+
+
+                }
+                TravelMode.TRANSIT ->{
+
+                    polylineFormatting =
+                        PolylineOptions()
+                            .color(0xFF7B1FA2.toInt())
+                            .width(18f)
+
+                }
+            }
+
             withContext(Dispatchers.Main) {
                 routePolylineRef?.remove()
                 routePolylineRef = googleMap?.addPolyline(
-                    PolylineOptions()
+                    polylineFormatting
                         .addAll(route.points)
-                        .color(0xFF1565C0.toInt())
-                        .width(12f)
                 )
             }
 
@@ -272,7 +276,7 @@ fun MapScreen(
                 destinationBuilding, step.origin)
             if (isCrossCampus) {
                 scope.launch {
-                    snackbarHostState.showSnackbar(
+                    snackBarHostState.showSnackbar(
                         message = getCrossCampusMessage(travelMode),
                         duration = SnackbarDuration.Short
                     )
@@ -302,15 +306,6 @@ fun MapScreen(
                 isLoadingRoute = false,
                 errorMessage = errorMsg,
             )
-        }
-    }
-
-// Re-show bottom cards whenever the relevant step is entered fresh
-    LaunchedEffect(directionsUiState.step) {
-        when (directionsUiState.step) {
-            is DirectionsStep.PlanRoute     -> showRouteOptionsCard = true
-            is DirectionsStep.ShowingRoute  -> showDirectionsReadyCard = false
-            else -> {}
         }
     }
 
@@ -400,7 +395,7 @@ fun MapScreen(
 
         when (topBarSelectedSuggestion) {
             is CampusBuilding -> {
-                val building = topBarSelectedSuggestion ?: return@LaunchedEffect
+                val building = topBarSelectedSuggestion
                 val latLng = resolveBuildingLatLng(building)
 
                 // Drop pin on the building
@@ -432,19 +427,19 @@ fun MapScreen(
             }
 
             is ShuttleStop -> {
-                val Stop = topBarSelectedSuggestion
-                val latLng = Stop.latLng
+                val stop = topBarSelectedSuggestion
+                val latLng = stop.latLng
 
                 googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
 
                 // Set as To destination and open route panel
-                destinationBuilding = Stop  // Track for cross-campus detection
+                destinationBuilding = stop  // Track for cross-campus detection
                 val hit = BuildingHit(
-                    id = Stop.id,
+                    id = stop.id,
                     properties = JSONObject().apply {
-                        put("building-code", Stop.id)
-                        put("building-name", Stop.name)
-                        put("address", Stop.description)
+                        put("building-code", stop.id)
+                        put("building-name", stop.name)
+                        put("address", stop.description)
                     }
                 )
                 directionsUiState = directionsUiState.copy(
@@ -464,8 +459,8 @@ fun MapScreen(
 
     // Get user location for default origin
     LaunchedEffect(Unit) {
-        val fineGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!fineGranted && !coarseGranted) return@LaunchedEffect
 
         userLocationViewModel.fetchUserLocation(context)
@@ -497,8 +492,9 @@ fun MapScreen(
                         fusedLocationProviderClient,
                         googleMap,
                         sgwOverlay,
-                        loyOverlay
-                    ) { callback ->
+                        loyOverlay,
+                        userLocationViewModel,
+                        ) { callback ->
                         locationCallback = callback
                     }
                 }
@@ -553,7 +549,7 @@ fun MapScreen(
                     try {
                         val geocoder = Geocoder(context, Locale.getDefault())
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NOSONAR: minSdk=33, kept for explicit API clarity
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NO SONAR: minSdk=33, kept for explicit API clarity
                             suspendCancellableCoroutine { cont ->
                                 geocoder.getFromLocationName(query, 1) { results ->
                                     cont.resume(results.firstOrNull())
@@ -667,48 +663,6 @@ fun MapScreen(
         }
     }
 
-    // Map controls
-    fun moveUp() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(0f, -200f))
-    }
-
-    fun moveDown() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(0f, 200f))
-    }
-
-    fun moveLeft() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(-200f, 0f))
-    }
-
-    fun moveRight() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
-    }
-
-    fun zoomIn() {
-        googleMap?.animateCamera(CameraUpdateFactory.zoomIn())
-    }
-
-    fun zoomOut() {
-        googleMap?.animateCamera(CameraUpdateFactory.zoomOut())
-    }
-
-    fun recenter() {
-        googleMap?.let { map ->
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        val currentLatLng = LatLng(location.latitude, location.longitude)
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-                    }
-                }
-            }
-        }
-    }
-
     // Dispose location tracking
     DisposableEffect(Unit) {
         onDispose {
@@ -779,7 +733,7 @@ fun MapScreen(
                                     MarkerOptions()
                                         .position(stop.latLng)
                                         .icon(shuttleIcon)
-                                        .anchor(0.5f, 1.0f) // tip of pin points to coordinate
+                                        .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
                                 )
                                 if (marker != null) {
                                     marker.tag = stop
@@ -788,13 +742,13 @@ fun MapScreen(
                             }
                         } else {
                             scope.launch {
-                                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+                                snackBarHostState.showSnackbar("Shuttle stop data unavailable")
                             }
                         }
 
                         // Marker click: handle shuttle stop taps (US-3.1)
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
-                        map.setOnMarkerClickListener { marker -> // NOSONAR
+                        map.setOnMarkerClickListener { marker -> // NO SONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 if (isPickingOrigin) {
@@ -902,7 +856,9 @@ fun MapScreen(
                                     fusedLocationProviderClient,
                                     map,
                                     sgwOverlay,
-                                    loyOverlay
+                                    loyOverlay,
+                                    userLocationViewModel
+
                                 ) { callback ->
                                     locationCallback = callback
                                 }
@@ -967,7 +923,7 @@ fun MapScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = { zoomIn() },
+                    onClick = { zoomIn(googleMap) },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -983,7 +939,7 @@ fun MapScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { moveLeft() },
+                        onClick = { moveLeft(googleMap) },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -999,7 +955,7 @@ fun MapScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(
-                            onClick = { moveUp() },
+                            onClick = { moveUp(googleMap) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1011,7 +967,7 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { recenter() },
+                            onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1023,7 +979,7 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { moveDown() },
+                            onClick = { moveDown(googleMap) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1036,7 +992,7 @@ fun MapScreen(
                     }
 
                     IconButton(
-                        onClick = { moveRight() },
+                        onClick = { moveRight(googleMap) },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -1049,7 +1005,7 @@ fun MapScreen(
                 }
 
                 IconButton(
-                    onClick = { zoomOut() },
+                    onClick = { zoomOut(googleMap) },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -1126,8 +1082,8 @@ fun MapScreen(
 
                     // Find corresponding CampusBuilding for cross-campus detection
                     destinationBuilding = ALL_SUGGESTIONS.firstOrNull {
-                        (it.suggestion as? CampusBuilding)?.buildingCode == info.buildingCode
-                    }?.suggestion as? CampusBuilding
+                        (it as? CampusBuilding)?.buildingCode == info.buildingCode
+                    } as? CampusBuilding
 
                     val buildingHit = BuildingHit(
                         id = info.buildingCode,
@@ -1175,464 +1131,11 @@ fun MapScreen(
         }
 
         SnackbarHost(
-            hostState = snackbarHostState,
+            hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
-
-        // Shuttle results card (US-3.3)
-        if (showShuttleResultsCard && shuttleRouteResults.isNotEmpty()) {
-            val nearestId = NearestShuttleStopFinder.find(
-                defaultOrigin,
-                shuttleRouteResults.map { it.stop }
-            )?.stop?.id
-
-            BottomCard(onDismiss = { showShuttleResultsCard = false }) {
-                Text(
-                    text = "Directions",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(10.dp).background(Color(0xFF1565C0), CircleShape))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Your location", style = MaterialTheme.typography.bodySmall)
-                }
-                Spacer(Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.error, CircleShape))
-                    Spacer(Modifier.width(8.dp))
-                    Text("shuttle stop", style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Spacer(Modifier.height(12.dp))
-                shuttleRouteResults.forEach { result ->
-                    val isNearest = result.stop.id == nearestId
-                    val isCrossCampus = result.stop.campus == Campus.LOYOLA
-                    val duration = result.route?.durationSeconds?.let {
-                        val m = it / 60
-                        if (m < 60) "$m min" else "${m/60} h ${m%60} min"
-                    }
-                    val distance = result.route?.distanceMeters?.let {
-                        if (it < 1000) "$it m" else "${"%.1f".format(it/1000.0)} km"
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                showShuttleResultsCard = false
-                                result.route?.let { route ->
-                                    routePolylineRef?.remove()
-                                    routePolylineRef = googleMap?.addPolyline(
-                                        PolylineOptions()
-                                            .addAll(route.points)
-                                            .color(0xFF1565C0.toInt())
-                                            .width(12f)
-                                    )
-                                }
-                                directionsUiState = directionsUiState.copy(
-                                    step = DirectionsStep.ShowingRoute(
-                                        origin = defaultOrigin,
-                                        destination = result.stop.latLng,
-                                        buildingHit = BuildingHit(
-                                            id = result.stop.id,
-                                            properties = JSONObject().apply {
-                                                put("building-name", result.stop.name)
-                                                put("building-code", result.stop.id)
-                                                put("address", result.stop.description)
-                                            }
-                                        ),
-                                        route = result.route ?: return@clickable,
-                                    )
-                                )
-                            }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_directions_bus),
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Column(Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (isNearest) {
-                                    Surface(
-                                        shape = RoundedCornerShape(4.dp),
-                                        color = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.border(
-                                            1.5.dp, MaterialTheme.colorScheme.primary,
-                                            RoundedCornerShape(4.dp)
-                                        )
-                                    ) {
-                                        Text("Nearest",
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                                    }
-                                    Spacer(Modifier.width(4.dp))
-                                }
-                                if (isCrossCampus) {
-                                    Surface(
-                                        shape = RoundedCornerShape(4.dp),
-                                        color = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.border(
-                                            1.5.dp, MaterialTheme.colorScheme.outline,
-                                            RoundedCornerShape(4.dp)
-                                        )
-                                    ) {
-                                        Text("Cross-campus",
-                                            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
-                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
-                                    }
-                                    Spacer(Modifier.width(4.dp))
-                                }
-                                Text(result.stop.name,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Medium)
-                            }
-                        }
-                        Column(horizontalAlignment = Alignment.End) {
-                            if (duration != null) Text(duration,
-                                style = MaterialTheme.typography.labelSmall)
-                            if (distance != null) Text(distance,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                    HorizontalDivider(thickness = 0.5.dp)
-                }
-                Spacer(Modifier.height(8.dp))
-                OutlinedButton(
-                    onClick = { showShuttleResultsCard = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) { Text("Cancel") }
-            }
-        }
-
-        // Directions overlay
-        when (val step = directionsUiState.step) {
-            is DirectionsStep.PickDestination -> {
-                // Normal map mode, nothing extra
-            }
-            is DirectionsStep.ConfirmDestination -> {
-                // Shouldn't normally reach here since we go straight to PlanRoute
-            }
-            is DirectionsStep.PlanRoute -> {
-                // Route options are handled entirely in the DirectionsTopBar above the map
-            }
-
-            is DirectionsStep.ShowingRoute -> if (showDirectionsReadyCard) BottomCard(onDismiss = {
-                    // X just hides the card — route and top bar remain intact
-                    showDirectionsReadyCard = false
-                }) {
-                    Text(
-                        text = "Directions ready",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-                    Text("From: ${originDisplayName ?: latLngShort(step.origin)}")
-                    Text("To: ${buildingTitle(step.buildingHit, step.destination)}")
-
-                    // Display duration and distance if available
-                    step.route.durationSeconds?.let { seconds ->
-                        val minutes = seconds / 60
-                        val displayTime = if (minutes < 60) {
-                            "$minutes min"
-                        } else {
-                            val hours = minutes / 60
-                            val remainingMins = minutes % 60
-                            "${hours}h ${remainingMins}min"
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Duration: $displayTime",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    step.route.distanceMeters?.let { meters ->
-                        val displayDistance = if (meters < 1000) {
-                            "$meters m"
-                        } else {
-                            val km = meters / 1000.0
-                            String.format(java.util.Locale.US, "%.1f km", km)
-                        }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Distance: $displayDistance",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            directionsUiState = directionsUiState.copy(
-                                step = DirectionsStep.PlanRoute(
-                                    origin = step.origin,
-                                    destination = step.destination,
-                                    buildingHit = step.buildingHit
-                                )
-                            )
-                        }
-                    ) {
-                        Text("Edit")
-                    }
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            routePolylineRef?.remove()
-                            routePolylineRef = null
-                            directionsUiState = directionsUiState.copy(
-                                step = DirectionsStep.PickDestination,
-                                errorMessage = null
-                            )
-                        }
-                    ) {
-                        Text("Clear")
-                    }
-                }
-
-        }
     }
 }
 
-@Composable
-private fun BottomCard(
-    onDismiss: (() -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                if (onDismiss != null) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close directions"
-                            )
-                        }
-                    }
-                }
-                content()
-            }
-        }
-    }
-}
-
-private fun buildingTitle(
-    hit: BuildingHit?,
-    fallback: LatLng
-): String {
-    val props = hit?.properties
-    val name = props
-        ?.optString("building-name")
-        ?.takeIf { it.isNotBlank() }
-
-    return name ?: "Destination (${latLngShort(fallback)})"
-}
-
-private fun latLngShort(p: LatLng): String =
-    "%.5f, %.5f".format(p.latitude, p.longitude)
-
-// Helper Functions
-private fun getSavedCampus(context: Context): Campus {
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    val savedCampusName = prefs.getString(KEY_SELECTED_CAMPUS, Campus.SGW.name)
-    return try {
-        Campus.valueOf(savedCampusName ?: Campus.SGW.name)
-    } catch (e: IllegalArgumentException) {
-        Campus.SGW
-    }
-}
-
-private fun saveCampus(context: Context, campus: Campus) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit { putString(KEY_SELECTED_CAMPUS, campus.name) }
-}
-
-private fun loadGeoJson(context: Context, rawRes: Int): JSONObject {
-    val input = context.resources.openRawResource(rawRes)
-    val text = BufferedReader(InputStreamReader(input)).use { it.readText() }
-    return JSONObject(text)
-}
-
-private var defaultOverlayStyle = GeoJsonStyle(
-    fillColor = 0x80ffaca6.toInt(),
-    strokeColor = 0xFFbc4949.toInt(),
-    strokeWidth = 2f,
-    zIndex = 10f,
-    clickable = true,
-    markerColor = 0xFFbc4949.toInt(),
-    markerAlpha = 1f,
-    markerScale = 1.5f
-)
-
-private var highlightedOverlayStyle = GeoJsonStyle(
-    fillColor = 0xF0ffacaf.toInt(),
-    strokeColor = 0xFFbc4949.toInt(),
-    strokeWidth = 9f,
-    zIndex = 10f,
-    clickable = true,
-    markerColor = 0xFFbc4949.toInt(),
-    markerAlpha = 1f,
-    markerScale = 1.5f
-)
-
-private fun initializeOverlays(
-    campus: Campus,
-    sgwOverlay: GeoJsonOverlay,
-    loyOverlay: GeoJsonOverlay,
-    context: Context,
-    fusedLocationProviderClient: FusedLocationProviderClient,
-    googleMap: GoogleMap?,
-    sgwOverlayNullable: GeoJsonOverlay?,
-    loyOverlayNullable: GeoJsonOverlay?,
-    setCallback: (LocationCallback) -> Unit
-) {
-    sgwOverlay.setAllStyles(defaultOverlayStyle)
-    loyOverlay.setAllStyles(defaultOverlayStyle)
 
 
-
-    when (campus) {
-        Campus.SGW -> {
-            sgwOverlay.setBuildingsVisible(true)
-            loyOverlay.setBuildingsVisible(false)
-        }
-        Campus.LOYOLA -> {
-            loyOverlay.setBuildingsVisible(true)
-            sgwOverlay.setBuildingsVisible(false)
-        }
-    }
-
-    sgwOverlay.setMarkersVisible(false)
-    loyOverlay.setMarkersVisible(false)
-
-    startLocationTracking(
-        context,
-        fusedLocationProviderClient,
-        googleMap,
-        sgwOverlayNullable,
-        loyOverlayNullable,
-        setCallback
-    )
-}
-
-private fun startLocationTracking(
-    context: Context,
-    fusedLocationProviderClient: FusedLocationProviderClient,
-    googleMap: GoogleMap?,
-    sgwOverlay: GeoJsonOverlay?,
-    loyOverlay: GeoJsonOverlay?,
-    setCallback: (LocationCallback) -> Unit
-) {
-    if (ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED &&
-        ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        val callback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    highlightBuildingUserIsIn(userLatLng, sgwOverlay, loyOverlay)
-                }
-            }
-        }
-        setCallback(callback)
-
-        val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            TimeUnit.SECONDS.toMillis(10)
-        ).setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5))
-            .build()
-
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            callback,
-            Looper.getMainLooper()
-        )
-    }
-}
-
-private fun highlightBuildingUserIsIn(
-    latLng: LatLng,
-    sgwOverlay: GeoJsonOverlay?,
-    loyOverlay: GeoJsonOverlay?
-) {
-    sgwOverlay?.let { sgw ->
-        loyOverlay?.let { loy ->
-            val sgwBuildingLocator = BuildingLocator(
-                sgw.getBuildings(),
-                sgw.getBuildingProps()
-            )
-            val loyBuildingLocator = BuildingLocator(
-                loy.getBuildings(),
-                loy.getBuildingProps()
-            )
-
-            val sgwIsHit = sgwBuildingLocator.pointInBuilding(latLng)
-            val loyIsHit = loyBuildingLocator.pointInBuilding(latLng)
-
-            sgw.setAllStyles(defaultOverlayStyle)
-            loy.setAllStyles(defaultOverlayStyle)
-
-            if (sgwIsHit) {
-                val building = sgwBuildingLocator.findBuilding(latLng)
-                building?.let {
-                    sgw.setStyleForFeature(it.id, highlightedOverlayStyle)
-                }
-            }
-            if (loyIsHit) {
-                val building = loyBuildingLocator.findBuilding(latLng)
-                building?.let {
-                    loy.setStyleForFeature(it.id, highlightedOverlayStyle)
-                }
-            }
-        }
-    }
-
-}
-
-private fun isLocationEnabled(context: Context): Boolean {
-    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-}

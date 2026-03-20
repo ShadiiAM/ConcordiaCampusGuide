@@ -1,7 +1,7 @@
 package com.example.campusguide.ui
 
 import com.example.campusguide.ui.directions.TravelMode
-import com.example.campusguide.ui.screens.DirectionsTopBarState
+import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -147,7 +147,7 @@ class DirectionsTopBarStateTest {
         val leg = com.example.campusguide.ui.directions.RouteLeg(
             steps = listOf(com.example.campusguide.ui.directions.RouteStep(navigationInstruction = "Walk north"))
         )
-        val state = DirectionsTopBarState(active = true, currentSteps = leg, selectedMode = com.example.campusguide.ui.directions.TravelMode.WALK)
+        val state = DirectionsTopBarState(active = true, currentSteps = leg, selectedMode = TravelMode.WALK)
         val updated = state.copy(selectedMode = com.example.campusguide.ui.directions.TravelMode.TRANSIT)
 
         assertEquals(com.example.campusguide.ui.directions.TravelMode.TRANSIT, updated.selectedMode)

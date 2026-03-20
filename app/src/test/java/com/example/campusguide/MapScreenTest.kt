@@ -4,9 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.key
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -14,7 +12,7 @@ import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.fullSuggestions
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
-import com.example.campusguide.ui.screens.MapScreen
+import com.example.campusguide.ui.screens.map.MapScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.FocusClearWrapper
@@ -23,7 +21,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import kotlin.inc
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [33])

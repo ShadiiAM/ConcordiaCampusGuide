@@ -10,25 +10,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -45,25 +41,21 @@ import com.example.campusguide.ui.components.NavigationBar
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.screens.CalendarScreen
-import com.example.campusguide.ui.screens.MapScreen
+import com.example.campusguide.ui.screens.map.MapScreen
 import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.TravelMode
-import com.example.campusguide.ui.screens.DirectionsTopBarState
+import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
-import com.example.campusguide.data.SuggestionData
-import com.example.campusguide.data.fullSuggestions
-import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.FocusClearWrapper
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.viewmodels.MapSearchViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 
 
@@ -104,24 +96,24 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun ConcordiaCampusGuideApp() {
-    var currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-    var showProfile by rememberSaveable { mutableStateOf(false) }
     var showAccessibility by rememberSaveable { mutableStateOf(false) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-    var searchCounter by rememberSaveable { mutableStateOf(0) }
-    var topBarSuggestions by remember { mutableStateOf<List<SuggestionData>>(emptyList()) }
-    var topBarSelectedSuggestion by remember { mutableStateOf<com.example.campusguide.data.Suggestion?>(null) }
     val searchFocusRequester = remember { FocusRequester() }
     val context = LocalContext.current
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
-    var directionsGoTrigger by remember { mutableStateOf(0) }
-    var directionsCancelTrigger by remember { mutableStateOf(0) }
-    var originPickTrigger by remember { mutableStateOf(0) }
-    var myLocationTrigger by remember { mutableStateOf(0) }
+    var directionsGoTrigger by remember { mutableIntStateOf(0) }
+    var directionsCancelTrigger by remember { mutableIntStateOf(0) }
+    var originPickTrigger by remember { mutableIntStateOf(0) }
+    var myLocationTrigger by remember { mutableIntStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
     val viewModel = viewModel<ControlsViewModel>()
     val userLocationViewModel = viewModel<UserLocationViewModel>()
     val userLatLng by userLocationViewModel.userLatLng.collectAsState()
+    val nearestId by userLocationViewModel.nearestId.collectAsState()
+
+    val mapViewmodel: MapSearchViewModel = viewModel()
+    var showProfile by remember {mutableStateOf(false)}
+
+    var currentDestination = remember { mutableStateOf(AppDestinations.MAP) }
 
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -172,11 +164,14 @@ fun ConcordiaCampusGuideApp() {
                 NavigationBar((currentDestination), { modifier ->
 
                     when (currentDestination.value) {
-                        AppDestinations.MAP -> MapScreen(
+                        AppDestinations.MAP -> {
+                            MapScreen(
                             viewModel = viewModel,
-                            searchQuery = "$searchQuery#$searchCounter",
-                            topBarSelectedSuggestion = topBarSelectedSuggestion,
-                            onTopBarBuildingConsumed = { topBarSelectedSuggestion = null },
+                            searchQuery = "$mapViewmodel.searchQuery#$mapViewmodel.searchCounter",
+                            topBarSelectedSuggestion = mapViewmodel.topBarSelectedSuggestion,
+                            onTopBarBuildingConsumed = {
+                                mapViewmodel.topBarSelectedSuggestion = null
+                            },
                             onBottomSearchClick = {
                                 try {
                                     searchFocusRequester.requestFocus()
@@ -194,72 +189,60 @@ fun ConcordiaCampusGuideApp() {
                             topBarTravelMode = topBarTravelMode,
                         )
 
-                        AppDestinations.CALENDAR -> CalendarScreen()
-                        AppDestinations.POI -> PlaceholderScreen("POI Screen", modifier)
+                            if (directionsTopBarState.active) {
+                                DirectionsTopBar(
+                                    modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp),
+                                    originLabel = directionsTopBarState.originLabel,
+                                    destinationLabel = directionsTopBarState.destinationLabel,
+                                    isCrossCampus = directionsTopBarState.isCrossCampus,
+                                    selectedMode = directionsTopBarState.selectedMode,
+                                    onModeSelected = { mode -> topBarTravelMode = mode },
+                                    routeSummary = directionsTopBarState.routeSummary,
+                                    errorMessage = directionsTopBarState.errorMessage,
+                                    showActions = directionsTopBarState.showActions,
+                                    isLoadingRoute = directionsTopBarState.isLoadingRoute,
+                                    currentSteps = directionsTopBarState.currentSteps,
+                                    isPickingOrigin = directionsTopBarState.isPickingOrigin,
+                                    onOriginClick = { originPickTrigger++ },
+                                    onMyLocationClick = { myLocationTrigger++ },
+                                    onGoClick = { directionsGoTrigger++ },
+                                    onCancelClick = {
+                                        directionsCancelTrigger++
+                                        topBarTravelMode = TravelMode.DRIVE
+                                    },
+                                )
+                            } else {
+                                val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+                                    mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
+                                }
+
+                                SearchBarWithProfile(
+                                    modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
+                                    focusRequester = searchFocusRequester,
+                                    suggestions = mapViewmodel.topBarSuggestions,
+
+                                    onSearchQueryChange = mapViewmodel::onSearchQueryChange,
+                                    onSearchSubmit = mapViewmodel::onSearchSubmit,
+                                    onSuggestionSelected = mapViewmodel::onSuggestionSelected,
+                                    onProfileClick = { showProfile = true },
+
+
+                                    suggestionContent = suggestionContent,
+                                    suggestionKey = mapViewmodel.suggestionKey,
+                                )
+                            }
                     }
 
-                    if (directionsTopBarState.active) {
-                        DirectionsTopBar(
-                            modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp),
-                            originLabel = directionsTopBarState.originLabel,
-                            destinationLabel = directionsTopBarState.destinationLabel,
-                            isCrossCampus = directionsTopBarState.isCrossCampus,
-                            selectedMode = directionsTopBarState.selectedMode,
-                            onModeSelected = { mode -> topBarTravelMode = mode },
-                            routeSummary = directionsTopBarState.routeSummary,
-                            errorMessage = directionsTopBarState.errorMessage,
-                            showActions = directionsTopBarState.showActions,
-                            isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                            currentSteps = directionsTopBarState.currentSteps,
-                            isPickingOrigin = directionsTopBarState.isPickingOrigin,
-                            onOriginClick = { originPickTrigger++ },
-                            onMyLocationClick = { myLocationTrigger++ },
-                            onGoClick = { directionsGoTrigger++ },
-                            onCancelClick = {
-                                directionsCancelTrigger++
-                                topBarTravelMode = TravelMode.DRIVE
-                            },
-                        )
-                    } else {
-                        SearchBarWithProfile(
-                            modifier = Modifier.padding(top = 35.dp)
-                                .ignoreFocusClearOnTouch(),
-                            focusRequester = searchFocusRequester,
-                            onSearchQueryChange = { query ->
-                                topBarSuggestions =
-                                    fullSuggestions(
-                                        query = query,
-                                        activeCampus = Campus.SGW,
-                                        crossCampus = true,
-                                    )
-                            },
-                            onSearchSubmit = { query ->
-                                val matchedBuilding =
-                                    com.example.campusguide.data.ALL_SUGGESTIONS
-                                        .firstOrNull { it.suggestion.matches(query) }
-                                if (matchedBuilding != null) {
-                                    topBarSelectedSuggestion = matchedBuilding.suggestion
-                                    topBarSuggestions = emptyList()
-                                    currentDestination.value = AppDestinations.MAP
-                                } else {
-                                    searchQuery = query
-                                    searchCounter++
-                                    topBarSuggestions = emptyList()
-                                    if (currentDestination.value != AppDestinations.MAP) {
-                                        currentDestination.value = AppDestinations.MAP
-                                    }
-                                }
-                            },
-                            onProfileClick = { showProfile = true },
-                            suggestions = topBarSuggestions,
-                            onSuggestionSelected = { suggestion ->
-                                topBarSelectedSuggestion = suggestion
-                                topBarSuggestions = emptyList()
-                                searchQuery = ""
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            UserLatLng = userLatLng
-                        )
+
+
+
+                        AppDestinations.CALENDAR -> {
+                            CalendarScreen()
+
+                        }
+                        AppDestinations.POI -> {
+                            Greeting("POI Screen", modifier)
+                        }
                     }
                 }
                 )
@@ -270,7 +253,7 @@ fun ConcordiaCampusGuideApp() {
 }
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
-    data class Drawable(@DrawableRes val resId: Int) : AppIcon()
+    data class Drawable(@param:DrawableRes val resId: Int) : AppIcon()
 }
 
 enum class AppDestinations(
@@ -296,15 +279,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     ConcordiaCampusGuideTheme {
         Greeting("Android")
-    }
-}
-
-@Composable
-fun PlaceholderScreen(name: String, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = name)
     }
 }

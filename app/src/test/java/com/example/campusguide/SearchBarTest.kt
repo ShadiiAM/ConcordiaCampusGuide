@@ -19,8 +19,8 @@ import com.example.campusguide.data.fullSuggestions
 //import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.FocusClearWrapper
-import com.example.campusguide.ui.screens.DirectionsTopBarState
-import com.example.campusguide.ui.screens.MapScreen
+import com.example.campusguide.ui.screens.map.DirectionsTopBarState
+import com.example.campusguide.ui.screens.map.MapScreen
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
