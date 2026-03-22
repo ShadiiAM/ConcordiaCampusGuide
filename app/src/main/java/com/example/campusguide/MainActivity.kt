@@ -54,6 +54,7 @@ import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.components.FocusClearWrapper
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
+import com.example.campusguide.ui.screens.map.canUseShuttle
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.ui.viewmodels.MapSearchViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
@@ -201,7 +202,7 @@ fun ConcordiaCampusGuideApp() {
                                     errorMessage = directionsTopBarState.errorMessage,
                                     showActions = directionsTopBarState.showActions,
                                     isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                                    currentSteps = directionsTopBarState.currentSteps,
+                                    route = directionsTopBarState.route,
                                     isPickingOrigin = directionsTopBarState.isPickingOrigin,
                                     onOriginClick = { originPickTrigger++ },
                                     onMyLocationClick = { myLocationTrigger++ },
@@ -210,7 +211,8 @@ fun ConcordiaCampusGuideApp() {
                                         directionsCancelTrigger++
                                         topBarTravelMode = TravelMode.DRIVE
                                     },
-                                )
+                                    canUseShuttle = directionsTopBarState.canUseShuttle,
+                                    )
                             } else {
                                 val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
                                     mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)

@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
-import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 
 
@@ -50,13 +50,16 @@ fun DirectionsTopBar(
     errorMessage: String? = null,
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
-    currentSteps: RouteLeg? = null,
+    route: RouteResult = RouteResult(points = emptyList()),
     isPickingOrigin: Boolean = false,
     onOriginClick: () -> Unit = {},
     onMyLocationClick: () -> Unit = {},
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
+    canUseShuttle: Boolean = false
 ) {
+    val currentSteps = route.legs.firstOrNull()
+
     val purple = Color(0xFF6B4D8A)
 
     // Local UI state: whether the step-by-step detail panel is open
@@ -179,6 +182,39 @@ fun DirectionsTopBar(
                         color = purple,
                         fontWeight = FontWeight.Medium,
                     )
+                }
+            }
+
+            //Shuttle Badge
+            if(selectedMode == TravelMode.TRANSIT) {
+                if (canUseShuttle) {
+                    Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color(0xFFE53935), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Path uses Concordia Shuttle",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFFE53935),
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                } else {
+                    Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color.Blue, RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Path uses regular transit",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.Blue,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
                 }
             }
 

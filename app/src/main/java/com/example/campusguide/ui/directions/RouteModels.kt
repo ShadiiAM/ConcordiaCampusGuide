@@ -16,6 +16,7 @@ data class RouteResult(
     val durationSeconds: Int? = null,
     val distanceMeters: Int? = null,
     val legs: List<RouteLeg> = emptyList(),
+    val isShuttleRoute: Boolean = false
 )
 
 data class RouteLeg(
