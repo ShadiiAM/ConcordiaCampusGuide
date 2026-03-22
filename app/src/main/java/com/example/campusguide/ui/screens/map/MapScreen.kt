@@ -161,6 +161,21 @@ fun MapScreen(
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
+    // Get user location for default origin
+    LaunchedEffect(Unit) {
+        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!fineGranted && !coarseGranted) return@LaunchedEffect
+
+        userLocationViewModel.fetchUserLocation(context)
+    }
+
+    // Location services
+    val fusedLocationProviderClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
+
 
     fun resolveBuildingLatLng(building: CampusBuilding): LatLng {
         val overlay = when (building.campus) {
@@ -225,7 +240,7 @@ fun MapScreen(
                 )
             )
         }.onSuccess { route ->
-
+            recenter(googleMap, fusedLocationProviderClient, context)
             when(travelMode) {
                 TravelMode.DRIVE ->
                 {
@@ -445,21 +460,6 @@ fun MapScreen(
         }
         onTopBarBuildingConsumed()
     }
-
-    // Get user location for default origin
-    LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) return@LaunchedEffect
-
-        userLocationViewModel.fetchUserLocation(context)
-    }
-
-    // Location services
-    val fusedLocationProviderClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
 
     // Permission handling
     val locationPermissionLauncher = rememberLauncherForActivityResult(
