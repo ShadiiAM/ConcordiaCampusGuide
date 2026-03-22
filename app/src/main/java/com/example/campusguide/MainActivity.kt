@@ -136,7 +136,7 @@ fun ConcordiaCampusGuideApp() {
 
 
     LaunchedEffect(Unit) {
-        userLocationViewModel.fetchUserLocation(context)
+        userLocationViewModel.fetchUserLocation()
     }
 
 

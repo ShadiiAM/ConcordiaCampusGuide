@@ -1,30 +1,52 @@
 package com.example.campusguide.ui.viewmodels
 
 import android.Manifest
-import android.content.Context
+import android.app.Application
 import android.content.pm.PackageManager
-import androidx.compose.runtime.remember
+import android.os.Looper
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class UserLocationViewModel : ViewModel() {
+class UserLocationViewModel(application: Application) : AndroidViewModel(application) {
     private val _userLatLng = MutableStateFlow<LatLng?>(null)
     val userLatLng: StateFlow<LatLng?> = _userLatLng
+
+    private val _defaultOrigin = MutableStateFlow(LatLng(45.4953, -73.5788)) // your fallback
+
+    val effectiveOrigin: StateFlow<LatLng> = userLatLng
+        .map { it ?: _defaultOrigin.value }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, _defaultOrigin.value)
 
     private val _nearestShuttleId = MutableStateFlow<String?>(null)
     val nearestId: StateFlow<String?> = _nearestShuttleId
 
+    private val fusedClient = LocationServices.getFusedLocationProviderClient(application)
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
+            result.lastLocation?.let {
+                _userLatLng.value = LatLng(it.latitude, it.longitude)
+            }
+        }
+    }
+
     init {
+        fetchUserLocation()
         viewModelScope.launch {
             userLatLng.collect { latLng ->
                 updateNearestId(latLng)
@@ -32,32 +54,31 @@ class UserLocationViewModel : ViewModel() {
         }
     }
 
-    fun updateNearestId(userLatLng: LatLng?) {
+    fun fetchUserLocation() {
+        val context = getApplication<Application>()
+        val fineGranted = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
-        val allShuttleStop = ALL_SUGGESTIONS.map { it }.filterIsInstance<ShuttleStop>()
-
-        _nearestShuttleId.value = userLatLng?.let {
-            NearestShuttleStopFinder.find(it, allShuttleStop)?.stop?.id
+        if (fineGranted) {
+            val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L).build()
+            fusedClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper())
         }
     }
-    fun fetchUserLocation(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
 
-            val fineGranted = ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+    override fun onCleared() {
+        super.onCleared()
+        fusedClient.removeLocationUpdates(locationCallback)
+    }
 
-            if (fineGranted) {
-                val fused = LocationServices.getFusedLocationProviderClient(context)
-                fused.lastLocation.addOnSuccessListener { loc ->
-                    _userLatLng.value = loc?.let { LatLng(it.latitude, it.longitude) }
-                }
-            }
+    fun updateNearestId(userLatLng: LatLng?) {
+        val allShuttleStop = ALL_SUGGESTIONS.map { it }.filterIsInstance<ShuttleStop>()
+        _nearestShuttleId.value = userLatLng?.let {
+            NearestShuttleStopFinder.find(it, allShuttleStop)?.stop?.id
         }
     }
 
     fun onLocationUpdated(latLng: LatLng) {
         _userLatLng.value = latLng
     }
-
 }

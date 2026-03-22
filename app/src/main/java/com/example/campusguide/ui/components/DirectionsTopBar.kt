@@ -10,9 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.text.font.FontStyle
@@ -470,10 +470,10 @@ private fun directionIconFor(instruction: String?): ImageVector {
         "u-turn" in lower || "uturn" in lower     -> Icons.AutoMirrored.Filled.ArrowBack
         "turn left" in lower || "left onto" in lower
                 || "slight left" in lower
-                || "keep left" in lower            -> Icons.Default.KeyboardArrowLeft
+                || "keep left" in lower            -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
         "turn right" in lower || "right onto" in lower
                 || "slight right" in lower
-                || "keep right" in lower           -> Icons.Default.KeyboardArrowRight
+                || "keep right" in lower           -> Icons.AutoMirrored.Filled.KeyboardArrowRight
         else                                       -> Icons.Default.KeyboardArrowUp
     }
 }

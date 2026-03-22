@@ -84,7 +84,6 @@ import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.Polyline
-import com.google.maps.android.ktx.model.polylineOptions
 
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
@@ -132,7 +131,7 @@ fun MapScreen(
     var pendingSearchQuery by remember { mutableStateOf(searchQuery) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
     var controlsVisible = viewModel.controlsVisible
-    var polylineFormatting = polylineOptions {  }
+    lateinit var polylineFormatting: PolylineOptions
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -140,10 +139,9 @@ fun MapScreen(
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
     var travelMode by rememberSaveable { mutableStateOf(TravelMode.DRIVE) }
     var isPickingOrigin by remember { mutableStateOf(false) }
-    var routePolylineRef by remember {
-        mutableStateOf<Polyline?>(null)
-    }
-    var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
+    val routePolylines = remember { mutableListOf<Polyline?>() }
+
+    val defaultOrigin by userLocationViewModel.effectiveOrigin.collectAsState()
     // Track the selected building's LatLng for directions
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
@@ -167,7 +165,7 @@ fun MapScreen(
         val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!fineGranted && !coarseGranted) return@LaunchedEffect
 
-        userLocationViewModel.fetchUserLocation(context)
+        userLocationViewModel.fetchUserLocation()
     }
 
     // Location services
@@ -212,7 +210,7 @@ fun MapScreen(
     }
     // Sync travel mode from top bar selection
     LaunchedEffect(topBarTravelMode) {
-        travelMode = topBarTravelMode
+            travelMode = topBarTravelMode
         val step = directionsUiState.step
         if (step is DirectionsStep.ShowingRoute) {
             directionsUiState = directionsUiState.copy(
@@ -229,6 +227,10 @@ fun MapScreen(
 // Handle Go button from top bar
     LaunchedEffect(directionsGoTrigger) {
         if (directionsGoTrigger == 0) return@LaunchedEffect
+
+        routePolylines.forEach { it?.remove() }
+        routePolylines.clear()
+
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
         runCatching {
@@ -240,42 +242,53 @@ fun MapScreen(
                 )
             )
         }.onSuccess { route ->
+
+            android.util.Log.d("Legs", route.legs.toString())
             recenter(googleMap, fusedLocationProviderClient, context)
-            when(travelMode) {
-                TravelMode.DRIVE ->
-                {
-                    polylineFormatting =
-                        PolylineOptions()
-                            .color(0xFF1565C0.toInt())
-                            .width(18f)
+            when(travelMode){
+                TravelMode.DRIVE ->{
+                    polylineFormatting = PolylineOptions()
+                        .addAll(route.points)
+                        .color(0xFF1565C0.toInt())
+                        .width(18f)
+
+                    val polyline = googleMap?.addPolyline(polylineFormatting)
+                    routePolylines.add(polyline)
                 }
-                TravelMode.WALK -> {
+                TravelMode.WALK ->{
+                    polylineFormatting = PolylineOptions()
+                        .addAll(route.points)
+                        .color(0xFF1565C0.toInt())
+                        .width(14f)
+                        .pattern(listOf(Dash(20f), Gap(10f)))
 
-                    polylineFormatting =
-                        PolylineOptions()
-                            .color(0xFF1565C0.toInt())
-                            .width(14f)
-                            .pattern(listOf(Dash(20f), Gap(10f)))
-
-
+                    val polyline = googleMap?.addPolyline(polylineFormatting)
+                    routePolylines.add(polyline)
                 }
                 TravelMode.TRANSIT ->{
-
-                    polylineFormatting =
-                        PolylineOptions()
-                            .color(0xFF7B1FA2.toInt())
-                            .width(18f)
-
+                    route.legs.forEach { leg ->
+                        leg.steps.forEach { step ->
+                            when (step.travelMode) {
+                                TravelMode.TRANSIT -> {
+                                    polylineFormatting = PolylineOptions()
+                                        .addAll(step.polyline)
+                                        .color(0xFF7B1FA2.toInt())
+                                        .width(18f)
+                                }
+                                else -> {
+                                    polylineFormatting = PolylineOptions()
+                                        .addAll(step.polyline)
+                                        .color(0xFF1565C0.toInt())
+                                        .width(14f)
+                                        .pattern(listOf(Dash(20f), Gap(10f)))
+                                }
+                            }
+                            val polyline = googleMap?.addPolyline(polylineFormatting)
+                            routePolylines.add(polyline)                        }
+                    }
                 }
             }
 
-            withContext(Dispatchers.Main) {
-                routePolylineRef?.remove()
-                routePolylineRef = googleMap?.addPolyline(
-                    polylineFormatting
-                        .addAll(route.points)
-                )
-            }
 
             // Show helpful message for cross-campus routes
             val isCrossCampus = isCrossCampusRoute(originBuilding,
@@ -318,8 +331,8 @@ fun MapScreen(
 // Handle Cancel from top bar
     LaunchedEffect(directionsCancelTrigger) {
         if (directionsCancelTrigger == 0) return@LaunchedEffect
-        routePolylineRef?.remove()
-        routePolylineRef = null
+        routePolylines.forEach { it?.remove() }
+        routePolylines.clear()
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
             errorMessage = null,

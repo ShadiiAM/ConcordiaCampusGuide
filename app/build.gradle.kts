@@ -225,6 +225,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.uiautomator)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Unit Tests
     testImplementation("junit:junit:4.13.2")

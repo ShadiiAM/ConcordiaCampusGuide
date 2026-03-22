@@ -48,30 +48,27 @@ class GoogleRoutesRepository(
 
             val bodyStr = json.encodeToString(ComputeRoutesRequest.serializer(), bodyObj)
             // Field mask varies by travel mode
-            val fieldMask = if (request.travelMode == "TRANSIT") {
-                "routes.duration," +
-                "routes.distanceMeters," +
-                "routes.polyline.encodedPolyline," +
-                "routes.legs.duration," +
-                "routes.legs.distanceMeters," +
-                "routes.legs.steps.distanceMeters," +
-                "routes.legs.steps.staticDuration," +
-                "routes.legs.steps.transitDetails.stopDetails," +
-                "routes.legs.steps.transitDetails.localizedValues," +
-                "routes.legs.steps.transitDetails.headsign," +
-                "routes.legs.steps.transitDetails.transitLine," +
-                "routes.legs.steps.transitDetails.stopCount"
-            } else {
-                "routes.duration," +
-                "routes.distanceMeters," +
-                "routes.polyline.encodedPolyline," +
-                "routes.legs.duration," +
-                "routes.legs.distanceMeters," +
-                "routes.legs.steps.distanceMeters," +
-                "routes.legs.steps.staticDuration," +
-                "routes.legs.steps.navigationInstruction"
-            }
 
+            var fieldMask =
+                    "routes.duration," +
+                    "routes.distanceMeters," +
+                    "routes.polyline.encodedPolyline," +
+                    "routes.legs.duration," +
+                    "routes.legs.distanceMeters," +
+                    "routes.legs.steps.distanceMeters," +
+                    "routes.legs.steps.staticDuration," +
+                    "routes.legs.steps.navigationInstruction," +
+                    "routes.legs.steps.travelMode,"
+
+            if (request.travelMode == "TRANSIT") {
+                fieldMask = fieldMask +
+                    "routes.legs.steps.polyline.encodedPolyline," +
+                    "routes.legs.steps.transitDetails.stopDetails," +
+                    "routes.legs.steps.transitDetails.localizedValues," +
+                    "routes.legs.steps.transitDetails.headsign," +
+                    "routes.legs.steps.transitDetails.transitLine," +
+                    "routes.legs.steps.transitDetails.stopCount"
+            }
             val req = Request.Builder()
                 .url(url)
                 .post(bodyStr.toRequestBody("application/json".toMediaType()))
@@ -91,7 +88,7 @@ class GoogleRoutesRepository(
                     json.decodeFromString(ComputeRoutesResponse.serializer(), text)
                 } catch (e: Exception) {
                     // Log the problematic JSON for debugging
-                    android.util.Log.e("GoogleRoutesRepo", "Failed to parse JSON response: $text", e)
+                    Log.e("GoogleRoutesRepo", "Failed to parse JSON response: $text", e)
                     throw IllegalStateException("Failed to parse Routes API response: ${e.message}", e)
                 }
 
@@ -159,11 +156,18 @@ class GoogleRoutesRepository(
                                 stopCount = td.stopCount
                             )
                         }
+                        val travelMode = when {
+                            step.transitDetails != null -> TravelMode.TRANSIT
+                            request.travelMode == "DRIVE" -> TravelMode.DRIVE
+                            else -> TravelMode.WALK
+                        }
                         RouteStep(
                             durationSeconds = stepDuration,
                             distanceMeters = step.distanceMeters,
                             navigationInstruction = step.navigationInstruction?.instructions,
-                            transitDetails = transitDetails
+                            transitDetails = transitDetails,
+                            travelMode = travelMode,
+                            polyline = PolyUtil.decode(step.polyline?.encodedPolyline ?: "")
                         )
                     } ?: emptyList()
 
@@ -261,7 +265,9 @@ data class ApiRouteStep(
     val staticDuration: String? = null,
     val navigationInstruction: NavigationInstruction? = null,
     val transitDetails: ApiTransitDetails? = null,
-)
+    val travelMode: String? = null,
+    val polyline: RoutePolyline? = null
+    )
 
 @Serializable
 data class NavigationInstruction(
@@ -310,7 +316,7 @@ data class ApiTransitLine(
 
 @Serializable
 data class ApiTransitVehicle(
-    val name: String? = null,
+    val name: LocalizedText? = null,
     val type: String? = null,
 )
 
