@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import com.example.campusguide.R
-import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
@@ -78,12 +77,9 @@ import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import androidx.core.content.ContextCompat
-import com.example.campusguide.AppDestinations
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
-import com.example.campusguide.ui.screens.AccessibilityScreen
-import com.example.campusguide.ui.screens.ProfileScreen
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
@@ -122,7 +118,6 @@ fun MapScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val accessibilityState = LocalAccessibilityState.current
     val userLocationViewModel: UserLocationViewModel = viewModel()
 
     // State management
@@ -136,8 +131,6 @@ fun MapScreen(
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
     var pendingSearchQuery by remember { mutableStateOf(searchQuery) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
-    var showProfile by remember { mutableStateOf(false) }
-    var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible = viewModel.controlsVisible
     var polylineFormatting = polylineOptions {  }
 
@@ -155,8 +148,6 @@ fun MapScreen(
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
-    var originSuggestions  by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
-    var destSuggestions    by remember { mutableStateOf<List<CampusBuilding>>(emptyList()) }
     var originDisplayName  by remember { mutableStateOf<String?>(null) }
 
     val mapView = remember { MapView(context) }
@@ -318,8 +309,6 @@ fun MapScreen(
             step = DirectionsStep.PickDestination,
             errorMessage = null,
         )
-        originSuggestions = emptyList()
-        destSuggestions = emptyList()
         isPickingOrigin = false
 
         searchMarker?.remove()
@@ -1044,31 +1033,6 @@ fun MapScreen(
                     tint = Color.Unspecified,
                     modifier = Modifier.fillMaxSize()
                 )
-            }
-        }
-
-
-        // Profile/Accessibility Overlay
-        if (showProfile || showAccessibility) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
-                if (showAccessibility) {
-                    AccessibilityScreen(
-                        onBackClick = {
-                            showAccessibility = false
-                        }
-                    )
-                } else if (showProfile) {
-                    ProfileScreen(
-                        onBackClick = { showProfile = false },
-                        onProfileClick = { },
-                        onAccessibilityClick = { showAccessibility = true }
-                    )
-                }
             }
         }
 
