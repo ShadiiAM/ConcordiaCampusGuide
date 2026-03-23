@@ -8,10 +8,13 @@ import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.directions.RouteResult
+import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.utils.BuildingHit
 import com.example.campusguide.ui.map.utils.BuildingLocator
+import com.example.campusguide.ui.shuttle.DepartureResult
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -218,3 +221,21 @@ internal fun buildingTitle(
 
 internal fun latLngShort(p: LatLng): String =
     "%.5f, %.5f".format(p.latitude, p.longitude)
+
+
+
+data class DirectionsTopBarState(
+    val active: Boolean,
+    val originLabel: String = "Your location",
+    val destinationLabel: String = "",
+    val isCrossCampus: Boolean = false,
+    val selectedMode: TravelMode = TravelMode.DRIVE,
+    val routeSummary: String? = null,
+    val errorMessage: String? = null,
+    val isLoadingRoute: Boolean = false,
+    val showActions: Boolean = false,
+    val route: RouteResult = RouteResult(points = emptyList()),
+    val isPickingOrigin: Boolean = false,
+    val canUseShuttle: Boolean = false,
+    val shuttleStatus: DepartureResult = DepartureResult.NoMoreToday
+)

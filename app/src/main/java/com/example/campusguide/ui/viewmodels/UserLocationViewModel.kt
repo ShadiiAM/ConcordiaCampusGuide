@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
+import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -72,7 +73,7 @@ class UserLocationViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun updateNearestId(userLatLng: LatLng?) {
-        val allShuttleStop = ALL_SUGGESTIONS.map { it }.filterIsInstance<ShuttleStop>()
+        val allShuttleStop = ShuttleTracker().getShuttleStops()
         _nearestShuttleId.value = userLatLng?.let {
             NearestShuttleStopFinder.find(it, allShuttleStop)?.stop?.id
         }

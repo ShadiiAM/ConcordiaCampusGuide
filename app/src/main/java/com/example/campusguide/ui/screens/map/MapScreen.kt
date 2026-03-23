@@ -79,7 +79,8 @@ import androidx.core.content.ContextCompat
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
-import com.example.campusguide.ui.directions.RouteResult
+import com.example.campusguide.ui.directions.detectCampus
+import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
@@ -88,20 +89,6 @@ import com.google.android.gms.maps.model.Polyline
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
 
-data class DirectionsTopBarState(
-    val active: Boolean,
-    val originLabel: String = "Your location",
-    val destinationLabel: String = "",
-    val isCrossCampus: Boolean = false,
-    val selectedMode: TravelMode = TravelMode.DRIVE,
-    val routeSummary: String? = null,
-    val errorMessage: String? = null,
-    val isLoadingRoute: Boolean = false,
-    val showActions: Boolean = false,
-    val route: RouteResult = RouteResult(points = emptyList()),
-    val isPickingOrigin: Boolean = false,
-    val canUseShuttle: Boolean = false
-)
 @Composable
 fun MapScreen(
     searchQuery: String = "",
@@ -231,6 +218,11 @@ fun MapScreen(
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
+        val isCrossCampus = isCrossCampusRoute(
+            originBuilding,
+            destinationBuilding, step.origin
+        )
+
         routePolylines.forEach { it?.remove() }
         routePolylines.clear()
         if(canUseShuttle(step.origin, step.destination, travelMode)){
@@ -331,10 +323,7 @@ fun MapScreen(
 
 
                 // Show helpful message for cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(
-                    originBuilding,
-                    destinationBuilding, step.origin
-                )
+
                 if (isCrossCampus) {
                     scope.launch {
                         snackBarHostState.showSnackbar(
@@ -355,16 +344,11 @@ fun MapScreen(
                 )
             }.onFailure { e ->
                 // Check if this is a cross-campus route and provide helpful error message
-                val isCrossCampus = isCrossCampusRoute(
-                    originBuilding,
-                    destinationBuilding, step.origin
-                )
                 val errorMsg = if (isCrossCampus) {
                     getCrossCampusErrorMessage(travelMode)
                 } else {
                     e.message ?: "Failed to get route"
                 }
-
                 directionsUiState = directionsUiState.copy(
                     isLoadingRoute = false,
                     errorMessage = errorMsg,
@@ -414,8 +398,10 @@ fun MapScreen(
                 // Automatically detect cross-campus routes
                 val isCrossCampus = isCrossCampusRoute(originBuilding,
                     destinationBuilding, step.origin)
-
                 val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode)
+
+                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
+
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
                         active = true,
@@ -427,7 +413,8 @@ fun MapScreen(
                         isLoadingRoute = directionsUiState.isLoadingRoute,
                         showActions = true,
                         isPickingOrigin = isPickingOrigin,
-                        canUseShuttle = canUseShuttle
+                        canUseShuttle = canUseShuttle,
+                        shuttleStatus = shuttleStatus
                     )
                 )
             }

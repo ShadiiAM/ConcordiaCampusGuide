@@ -212,6 +212,7 @@ fun ConcordiaCampusGuideApp() {
                                         topBarTravelMode = TravelMode.DRIVE
                                     },
                                     canUseShuttle = directionsTopBarState.canUseShuttle,
+                                    shuttleStatus = directionsTopBarState.shuttleStatus
                                     )
                             } else {
                                 val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
@@ -234,9 +235,6 @@ fun ConcordiaCampusGuideApp() {
                                 )
                             }
                     }
-
-
-
 
                         AppDestinations.CALENDAR -> {
                             CalendarScreen()

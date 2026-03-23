@@ -33,9 +33,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.directions.detectCampus
+import com.example.campusguide.ui.shuttle.DepartureResult
+import com.example.campusguide.ui.shuttle.ShuttleSchedule
 
 
 @Composable
@@ -56,7 +60,8 @@ fun DirectionsTopBar(
     onMyLocationClick: () -> Unit = {},
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
-    canUseShuttle: Boolean = false
+    canUseShuttle: Boolean = false,
+    shuttleStatus: DepartureResult = DepartureResult.NoMoreToday
 ) {
     val currentSteps = route.legs.firstOrNull()
 
@@ -202,14 +207,15 @@ fun DirectionsTopBar(
                         )
                     }
                 } else {
-                    Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
                     Box(
                         modifier = Modifier
                             .border(1.5.dp, Color.Blue, RoundedCornerShape(6.dp))
                             .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = "Path uses regular transit",
+                            text = if(shuttleStatus !is DepartureResult.Soon) "Regular Transit: Outside Concordia Shuttle Hours"
+                                    else "Regular Transit: Path not offered by Concordia Shuttle",
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.Blue,
                             fontWeight = FontWeight.Medium,
@@ -424,12 +430,20 @@ fun DirectionsTopBar(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.size(48.dp),
                                 ) {
-                                    Icon(
-                                        imageVector = directionIconFor(step.navigationInstruction),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(24.dp),
-                                    )
+                                    when (val icon = directionIconFor(step.navigationInstruction)) {
+                                        is AppIcon.Vector -> Icon(
+                                            imageVector = icon.imageVector,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                        is AppIcon.Drawable -> Icon(
+                                            painter = painterResource(icon.resId),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                    }
                                 }
                             }
 
@@ -500,16 +514,18 @@ fun DirectionsTopBar(
 }
 
 /** Maps a navigation instruction string to a direction arrow icon. */
-private fun directionIconFor(instruction: String?): ImageVector {
-    val lower = instruction?.lowercase() ?: return Icons.Default.KeyboardArrowUp
+private fun directionIconFor(instruction: String?): AppIcon {
+    val lower = instruction?.lowercase() ?: return AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     return when {
-        "u-turn" in lower || "uturn" in lower     -> Icons.AutoMirrored.Filled.ArrowBack
-        "turn left" in lower || "left onto" in lower
+        ("u-turn" in lower || "uturn" in lower)     -> AppIcon.Drawable(R.drawable.u_turn_icon)
+        ("turn left" in lower || "left onto" in lower
                 || "slight left" in lower
-                || "keep left" in lower            -> Icons.AutoMirrored.Filled.KeyboardArrowLeft
-        "turn right" in lower || "right onto" in lower
+                || "keep left" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft)
+        ("turn right" in lower || "right onto" in lower
                 || "slight right" in lower
-                || "keep right" in lower           -> Icons.AutoMirrored.Filled.KeyboardArrowRight
-        else                                       -> Icons.Default.KeyboardArrowUp
+                || "keep right" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowRight)
+        ("bus" in lower || "shuttle" in lower)      -> AppIcon.Drawable(R.drawable.ic_directions_bus)
+        ("walk to destination" in lower|| "Walk to shuttle stop" in lower) -> AppIcon.Drawable(R.drawable.ic_directions_walk)
+        else                                        -> AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     }
 }

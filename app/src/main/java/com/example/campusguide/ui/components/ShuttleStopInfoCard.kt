@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.campusguide.ui.shuttle.DepartureResult
+
 private val ShuttleBlue = Color(0xFF1565C0)
 
 @Composable
@@ -36,15 +38,22 @@ fun ShuttleStopInfoCard(
         ShuttleScheduleDialog(onDismiss = { showSchedule = false })
         return
     }
-
+    var nextDepText: String
     // Compute next departure
     val nextDep = ShuttleSchedule.nextDeparture(stop.campus)
-    val nextDepText = if (nextDep != null) {
-        "Next departure: $nextDep"
-    } else {
-        val nextDay = ShuttleSchedule.nextDepartureNextDay(stop.campus)
-        if (nextDay != null) "No more departures today.\nNext departure: ${nextDay.first} ${nextDay.second}"
-        else "No more departures today."
+
+    when (nextDep){
+        is DepartureResult.Soon ->{
+            nextDepText = "Next departure: $nextDep"
+        }
+        is DepartureResult.NoMoreToday ->{
+            val nextDay = ShuttleSchedule.nextDepartureNextDay(stop.campus)
+            nextDepText = if (nextDay != null) "No more departures today.\nNext departure: ${nextDay.first} ${nextDay.second}"
+            else "No more departures today."
+        }
+        is DepartureResult.TooFarAway ->{
+            nextDepText = "Next Departure is still more than 2 hours away.\nNext departure: ${nextDep.departure}"
+        }
     }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -92,7 +101,7 @@ fun ShuttleStopInfoCard(
                         text = nextDepText,
                         baseFontSizeSp = 14f,
                         forceFontWeight = FontWeight.SemiBold,
-                        fallbackColor = if (nextDep != null)
+                        fallbackColor = if (nextDep is DepartureResult.Soon)
                             MaterialTheme.colorScheme.onSurface
                         else
                             MaterialTheme.colorScheme.error

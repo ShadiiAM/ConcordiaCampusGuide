@@ -6,9 +6,10 @@ import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.RouteStep
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.detectCampus
+import com.example.campusguide.ui.shuttle.DepartureResult
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder.distanceBetween
-import com.example.campusguide.ui.shuttle.ShuttleTracker
+import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.shuttle.StaticShuttleDataSource
 import com.google.android.gms.maps.model.LatLng
 
@@ -71,7 +72,7 @@ fun getShuttleRoute(origin: LatLng, destination: LatLng): RouteResult {
     val shuttleStep = RouteStep(
         durationSeconds = 1500,      // ~25 min estimate
         distanceMeters = 7500,       // ~7.5km estimate
-        navigationInstruction = "Take the Concordia shuttle",
+        navigationInstruction = "Take the ${(ShuttleSchedule.nextDeparture(detectCampus(destination)) as DepartureResult.Soon).departure} Concordia shuttle",
         travelMode = TravelMode.TRANSIT,
         polyline = shuttlePoints
     )
@@ -106,7 +107,7 @@ fun canUseShuttle(origin: LatLng, destination: LatLng, mode: TravelMode): Boolea
     val nearDestStop = (NearestShuttleStopFinder.find(destination, StaticShuttleDataSource().getShuttleStops())?.distanceMetres?: 0f) < 500
     val isCrossCampus = detectCampus(origin) != detectCampus(destination)
     val isTransit = mode == TravelMode.TRANSIT
-    val shuttleRunning = ShuttleTracker().getNextShuttleForCampus(detectCampus(destination)) != null
+    val shuttleRunning = ShuttleSchedule.nextDeparture(detectCampus(destination)) is DepartureResult.Soon
 
     return isTransit && nearOriginStop && nearDestStop && isCrossCampus && shuttleRunning
 }
