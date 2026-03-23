@@ -80,6 +80,7 @@ import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.detectCampus
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.Polyline
 
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
@@ -728,10 +729,11 @@ fun MapScreen(
                             val shuttleIcon = ShuttleMarkerFactory.create(ctx)
                             shuttleTracker.getShuttleStops().forEach { stop ->
                                 val marker = map.addMarker(
-                                    MarkerOptions()
+                                    AdvancedMarkerOptions()
                                         .position(stop.latLng)
                                         .icon(shuttleIcon)
                                         .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
+                                        .contentDescription(stop.id + "1")
                                 )
                                 if (marker != null) {
                                     marker.tag = stop

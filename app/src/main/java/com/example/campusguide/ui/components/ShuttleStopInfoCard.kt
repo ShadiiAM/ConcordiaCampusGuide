@@ -21,6 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.example.campusguide.ui.shuttle.DepartureResult
 
 private val ShuttleBlue = Color(0xFF1565C0)
@@ -122,6 +125,8 @@ fun ShuttleStopInfoCard(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (onDirectionsClick != null) {
                     Button(
+                        modifier = Modifier.semantics { contentDescription = "ShuttleInfoCardDirections" }
+                            .testTag("ShuttleInfoCardDirections"),
                         onClick = {
                             onDismiss()
                             onDirectionsClick()
