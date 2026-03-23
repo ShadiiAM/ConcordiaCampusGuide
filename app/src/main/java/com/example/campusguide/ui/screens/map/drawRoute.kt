@@ -14,6 +14,9 @@ import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import kotlin.collections.mutableListOf
 
 
@@ -23,7 +26,7 @@ suspend fun drawRoute(
     destination: LatLng,
     travelMode: String,
     googleMap: GoogleMap?,
-    directionsUiState: DirectionsUiState,
+    getDirectionsUiState: () -> DirectionsUiState,
     onDirectionsUiStateChange: (DirectionsUiState) -> Unit,
     repo: GoogleRoutesRepository,
     isCrossCampus: Boolean
@@ -56,10 +59,23 @@ suspend fun drawRoute(
                                 .pattern(listOf(Dash(20f), Gap(10f)))
                         }
                     }
-                    val polyline = googleMap?.addPolyline(polylineFormatting)
-                    routePolylines.add(polyline)
+                    withContext(Dispatchers.Main.immediate) {
+                        val polyline = googleMap?.addPolyline(polylineFormatting)
+                        routePolylines.add(polyline)
+                    }
+                    yield()
                 }
             }
+
+        onDirectionsUiStateChange(getDirectionsUiState().copy(
+            isLoadingRoute = false,
+            step = DirectionsStep.ShowingRoute(
+                origin = origin,
+                destination = destination,
+                buildingHit = step.buildingHit,
+                route = route,
+            ),
+        ))
     }
     else{
         travelType = enumValueOf<TravelMode>(travelMode)
@@ -82,8 +98,11 @@ suspend fun drawRoute(
                         .color(0xFF1565C0.toInt())
                         .width(18f)
 
-                    val polyline = googleMap?.addPolyline(polylineFormatting)
-                    routePolylines.add(polyline)
+                    withContext(Dispatchers.Main.immediate) {
+                        val polyline = googleMap?.addPolyline(polylineFormatting)
+                        routePolylines.add(polyline)
+                    }
+                    yield()
                 }
 
                 TravelMode.WALK -> {
@@ -93,8 +112,11 @@ suspend fun drawRoute(
                         .width(14f)
                         .pattern(listOf(Dash(20f), Gap(10f)))
 
-                    val polyline = googleMap?.addPolyline(polylineFormatting)
-                    routePolylines.add(polyline)
+                    withContext(Dispatchers.Main.immediate) {
+                        val polyline = googleMap?.addPolyline(polylineFormatting)
+                        routePolylines.add(polyline)
+                    }
+                    yield()
                 }
 
                 TravelMode.TRANSIT -> {
@@ -116,8 +138,11 @@ suspend fun drawRoute(
                                         .pattern(listOf(Dash(20f), Gap(10f)))
                                 }
                             }
-                            val polyline = googleMap?.addPolyline(polylineFormatting)
-                            routePolylines.add(polyline)
+                            withContext(Dispatchers.Main.immediate) {
+                                val polyline = googleMap?.addPolyline(polylineFormatting)
+                                routePolylines.add(polyline)
+                            }
+                            yield()
                         }
                     }
                 }
@@ -127,7 +152,7 @@ suspend fun drawRoute(
             // Show helpful message for cross-campus routes
 
 
-            onDirectionsUiStateChange(directionsUiState.copy(
+            onDirectionsUiStateChange(getDirectionsUiState().copy(
                 isLoadingRoute = false,
                 step = DirectionsStep.ShowingRoute(
                     origin = origin,
@@ -144,7 +169,7 @@ suspend fun drawRoute(
             } else {
                 e.message ?: "Failed to get route"
             }
-            onDirectionsUiStateChange(directionsUiState.copy(
+            onDirectionsUiStateChange(getDirectionsUiState().copy(
                 isLoadingRoute = false,
                 errorMessage = errorMsg,
                 ))

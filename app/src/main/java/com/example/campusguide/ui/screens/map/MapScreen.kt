@@ -19,6 +19,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -141,6 +142,13 @@ fun MapScreen(
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
 
+
+    val locationSettingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { }
+
+
+
     // Get user location for default origin
     LaunchedEffect(Unit) {
         val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -232,7 +240,7 @@ fun MapScreen(
                     step.destination,
                     "SHUTTLE",
                     googleMap,
-                    directionsUiState,
+                    getDirectionsUiState = { directionsUiState },
                     onDirectionsUiStateChange = { directionsUiState = it },
                     repo,
                     isCrossCampus
@@ -248,7 +256,7 @@ fun MapScreen(
                             step.destination,
                             "DRIVE",
                             googleMap,
-                            directionsUiState,
+                            getDirectionsUiState = { directionsUiState },
                             onDirectionsUiStateChange = { directionsUiState = it },
                             repo,
                             isCrossCampus
@@ -263,7 +271,7 @@ fun MapScreen(
                             step.destination,
                             "WALK",
                             googleMap,
-                            directionsUiState,
+                            getDirectionsUiState = { directionsUiState },
                             onDirectionsUiStateChange = { directionsUiState = it },
                             repo,
                             isCrossCampus
@@ -278,7 +286,7 @@ fun MapScreen(
                             step.destination,
                             "TRANSIT",
                             googleMap,
-                            directionsUiState,
+                            getDirectionsUiState = { directionsUiState },
                             onDirectionsUiStateChange = { directionsUiState = it },
                             repo,
                             isCrossCampus
@@ -453,14 +461,19 @@ fun MapScreen(
         onTopBarBuildingConsumed()
     }
 
+
     // Permission handling
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
         val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+        val activity = context as ComponentActivity
+
 
         if (fineLocationGranted && coarseLocationGranted) {
+            checkLocationSettings(activity, locationSettingsLauncher)
+
             googleMap?.let { map ->
                 if (ActivityCompat.checkSelfPermission(
                         context,
@@ -496,6 +509,9 @@ fun MapScreen(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
+        }else {
+            // permissions already granted, check accuracy directly
+            checkLocationSettings(context, locationSettingsLauncher)
         }
     }
 

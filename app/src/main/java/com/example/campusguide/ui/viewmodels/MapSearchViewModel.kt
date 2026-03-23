@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,10 +41,10 @@ import com.google.android.gms.maps.model.LatLng
 
 class MapSearchViewModel : ViewModel() {
 
-    var topBarSuggestions by mutableStateOf<List<Suggestion>>(kotlin.collections.emptyList())
-    var topBarSelectedSuggestion by mutableStateOf<com.example.campusguide.data.Suggestion?>(null)
+    var topBarSuggestions by mutableStateOf<List<Suggestion>>(emptyList())
+    var topBarSelectedSuggestion by mutableStateOf<Suggestion?>(null)
     var searchQuery by mutableStateOf("")
-    var searchCounter by mutableStateOf(0)
+    var searchCounter by mutableIntStateOf(0)
 
     val suggestionKey: (Suggestion) -> Any = { suggestion ->
         when (suggestion) {
@@ -133,6 +134,7 @@ class MapSearchViewModel : ViewModel() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .testTag(suggestion.id)
                         .clickable {
                             searchQuery = ""
                             onSuggestionSelected(suggestion)

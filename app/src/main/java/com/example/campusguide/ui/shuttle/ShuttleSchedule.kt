@@ -91,8 +91,8 @@ object ShuttleSchedule {
 
         // Return null if next departure is more than 3 hours away
         if (closestDeparture != null) {
-            val hoursUntilDeparture = Duration.between(currentTime, closestDeparture.localTime).toHours()
-            if (hoursUntilDeparture > 2) {return DepartureResult.TooFarAway(closestDeparture)}
+            val minutesUntilDeparture = Duration.between(currentTime, closestDeparture.localTime).toMinutes()
+            if (minutesUntilDeparture > 30) {return DepartureResult.TooFarAway(closestDeparture)}
             return DepartureResult.Soon(closestDeparture)
         }
         else{

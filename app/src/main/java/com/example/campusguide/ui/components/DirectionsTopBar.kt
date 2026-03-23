@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -26,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -37,9 +36,7 @@ import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
-import com.example.campusguide.ui.directions.detectCampus
 import com.example.campusguide.ui.shuttle.DepartureResult
-import com.example.campusguide.ui.shuttle.ShuttleSchedule
 
 
 @Composable
@@ -483,7 +480,10 @@ fun DirectionsTopBar(
                     Surface(
                         shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onCancelClick)
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .clickable(onClick = onCancelClick)
+                            .testTag("CancelButton")
                     ) {
                         Text("Cancel", modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
                             style = MaterialTheme.typography.labelLarge)

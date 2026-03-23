@@ -45,7 +45,7 @@ fun recenter(googleMap: GoogleMap?, fusedLocationProviderClient: FusedLocationPr
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
                     val currentLatLng = LatLng(location.latitude, location.longitude)
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
                 }
             }
         }

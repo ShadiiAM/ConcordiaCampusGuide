@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Looper
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
 import com.example.campusguide.ui.components.Campus
@@ -16,10 +19,13 @@ import com.example.campusguide.ui.map.utils.BuildingHit
 import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.example.campusguide.ui.shuttle.DepartureResult
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -30,7 +36,6 @@ import java.util.concurrent.TimeUnit
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
-const val EXTRA_SEARCH_QUERY = "EXTRA_SEARCH_QUERY"
 
 // Helper Functions
 internal fun getSavedCampus(context: Context): Campus {
@@ -223,6 +228,29 @@ internal fun latLngShort(p: LatLng): String =
     "%.5f, %.5f".format(p.latitude, p.longitude)
 
 
+
+fun checkLocationSettings(
+    context: Context,
+    launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>
+) {
+    val locationRequest = LocationRequest.Builder(
+        Priority.PRIORITY_HIGH_ACCURACY, 10000
+    ).build()
+
+    val settingsRequest = LocationSettingsRequest.Builder()
+        .addLocationRequest(locationRequest)
+        .build()
+
+    LocationServices.getSettingsClient(context)
+        .checkLocationSettings(settingsRequest)
+        .addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                launcher.launch(
+                    IntentSenderRequest.Builder(exception.resolution).build()
+                )
+            }
+        }
+}
 
 data class DirectionsTopBarState(
     val active: Boolean,

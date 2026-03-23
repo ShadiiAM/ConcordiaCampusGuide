@@ -44,7 +44,7 @@ fun ShuttleStopInfoCard(
 
     when (nextDep){
         is DepartureResult.Soon ->{
-            nextDepText = "Next departure: $nextDep"
+            nextDepText = "Next departure: ${nextDep.departure}"
         }
         is DepartureResult.NoMoreToday ->{
             val nextDay = ShuttleSchedule.nextDepartureNextDay(stop.campus)
@@ -52,7 +52,7 @@ fun ShuttleStopInfoCard(
             else "No more departures today."
         }
         is DepartureResult.TooFarAway ->{
-            nextDepText = "Next Departure is still more than 2 hours away.\nNext departure: ${nextDep.departure}"
+            nextDepText = "Next Departure is still more than 30 minutes away.\nNext departure: ${nextDep.departure}"
         }
     }
     AlertDialog(
