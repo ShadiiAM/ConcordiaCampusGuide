@@ -50,7 +50,6 @@ import com.example.campusguide.ui.map.models.BuildingInfo
 import com.example.campusguide.ui.directions.DirectionsStep
 import com.example.campusguide.ui.directions.DirectionsUiState
 import com.example.campusguide.ui.directions.GoogleRoutesRepository
-import com.example.campusguide.ui.directions.RouteRequest
 import com.example.campusguide.ui.map.utils.BuildingHit
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -59,7 +58,6 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.Locale
@@ -69,7 +67,6 @@ import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.isCrossCampusRoute
 import com.example.campusguide.ui.directions.getCrossCampusMessage
-import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
@@ -82,8 +79,6 @@ import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.detectCampus
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
-import com.google.android.gms.maps.model.Dash
-import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.Polyline
 
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
@@ -119,7 +114,6 @@ fun MapScreen(
     var pendingSearchQuery by remember { mutableStateOf(searchQuery) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
     var controlsVisible = viewModel.controlsVisible
-    lateinit var polylineFormatting: PolylineOptions
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -215,143 +209,92 @@ fun MapScreen(
     LaunchedEffect(directionsGoTrigger) {
         if (directionsGoTrigger == 0) return@LaunchedEffect
 
+        recenter(googleMap, fusedLocationProviderClient, context)
+
+
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
-        val isCrossCampus = isCrossCampusRoute(
-            originBuilding,
-            destinationBuilding, step.origin
-        )
+
+        val isCrossCampus = isCrossCampusRoute(originBuilding,
+            destinationBuilding, step.origin)
 
         routePolylines.forEach { it?.remove() }
         routePolylines.clear()
+        lateinit var drawRouteResult: DrawRouteResult
+
         if(canUseShuttle(step.origin, step.destination, travelMode)){
-            val route = getShuttleRoute(step.origin, step.destination)
 
-            route.legs.forEach { leg ->
-                leg.steps.forEach { step ->
-                    when (step.travelMode) {
-                        TravelMode.TRANSIT -> {
-                            polylineFormatting = PolylineOptions()
-                                .addAll(step.polyline)
-                                .color(0xFFE53935.toInt())
-                                .width(18f)
-                        }
-
-                        else -> {
-                            polylineFormatting = PolylineOptions()
-                                .addAll(step.polyline)
-                                .color(0xFF1565C0.toInt())
-                                .width(14f)
-                                .pattern(listOf(Dash(20f), Gap(10f)))
-                        }
-                    }
-                    val polyline = googleMap?.addPolyline(polylineFormatting)
-                    routePolylines.add(polyline)
-                }
-            }
-            directionsUiState = directionsUiState.copy(
-                isLoadingRoute = false,
-                step = DirectionsStep.ShowingRoute(
-                    origin = step.origin,
-                    destination = step.destination,
-                    buildingHit = step.buildingHit,
-                    route = route,
-                ),
-            )
+            drawRouteResult =
+                drawRoute(
+                    step,
+                    step.origin,
+                    step.destination,
+                    "SHUTTLE",
+                    googleMap,
+                    directionsUiState,
+                    onDirectionsUiStateChange = { directionsUiState = it },
+                    repo,
+                    isCrossCampus
+                )
         }
         else {
-            runCatching {
-                repo.getRoute(
-                    RouteRequest(
-                        origin = step.origin,
-                        destination = step.destination,
-                        mode = travelMode,
-                    )
-                )
-            }.onSuccess { route ->
-
-                android.util.Log.d("Route", route.toString())
-                recenter(googleMap, fusedLocationProviderClient, context)
-                when (travelMode) {
-                    TravelMode.DRIVE -> {
-                        polylineFormatting = PolylineOptions()
-                            .addAll(route.points)
-                            .color(0xFF1565C0.toInt())
-                            .width(18f)
-
-                        val polyline = googleMap?.addPolyline(polylineFormatting)
-                        routePolylines.add(polyline)
-                    }
-
-                    TravelMode.WALK -> {
-                        polylineFormatting = PolylineOptions()
-                            .addAll(route.points)
-                            .color(0xFF1565C0.toInt())
-                            .width(14f)
-                            .pattern(listOf(Dash(20f), Gap(10f)))
-
-                        val polyline = googleMap?.addPolyline(polylineFormatting)
-                        routePolylines.add(polyline)
-                    }
-
-                    TravelMode.TRANSIT -> {
-                        route.legs.forEach { leg ->
-                            leg.steps.forEach { step ->
-                                when (step.travelMode) {
-                                    TravelMode.TRANSIT -> {
-                                        polylineFormatting = PolylineOptions()
-                                            .addAll(step.polyline)
-                                            .color(0xFF7B1FA2.toInt())
-                                            .width(18f)
-                                    }
-
-                                    else -> {
-                                        polylineFormatting = PolylineOptions()
-                                            .addAll(step.polyline)
-                                            .color(0xFF1565C0.toInt())
-                                            .width(14f)
-                                            .pattern(listOf(Dash(20f), Gap(10f)))
-                                    }
-                                }
-                                val polyline = googleMap?.addPolyline(polylineFormatting)
-                                routePolylines.add(polyline)
-                            }
-                        }
-                    }
-                }
-
-
-                // Show helpful message for cross-campus routes
-
-                if (isCrossCampus) {
-                    scope.launch {
-                        snackBarHostState.showSnackbar(
-                            message = getCrossCampusMessage(travelMode),
-                            duration = SnackbarDuration.Short
+            when (travelMode) {
+                TravelMode.DRIVE -> {
+                    drawRouteResult =
+                        drawRoute(
+                            step,
+                            step.origin,
+                            step.destination,
+                            "DRIVE",
+                            googleMap,
+                            directionsUiState,
+                            onDirectionsUiStateChange = { directionsUiState = it },
+                            repo,
+                            isCrossCampus
                         )
-                    }
                 }
 
-                directionsUiState = directionsUiState.copy(
-                    isLoadingRoute = false,
-                    step = DirectionsStep.ShowingRoute(
-                        origin = step.origin,
-                        destination = step.destination,
-                        buildingHit = step.buildingHit,
-                        route = route,
-                    ),
-                )
-            }.onFailure { e ->
-                // Check if this is a cross-campus route and provide helpful error message
-                val errorMsg = if (isCrossCampus) {
-                    getCrossCampusErrorMessage(travelMode)
-                } else {
-                    e.message ?: "Failed to get route"
+                TravelMode.WALK -> {
+                    drawRouteResult =
+                        drawRoute(
+                            step,
+                            step.origin,
+                            step.destination,
+                            "WALK",
+                            googleMap,
+                            directionsUiState,
+                            onDirectionsUiStateChange = { directionsUiState = it },
+                            repo,
+                            isCrossCampus
+                        )
                 }
-                directionsUiState = directionsUiState.copy(
-                    isLoadingRoute = false,
-                    errorMessage = errorMsg,
+
+                TravelMode.TRANSIT -> {
+                    drawRouteResult =
+                        drawRoute(
+                            step,
+                            step.origin,
+                            step.destination,
+                            "TRANSIT",
+                            googleMap,
+                            directionsUiState,
+                            onDirectionsUiStateChange = { directionsUiState = it },
+                            repo,
+                            isCrossCampus
+                        )
+                }
+            }
+            // Show helpful message for cross-campus routes
+        }
+
+        routePolylines.addAll(drawRouteResult.polylines)
+
+        if (isCrossCampus) {
+            scope.launch {
+                snackBarHostState.showSnackbar(
+                    message = getCrossCampusMessage(travelMode),
+                    duration = SnackbarDuration.Short
                 )
             }
         }
