@@ -29,11 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,9 +49,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.example.campusguide.data.CampusBuilding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import com.example.campusguide.data.ShuttleStop
@@ -148,6 +151,8 @@ private fun ShuttleStopDropdown(
         }
     }
 }
+
+
 @Composable
 fun SearchBarWithProfile(
     modifier: Modifier = Modifier,
@@ -155,14 +160,18 @@ fun SearchBarWithProfile(
     onSearchQueryChange: (String) -> Unit = {},
     onSearchSubmit: (String) -> Unit = {},
     onProfileClick: () -> Unit = {},
-    suggestions: List<CampusBuilding> = emptyList(),
+    suggestions: List<TopSearchSuggestion> = emptyList(),
     onBuildingSelected: (CampusBuilding) -> Unit = {},
+    onIndoorResultSelected: (TopSearchSuggestion.Indoor) -> Unit = {},
+    onIndoorSetAsStart: (TopSearchSuggestion.Indoor) -> Unit = {},
+    onIndoorSetAsDestination: (TopSearchSuggestion.Indoor) -> Unit = {},
     shuttleStops: List<ShuttleStop> = emptyList(),
     shuttleUserLatLng: LatLng? = null,
     onShuttleStopSelected: (ShuttleStop) -> Unit = {},
 ) {
     val textFocusRequester = focusRequester ?: remember { FocusRequester() }
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    val showNoResults = searchQuery.isNotBlank() && suggestions.isEmpty()
     Column(modifier = modifier.fillMaxWidth()) {
         Surface(
             shape = RoundedCornerShape(28.dp),
@@ -203,8 +212,8 @@ fun SearchBarWithProfile(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .testTag("searchBar")
-                            .focusRequester(textFocusRequester),
+                            .focusRequester(textFocusRequester)
+                            .testTag("searchBar"),
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp
@@ -241,46 +250,126 @@ fun SearchBarWithProfile(
             }
         }
 
-        if (suggestions.isNotEmpty()) {
+        if (suggestions.isNotEmpty() || showNoResults) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .heightIn(max = 260.dp),
+                    .heightIn(max = 260.dp)
+                    .zIndex(1f),
                 shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 6.dp,
                 shadowElevation = 6.dp,
             ) {
                 LazyColumn {
-                    items(suggestions, key = { it.buildingCode }) { building ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(building.buildingName)
-                                .clickable {
-                                    searchQuery = ""
-                                    onBuildingSelected(building)
-                                }
-                                .padding(horizontal = 16.dp, vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer,
+                    if (showNoResults) {
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                                    .semantics { contentDescription = "No results found" },
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    text = building.buildingCode,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                                    text = "No results found.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Spacer(Modifier.width(10.dp))
-                            Column {
-                                Text(building.buildingName, style = MaterialTheme.typography.bodySmall)
-                                Text(building.address, style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                    items(
+                        items = suggestions,
+                        key = {
+                            when (it) {
+                                is TopSearchSuggestion.Building -> "b:${it.building.buildingCode}"
+                                is TopSearchSuggestion.Indoor -> "i:${it.node.id}"
+                            }
+                        }
+                    ) { suggestion ->
+                        when (suggestion) {
+                            is TopSearchSuggestion.Building -> {
+                                val building = suggestion.building
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            searchQuery = ""
+                                            onBuildingSelected(building)
+                                        }
+                                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = MaterialTheme.colorScheme.primaryContainer,
+                                    ) {
+                                        Text(
+                                            text = building.buildingCode,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                                        )
+                                    }
+                                    Spacer(Modifier.width(10.dp))
+                                    Column {
+                                        Text(building.buildingName, style = MaterialTheme.typography.bodySmall)
+                                        Text(
+                                            building.address,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+
+                            is TopSearchSuggestion.Indoor -> {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            searchQuery = ""
+                                            onIndoorResultSelected(suggestion)
+                                        }
+                                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                                        .semantics {
+                                            // Give screen readers a useful announcement.
+                                            contentDescription = "${suggestion.primaryLabel}, ${suggestion.secondaryLabel}, ${suggestion.tertiaryLabel}"
+                                        },
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Column(modifier = Modifier.fillMaxWidth()) {
+                                        Text(suggestion.primaryLabel, style = MaterialTheme.typography.bodySmall)
+                                        Text(
+                                            suggestion.secondaryLabel,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            suggestion.tertiaryLabel,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Row(
+                                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            TextButton(onClick = {
+                                                searchQuery = ""
+                                                onIndoorSetAsStart(suggestion)
+                                            }) {
+                                                Text("Set as start")
+                                            }
+                                            TextButton(onClick = {
+                                                searchQuery = ""
+                                                onIndoorSetAsDestination(suggestion)
+                                            }) {
+                                                Text("Set as destination")
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         HorizontalDivider(thickness = 0.5.dp)
@@ -296,7 +385,6 @@ fun SearchBarWithProfile(
                 onShuttleStopSelected(stop)
             }
         )
-
     }
 }
 
@@ -307,4 +395,3 @@ fun SearchBarWithProfilePreview() {
         SearchBarWithProfile()
     }
 }
-

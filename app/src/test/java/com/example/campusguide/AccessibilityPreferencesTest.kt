@@ -36,7 +36,9 @@ class AccessibilityPreferencesTest {
             initialOffsetSp = 3.5f,
             initialBoldEnabled = true,
             initialTextColor = Color(0xFF123456.toInt()),
-            colorBlindMode = ColorBlindMode.DEUTERANOPIA
+            colorBlindMode = ColorBlindMode.DEUTERANOPIA,
+            initialAvoidStairs = true,
+            initialAvoidEscalators = false,
         )
 
         AccessibilityPreferences.saveFromState(context, original)
@@ -46,6 +48,8 @@ class AccessibilityPreferencesTest {
         assertEquals(original.isBoldEnabled, loaded.isBoldEnabled)
         assertEquals(original.textColor.value.toInt(), loaded.textColor.value.toInt())
         assertEquals(original.colorBlindMode, loaded.colorBlindMode)
+        assertEquals(original.avoidStairs, loaded.avoidStairs)
+        assertEquals(original.avoidEscalators, loaded.avoidEscalators)
     }
 
     @Test
@@ -65,5 +69,19 @@ class AccessibilityPreferencesTest {
         // After saving black explicitly we expect to get black back
         assertEquals(boldState.textColor.value.toInt(), loaded.textColor.value.toInt())
         assertEquals(ColorBlindMode.NONE, loaded.colorBlindMode)
+    }
+
+    @Test
+    fun accessibilityPreferences_persistsRoutingAccessibilityFlags() = runBlocking {
+        val state = AccessibilityState(
+            initialAvoidStairs = true,
+            initialAvoidEscalators = true,
+        )
+
+        AccessibilityPreferences.saveFromState(context, state)
+        val loaded = AccessibilityPreferences.load(context)
+
+        assertEquals(true, loaded.avoidStairs)
+        assertEquals(true, loaded.avoidEscalators)
     }
 }

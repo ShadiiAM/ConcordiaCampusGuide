@@ -57,4 +57,32 @@ class AccessibilityStateTest {
         state.setBold(false)
         assertFalse(state.isBoldEnabled)
     }
+
+    @Test
+    fun `avoid stairs and escalators update and notify`() {
+        var callbackCount = 0
+        val state = AccessibilityState(onStateChanged = { callbackCount++ })
+
+        state.updateAvoidStairs(true)
+        state.updateAvoidEscalators(true)
+        state.updateAvoidEscalators(true)
+
+        assertTrue(state.avoidStairs)
+        assertTrue(state.avoidEscalators)
+        Assert.assertEquals(2, callbackCount)
+    }
+
+    @Test
+    fun `setFrom copies avoid preferences`() {
+        val from = AccessibilityState(
+            initialAvoidStairs = true,
+            initialAvoidEscalators = true,
+        )
+        val to = AccessibilityState()
+
+        to.setFrom(from)
+
+        assertTrue(to.avoidStairs)
+        assertTrue(to.avoidEscalators)
+    }
 }

@@ -26,6 +26,7 @@ foundation = "1.10.2"
 navigationTesting = "2.9.7"
 rules = "1.7.0"
 foundationVersion = "1.10.3"
+composeTesting = "1.0.0-alpha11"
 uiautomator = "2.3.0"
 
 [libraries]
@@ -62,6 +63,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+androidx-compose-testing = { group = "androidx.xr.compose", name = "compose-testing", version.ref = "composeTesting" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 
 [plugins]

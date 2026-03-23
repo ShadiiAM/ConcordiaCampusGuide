@@ -20,6 +20,8 @@ private object Keys {
     val BOLD_ENABLED = booleanPreferencesKey("bold_enabled")
     val TEXT_COLOR = intPreferencesKey("text_color_argb")
     val COLOR_BLIND_MODE = intPreferencesKey("color_blind_mode")
+    val AVOID_STAIRS = booleanPreferencesKey("avoid_stairs")
+    val AVOID_ESCALATORS = booleanPreferencesKey("avoid_escalators")
 }
 
 object AccessibilityPreferences {
@@ -33,12 +35,16 @@ object AccessibilityPreferences {
         val color: Color = if (colorInt != null) Color(colorInt) else Color.Unspecified
         val modeOrdinal: Int = prefs[Keys.COLOR_BLIND_MODE] ?: ColorBlindMode.NONE.ordinal
         val mode: ColorBlindMode = ColorBlindMode.entries.getOrElse(modeOrdinal) { ColorBlindMode.NONE }
+        val avoidStairs: Boolean = prefs[Keys.AVOID_STAIRS] ?: false
+        val avoidEscalators: Boolean = prefs[Keys.AVOID_ESCALATORS] ?: false
 
         return AccessibilityState(
             initialOffsetSp = offset,
             initialBoldEnabled = bold,
             initialTextColor = color,
-            colorBlindMode = mode
+            colorBlindMode = mode,
+            initialAvoidStairs = avoidStairs,
+            initialAvoidEscalators = avoidEscalators,
         )
     }
 
@@ -52,6 +58,8 @@ object AccessibilityPreferences {
             }
 
             prefs[Keys.COLOR_BLIND_MODE] = state.colorBlindMode.ordinal
+            prefs[Keys.AVOID_STAIRS] = state.avoidStairs
+            prefs[Keys.AVOID_ESCALATORS] = state.avoidEscalators
         }
     }
 }
