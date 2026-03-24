@@ -47,7 +47,7 @@ fun NavigationBar(
                     },
                     label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                     selected = it == currentDestination.value,
-                    onClick = { onDestinationSelected(it) }
+                    onClick = { currentDestination.value = it }
                 )
             }
         }
@@ -63,6 +63,6 @@ fun NavigationBar(
 fun NavigationBarPreview() {
     ConcordiaCampusGuideTheme {
         NavigationBar(rememberSaveable{mutableStateOf(AppDestinations.MAP)},
-            { SearchBarWithProfile<String>( ) })
+            content ={ SearchBarWithProfile<String>( ) })
     }
 }

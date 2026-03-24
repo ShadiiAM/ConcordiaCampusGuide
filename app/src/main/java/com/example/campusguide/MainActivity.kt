@@ -66,31 +66,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
-import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
 import com.example.campusguide.data.CampusBuilding
-import com.example.campusguide.data.buildingSuggestions
-import com.example.campusguide.ui.components.BuildingAutocompleteField
-import com.example.campusguide.ui.components.Campus
-import com.example.campusguide.ui.directions.TravelMode
-import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
-import com.example.campusguide.ui.screens.DirectionsTopBarState
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.components.FocusClearWrapper
-import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
-import com.example.campusguide.ui.screens.map.canUseShuttle
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.ui.viewmodels.MapSearchViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
-import com.example.campusguide.ui.viewmodels.ShuttleViewModel
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
-import com.example.campusguide.ui.components.TopSearchSuggestion
-
-private enum class DirectionsEditMode {
-    OUTDOOR_DESTINATION,
-    INDOOR_ORIGIN,
-    INDOOR_DESTINATION,
-}
+import com.example.campusguide.ui.components.BuildingAutocompleteField
+import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
+import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -145,14 +131,6 @@ fun ConcordiaCampusGuideApp() {
     var topBarDirectionsDestinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
 
     // Indoor overlay + search triggers
-    var openIndoorBuildingCode by remember { mutableStateOf<String?>(null) }
-    var indoorTopCardActive by remember { mutableStateOf(false) }
-    var indoorFocusNodeTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
-    var indoorSetStartTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
-    var indoorSetDestTrigger by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
-    var pendingIndoorStart by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
-    var pendingIndoorDestination by remember { mutableStateOf<com.example.campusguide.indoor.IndoorNode?>(null) }
-    var indoorOutdoorRouteRequest by remember { mutableStateOf<IndoorOutdoorRouteRequest?>(null) }
     val viewModel = viewModel<ControlsViewModel>()
     val userLocationViewModel = viewModel<UserLocationViewModel>()
     val userLatLng by userLocationViewModel.userLatLng.collectAsState()
@@ -165,14 +143,14 @@ fun ConcordiaCampusGuideApp() {
 
     val clearDirectionsAndIndoorState = {
         directionsTopBarState = DirectionsTopBarState(active = false)
-        openIndoorBuildingCode = null
-        indoorTopCardActive = false
-        indoorFocusNodeTrigger = null
-        indoorSetStartTrigger = null
-        indoorSetDestTrigger = null
-        pendingIndoorStart = null
-        pendingIndoorDestination = null
-        indoorOutdoorRouteRequest = null
+        mapViewmodel.openIndoorBuildingCode = null
+        mapViewmodel.indoorTopCardActive = false
+        mapViewmodel.indoorFocusNodeTrigger = null
+        mapViewmodel.indoorSetStartTrigger = null
+        mapViewmodel.indoorSetDestTrigger = null
+        mapViewmodel.pendingIndoorStart = null
+        mapViewmodel.pendingIndoorDestination = null
+        mapViewmodel.indoorOutdoorRouteRequest = null
         directionsEditMode = null
         directionsDestinationSuggestions = emptyList()
         indoorDirectionsQuery = ""
@@ -195,6 +173,7 @@ fun ConcordiaCampusGuideApp() {
                 )
             )
         }
+
     }
 
     LaunchedEffect(directionsTopBarState.active) {
@@ -213,10 +192,10 @@ fun ConcordiaCampusGuideApp() {
 
     LaunchedEffect(directionsTopBarState.indoorOriginNode, directionsTopBarState.indoorDestinationNode) {
         if (directionsTopBarState.indoorOriginNode != null) {
-            pendingIndoorStart = directionsTopBarState.indoorOriginNode
+            mapViewmodel.pendingIndoorStart = directionsTopBarState.indoorOriginNode
         }
         if (directionsTopBarState.indoorDestinationNode != null) {
-            pendingIndoorDestination = directionsTopBarState.indoorDestinationNode
+            mapViewmodel.pendingIndoorDestination = directionsTopBarState.indoorDestinationNode
         }
     }
 
@@ -240,508 +219,323 @@ fun ConcordiaCampusGuideApp() {
                 onAccessibilityClick = { showAccessibility = true }
             )
         }
+
         else -> {
             FocusClearWrapper {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                NavigationBar((currentDestination), { modifier ->
-
-                    when (currentDestination.value) {
-                        AppDestinations.MAP -> {
-                            MapScreen(
-                            viewModel = viewModel,
-                            searchQuery = "$mapViewmodel.searchQuery#$mapViewmodel.searchCounter",
-                            topBarSelectedSuggestion = mapViewmodel.topBarSelectedSuggestion,
-                            onTopBarBuildingConsumed = {
-                                mapViewmodel.topBarSelectedSuggestion = null
-                            },
-                            onBottomSearchClick = {
-                                try {
-                                    searchFocusRequester.requestFocus()
-                                } catch (_: IllegalStateException) {
-                                }
-                            },
-                            onDirectionsTopBarState = { state ->
-                                directionsTopBarState = state
-                            },
-
-                            directionsGoTrigger = directionsGoTrigger,
-                            directionsCancelTrigger = directionsCancelTrigger,
-                            originPickTrigger = originPickTrigger,
-                            myLocationTrigger = myLocationTrigger,
-                            topBarTravelMode = topBarTravelMode,
-            NavigationBar(
-                currentDestination = currentDestination,
-                onDestinationSelected = { destination ->
-                    val wasOnMap = currentDestination.value == AppDestinations.MAP
-                    if (destination == AppDestinations.MAP && wasOnMap) {
-                        openIndoorBuildingCode = null
-                        indoorTopCardActive = false
-                        indoorFocusNodeTrigger = null
-                        indoorSetStartTrigger = null
-                        indoorSetDestTrigger = null
-                    }
-                    currentDestination.value = destination
-                }
-            ) { modifier ->
-                Box(modifier = modifier.fillMaxSize()) {
-                    val preservedIndoorDestination = directionsTopBarState.indoorDestinationNode ?: pendingIndoorDestination
-
-                    when (currentDestination.value) {
-                        AppDestinations.MAP -> MapScreen(
-                            viewModel= viewModel,
-                            searchQuery = "$searchQuery#$searchCounter",
-                            topBarSelectedBuilding = topBarSelectedBuilding,
-                            onTopBarBuildingConsumed = { topBarSelectedBuilding = null },
-                            topBarDirectionsDestinationBuilding = topBarDirectionsDestinationBuilding,
-                            onTopBarDirectionsDestinationConsumed = { topBarDirectionsDestinationBuilding = null },
-                            onBottomSearchClick = {
-                                try { searchFocusRequester.requestFocus() } catch (_: IllegalStateException) {}
-                            },
-                            onDirectionsTopBarState = { state -> directionsTopBarState = state },  // ← add
-                            directionsGoTrigger = directionsGoTrigger,                              // ← add
-                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
-                            topBarTravelMode = topBarTravelMode,
-                            onIndoorOverlayChanged = { openIndoorBuildingCode = it },
-                            requestedIndoorBuildingCode = openIndoorBuildingCode,
-                            indoorOutdoorRouteRequest = indoorOutdoorRouteRequest,
-                            onIndoorOutdoorRouteRequested = { request ->
-                                indoorOutdoorRouteRequest = request
-                                openIndoorBuildingCode = null
-                            },
-                            onIndoorOutdoorRouteRequestConsumed = { indoorOutdoorRouteRequest = null },
-                            indoorSearchFocusNodeTrigger = indoorFocusNodeTrigger,
-                            indoorSetStartTrigger = indoorSetStartTrigger,
-                            indoorSetDestTrigger = indoorSetDestTrigger,
-                            onIndoorTriggerConsumed = {
-                                indoorFocusNodeTrigger = null
-                                indoorSetStartTrigger = null
-                                indoorSetDestTrigger = null
-                            },
-                            onIndoorTopCardActiveChanged = { active -> indoorTopCardActive = active },
-                            hasExistingDestinationSelection = preservedIndoorDestination != null,
-                            shuttleShowBothStops = shuttleViewModel.shuttleShowBothStops,
-                            onShuttleShowBothStopsConsumed = { shuttleViewModel.consumeShowBothStops() },
-                        )
-
-                            if (directionsTopBarState.active) {
-                                DirectionsTopBar(
-                                    modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp),
-                                    originLabel = directionsTopBarState.originLabel,
-                                    destinationLabel = directionsTopBarState.destinationLabel,
-                                    isCrossCampus = directionsTopBarState.isCrossCampus,
-                                    selectedMode = directionsTopBarState.selectedMode,
-                                    onModeSelected = { mode -> topBarTravelMode = mode },
-                                    routeSummary = directionsTopBarState.routeSummary,
-                                    errorMessage = directionsTopBarState.errorMessage,
-                                    showActions = directionsTopBarState.showActions,
-                                    isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                                    route = directionsTopBarState.route,
-                                    isPickingOrigin = directionsTopBarState.isPickingOrigin,
-                                    onOriginClick = { originPickTrigger++ },
-                                    onMyLocationClick = { myLocationTrigger++ },
-                                    onGoClick = { directionsGoTrigger++ },
-                                    onCancelClick = {
-                                        directionsCancelTrigger++
-                                        topBarTravelMode = TravelMode.DRIVE
-                                    },
-                                    canUseShuttle = directionsTopBarState.canUseShuttle,
-                                    shuttleStatus = directionsTopBarState.shuttleStatus
-                                    )
-                            } else {
-                                val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                    mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
-                                }
-
-                                SearchBarWithProfile(
-                                    modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
-                                    focusRequester = searchFocusRequester,
-                                    suggestions = mapViewmodel.topBarSuggestions,
-
-                                    onSearchQueryChange = mapViewmodel::onSearchQueryChange,
-                                    onSearchSubmit = mapViewmodel::onSearchSubmit,
-                                    onSuggestionSelected = mapViewmodel::onSuggestionSelected,
-                                    onProfileClick = { showProfile = true },
-
-
-                                    suggestionContent = suggestionContent,
-                                    suggestionKey = mapViewmodel.suggestionKey,
-                                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    NavigationBar(
+                        currentDestination = currentDestination,
+                        onDestinationSelected = { destination ->
+                            val wasOnMap = currentDestination.value == AppDestinations.MAP
+                            if (destination == AppDestinations.MAP && wasOnMap) {
+                                mapViewmodel.openIndoorBuildingCode = null
+                                mapViewmodel.indoorTopCardActive = false
+                                mapViewmodel.indoorFocusNodeTrigger = null
+                                mapViewmodel.indoorSetStartTrigger = null
+                                mapViewmodel.indoorSetDestTrigger = null
                             }
-                    }
+                            currentDestination.value = destination
+                        },
+                        content = { modifier ->
+                            Box(modifier = modifier.fillMaxSize()) {
+                                val preservedIndoorDestination =
+                                    directionsTopBarState.indoorDestinationNode
+                                        ?: mapViewmodel.pendingIndoorDestination
 
-                        AppDestinations.CALENDAR -> {
-                            CalendarScreen()
+                                when (currentDestination.value) {
+                                    AppDestinations.MAP -> {
+                                        MapScreen(
+                                            viewModel = viewModel,
+                                            searchQuery = "$mapViewmodel.searchQuery#$mapViewmodel.searchCounter",
+                                            topBarSelectedSuggestion = mapViewmodel.topBarSelectedSuggestion,
+                                            onTopBarBuildingConsumed = {
+                                                mapViewmodel.topBarSelectedSuggestion = null
+                                            },
 
-                        }
-                        AppDestinations.POI -> {
-                            Greeting("POI Screen", modifier)
-                        }
-                    if (directionsTopBarState.active) {
-                        DirectionsTopBar(
-                            modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp),
-                            originLabel = directionsTopBarState.originLabel,
-                            destinationLabel = directionsTopBarState.destinationLabel,
-                            isCrossCampus = directionsTopBarState.isCrossCampus,
-                            selectedMode = directionsTopBarState.selectedMode,
-                            onModeSelected = { mode -> topBarTravelMode = mode },
-                            routeSummary = directionsTopBarState.routeSummary,
-                            errorMessage = directionsTopBarState.errorMessage,
-                            showActions = directionsTopBarState.showActions,
-                            isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                            currentSteps = directionsTopBarState.currentSteps,
-                            showTravelModes = directionsTopBarState.showTravelModes,
-                            goEnabled = directionsTopBarState.goEnabled,
-                            goLabel = directionsTopBarState.goLabel,
-                            cancelLabel = directionsTopBarState.cancelLabel,
-                            onGoClick = { directionsGoTrigger++ },
-                            onCancelClick = {
-                                directionsCancelTrigger++
-                                topBarTravelMode = TravelMode.DRIVE
-                                clearDirectionsAndIndoorState()
-                            },
-                            onBackClick = {
-                                // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                directionsTopBarState = directionsTopBarState.copy(active = false)
-                                directionsEditMode = null
-                                directionsDestinationSuggestions = emptyList()
-                                indoorDirectionsQuery = ""
-                                indoorDirectionsSuggestions = emptyList()
-                            },
-                            onOriginClick = if (openIndoorBuildingCode != null) {
-                                {
-                                    directionsEditMode = if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) null else DirectionsEditMode.INDOOR_ORIGIN
-                                    directionsDestinationSuggestions = emptyList()
-                                    indoorDirectionsQuery = ""
-                                    indoorDirectionsSuggestions = emptyList()
-                                }
-                            } else {
-                                null
-                            },
-                            onDestinationClick = {
-                                directionsEditMode = when {
-                                    openIndoorBuildingCode != null && directionsEditMode == DirectionsEditMode.INDOOR_DESTINATION -> null
-                                    openIndoorBuildingCode != null -> DirectionsEditMode.INDOOR_DESTINATION
-                                    directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION -> null
-                                    else -> DirectionsEditMode.OUTDOOR_DESTINATION
-                                }
-                                directionsDestinationSuggestions = emptyList()
-                                indoorDirectionsQuery = ""
-                                indoorDirectionsSuggestions = emptyList()
-                            },
-                            extraContent = {
-                                if (directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION) {
-                                    Spacer(Modifier.height(8.dp))
-                                    BuildingAutocompleteField(
-                                        label = "To:",
-                                        value = directionsTopBarState.destinationLabel,
-                                        suggestions = directionsDestinationSuggestions,
-                                        placeholder = "Building name or code…",
-                                        enabled = !directionsTopBarState.isLoadingRoute,
-                                        testTag = "top_directions_destination_field",
-                                        onQueryChange = { query ->
-                                            directionsDestinationSuggestions = buildingSuggestions(
-                                                query = query,
-                                                activeCampus = Campus.SGW,
-                                                crossCampus = true,
-                                            )
-                                        },
-                                        onSelected = { building ->
-                                            topBarDirectionsDestinationBuilding = building
-                                            directionsEditMode = null
-                                            directionsDestinationSuggestions = emptyList()
-                                        },
-                                    )
-                                }
+                                            originPickTrigger = originPickTrigger,
+                                            myLocationTrigger = myLocationTrigger,
+                                            topBarTravelMode = topBarTravelMode,
+                                            topBarDirectionsDestinationBuilding = topBarDirectionsDestinationBuilding,
+                                            onTopBarDirectionsDestinationConsumed = {
+                                                topBarDirectionsDestinationBuilding = null
+                                            },
+                                            onBottomSearchClick = {
+                                                try {
+                                                    searchFocusRequester.requestFocus()
+                                                } catch (_: IllegalStateException) {
+                                                }
+                                            },
+                                            onDirectionsTopBarState = { state ->
+                                                directionsTopBarState = state
+                                            },  // ← add
+                                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                                            onIndoorOverlayChanged = { mapViewmodel.openIndoorBuildingCode = it },
+                                            requestedIndoorBuildingCode = mapViewmodel.openIndoorBuildingCode,
+                                            indoorOutdoorRouteRequest = mapViewmodel.indoorOutdoorRouteRequest,
+                                            onIndoorOutdoorRouteRequested = { request ->
+                                                mapViewmodel.indoorOutdoorRouteRequest = request
+                                                mapViewmodel.openIndoorBuildingCode = null
+                                            },
+                                            onIndoorOutdoorRouteRequestConsumed = {
+                                                mapViewmodel.indoorOutdoorRouteRequest = null
+                                            },
+                                            indoorSearchFocusNodeTrigger = mapViewmodel.indoorFocusNodeTrigger,
+                                            indoorSetStartTrigger = mapViewmodel.indoorSetStartTrigger,
+                                            indoorSetDestTrigger = mapViewmodel.indoorSetDestTrigger,
+                                            onIndoorTriggerConsumed = {
+                                                mapViewmodel.indoorFocusNodeTrigger = null
+                                                mapViewmodel.indoorSetStartTrigger = null
+                                                mapViewmodel.indoorSetDestTrigger = null
+                                            },
+                                            onIndoorTopCardActiveChanged = { active ->
+                                                mapViewmodel.indoorTopCardActive = active
+                                            },
+                                            hasExistingDestinationSelection = preservedIndoorDestination != null,
+                                        )
 
-                                if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN || directionsEditMode == DirectionsEditMode.INDOOR_DESTINATION) {
-                                    Spacer(Modifier.height(8.dp))
-                                    OutlinedTextField(
-                                        value = indoorDirectionsQuery,
-                                        onValueChange = { query ->
-                                            indoorDirectionsQuery = query
-                                            indoorDirectionsSuggestions = if (query.isBlank()) {
-                                                emptyList()
-                                            } else {
-                                                IndoorRoomSearchService.search(
-                                                    query = query,
-                                                    scope = IndoorRoomSearchService.Scope.Global,
-                                                    limit = 8,
-                                                )
-                                            }
-                                        },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        label = {
-                                            Text(
-                                                if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
-                                                    "Search start classroom"
-                                                else
-                                                    "Search destination classroom"
-                                            )
-                                        },
-                                        placeholder = {
-                                            Text(
-                                                if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
-                                                    "e.g. H.937"
-                                                else
-                                                    "e.g. H.831"
-                                            )
-                                        }
-                                    )
+                                        if (directionsTopBarState.active) {
+                                            DirectionsTopBar(
+                                                modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
+                                                    .ignoreFocusClearOnTouch(),
+                                                originLabel = directionsTopBarState.originLabel,
+                                                destinationLabel = directionsTopBarState.destinationLabel,
+                                                isCrossCampus = directionsTopBarState.isCrossCampus,
+                                                selectedMode = directionsTopBarState.selectedMode,
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
+                                                routeSummary = directionsTopBarState.routeSummary,
+                                                errorMessage = directionsTopBarState.errorMessage,
+                                                showActions = directionsTopBarState.showActions,
+                                                isLoadingRoute = directionsTopBarState.isLoadingRoute,
+                                                showTravelModes = directionsTopBarState.showTravelModes,
+                                                goEnabled = directionsTopBarState.goEnabled,
+                                                goLabel = directionsTopBarState.goLabel,
+                                                cancelLabel = directionsTopBarState.cancelLabel,
+                                                onGoClick = { directionsGoTrigger++ },
+                                                onCancelClick = {
+                                                    directionsCancelTrigger++
+                                                    topBarTravelMode = TravelMode.DRIVE
+                                                    clearDirectionsAndIndoorState()
+                                                },
+                                                onBackClick = {
+                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
+                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
+                                                    directionsEditMode = null
+                                                    directionsDestinationSuggestions = emptyList()
+                                                    indoorDirectionsQuery = ""
+                                                    indoorDirectionsSuggestions = emptyList()
+                                                },
+                                                shuttleStatus = directionsTopBarState.shuttleStatus,
+                                                canUseShuttle = directionsTopBarState.canUseShuttle,
+                                                onOriginClick = if (mapViewmodel.openIndoorBuildingCode != null) {
+                                                    {
+                                                        directionsEditMode = if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) null else DirectionsEditMode.INDOOR_ORIGIN
+                                                        directionsDestinationSuggestions = emptyList()
+                                                        indoorDirectionsQuery = ""
+                                                        indoorDirectionsSuggestions = emptyList()
+                                                    }
+                                                } else {
+                                                    null
+                                                },
+                                                onDestinationClick = {
+                                                    directionsEditMode =
 
-                                    if (indoorDirectionsSuggestions.isNotEmpty()) {
-                                        Spacer(Modifier.height(6.dp))
-                                        Surface(
-                                            shape = RoundedCornerShape(12.dp),
-                                            tonalElevation = 2.dp,
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            LazyColumn(
-                                                modifier = Modifier.heightIn(max = 220.dp)
-                                            ) {
-                                                items(indoorDirectionsSuggestions) { suggestion ->
-                                                    Column(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .clickable {
-                                                                val pickedNode = suggestion.node
-                                                                val pickedBuildingCode = pickedNode.buildingCode.uppercase()
+                                                        when {
+                                                        mapViewmodel.openIndoorBuildingCode != null && directionsEditMode == DirectionsEditMode.INDOOR_DESTINATION -> null
+                                                        mapViewmodel.openIndoorBuildingCode != null -> DirectionsEditMode.INDOOR_DESTINATION
+                                                        directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION  && !mapViewmodel.searchVanish -> null
+                                                        else -> DirectionsEditMode.OUTDOOR_DESTINATION
+                                                    }
+                                                    directionsDestinationSuggestions = emptyList()
+                                                    indoorDirectionsQuery = ""
+                                                    indoorDirectionsSuggestions = emptyList()
+                                                    mapViewmodel.searchVanish = false
+                                                },
+                                                extraContent = {
 
-                                                                if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) {
-                                                                    pendingIndoorStart = pickedNode
-                                                                    val existingDest = pendingIndoorDestination
-                                                                    if (existingDest != null && !existingDest.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
-                                                                        indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
-                                                                            startNode = pickedNode,
-                                                                            destinationNode = existingDest,
-                                                                        )
-                                                                        openIndoorBuildingCode = null
-                                                                    } else {
-                                                                        openIndoorBuildingCode = pickedBuildingCode
-                                                                        indoorSetStartTrigger = pickedNode
-                                                                    }
+
+                                                    if (directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION) {
+
+                                                        val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+                                                            mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
+                                                        }
+
+                                                        if(!mapViewmodel.searchVanish){
+
+                                                            BuildingAutocompleteField(
+                                                                modifier = Modifier.padding(top = 20.dp).ignoreFocusClearOnTouch(),
+                                                                focusRequester = searchFocusRequester,
+                                                                onSearchQueryChange = mapViewmodel::onSearchQueryChange,
+
+                                                                onSearchSubmit = mapViewmodel::onSearchSubmit,
+                                                                suggestions = mapViewmodel.topBarSuggestions,
+                                                                suggestionContent = suggestionContent,
+                                                                suggestionKey = mapViewmodel.suggestionKey,
+
+                                                            )
+                                                        }
+                                                    }
+
+                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN || directionsEditMode == DirectionsEditMode.INDOOR_DESTINATION) {
+                                                        Spacer(Modifier.height(8.dp))
+                                                        OutlinedTextField(
+                                                            value = indoorDirectionsQuery,
+                                                            onValueChange = { query ->
+                                                                indoorDirectionsQuery = query
+                                                                indoorDirectionsSuggestions = if (query.isBlank()) {
+                                                                    emptyList()
                                                                 } else {
-                                                                    pendingIndoorDestination = pickedNode
-                                                                    val existingStart = pendingIndoorStart
-                                                                    if (existingStart != null && !existingStart.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
-                                                                        indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
-                                                                            startNode = existingStart,
-                                                                            destinationNode = pickedNode,
-                                                                        )
-                                                                        openIndoorBuildingCode = null
-                                                                    } else {
-                                                                        openIndoorBuildingCode = pickedBuildingCode
-                                                                        indoorSetDestTrigger = pickedNode
+                                                                    IndoorRoomSearchService.search(
+                                                                        query = query,
+                                                                        scope = IndoorRoomSearchService.Scope.Global,
+                                                                        limit = 8,
+                                                                    )
+                                                                }
+                                                            },
+                                                            singleLine = true,
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            label = {
+                                                                Text(
+                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
+                                                                        "Search start classroom"
+                                                                    else
+                                                                        "Search destination classroom"
+                                                                )
+                                                            },
+                                                            placeholder = {
+                                                                Text(
+                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
+                                                                        "e.g. H.937"
+                                                                    else
+                                                                        "e.g. H.831"
+                                                                )
+                                                            }
+                                                        )
+
+                                                        if (indoorDirectionsSuggestions.isNotEmpty()) {
+                                                            Spacer(Modifier.height(6.dp))
+                                                            Surface(
+                                                                shape = RoundedCornerShape(12.dp),
+                                                                tonalElevation = 2.dp,
+                                                                modifier = Modifier.fillMaxWidth()
+                                                            ) {
+                                                                LazyColumn(
+                                                                    modifier = Modifier.heightIn(max = 220.dp)
+                                                                ) {
+                                                                    items(indoorDirectionsSuggestions) { suggestion ->
+                                                                        Column(
+                                                                            modifier = Modifier
+                                                                                .fillMaxWidth()
+                                                                                .clickable {
+                                                                                    val pickedNode = suggestion.node
+                                                                                    val pickedBuildingCode = pickedNode.buildingCode.uppercase()
+
+                                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) {
+                                                                                        mapViewmodel.pendingIndoorStart = pickedNode
+                                                                                        val existingDest = mapViewmodel.pendingIndoorDestination
+                                                                                        if (existingDest != null && !existingDest.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
+                                                                                            mapViewmodel.indoorOutdoorRouteRequest =
+                                                                                                IndoorOutdoorRouteRequest(
+                                                                                                    startNode = pickedNode,
+                                                                                                    destinationNode = existingDest,
+                                                                                                )
+                                                                                            mapViewmodel.openIndoorBuildingCode = null
+                                                                                        } else {
+                                                                                            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
+                                                                                            mapViewmodel.indoorSetStartTrigger = pickedNode
+                                                                                        }
+                                                                                    } else {
+                                                                                        mapViewmodel.pendingIndoorDestination = pickedNode
+                                                                                        val existingStart = mapViewmodel.pendingIndoorStart
+                                                                                        if (existingStart != null && !existingStart.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
+                                                                                            mapViewmodel.indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
+                                                                                                startNode = existingStart,
+                                                                                                destinationNode = pickedNode,
+                                                                                            )
+                                                                                            mapViewmodel.openIndoorBuildingCode = null
+                                                                                        } else {
+                                                                                            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
+                                                                                            mapViewmodel.indoorSetDestTrigger = pickedNode
+                                                                                        }
+                                                                                    }
+
+                                                                                    currentDestination.value = AppDestinations.MAP
+                                                                                    directionsEditMode = null
+                                                                                    indoorDirectionsQuery = ""
+                                                                                    indoorDirectionsSuggestions = emptyList()
+                                                                                    directionsDestinationSuggestions = emptyList()
+                                                                                }
+                                                                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                                                                        ) {
+                                                                            Text(
+                                                                                text = suggestion.primaryLabel,
+                                                                                style = MaterialTheme.typography.bodyMedium,
+                                                                            )
+                                                                            Text(
+                                                                                text = "${suggestion.typeLabel} · ${suggestion.locationLabel}",
+                                                                                style = MaterialTheme.typography.bodySmall,
+                                                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                                            )
+                                                                        }
                                                                     }
                                                                 }
-
-                                                                currentDestination.value = AppDestinations.MAP
-                                                                directionsEditMode = null
-                                                                indoorDirectionsQuery = ""
-                                                                indoorDirectionsSuggestions = emptyList()
-                                                                directionsDestinationSuggestions = emptyList()
                                                             }
-                                                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                                                    ) {
+                                                        }
+                                                    }
+
+                                                    directionsTopBarState.legFallbackMessage?.let { fallback ->
+                                                        Spacer(Modifier.height(6.dp))
                                                         Text(
-                                                            text = suggestion.primaryLabel,
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                        )
-                                                        Text(
-                                                            text = "${suggestion.typeLabel} · ${suggestion.locationLabel}",
+                                                            text = fallback,
                                                             style = MaterialTheme.typography.bodySmall,
-                                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                            color = MaterialTheme.colorScheme.error,
+                                                            modifier = Modifier.semantics {
+                                                                contentDescription = fallback
+                                                            }
                                                         )
                                                     }
-                                                }
+                                                },
+                                                route = directionsTopBarState.route
+                                            )
+                                        } else{
+
+                                            val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+                                                mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
                                             }
-                                        }
-                                    }
-                                }
 
-                                directionsTopBarState.legFallbackMessage?.let { fallback ->
-                                    Spacer(Modifier.height(6.dp))
-                                    Text(
-                                        text = fallback,
-                                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
-                                        color = androidx.compose.material3.MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.semantics {
-                                            contentDescription = fallback
-                                        }
-                                    )
-                                }
-                            }
-                        )
-                    } else if (openIndoorBuildingCode == null) {
-                        SearchBarWithProfile(
-                            modifier = Modifier.padding(top = 35.dp),
-                            focusRequester = searchFocusRequester,
-                            onSearchQueryChange = { query ->
-                                val indoorCode = openIndoorBuildingCode
-                                if (indoorCode != null) {
-                                    topBarSuggestions = IndoorRoomSearchService.search(
-                                        query = query,
-                                        scope = IndoorRoomSearchService.Scope.Building,
-                                        buildingCode = indoorCode,
-                                    ).map {
-                                        TopSearchSuggestion.Indoor(
-                                            node = it.node,
-                                            buildingCode = it.buildingCode,
-                                            primaryLabel = it.primaryLabel,
-                                            secondaryLabel = it.typeLabel,
-                                            tertiaryLabel = it.locationLabel,
-                                        )
-                                    }
-                                } else {
-                                    val building = com.example.campusguide.data.buildingSuggestions(
-                                        query = query,
-                                        activeCampus = com.example.campusguide.ui.components.Campus.SGW,
-                                        crossCampus = true,
-                                    ).map { com.example.campusguide.ui.components.TopSearchSuggestion.Building(it) }
+                                            SearchBarWithProfile(
+                                                modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
+                                                focusRequester = searchFocusRequester,
+                                                onSearchQueryChange = mapViewmodel::onSearchQueryChange,
+                                                onSearchSubmit = mapViewmodel::onSearchSubmit,
+                                                onProfileClick = { showProfile = true },
+                                                suggestions = mapViewmodel.topBarSuggestions,
 
-                                    val indoor = IndoorRoomSearchService.search(
-                                        query = query,
-                                        scope = IndoorRoomSearchService.Scope.Global,
-                                    ).map {
-                                        TopSearchSuggestion.Indoor(
-                                            node = it.node,
-                                            buildingCode = it.buildingCode,
-                                            primaryLabel = it.primaryLabel,
-                                            secondaryLabel = it.typeLabel,
-                                            tertiaryLabel = it.locationLabel,
-                                        )
-                                    }
-
-                                    topBarSuggestions = indoor + building
-                                }
-                                shuttleViewModel.handleSearchQuery(query, context)
-                            },
-                            onSearchSubmit = { query ->
-                                val indoorCode = openIndoorBuildingCode
-                                if (indoorCode != null) {
-                                    // Submit behaves like query-change for indoors: show suggestions; selection drives focusing.
-                                    topBarSuggestions = IndoorRoomSearchService.search(
-                                        query = query,
-                                        scope = IndoorRoomSearchService.Scope.Building,
-                                        buildingCode = indoorCode,
-                                    ).map {
-                                        TopSearchSuggestion.Indoor(
-                                            node = it.node,
-                                            buildingCode = it.buildingCode,
-                                            primaryLabel = it.primaryLabel,
-                                            secondaryLabel = it.typeLabel,
-                                            tertiaryLabel = it.locationLabel,
-                                        )
-                                    }
-                                } else {
-                                    // Prefer indoor matches if any exist
-                                    val indoor = IndoorRoomSearchService.search(
-                                        query = query,
-                                        scope = IndoorRoomSearchService.Scope.Global,
-                                    )
-                                    if (indoor.isNotEmpty()) {
-                                        topBarSuggestions = indoor.map {
-                                            TopSearchSuggestion.Indoor(
-                                                node = it.node,
-                                                buildingCode = it.buildingCode,
-                                                primaryLabel = it.primaryLabel,
-                                                secondaryLabel = it.typeLabel,
-                                                tertiaryLabel = it.locationLabel,
+                                                suggestionContent = suggestionContent,
+                                                suggestionKey = mapViewmodel.suggestionKey,
                                             )
                                         }
-                                        currentDestination.value = AppDestinations.MAP
-                                    } else {
-                                        // Check if query matches a campus building first
-                                        val matchedBuilding = ALL_CAMPUS_BUILDINGS
-                                            .firstOrNull { it.matches(query) }
-                                        if (matchedBuilding != null) {
-                                            // Use building directly, skip geocoder
-                                            topBarSelectedBuilding = matchedBuilding
-                                            topBarSuggestions = emptyList()
-                                            currentDestination.value = AppDestinations.MAP
-                                        } else {
-                                            // Fall back to geocoder search
-                                            searchQuery = query
-                                            searchCounter++
-                                            topBarSuggestions = emptyList()
-                                            if (currentDestination.value != AppDestinations.MAP) {
-                                                currentDestination.value = AppDestinations.MAP
-                                            }
-                                        }
                                     }
-                                }
-                            },
-                            onProfileClick = { showProfile = true },
-                            suggestions = topBarSuggestions,
-                            onBuildingSelected = { building ->
-                                topBarSelectedBuilding = building
-                                topBarSuggestions = emptyList()
-                                searchQuery = ""
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            onIndoorResultSelected = { indoor ->
-                                // Default click on an indoor suggestion sets destination.
-                                pendingIndoorDestination = indoor.node
-                                if (openIndoorBuildingCode == null) {
-                                    openIndoorBuildingCode = indoor.buildingCode
-                                }
-                                indoorSetDestTrigger = indoor.node
-                                topBarSuggestions = emptyList()
-                                searchQuery = ""
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            onIndoorSetAsStart = { indoor ->
-                                pendingIndoorStart = indoor.node
-                                val existingDest = pendingIndoorDestination
-                                if (existingDest != null && existingDest.buildingCode != indoor.node.buildingCode) {
-                                    indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
-                                        startNode = indoor.node,
-                                        destinationNode = existingDest,
-                                    )
-                                    openIndoorBuildingCode = null
-                                } else {
-                                    if (openIndoorBuildingCode == null) {
-                                        openIndoorBuildingCode = indoor.buildingCode
+
+
+                                    AppDestinations.CALENDAR -> {
+                                        CalendarScreen()
                                     }
-                                    indoorSetStartTrigger = indoor.node
-                                }
-                                topBarSuggestions = emptyList()
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            onIndoorSetAsDestination = { indoor ->
-                                pendingIndoorDestination = indoor.node
-                                val existingStart = pendingIndoorStart
-                                if (existingStart != null && existingStart.buildingCode != indoor.node.buildingCode) {
-                                    indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
-                                        startNode = existingStart,
-                                        destinationNode = indoor.node,
-                                    )
-                                    openIndoorBuildingCode = null
-                                } else {
-                                    if (openIndoorBuildingCode == null) {
-                                        openIndoorBuildingCode = indoor.buildingCode
+                                    AppDestinations.POI -> {
+                                        Greeting("POI Screen", modifier)
                                     }
-                                    indoorSetDestTrigger = indoor.node
+
+
+
                                 }
-                                topBarSuggestions = emptyList()
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                            shuttleStops = shuttleViewModel.shuttleStops,
-                            shuttleUserLatLng = shuttleViewModel.shuttleUserLatLng,
-                            onShuttleStopSelected = { _ ->
-                                shuttleViewModel.onShuttleStopSelected()
-                                currentDestination.value = AppDestinations.MAP
-                            },
-                        )
-                    }
+                            }
+                        }
+                    )
                 }
-                )
             }
-        }
         }
     }
 }
@@ -758,6 +552,14 @@ enum class AppDestinations(
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
     POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
 }
+
+
+private enum class DirectionsEditMode {
+    OUTDOOR_DESTINATION,
+    INDOOR_ORIGIN,
+    INDOOR_DESTINATION,
+}
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

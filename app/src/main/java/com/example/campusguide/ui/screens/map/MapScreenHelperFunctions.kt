@@ -10,7 +10,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
+import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
@@ -265,5 +267,16 @@ data class DirectionsTopBarState(
     val route: RouteResult = RouteResult(points = emptyList()),
     val isPickingOrigin: Boolean = false,
     val canUseShuttle: Boolean = false,
-    val shuttleStatus: DepartureResult = DepartureResult.NoMoreToday
+    val shuttleStatus: DepartureResult = DepartureResult.NoMoreToday,
+
+
+    val legLabels: List<String> = emptyList(),
+    val legFallbackMessage: String? = null,
+    val currentSteps: RouteLeg? = null,
+    val goEnabled: Boolean = true,
+    val showTravelModes: Boolean = true,
+    val goLabel: String = "Go",
+    val cancelLabel: String = "Cancel",
+    val indoorOriginNode: IndoorNode? = null,
+    val indoorDestinationNode: IndoorNode? = null,
 )

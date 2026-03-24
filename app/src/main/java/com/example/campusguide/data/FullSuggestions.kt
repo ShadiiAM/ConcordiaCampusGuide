@@ -1,11 +1,12 @@
 package com.example.campusguide.data
 
+import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
 
 
 sealed class Suggestion(
-    open val campus: Campus
+    open val campus: Campus?
 
 ) {
 
@@ -27,7 +28,7 @@ class CampusBuilding(
     val buildingCode: String,
     val buildingName: String,
     val address: String,
-    campus: Campus,
+    override val campus: Campus,
 ) : Suggestion(campus) {
     /** Shown in the text field after selection: "Henry F. Hall Building (H)" */
     val displayName: String get() = "$buildingName ($buildingCode)"
@@ -81,6 +82,15 @@ data class ShuttleStop(
         }
     }
 }
+
+data class Indoor(
+    val node: IndoorNode,
+    val buildingCode: String,
+    val primaryLabel: String,
+    val secondaryLabel: String,
+    val tertiaryLabel: String,
+    override val campus: Campus? = null
+) : Suggestion(campus)
 
 private val SGW_STOP_LAT_LNG      = LatLng(45.4971, -73.5785)  // Hall Building front door, De Maisonneuve Blvd W
 private val LOYOLA_ARRIVAL_LAT_LNG   = LatLng(45.4579, -73.6389)  // Loyola stop — arriving from downtown

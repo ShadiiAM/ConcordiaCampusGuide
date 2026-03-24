@@ -1,5 +1,7 @@
 package com.example.campusguide.ui.screens.map
 
+import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.DirectionsStep
 import com.example.campusguide.ui.directions.DirectionsUiState
 import com.example.campusguide.ui.directions.GoogleRoutesRepository
@@ -29,12 +31,23 @@ suspend fun drawRoute(
     getDirectionsUiState: () -> DirectionsUiState,
     onDirectionsUiStateChange: (DirectionsUiState) -> Unit,
     repo: GoogleRoutesRepository,
-    isCrossCampus: Boolean
+    isCrossCampus: Boolean,
+    requestGeneration: Int,
+    routeRequestGeneration: Int,
+    isIndoorOutdoorFlow: Boolean,
+    destinationBuilding: Suggestion?,
+    indoorOutdoorFallbackParts: List<String>,
+    onLegFallbackMessage: (String?) -> Unit,
+    defaultOrigin: LatLng,
+    legLabels: List<String>,
+    onLegLabels: (List<String>) -> Unit
 ): DrawRouteResult{
     lateinit var polylineFormatting: PolylineOptions
     lateinit var route: RouteResult
     var travelType = TravelMode.TRANSIT
     val routePolylines = mutableListOf<Polyline?>()
+
+    var message = getCrossCampusMessage(travelType)
 
 
     if(travelMode == "SHUTTLE") {
@@ -89,8 +102,7 @@ suspend fun drawRoute(
                 )
             )
         }.onSuccess { route ->
-
-
+            if (requestGeneration != routeRequestGeneration) return@onSuccess
             when (travelType) {
                 TravelMode.DRIVE -> {
                     polylineFormatting = PolylineOptions()
@@ -149,7 +161,12 @@ suspend fun drawRoute(
             }
 
 
-            // Show helpful message for cross-campus routes
+            // Show helpful message for cross-campus routes or generic message for normal routes
+            message = if (isCrossCampus) {
+                getCrossCampusMessage(travelType)
+            }else{
+                "Be sure to reach your destination safely!"
+            }
 
 
             onDirectionsUiStateChange(getDirectionsUiState().copy(
@@ -163,19 +180,76 @@ suspend fun drawRoute(
             ))
 
         }.onFailure { e ->
+
+            if (requestGeneration != routeRequestGeneration) return@onFailure
+
+
+            if (requestGeneration != routeRequestGeneration) return@onFailure
+            if (isIndoorOutdoorFlow) {
+                val fallbackRoute = runCatching {
+                    repo.getRoute(
+                        RouteRequest(
+                            origin = defaultOrigin,
+                            destination = step.destination,
+                            mode = TravelMode.DRIVE,
+                        )
+                    )
+                }.getOrNull()
+
+                if (fallbackRoute != null) {
+                    if (requestGeneration != routeRequestGeneration) return@onFailure
+                    withContext(Dispatchers.Main) {
+
+                        polylineFormatting = PolylineOptions()
+                            .addAll(fallbackRoute.points)
+                            .color(0xFF1565C0.toInt())
+                            .width(12f)
+
+                        withContext(Dispatchers.Main.immediate) {
+                            val polyline = googleMap?.addPolyline(polylineFormatting)
+                            routePolylines.add(polyline)
+                        }
+                        yield()
+                    }
+
+                    val destinationCode = step.buildingHit?.id ?: (destinationBuilding as? CampusBuilding)?.buildingCode ?: "destination"
+                    onLegLabels( buildList {
+                        addAll(legLabels)
+                        add("Fallback outdoor leg: Current location → $destinationCode")
+                    })
+                    val prefix = if (indoorOutdoorFallbackParts.isNotEmpty()) {
+                        "${indoorOutdoorFallbackParts.joinToString(". ")}. "
+                    } else {
+                        ""
+                    }
+                    onLegFallbackMessage( prefix + "Primary outdoor leg failed. Showing fallback route to destination building.")
+
+                    onDirectionsUiStateChange(getDirectionsUiState().copy(
+                        isLoadingRoute = false,
+                        errorMessage = null,
+                        step = DirectionsStep.ShowingRoute(
+                            origin = defaultOrigin,
+                            destination = step.destination,
+                            buildingHit = step.buildingHit,
+                            route = fallbackRoute,
+                        ),
+                    ))
+                    return@onFailure
+                }
+            }
+
             // Check if this is a cross-campus route and provide helpful error message
-            val errorMsg = if (isCrossCampus) {
+            message = if (isCrossCampus) {
                 getCrossCampusErrorMessage(travelType)
             } else {
                 e.message ?: "Failed to get route"
             }
             onDirectionsUiStateChange(getDirectionsUiState().copy(
                 isLoadingRoute = false,
-                errorMessage = errorMsg,
-                ))
+                errorMessage = message,
+            ))
         }
     }
-    val message = getCrossCampusMessage(travelType)
 
     return DrawRouteResult(routePolylines, message)
 }

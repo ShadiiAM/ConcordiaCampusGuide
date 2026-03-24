@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.AppIcon
 import com.example.campusguide.R
+import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.shuttle.DepartureResult
@@ -54,13 +55,9 @@ fun DirectionsTopBar(
     isLoadingRoute: Boolean = false,
     route: RouteResult = RouteResult(points = emptyList()),
     isPickingOrigin: Boolean = false,
-    onOriginClick: () -> Unit = {},
     onMyLocationClick: () -> Unit = {},
-    onGoClick: () -> Unit = {},
-    onCancelClick: () -> Unit = {},
     canUseShuttle: Boolean = false,
-    shuttleStatus: DepartureResult = DepartureResult.NoMoreToday
-    currentSteps: RouteLeg? = null,
+    shuttleStatus: DepartureResult = DepartureResult.NoMoreToday,
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -554,8 +551,8 @@ private fun directionIconFor(instruction: String?): AppIcon {
         ("turn right" in lower || "right onto" in lower
                 || "slight right" in lower
                 || "keep right" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowRight)
-        ("bus" in lower || "shuttle" in lower)      -> AppIcon.Drawable(R.drawable.ic_directions_bus)
-        ("walk to destination" in lower|| "Walk to shuttle stop" in lower) -> AppIcon.Drawable(R.drawable.ic_directions_walk)
+        ("bus" in lower || "concordia shuttle" in lower)      -> AppIcon.Drawable(R.drawable.ic_directions_bus)
+        ("walk to destination" in lower|| "walk to shuttle stop" in lower) -> AppIcon.Drawable(R.drawable.ic_directions_walk)
         else                                        -> AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     }
 }

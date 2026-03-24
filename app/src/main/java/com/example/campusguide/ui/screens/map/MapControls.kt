@@ -51,3 +51,11 @@ fun recenter(googleMap: GoogleMap?, fusedLocationProviderClient: FusedLocationPr
         }
     }
 }
+
+fun centerOnOrigin(googleMap: GoogleMap?, origin: LatLng, context: Context) {
+    googleMap?.let { map ->
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 17f))
+    }
+
+
+}
