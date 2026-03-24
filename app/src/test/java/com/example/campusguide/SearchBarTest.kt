@@ -13,6 +13,8 @@ import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.SearchBarWithProfile
 import com.example.campusguide.ui.components.SearchBarWithProfilePreview
+import com.example.campusguide.ui.components.TopSearchSuggestion
+import com.example.campusguide.ui.screens.AccessibilityScreen
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.fullSuggestions
@@ -193,13 +195,13 @@ class SearchBarTest {
     fun searchBar_withCustomModifier_rendersCorrectly() {
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
-                    CompositionLocalProvider(
-                        LocalAccessibilityState provides defaultState
-                    ) {
-                        SearchBarWithProfile(
-                            modifier = androidx.compose.ui.Modifier
-                        )
-                    }
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile(
+                        modifier = androidx.compose.ui.Modifier
+                    )
+                }
             }
         }
 
@@ -242,7 +244,8 @@ class SearchBarTest {
 
     @Test
     fun searchBar_showsSuggestionsWhenUserTypes() {
-        val suggestions = fullSuggestions("hall", Campus.SGW, crossCampus = false)
+        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = false)
+            .map { TopSearchSuggestion.Building(it) }
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
                 CompositionLocalProvider(
@@ -266,7 +269,8 @@ class SearchBarTest {
 
     @Test
     fun searchBar_showsSuggestionsByBuildingCode() {
-        val suggestions = fullSuggestions("EV", Campus.SGW, crossCampus = false)
+        val suggestions = buildingSuggestions("EV", Campus.SGW, crossCampus = false)
+            .map { TopSearchSuggestion.Building(it) }
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
@@ -291,7 +295,8 @@ class SearchBarTest {
 
     @Test
     fun searchBar_showsNothingWhenQueryIsEmpty() {
-        val suggestions = fullSuggestions("", Campus.SGW, crossCampus = false)
+        val suggestions = buildingSuggestions("", Campus.SGW, crossCampus = false)
+            .map { TopSearchSuggestion.Building(it) }
 
         composeTestRule.setContent {
             ConcordiaCampusGuideTheme {
@@ -370,6 +375,62 @@ class SearchBarTest {
 //        composeTestRule.onNodeWithText("1455 De Maisonneuve Blvd. W.").assertIsDisplayed()
 //    }
 
+    //Selecting a suggestion fires the onSelected callback
+
+    @Test
+    fun autocompleteField_selectingSuggestionFiresCallback() {
+        var selectedBuilding: CampusBuilding? = null
+        val suggestions = buildingSuggestions("hall", Campus.SGW, crossCampus = false)
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                BuildingAutocompleteField(
+                    label = "To:",
+                    value = "hall",
+                    suggestions = suggestions,
+                    onQueryChange = {},
+                    onSelected = { selectedBuilding = it },
+                )
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Henry F. Hall Building").performClick()
+        composeTestRule.waitForIdle()
+
+        assert(selectedBuilding?.buildingCode == "H") {
+            "Expected building code H but got ${selectedBuilding?.buildingCode}"
+        }
+    }
+
+    @Test
+    fun searchBar_selectingSuggestionFiresBuildingSelectedCallback() {
+        var selectedBuilding: CampusBuilding? = null
+        val suggestions = buildingSuggestions("molson", Campus.SGW, crossCampus = false)
+            .map { TopSearchSuggestion.Building(it) }
+
+        composeTestRule.setContent {
+            ConcordiaCampusGuideTheme {
+                CompositionLocalProvider(
+                    LocalAccessibilityState provides defaultState
+                ) {
+                    SearchBarWithProfile(
+                        suggestions = suggestions,
+                        onBuildingSelected = { selectedBuilding = it },
+                    )
+                }
+            }
+        }
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("John Molson Building").performClick()
+        composeTestRule.waitForIdle()
+
+        assert(selectedBuilding?.buildingCode == "MB") {
+            "Expected MB but got ${selectedBuilding?.buildingCode}"
+        }
+    }
+
     // Bottom search button tests
 
     @Test
@@ -407,7 +468,7 @@ class SearchBarTest {
         assertTrue("Bottom search button on map should trigger callback", clicked)
     }
 
-  //Top search bar sets building as To: destination
+    //Top search bar sets building as To: destination
 
     @Test
     fun mapScreen_topBarBuildingSelection_opensRoutePanelWithDestination() {
@@ -417,6 +478,7 @@ class SearchBarTest {
             address = "1455 De Maisonneuve Blvd. W.",
             campus = Campus.SGW,
         )
+        var topBarState: DirectionsTopBarState? = null
 
         var capturedState: DirectionsTopBarState? = null
 
@@ -437,7 +499,6 @@ class SearchBarTest {
         }
 
         composeTestRule.waitForIdle()
-        // Route panel state should be published with Hall Building as destination
         assertTrue("Directions top bar should be active", capturedState?.active == true)
         assertTrue(
             "Destination label should contain building name",
@@ -453,6 +514,7 @@ class SearchBarTest {
             address = "1455 De Maisonneuve Blvd. W.",
             campus = Campus.SGW,
         )
+        var topBarState: DirectionsTopBarState? = null
 
         var capturedState: DirectionsTopBarState? = null
 

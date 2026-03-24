@@ -1,0 +1,165 @@
+{
+  "buildingCode": "H",
+  "floor": 1,
+  "imageWidth": 2643,
+  "imageHeight": 2823,
+  "imageName": "hall_floor_1.png",
+  "nodes": [
+    {
+      "id": "H-1-ENTRY-MAIN",
+      "label": "MAIN ENTRY",
+      "x": 839.56,
+      "y": 2726.44,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H2",
+      "label": "MAIN ENTRY",
+      "x": 895.65,
+      "y": 2449.87,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-ESCALATOR-DOWN-21",
+      "label": "ESCALATOR DOWN",
+      "x": 1533.9,
+      "y": 2426.66,
+      "type": "ESCALATOR",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-ESCALATOR-UP-12",
+      "label": "ESCALATOR UP",
+      "x": 1624.81,
+      "y": 2424.72,
+      "type": "ESCALATOR",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H3",
+      "label": "HALLWAY JUNCTION",
+      "x": 1520.36,
+      "y": 2511.76,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H4",
+      "label": "HALLWAY JUNCTION",
+      "x": 1640.28,
+      "y": 2515.63,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-ELEVATOR",
+      "label": "ELEVATOR",
+      "x": 1725.32,
+      "y": 2054.12,
+      "type": "ELEVATOR",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H6",
+      "label": "HALLWAYS JUNCTION",
+      "x": 2163.85,
+      "y": 2506.6,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H7",
+      "label": "HALLWAYS JUNCTION",
+      "x": 2167.84,
+      "y": 2018.24,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-1-H8",
+      "label": "HALLWAYS JUNCTION",
+      "x": 1753.23,
+      "y": 2010.26,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "H",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "H-1-H2",
+      "toId": "H-1-ENTRY-MAIN",
+      "weight": 282.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H4",
+      "toId": "H-1-H3",
+      "weight": 119.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H3",
+      "toId": "H-1-ESCALATOR-DOWN-21",
+      "weight": 86.17,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H4",
+      "toId": "H-1-ESCALATOR-UP-12",
+      "weight": 92.22,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H6",
+      "toId": "H-1-H4",
+      "weight": 523.65,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H6",
+      "toId": "H-1-H7",
+      "weight": 488.38,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H7",
+      "toId": "H-1-H8",
+      "weight": 414.69,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H8",
+      "toId": "H-1-ELEVATOR",
+      "weight": 51.99,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-1-H3",
+      "toId": "H-1-H2",
+      "weight": 627.77,
+      "isAccessible": true
+    }
+  ]
+}

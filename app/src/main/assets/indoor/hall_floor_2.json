@@ -1,0 +1,117 @@
+{
+  "buildingCode": "H",
+  "floor": 2,
+  "imageWidth": 2356,
+  "imageHeight": 2604,
+  "imageName": "hall_floor_2.png",
+  "nodes": [
+    {
+      "id": "H-2-ESCALATOR-UP-12",
+      "label": "ESCALATOR UP",
+      "x": 1722.06,
+      "y": 1877.28,
+      "type": "ESCALATOR",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-ESCALATOR-DOWN-21",
+      "label": "ESCALATOR DOWN",
+      "x": 1427.27,
+      "y": 1874.61,
+      "type": "ESCALATOR",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-ESCALATOR-UP-23",
+      "label": "ESCALATOR UP",
+      "x": 1279.21,
+      "y": 1326.38,
+      "type": "ESCALATOR",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-H1",
+      "label": "HALLWAY JUNCTION",
+      "x": 1428.6,
+      "y": 1781.24,
+      "type": "HALLWAY",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-H2",
+      "label": "HALLWAY JUNCTION",
+      "x": 1687.38,
+      "y": 1785.24,
+      "type": "HALLWAY",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-H3",
+      "label": "HALLWAY JUNCTION",
+      "x": 1419.27,
+      "y": 1318.38,
+      "type": "HALLWAY",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-2-110",
+      "label": "HALLWAY JUNCTION",
+      "x": 1019.1,
+      "y": 963.56,
+      "type": "ROOM",
+      "floor": 2,
+      "buildingCode": "H",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "H-2-ESCALATOR-UP-12",
+      "toId": "H-2-H2",
+      "weight": 98.36,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-2-ESCALATOR-DOWN-21",
+      "toId": "H-2-H1",
+      "weight": 93.38,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-2-H2",
+      "toId": "H-2-H1",
+      "weight": 258.81,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-2-H3",
+      "toId": "H-2-ESCALATOR-UP-23",
+      "weight": 140.29,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-2-H3",
+      "toId": "H-2-110",
+      "weight": 534.82,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-2-H3",
+      "toId": "H-2-H1",
+      "weight": 462.95,
+      "isAccessible": true
+    }
+  ]
+}

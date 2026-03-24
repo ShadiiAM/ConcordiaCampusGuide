@@ -22,6 +22,9 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 @Composable
 fun NavigationBar(
     currentDestination: MutableState<AppDestinations>,
+    onDestinationSelected: (AppDestinations) -> Unit = { destination ->
+        currentDestination.value = destination
+    },
     content: (@Composable (Modifier) -> Unit)? = null
 ) {
     NavigationSuiteScaffold(
@@ -44,7 +47,7 @@ fun NavigationBar(
                     },
                     label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                     selected = it == currentDestination.value,
-                    onClick = { currentDestination.value = it }
+                    onClick = { onDestinationSelected(it) }
                 )
             }
         }
