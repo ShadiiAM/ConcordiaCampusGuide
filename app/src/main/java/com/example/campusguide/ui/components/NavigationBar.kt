@@ -47,7 +47,7 @@ fun NavigationBar(
                     },
                     label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                     selected = it == currentDestination.value,
-                    onClick = { currentDestination.value = it }
+                    onClick = { onDestinationSelected(it) }
                 )
             }
         }
