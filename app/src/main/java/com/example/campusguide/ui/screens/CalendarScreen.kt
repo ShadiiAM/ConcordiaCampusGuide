@@ -26,13 +26,15 @@ import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.success
 import com.example.campusguide.ui.viewmodels.CalendarError
 import com.example.campusguide.ui.viewmodels.CalendarViewModel
+import com.example.campusguide.ui.viewmodels.ScheduleViewModel
 import java.util.Calendar
 import java.util.Locale
 
 enum class CalendarTab(val labelResId: Int) {
     DAILY_SCHEDULE(R.string.calendar_daily_schedule),
     COURSE_LIST(R.string.calendar_course_list),
-    ADD_COURSE(R.string.calendar_add_course)
+    ADD_COURSE(R.string.calendar_add_course),
+    OPEN_DATA(R.string.calendar_open_data)
 }
 
 @Composable
@@ -40,6 +42,7 @@ fun CalendarScreen() {
     val viewModel: CalendarViewModel = viewModel {
         CalendarViewModel(ServiceLocator.calendarRepository)
     }
+    val scheduleViewModel: ScheduleViewModel = viewModel()
 
     val uiState = viewModel.uiState
 
@@ -71,6 +74,9 @@ fun CalendarScreen() {
                     onAddCourse = { sub, cat, term, sec ->
                         viewModel.addCourse(sub, cat, term, sec)
                     }
+                )
+                CalendarTab.OPEN_DATA -> OpenDataScheduleSection(
+                    viewModel = scheduleViewModel
                 )
             }
 

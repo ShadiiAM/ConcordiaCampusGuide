@@ -36,7 +36,9 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
         termCode: String,
         section: String
     ): List<Course> = withContext(Dispatchers.IO) {
-        val url = "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$subject/$catalog" // did not use courseID because value is hard to find
+        val cleanSubject = subject.trim().uppercase()
+        val cleanCatalog = catalog.trim().uppercase()
+        val url = "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$cleanSubject/$cleanCatalog" // did not use courseID because value is hard to find
 
         /*
         to check what subject and catalog value is being used for the api
@@ -61,7 +63,7 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
             val results = json.decodeFromString<List<Course>>(body)
             
             results.filter {
-                it.termCode == termCode && it.section.trim().equals(section.trim(), ignoreCase = true)
+                it.termCode.trim() == termCode.trim() && it.section.trim().equals(section.trim(), ignoreCase = true)
             }
         }
     }

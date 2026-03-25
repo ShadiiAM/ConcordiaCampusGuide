@@ -6,6 +6,7 @@
     <string name="calendar_daily_schedule">Daily Schedule</string>
     <string name="calendar_course_list">Course List</string>
     <string name="calendar_add_course">Add Course</string>
+    <string name="calendar_open_data">Open Data</string>
 
     <string name="calendar_empty_schedule">No upcoming classes today!</string>
     <string name="calendar_empty_course_list">You aren\'t tracking any courses yet.\nGo to \'Add Course\' to begin.</string>
@@ -29,4 +30,10 @@
     <string name="calendar_directions">Directions to classroom</string>
 
     <string name="calendar_course_header">%1$s %2$s (%3$s)</string>
+
+
+    <string name="open_data_load_schedule">Load Schedule</string>
+    <string name="open_data_loading">Loading schedule...</string>
+    <string name="open_data_retry">Retry</string>
+    <string name="open_data_empty">No courses found for this term.</string>
 </resources>
