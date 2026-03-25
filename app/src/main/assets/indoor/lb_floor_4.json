@@ -1,0 +1,1123 @@
+{
+  "buildingCode": "LB",
+  "floor": 4,
+  "imageWidth": 850,
+  "imageHeight": 884,
+  "imageName": "lb_floor_4.png",
+  "nodes": [
+    {
+      "id": "LB-4-EMERGENCY-STAIR-1",
+      "label": "EMERGENCY-STAIR",
+      "x": 257.39,
+      "y": 734.36,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-EMERGENCY-STAIR-2",
+      "label": "EMERGENCY-STAIR",
+      "x": 177.15,
+      "y": 470.86,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-EMERGENCY-STAIR-3",
+      "label": "EMERGENCY-STAIR",
+      "x": 173.19,
+      "y": 313.36,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-EMERGENCY-STAIR-4",
+      "label": "EMERGENCY-STAIR",
+      "x": 729.89,
+      "y": 520.39,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-EMERGENCY-STAIR-5",
+      "label": "EMERGENCY-STAIR",
+      "x": 716.03,
+      "y": 263.83,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-STAIR-2",
+      "label": "STAIR",
+      "x": 419.84,
+      "y": 179.84,
+      "type": "STAIRCASE",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-STAIR-3",
+      "label": "STAIR",
+      "x": 419.5,
+      "y": 606.63,
+      "type": "STAIRCASE",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-ELEVATOR-1",
+      "label": "ELEVATOR",
+      "x": 325.22,
+      "y": 492.51,
+      "type": "ELEVATOR",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-ELEVATOR-2",
+      "label": "ELEVATOR",
+      "x": 325.75,
+      "y": 525.89,
+      "type": "ELEVATOR",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB1",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 198.34,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB2",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.12,
+      "y": 194.9,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB3",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.98,
+      "y": 631.64,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB4",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 585.12,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB5",
+      "label": "HALLWAY-JUNCTION",
+      "x": 335.97,
+      "y": 736.74,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB6",
+      "label": "HALLWAY-JUNCTION",
+      "x": 230.87,
+      "y": 704.86,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB7",
+      "label": "HALLWAY-JUNCTION",
+      "x": 212.78,
+      "y": 716.92,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB8",
+      "label": "HALLWAY-JUNCTION",
+      "x": 211.92,
+      "y": 749.66,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB9",
+      "label": "HALLWAY-JUNCTION",
+      "x": 497.05,
+      "y": 121.67,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB10",
+      "label": "HALLWAY-JUNCTION",
+      "x": 498.78,
+      "y": 663.52,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB11",
+      "label": "HALLWAY-JUNCTION",
+      "x": 757.21,
+      "y": 298.27,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB12",
+      "label": "HALLWAY-JUNCTION",
+      "x": 759.79,
+      "y": 489.51,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB13",
+      "label": "HALLWAY-JUNCTION",
+      "x": 220.53,
+      "y": 313.77,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB14",
+      "label": "HALLWAY-JUNCTION",
+      "x": 222.26,
+      "y": 208.68,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB15",
+      "label": "HALLWAY-JUNCTION",
+      "x": 220.53,
+      "y": 446.43,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB16",
+      "label": "HALLWAY-JUNCTION",
+      "x": 223.12,
+      "y": 574.79,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB17",
+      "label": "HALLWAY-JUNCTION",
+      "x": 220.99,
+      "y": 469,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB18",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 466.79,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB19",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 572,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB20",
+      "label": "HALLWAY-JUNCTION",
+      "x": 221.61,
+      "y": 499.69,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB21",
+      "label": "HALLWAY-JUNCTION",
+      "x": 222.05,
+      "y": 521.54,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB23",
+      "label": "HALLWAY-JUNCTION",
+      "x": 222.51,
+      "y": 544.29,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB24",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 491.78,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB25",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 524.76,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB26",
+      "label": "HALLWAY-JUNCTION",
+      "x": 336.74,
+      "y": 702.71,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB27",
+      "label": "HALLWAY-JUNCTION",
+      "x": 212.3,
+      "y": 735.02,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB28",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.9,
+      "y": 589.44,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB29",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.88,
+      "y": 580.22,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB30",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.82,
+      "y": 549.51,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB31",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.77,
+      "y": 523.26,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB32",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.32,
+      "y": 296.6,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB33",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.7,
+      "y": 490.5,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB34",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.26,
+      "y": 264.85,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB35",
+      "label": "HALLWAY-JUNCTION",
+      "x": 683.14,
+      "y": 207.04,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB36",
+      "label": "HALLWAY-JUNCTION",
+      "x": 496.4,
+      "y": 196.77,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB37",
+      "label": "HALLWAY-JUNCTION",
+      "x": 419.17,
+      "y": 197.54,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB38",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 314.27,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB39",
+      "label": "HALLWAY-JUNCTION",
+      "x": 339.41,
+      "y": 207.54,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB40",
+      "label": "HALLWAY-JUNCTION",
+      "x": 419.81,
+      "y": 586.13,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB41",
+      "label": "HALLWAY-JUNCTION",
+      "x": 496.88,
+      "y": 587.1,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB42",
+      "label": "HALLWAY-JUNCTION",
+      "x": 475.9,
+      "y": 586.84,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB43",
+      "label": "HALLWAY-JUNCTION",
+      "x": 474.62,
+      "y": 196.99,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB44",
+      "label": "HALLWAY-JUNCTION",
+      "x": 475.76,
+      "y": 545.11,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB45",
+      "label": "HALLWAY-JUNCTION",
+      "x": 475.46,
+      "y": 454.74,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB46",
+      "label": "HALLWAY-JUNCTION",
+      "x": 474.76,
+      "y": 238.74,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-445",
+      "label": "CLASS-ROOM",
+      "x": 667.94,
+      "y": 661.55,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-451",
+      "label": "CLASS-ROOM",
+      "x": 491.44,
+      "y": 544.65,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-453",
+      "label": "CLASS-ROOM",
+      "x": 494.53,
+      "y": 454.08,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-459",
+      "label": "CLASS-ROOM",
+      "x": 492.21,
+      "y": 238.09,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-461",
+      "label": "CLASS-ROOM",
+      "x": 758.13,
+      "y": 392.92,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-485",
+      "label": "CLASS-ROOM",
+      "x": 674.91,
+      "y": 122.75,
+      "type": "ROOM",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB47",
+      "label": "HALLWAY-JUNCTION",
+      "x": 689.28,
+      "y": 649.15,
+      "type": "HALLWAY",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB48",
+      "label": "WATER-FOUNTAIN",
+      "x": 237.97,
+      "y": 522.08,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB49",
+      "label": "WATER-FOUNTAIN",
+      "x": 700.74,
+      "y": 547.9,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB50",
+      "label": "WATER-FOUNTAIN",
+      "x": 695.3,
+      "y": 195.9,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB51",
+      "label": "BATHROOM-MWC",
+      "x": 734.85,
+      "y": 206.55,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB52",
+      "label": "BATHROOM-FWC",
+      "x": 733.43,
+      "y": 579.49,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB53",
+      "label": "BATHROOM-FWC",
+      "x": 264.75,
+      "y": 543.37,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-4-LB54",
+      "label": "BATHROOM-MWC",
+      "x": 264.26,
+      "y": 499.67,
+      "type": "POI",
+      "floor": 4,
+      "buildingCode": "LB",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "LB-4-LB6",
+      "toId": "LB-4-LB7",
+      "weight": 21.74,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB13",
+      "toId": "LB-4-LB14",
+      "weight": 105.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB15",
+      "toId": "LB-4-LB17",
+      "weight": 22.57,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB19",
+      "toId": "LB-4-LB4",
+      "weight": 13.12,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB17",
+      "toId": "LB-4-LB20",
+      "weight": 30.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB20",
+      "toId": "LB-4-LB21",
+      "weight": 21.85,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB16",
+      "toId": "LB-4-LB23",
+      "weight": 30.51,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB23",
+      "toId": "LB-4-LB21",
+      "weight": 22.75,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB18",
+      "toId": "LB-4-LB24",
+      "weight": 24.99,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB24",
+      "toId": "LB-4-LB25",
+      "weight": 32.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB25",
+      "toId": "LB-4-LB19",
+      "weight": 47.24,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB4",
+      "toId": "LB-4-LB26",
+      "weight": 117.62,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB26",
+      "toId": "LB-4-LB5",
+      "weight": 34.04,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB7",
+      "toId": "LB-4-LB27",
+      "weight": 18.11,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB27",
+      "toId": "LB-4-LB8",
+      "weight": 14.64,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB28",
+      "toId": "LB-4-LB3",
+      "weight": 42.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB29",
+      "toId": "LB-4-LB28",
+      "weight": 9.22,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB30",
+      "toId": "LB-4-LB29",
+      "weight": 30.71,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB31",
+      "toId": "LB-4-LB30",
+      "weight": 26.25,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB32",
+      "toId": "LB-4-LB33",
+      "weight": 193.9,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB33",
+      "toId": "LB-4-LB31",
+      "weight": 32.76,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB34",
+      "toId": "LB-4-LB32",
+      "weight": 31.75,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB2",
+      "toId": "LB-4-LB35",
+      "weight": 12.14,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB35",
+      "toId": "LB-4-LB34",
+      "weight": 57.81,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB36",
+      "toId": "LB-4-LB2",
+      "weight": 186.73,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB1",
+      "toId": "LB-4-LB37",
+      "weight": 79.76,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB38",
+      "toId": "LB-4-LB18",
+      "weight": 152.52,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB17",
+      "toId": "LB-4-LB18",
+      "weight": 118.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB19",
+      "toId": "LB-4-LB16",
+      "weight": 116.32,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB33",
+      "toId": "LB-4-LB12",
+      "weight": 76.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-EMERGENCY-STAIR-4",
+      "toId": "LB-4-LB31",
+      "weight": 46.21,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB32",
+      "toId": "LB-4-LB11",
+      "weight": 73.91,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB34",
+      "toId": "LB-4-EMERGENCY-STAIR-5",
+      "weight": 32.79,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB36",
+      "toId": "LB-4-LB9",
+      "weight": 75.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB37",
+      "toId": "LB-4-STAIR-2",
+      "weight": 17.71,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB1",
+      "toId": "LB-4-LB39",
+      "weight": 9.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB39",
+      "toId": "LB-4-LB38",
+      "weight": 106.73,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB39",
+      "toId": "LB-4-LB14",
+      "weight": 117.16,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB38",
+      "toId": "LB-4-LB13",
+      "weight": 118.88,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB13",
+      "toId": "LB-4-EMERGENCY-STAIR-3",
+      "weight": 47.34,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB17",
+      "toId": "LB-4-EMERGENCY-STAIR-2",
+      "weight": 43.88,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB26",
+      "toId": "LB-4-LB6",
+      "weight": 105.89,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB27",
+      "toId": "LB-4-EMERGENCY-STAIR-1",
+      "weight": 45.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB40",
+      "toId": "LB-4-LB4",
+      "weight": 80.41,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB28",
+      "toId": "LB-4-LB41",
+      "weight": 187.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB41",
+      "toId": "LB-4-LB10",
+      "weight": 76.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB40",
+      "toId": "LB-4-STAIR-3",
+      "weight": 20.5,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB41",
+      "toId": "LB-4-LB42",
+      "weight": 20.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB42",
+      "toId": "LB-4-LB40",
+      "weight": 56.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB37",
+      "toId": "LB-4-LB43",
+      "weight": 55.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB43",
+      "toId": "LB-4-LB36",
+      "weight": 21.78,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB44",
+      "toId": "LB-4-LB42",
+      "weight": 41.73,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB45",
+      "toId": "LB-4-LB44",
+      "weight": 90.37,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB43",
+      "toId": "LB-4-LB46",
+      "weight": 41.75,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB46",
+      "toId": "LB-4-LB45",
+      "weight": 216,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-ELEVATOR-1",
+      "toId": "LB-4-LB24",
+      "weight": 14.21,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-ELEVATOR-2",
+      "toId": "LB-4-LB25",
+      "weight": 13.71,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB47",
+      "toId": "LB-4-LB3",
+      "weight": 18.29,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB47",
+      "toId": "LB-4-445",
+      "weight": 24.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB44",
+      "toId": "LB-4-451",
+      "weight": 15.69,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB45",
+      "toId": "LB-4-453",
+      "weight": 19.08,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB11",
+      "toId": "LB-4-461",
+      "weight": 94.65,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB12",
+      "toId": "LB-4-461",
+      "weight": 96.6,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB46",
+      "toId": "LB-4-459",
+      "weight": 17.46,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB2",
+      "toId": "LB-4-485",
+      "weight": 72.62,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB2",
+      "toId": "LB-4-LB50",
+      "weight": 12.22,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB49",
+      "toId": "LB-4-LB30",
+      "weight": 17,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB21",
+      "toId": "LB-4-LB48",
+      "weight": 15.93,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB54",
+      "toId": "LB-4-LB20",
+      "weight": 42.65,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB53",
+      "toId": "LB-4-LB23",
+      "weight": 42.25,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB29",
+      "toId": "LB-4-LB52",
+      "weight": 49.56,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-4-LB51",
+      "toId": "LB-4-LB35",
+      "weight": 51.71,
+      "isAccessible": true
+    }
+  ]
+}
