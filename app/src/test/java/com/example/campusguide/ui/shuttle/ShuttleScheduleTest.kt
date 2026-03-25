@@ -22,38 +22,38 @@ class ShuttleScheduleTest {
     fun nextDeparture_duringOperatingHours_returnsUpcomingTime() {
         val now = timeOn(DayOfWeek.MONDAY, 10, 0)
         val result = ShuttleSchedule.nextDeparture(Campus.SGW, now)
-        assertNotNull(result)
-        assertTrue(result!!.localTime.isAfter(now.toLocalTime()))
+        assertTrue(result is DepartureResult.Soon)
+        assertTrue((result as DepartureResult.Soon).departure!!.localTime.isAfter(now.toLocalTime()))
     }
 
     // AC: clearly indicates "next departure" for SGW
     @Test
     fun nextDeparture_sgw_returnsCorrectNextTime() {
         val now = timeOn(DayOfWeek.MONDAY, 9, 0)
-        assertEquals(DepartureTime(9, 30), ShuttleSchedule.nextDeparture(Campus.SGW, now))
+        assertEquals(DepartureResult.Soon(DepartureTime(9, 30)), ShuttleSchedule.nextDeparture(Campus.SGW, now))
     }
 
     // AC: clearly indicates "next departure" for Loyola
     @Test
     fun nextDeparture_loyola_returnsCorrectNextTime() {
         val now = timeOn(DayOfWeek.MONDAY, 9, 0)
-        assertEquals(DepartureTime(9, 15), ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
+        assertEquals(DepartureResult.Soon(DepartureTime(9, 15)), ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
     }
 
     // AC: outside operating hours shows "No more shuttles today"
     @Test
     fun nextDeparture_afterLastBus_returnsNull() {
         val now = timeOn(DayOfWeek.MONDAY, 18, 31)
-        assertNull(ShuttleSchedule.nextDeparture(Campus.SGW, now))
-        assertNull(ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
+        assertEquals(DepartureResult.NoMoreToday, ShuttleSchedule.nextDeparture(Campus.SGW, now))
+        assertEquals(DepartureResult.NoMoreToday, ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
     }
 
     // AC: outside operating hours — weekend
     @Test
     fun nextDeparture_weekend_returnsNull() {
         val now = timeOn(DayOfWeek.SATURDAY, 10, 0)
-        assertNull(ShuttleSchedule.nextDeparture(Campus.SGW, now))
-        assertNull(ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
+        assertEquals(DepartureResult.NoMoreToday, ShuttleSchedule.nextDeparture(Campus.SGW, now))
+        assertEquals(DepartureResult.NoMoreToday, ShuttleSchedule.nextDeparture(Campus.LOYOLA, now))
     }
 
     // AC: next departure on next operating day shown when no more today
@@ -77,7 +77,7 @@ class ShuttleScheduleTest {
     @Test
     fun nextDeparture_friday_usesFridaySchedule() {
         val now = timeOn(DayOfWeek.FRIDAY, 9, 0)
-        assertEquals(DepartureTime(9, 45), ShuttleSchedule.nextDeparture(Campus.SGW, now))
+        assertEquals(DepartureResult.TooFarAway(DepartureTime(9, 45)), ShuttleSchedule.nextDeparture(Campus.SGW, now))
     }
 
     // AC: schedule data is available (non-empty)

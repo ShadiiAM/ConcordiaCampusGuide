@@ -2,7 +2,6 @@ package com.example.campusguide.ui.shuttle
 
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.Suggestion
-import com.example.campusguide.data.SuggestionData
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
 import org.junit.Assert.*

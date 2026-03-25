@@ -457,11 +457,11 @@ class MapScreenTest {
 
 
         // SGW results should appear
-        assert(suggestions.any { (it.suggestion as? CampusBuilding)?.buildingCode == "H" }) {
+        assert(suggestions.any { (it as? CampusBuilding)?.buildingCode == "H" }) {
             "Expected Hall Building (SGW) in suggestions"
         }
         // Loyola results shouldn't appear
-        assert(suggestions.none { it.suggestion.campus == Campus.LOYOLA }) {
+        assert(suggestions.none { it.campus == Campus.LOYOLA }) {
             "Expected no Loyola buildings when campus is SGW and crossCampus is false"
         }
     }
@@ -470,10 +470,10 @@ class MapScreenTest {
     fun suggestions_scopedToLoyolaWhenLoyolaSelected() {
         val suggestions = fullSuggestions("vanier", Campus.LOYOLA, crossCampus = false)
 
-        assert(suggestions.any { (it.suggestion as? CampusBuilding)?.buildingCode == "VL" }) {
+        assert(suggestions.any { (it as? CampusBuilding)?.buildingCode == "VL" }) {
             "Expected Vanier Library (Loyola) in suggestions"
         }
-        assert(suggestions.none { it.suggestion.campus == Campus.SGW }) {
+        assert(suggestions.none { it.campus == Campus.SGW }) {
             "Expected no SGW buildings when campus is Loyola and crossCampus is false"
         }
     }
@@ -482,7 +482,7 @@ class MapScreenTest {
     fun suggestions_sgwBuildingNotShownOnLoyolaCampus() {
         val suggestions = fullSuggestions("hall", Campus.LOYOLA, crossCampus = false)
 
-        assert(suggestions.none { (it.suggestion as? CampusBuilding)?.buildingCode == "H" }) {
+        assert(suggestions.none { (it as? CampusBuilding)?.buildingCode == "H" }) {
             "Hall Building (SGW) should not appear when Loyola campus is selected"
         }
     }
@@ -494,7 +494,7 @@ class MapScreenTest {
         val suggestions = fullSuggestions("hall", Campus.SGW, crossCampus = true)
 
         // Should include SGW buildings
-        assert(suggestions.any { it.suggestion.campus == Campus.SGW }) {
+        assert(suggestions.any { it.campus == Campus.SGW }) {
             "Expected SGW buildings when crossCampus is true"
         }
     }
@@ -504,7 +504,7 @@ class MapScreenTest {
         // "ha" matches Hingston Hall wings at Loyola
         val suggestions = fullSuggestions("ha", Campus.SGW, crossCampus = true)
 
-        assert(suggestions.any { it.suggestion.campus == Campus.LOYOLA }) {
+        assert(suggestions.any { it.campus == Campus.LOYOLA }) {
             "Expected Loyola buildings when crossCampus is true"
         }
     }

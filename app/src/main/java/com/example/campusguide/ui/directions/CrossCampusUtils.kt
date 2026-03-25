@@ -62,7 +62,7 @@ fun recommendedCrossCampusMode(): TravelMode {
  */
 fun getCrossCampusMessage(mode: TravelMode): String {
     return when (mode) {
-        TravelMode.TRANSIT -> "Check tag to ensure if this transit is using the Concordia shuttle"
+        TravelMode.TRANSIT -> "For cross-campus transit, the Concordia Shuttle is available between campuses"
         TravelMode.WALK -> "Walking cross-campus will take approximately 2 hours"
         TravelMode.DRIVE -> "Driving cross-campus may encounter traffic and parking challenges"
     }

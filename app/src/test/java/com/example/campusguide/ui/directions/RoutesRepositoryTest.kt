@@ -746,7 +746,7 @@ class GoogleRoutesRepositoryTest {
         )
 
         val vehicle = TransitVehicle(
-            name = "Metro",
+            name = LocalizedText(text = "Metro"),
             type = "SUBWAY"
         )
 
@@ -775,7 +775,7 @@ class GoogleRoutesRepositoryTest {
 
     @Test
     fun routeStep_withTransitDetails_createsCorrectly() {
-        val vehicle = TransitVehicle(name = "Bus", type = "BUS")
+        val vehicle = TransitVehicle(name = LocalizedText(text = "Bus"), type = "BUS")
         val line = TransitLine(name = "Bus 24", shortName = "24", vehicle = vehicle)
         val transit = TransitDetails(transitLine = line, stopCount = 3)
 
@@ -883,7 +883,7 @@ class GoogleRoutesRepositoryTest {
                               "shortName": "2",
                               "color": "#FF6600",
                               "vehicle": {
-                                "name": "Metro",
+                                "name": {"text": "Metro"},
                                 "type": "SUBWAY"
                               }
                             },
@@ -956,7 +956,7 @@ class GoogleRoutesRepositoryTest {
         // Test vehicle
         val vehicle = transitLine?.vehicle
         assertNotNull(vehicle)
-        assertEquals("Metro", vehicle?.name)
+        assertEquals("Metro", vehicle?.name?.text)
         assertEquals("SUBWAY", vehicle?.type)
     }
 
@@ -1132,7 +1132,7 @@ class GoogleRoutesRepositoryTest {
                           "transitDetails": {
                             "transitLine": {
                               "vehicle": {
-                                "name": "Bus",
+                                "name": {"text": "Bus"},
                                 "type": "BUS"
                               }
                             }
@@ -1159,7 +1159,7 @@ class GoogleRoutesRepositoryTest {
 
         val vehicle = result.legs[0].steps[0].transitDetails?.transitLine?.vehicle
         assertNotNull(vehicle)
-        assertEquals("Bus", vehicle?.name)
+        assertEquals("Bus", vehicle?.name?.text)
         assertEquals("BUS", vehicle?.type)
     }
 

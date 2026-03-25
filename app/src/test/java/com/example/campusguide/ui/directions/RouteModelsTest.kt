@@ -355,7 +355,7 @@ class RouteModelsTest {
 
     @Test
     fun transitLine_createsCorrectly() {
-        val vehicle = TransitVehicle(name = "Metro", type = "SUBWAY")
+        val vehicle = TransitVehicle(name = LocalizedText(text = "Metro"), type = "SUBWAY")
         val line = TransitLine(
             name = "Orange Line",
             shortName = "2",
@@ -366,18 +366,18 @@ class RouteModelsTest {
         assertEquals("Orange Line", line.name)
         assertEquals("2", line.shortName)
         assertEquals("#FF6600", line.color)
-        assertEquals("Metro", line.vehicle?.name)
+        assertEquals(LocalizedText(text = "Metro"), line.vehicle?.name)
         assertEquals("SUBWAY", line.vehicle?.type)
     }
 
     @Test
     fun transitVehicle_createsCorrectly() {
         val vehicle = TransitVehicle(
-            name = "Bus",
+            name = LocalizedText(text = "Bus"),
             type = "BUS"
         )
 
-        assertEquals("Bus", vehicle.name)
+        assertEquals(LocalizedText(text = "Bus"), vehicle.name)
         assertEquals("BUS", vehicle.type)
     }
 
@@ -429,7 +429,7 @@ class RouteModelsTest {
             departureTime = "2:30 PM"
         )
 
-        val vehicle = TransitVehicle("Metro", "SUBWAY")
+        val vehicle = TransitVehicle(LocalizedText(text = "Metro"), "SUBWAY")
         val transitLine = TransitLine("Green Line", "1", "#00AA00", vehicle)
 
         val transitDetails = TransitDetails(
