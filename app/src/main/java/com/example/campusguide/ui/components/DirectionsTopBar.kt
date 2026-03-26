@@ -479,14 +479,29 @@ fun DirectionsTopBar(
                                         color = Color.Black,
                                     )
                                 }
-                                step.distanceMeters?.let { m ->
-                                    val distanceText = if (m < 1000) "$m m"
-                                    else "${"%.1f".format(m / 1000.0)} km"
-                                    Text(
-                                        text = distanceText,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF4D4D4D),
-                                    )
+
+                                Row{
+                                    step.distanceMeters?.let { m ->
+                                        val distanceText = if (m < 1000) "$m m"
+                                        else "${"%.1f".format(m / 1000.0)} km"
+                                        Text(
+                                            text = distanceText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    step.durationSeconds?.let { s ->
+                                        val durationText = if (s < 60) "$s s"
+                                        else "${"%.0f".format(s / 60.0)} min"
+                                        Text(
+                                            text = durationText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
                                 }
                             }
                         }

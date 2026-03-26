@@ -52,33 +52,33 @@ suspend fun drawRoute(
 
     if(travelMode == "SHUTTLE") {
 
-            route = getShuttleRoute(origin, destination)
+        route = getShuttleRoute(origin, destination, repo)
 
-            route.legs.forEach { leg ->
-                leg.steps.forEach { step ->
-                    when (step.travelMode) {
-                        TravelMode.TRANSIT -> {
-                            polylineFormatting = PolylineOptions()
-                                .addAll(step.polyline)
-                                .color(0xFFE53935.toInt())
-                                .width(18f)
-                        }
+        route.legs.forEach { leg ->
+            leg.steps.forEach { step ->
+                when (step.travelMode) {
+                    TravelMode.TRANSIT -> {
+                        polylineFormatting = PolylineOptions()
+                            .addAll(step.polyline)
+                            .color(0xFFE53935.toInt())
+                            .width(18f)
+                    }
 
-                        else -> {
-                            polylineFormatting = PolylineOptions()
-                                .addAll(step.polyline)
-                                .color(0xFF1565C0.toInt())
-                                .width(14f)
-                                .pattern(listOf(Dash(20f), Gap(10f)))
-                        }
+                    else -> {
+                        polylineFormatting = PolylineOptions()
+                            .addAll(step.polyline)
+                            .color(0xFF1565C0.toInt())
+                            .width(14f)
+                            .pattern(listOf(Dash(20f), Gap(10f)))
                     }
-                    withContext(Dispatchers.Main.immediate) {
-                        val polyline = googleMap?.addPolyline(polylineFormatting)
-                        routePolylines.add(polyline)
-                    }
-                    yield()
                 }
+                withContext(Dispatchers.Main.immediate) {
+                    val polyline = googleMap?.addPolyline(polylineFormatting)
+                    routePolylines.add(polyline)
+                }
+                yield()
             }
+        }
 
         onDirectionsUiStateChange(getDirectionsUiState().copy(
             isLoadingRoute = false,

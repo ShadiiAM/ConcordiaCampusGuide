@@ -1,7 +1,9 @@
 package com.example.campusguide.ui.screens.map
 
 import com.example.campusguide.ui.components.Campus
+import com.example.campusguide.ui.directions.GoogleRoutesRepository
 import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.RouteRequest
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.RouteStep
 import com.example.campusguide.ui.directions.TravelMode
@@ -13,7 +15,7 @@ import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.shuttle.StaticShuttleDataSource
 import com.google.android.gms.maps.model.LatLng
 
-fun getShuttleRoute(origin: LatLng, destination: LatLng): RouteResult {
+suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRoutesRepository): RouteResult {
 
     val sgwToLoyolaPoints = listOf(
         LatLng(45.4971, -73.5785), //shuttle stop LatLng
@@ -166,14 +168,56 @@ fun getShuttleRoute(origin: LatLng, destination: LatLng): RouteResult {
     val durationSecondsOriginToShuttleEstimate = (distanceFromOriginToShuttle/1.4).toInt()
     val durationSecondsArrivalToDestinationEstimate = (distanceFromArrivalToDestination/1.4).toInt()
 
-
-    val walkToStopStep = RouteStep(
-        durationSeconds = durationSecondsOriginToShuttleEstimate,       // ~5 min walk estimate
-        distanceMeters = distanceFromOriginToShuttle,
-        navigationInstruction = "Walk to shuttle stop",
-        travelMode = TravelMode.WALK,
-        polyline = listOf(origin, shuttleStop)
+    val walkToShuttleLeg = runCatching {
+        repo.getRoute(RouteRequest(origin = origin, destination = shuttleStop, mode = TravelMode.WALK))
+    }.fold(
+        onSuccess = { result ->
+            RouteLeg(
+                durationSeconds = result.durationSeconds,
+                distanceMeters = result.distanceMeters,
+                steps = result.legs.flatMap { it.steps }  // all steps, single leg
+            )
+        },
+        onFailure = {
+            RouteLeg(
+                durationSeconds = durationSecondsOriginToShuttleEstimate,
+                distanceMeters = distanceFromOriginToShuttle,
+                steps = listOf(RouteStep(
+                    durationSeconds = durationSecondsOriginToShuttleEstimate,
+                    distanceMeters = distanceFromOriginToShuttle,
+                    navigationInstruction = "Walk to shuttle stop",
+                    travelMode = TravelMode.WALK,
+                    polyline = listOf(origin, shuttleStop)
+                ))
+            )
+        }
     )
+
+    val walkFromShuttleLeg = runCatching {
+        repo.getRoute(RouteRequest(origin = arrivalStop, destination = destination, mode = TravelMode.WALK))
+    }.fold(
+        onSuccess = { result ->
+            RouteLeg(
+                durationSeconds = result.durationSeconds,
+                distanceMeters = result.distanceMeters,
+                steps = result.legs.flatMap { it.steps }
+            )
+        },
+        onFailure = {
+            RouteLeg(
+                durationSeconds = durationSecondsArrivalToDestinationEstimate,
+                distanceMeters = distanceFromArrivalToDestination,
+                steps = listOf(RouteStep(
+                    durationSeconds = durationSecondsArrivalToDestinationEstimate,
+                    distanceMeters = distanceFromArrivalToDestination,
+                    navigationInstruction = "Walk to destination",
+                    travelMode = TravelMode.WALK,
+                    polyline = listOf(arrivalStop, destination)
+                ))
+            )
+        }
+    )
+
 
     val shuttleStep = RouteStep(
         durationSeconds = 1500,      // ~25 min estimate
@@ -183,27 +227,29 @@ fun getShuttleRoute(origin: LatLng, destination: LatLng): RouteResult {
         polyline = shuttlePoints
     )
 
-    val walkFromStopStep = RouteStep(
-        durationSeconds = durationSecondsArrivalToDestinationEstimate,       // ~5 min walk estimate
-        distanceMeters = distanceFromArrivalToDestination,
-        navigationInstruction = "Walk to destination",
-        travelMode = TravelMode.WALK,
-        polyline = listOf(arrivalStop, destination)
+    val shuttleLeg = RouteLeg(
+        durationSeconds = 1500,
+        distanceMeters = 7500,
+        steps = listOf(shuttleStep)
     )
 
-    val leg = RouteLeg(
-        durationSeconds = durationSecondsOriginToShuttleEstimate + 2100 + durationSecondsArrivalToDestinationEstimate,      // sum of all steps
-        distanceMeters = distanceFromOriginToShuttle + 7500 + distanceFromArrivalToDestination,       // sum of all steps
-        steps = listOf(walkToStopStep, shuttleStep, walkFromStopStep)
-    )
+    val allLegs = listOf(walkToShuttleLeg, shuttleLeg, walkFromShuttleLeg)
+    val allPoints = walkToShuttleLeg.steps.flatMap { it.polyline } +
+            shuttlePoints +
+            walkFromShuttleLeg.steps.flatMap { it.polyline }
+    val allSteps = walkToShuttleLeg.steps + shuttleLeg.steps + walkFromShuttleLeg.steps
 
-    val allPoints = listOf(origin) + shuttlePoints + listOf(destination)
+    val fullRouteLeg = RouteLeg(
+        durationSeconds = (walkToShuttleLeg.durationSeconds ?: 0) + (shuttleLeg.durationSeconds ?: 0) + (walkFromShuttleLeg.durationSeconds ?: 0),
+        distanceMeters = (walkToShuttleLeg.distanceMeters ?: 0) + (shuttleLeg.distanceMeters ?: 0) + (walkFromShuttleLeg.distanceMeters ?: 0),
+        steps = allSteps
+    )
 
     return RouteResult(
         points = allPoints,
-        durationSeconds = leg.durationSeconds,
-        distanceMeters = leg.distanceMeters,
-        legs = listOf(leg),
+        durationSeconds = (walkToShuttleLeg.durationSeconds ?: 0) + (shuttleLeg.durationSeconds ?: 0) + (walkFromShuttleLeg.durationSeconds ?: 0),
+        distanceMeters = (walkToShuttleLeg.distanceMeters ?: 0) + (shuttleLeg.distanceMeters ?: 0) + (walkFromShuttleLeg.distanceMeters ?: 0),
+        legs = listOf(fullRouteLeg),
         isShuttleRoute = true
     )
 }

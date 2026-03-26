@@ -58,11 +58,11 @@ class GoogleRoutesRepository(
                     "routes.legs.steps.distanceMeters," +
                     "routes.legs.steps.staticDuration," +
                     "routes.legs.steps.navigationInstruction," +
-                    "routes.legs.steps.travelMode,"
+                    "routes.legs.steps.travelMode," +
+                    "routes.legs.steps.polyline.encodedPolyline,"
 
             if (request.travelMode == "TRANSIT") {
                 fieldMask = fieldMask +
-                    "routes.legs.steps.polyline.encodedPolyline," +
                     "routes.legs.steps.transitDetails.stopDetails," +
                     "routes.legs.steps.transitDetails.localizedValues," +
                     "routes.legs.steps.transitDetails.headsign," +
