@@ -684,7 +684,7 @@ fun MapScreen(
                 // Automatically detect cross-campus routes
                 val isCrossCampus = isCrossCampusRoute(originBuilding,
                     destinationBuilding, step.origin)
-                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode)
+                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
 
                 val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
 
@@ -714,7 +714,7 @@ fun MapScreen(
                 // Automatically detect cross-campus routes
                 val isCrossCampus = isCrossCampusRoute(originBuilding,
                     destinationBuilding, step.origin)
-                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode)
+                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
                 val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
 
                 onDirectionsTopBarState(
