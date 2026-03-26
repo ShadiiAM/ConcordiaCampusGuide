@@ -10,6 +10,7 @@ import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.ui.directions.getCrossCampusMessage
+import com.example.campusguide.ui.shuttle.DepartureResult
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Dash
 import com.google.android.gms.maps.model.Gap
@@ -40,7 +41,8 @@ suspend fun drawRoute(
     onLegFallbackMessage: (String?) -> Unit,
     defaultOrigin: LatLng,
     legLabels: List<String>,
-    onLegLabels: (List<String>) -> Unit
+    onLegLabels: (List<String>) -> Unit,
+    departure: DepartureResult.Soon? = null
 ): DrawRouteResult{
     lateinit var polylineFormatting: PolylineOptions
     lateinit var route: RouteResult
@@ -52,7 +54,9 @@ suspend fun drawRoute(
 
     if(travelMode == "SHUTTLE") {
 
-        route = getShuttleRoute(origin, destination, repo)
+        val safeDeparture = departure ?: return DrawRouteResult(emptyList(), "No shuttle available")
+
+        route = getShuttleRoute(origin, destination, repo, safeDeparture)
 
         route.legs.forEach { leg ->
             leg.steps.forEach { step ->

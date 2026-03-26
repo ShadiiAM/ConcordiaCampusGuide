@@ -15,7 +15,7 @@ import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.shuttle.StaticShuttleDataSource
 import com.google.android.gms.maps.model.LatLng
 
-suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRoutesRepository): RouteResult {
+suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRoutesRepository, departure: DepartureResult.Soon): RouteResult {
 
     val sgwToLoyolaPoints = listOf(
         LatLng(45.4971, -73.5785), //shuttle stop LatLng
@@ -222,7 +222,7 @@ suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRou
     val shuttleStep = RouteStep(
         durationSeconds = 1500,      // ~25 min estimate
         distanceMeters = 7500,       // ~7.5km estimate
-        navigationInstruction = "Take the ${(ShuttleSchedule.nextDeparture(detectCampus(destination)) as DepartureResult.Soon).departure} Concordia shuttle",
+        navigationInstruction = "Take the ${departure.departure} Concordia shuttle",
         travelMode = TravelMode.TRANSIT,
         polyline = shuttlePoints
     )
@@ -254,12 +254,12 @@ suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRou
     )
 }
 
-fun canUseShuttle(origin: LatLng, destination: LatLng, mode: TravelMode): Boolean {
+fun canUseShuttle(origin: LatLng, destination: LatLng, mode: TravelMode): DepartureResult.Soon? {
     val nearOriginStop = (NearestShuttleStopFinder.find(origin, StaticShuttleDataSource().getShuttleStops())?.distanceMetres?: 0f) < 500
     val nearDestStop = (NearestShuttleStopFinder.find(destination, StaticShuttleDataSource().getShuttleStops())?.distanceMetres?: 0f) < 500
     val isCrossCampus = detectCampus(origin) != detectCampus(destination)
     val isTransit = mode == TravelMode.TRANSIT
-    val shuttleRunning = ShuttleSchedule.nextDeparture(detectCampus(destination)) is DepartureResult.Soon
+    val departure = ShuttleSchedule.nextDeparture(detectCampus(destination)) as? DepartureResult.Soon
 
-    return isTransit && nearOriginStop && nearDestStop && isCrossCampus && shuttleRunning
+    return if (isTransit && nearOriginStop && nearDestStop && isCrossCampus && departure != null) departure else null
 }

@@ -19,7 +19,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -487,15 +487,15 @@ fun MapScreen(
         }
 
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
-        lateinit var drawRouteResult: DrawRouteResult
+        var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
 
         centerOnOrigin(googleMap, step.origin, context)
 
         val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
-
-        if(canUseShuttle(step.origin, step.destination, travelMode)){
+        val departure = canUseShuttle(step.origin, step.destination, travelMode)
+        if(departure != null){
             drawRouteResult =
                     drawRoute(
                         step,
@@ -516,7 +516,8 @@ fun MapScreen(
                         defaultOrigin,
 
                         legLabels = legLabels,
-                        onLegLabels = { legLabels = it }
+                        onLegLabels = { legLabels = it },
+                        departure = departure
                     )
 
         }
@@ -896,18 +897,19 @@ fun MapScreen(
         onTopBarDirectionsDestinationConsumed()
     }
 
-
+    val activity = LocalActivity.current
     // Permission handling
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
         val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
-        val activity = context as ComponentActivity
 
 
         if (fineLocationGranted && coarseLocationGranted) {
-            checkLocationSettings(activity, locationSettingsLauncher)
+            activity?.let { act ->
+                checkLocationSettings(act, locationSettingsLauncher)
+            }
 
             googleMap?.let { map ->
                 if (ActivityCompat.checkSelfPermission(
@@ -944,10 +946,10 @@ fun MapScreen(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
-        }else {
-            // permissions already granted, check accuracy directly
-            checkLocationSettings(context, locationSettingsLauncher)
         }
+            // check accuracy directly
+            checkLocationSettings(context, locationSettingsLauncher)
+
     }
 
 
