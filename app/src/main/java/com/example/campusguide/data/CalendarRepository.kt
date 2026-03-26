@@ -24,9 +24,9 @@ interface CalendarRepository {
 }
 
 class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) : CalendarRepository {
-    
-    private val json = Json { 
-        ignoreUnknownKeys = true 
+
+    private val json = Json {
+        ignoreUnknownKeys = true
         coerceInputValues = true
     }
 
@@ -36,19 +36,22 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
         termCode: String,
         section: String
     ): List<Course> = withContext(Dispatchers.IO) {
-        val url = "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$subject/$catalog" // did not use courseID because value is hard to find
+        val url =
+            "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$subject/$catalog" // did not use courseID because value is hard to find
 
-        /*
-        to check what subject and catalog value is being used for the api
-        Log.d("CalendarRepo", "REQUESTING URL: $url")
-         */
 
-        val authHeader = Credentials.basic(BuildConfig.CONCORDIA_API_USER, BuildConfig.CONCORDIA_API_KEY)
+        //to check what subject and catalog value is being used for the api
+        //Log.d("CalendarRepo", "REQUESTING URL: $url")
+
+
+        val authHeader =
+            Credentials.basic(BuildConfig.CONCORDIA_API_USER, BuildConfig.CONCORDIA_API_KEY)
 
         val request = Request.Builder()
             .url(url)
             .addHeader("Authorization", authHeader)
             .build()
+
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
@@ -56,12 +59,15 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
                 if (response.code in 400..499) return@withContext emptyList()
                 throw IOException("Server Error: ${response.code}")
             }
-            
+
             val body = response.body?.string() ?: return@withContext emptyList()
+            //Log.d("CalendarRepo", "API Response: $body")
+
             val results = json.decodeFromString<List<Course>>(body)
-            
+
             results.filter {
-                it.termCode == termCode && it.section.trim().equals(section.trim(), ignoreCase = true)
+                it.termCode == termCode && it.section.trim()
+                    .equals(section.trim(), ignoreCase = true)
             }
         }
     }

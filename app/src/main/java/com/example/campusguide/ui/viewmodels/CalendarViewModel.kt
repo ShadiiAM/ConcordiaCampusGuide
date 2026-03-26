@@ -23,7 +23,11 @@ data class CalendarUiState(
     val isLoading: Boolean = false,
     val error: CalendarError? = null,
     val lastAddedCourses: List<Course>? = null,
-    val trackedCourses: List<Course> = emptyList()
+    val trackedCourses: List<Course> = emptyList(),
+    val termCode: String = "",
+    val subject: String = "",
+    val catalog: String = "",
+    val section: String = ""
 )
 
 class CalendarViewModel(private val repository: CalendarRepository) : ViewModel() {
@@ -34,10 +38,19 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
     var selectedDate: Calendar by mutableStateOf(Calendar.getInstance())
         private set
 
-    var selectedTab by mutableStateOf(CalendarTab.DAILY_SCHEDULE)
+    private var _selectedTab by mutableStateOf(CalendarTab.DAILY_SCHEDULE)
+    var selectedTab: CalendarTab
+        get() = _selectedTab
+        set(value) {
+            if (_selectedTab != value) {
+                // Clear success and error states when navigating between tabs
+                uiState = uiState.copy(lastAddedCourses = null, error = null)
+                _selectedTab = value
+            }
+        }
 
     /**
-     * Derived state that automatically updates whenever trackedCourses or selectedDate changes.
+     * automatically updates whenever trackedCourses or selectedDate changes.
      */
     val coursesForSelectedDay by derivedStateOf {
         val dayOfWeek = selectedDate.get(Calendar.DAY_OF_WEEK)
@@ -50,16 +63,41 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
         selectedDate = newDate
     }
 
-    fun addCourse(subject: String, catalog: String, termCode: String, section: String) {
+    fun updateInput(
+        termCode: String = uiState.termCode,
+        subject: String = uiState.subject,
+        catalog: String = uiState.catalog,
+        section: String = uiState.section
+    ) {
+        uiState = uiState.copy(
+            termCode = termCode,
+            subject = subject,
+            catalog = catalog,
+            section = section
+        )
+    }
+
+    fun addCourse() {
+        val subject = uiState.subject
+        val catalog = uiState.catalog
+        val termCode = uiState.termCode
+        val section = uiState.section
+
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, error = null)
+            // Clear success and error states when starting a new search
+            uiState = uiState.copy(isLoading = true, error = null, lastAddedCourses = null)
             try {
                 val matchedComponents = repository.fetchAndFilterCourse(subject, catalog, termCode, section)
 
                 uiState = if (matchedComponents.isNotEmpty()) {
                     uiState.copy(
                         trackedCourses = uiState.trackedCourses + matchedComponents,
-                        lastAddedCourses = matchedComponents
+                        lastAddedCourses = matchedComponents,
+                        // Clear fields on success
+                        termCode = "",
+                        subject = "",
+                        catalog = "",
+                        section = ""
                     )
                 } else {
                     uiState.copy(error = CalendarError.NotFound)

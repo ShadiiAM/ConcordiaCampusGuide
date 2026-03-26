@@ -24,9 +24,10 @@
     <string name="calendar_error_not_found">Course or section not found.</string>
     <string name="calendar_error_network">Network Error: Check connection.</string>
 
-    <string name="calendar_location_label">Location: %1$s</string>
+    <string name="calendar_location_label">Location: %s</string>
     <string name="calendar_remove_course">Remove course</string>
+    <string name="calendar_confirm_removal">Confirm removal</string>
     <string name="calendar_directions">Directions to classroom</string>
 
-    <string name="calendar_course_header">%1$s %2$s (%3$s)</string>
+    <string name="calendar_course_header">%s %s (%s) %s</string>
 </resources>
