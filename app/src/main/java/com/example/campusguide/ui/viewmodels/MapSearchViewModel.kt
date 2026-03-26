@@ -71,7 +71,7 @@ class MapSearchViewModel : ViewModel() {
     val suggestionKey: (Suggestion) -> Any = { suggestion ->
         when (suggestion) {
             is CampusBuilding -> "b:${suggestion.buildingCode}"
-            is ShuttleStop -> "s>${suggestion.id}"
+            is ShuttleStop -> "s:${suggestion.id}"
             is Indoor -> "i:${suggestion.node.id}"
         }
     }
@@ -99,7 +99,6 @@ class MapSearchViewModel : ViewModel() {
         topBarSuggestions = fullSuggestions(
             query = query,
             activeCampus = Campus.SGW,
-            crossCampus = true,
         ) + indoor
     }
 

@@ -174,7 +174,7 @@ val ALL_SUGGESTIONS: List<Suggestion> = listOf(
 fun fullSuggestions(
     query: String,
     activeCampus: Campus,
-    crossCampus: Boolean,
+    crossCampus: Boolean = true,
     max: Int = 8,
 ): List<Suggestion> {
     val q = query.trim()
