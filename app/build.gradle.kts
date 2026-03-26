@@ -122,7 +122,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Activity entry point — framework lifecycle, not unit testable
         "**/MainActivity*",
         // Requires live network/API calls — not unit testable on JVM
-        "**/ui/directions/**"
+        "**/ui/directions/**," +
+        // composable function builds suggestion rows
+        "**/*Composable*.kt"
     )
 
     val buildDir = layout.buildDirectory.get().asFile

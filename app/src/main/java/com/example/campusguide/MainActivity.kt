@@ -76,6 +76,7 @@ import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
+import com.example.campusguide.ui.viewmodels.BuildingRow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -359,7 +360,14 @@ fun ConcordiaCampusGuideApp() {
                                                     if (directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION) {
 
                                                         val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                            mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
+                                                            BuildingRow(
+                                                                suggestion = suggestion,
+                                                                nearestId =  nearestId,
+                                                                userLatLng = userLatLng,
+                                                                onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
+                                                                onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
+                                                                onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
+                                                            )
                                                         }
 
                                                         if(!mapViewmodel.searchVanish){
@@ -502,7 +510,14 @@ fun ConcordiaCampusGuideApp() {
                                         } else{
 
                                             val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                mapViewmodel.BuildingRow(suggestion, nearestId, userLatLng)
+                                                BuildingRow(
+                                                    suggestion = suggestion,
+                                                    nearestId =  nearestId,
+                                                    userLatLng = userLatLng,
+                                                    onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
+                                                    onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
+                                                    onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
+                                                )
                                             }
 
                                             SearchBarWithProfile(
