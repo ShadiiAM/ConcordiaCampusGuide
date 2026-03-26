@@ -74,7 +74,6 @@ import com.example.campusguide.ui.viewmodels.MapSearchViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
-import com.example.campusguide.ui.components.BuildingAutocompleteField
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 
@@ -365,7 +364,7 @@ fun ConcordiaCampusGuideApp() {
 
                                                         if(!mapViewmodel.searchVanish){
 
-                                                            BuildingAutocompleteField(
+                                                            SearchBarWithProfile(
                                                                 modifier = Modifier.padding(top = 20.dp).ignoreFocusClearOnTouch(),
                                                                 focusRequester = searchFocusRequester,
                                                                 onSearchQueryChange = mapViewmodel::onSearchQueryChange,
@@ -374,7 +373,7 @@ fun ConcordiaCampusGuideApp() {
                                                                 suggestions = mapViewmodel.topBarSuggestions,
                                                                 suggestionContent = suggestionContent,
                                                                 suggestionKey = mapViewmodel.suggestionKey,
-
+                                                                showProfile = false
                                                             )
                                                         }
                                                     }

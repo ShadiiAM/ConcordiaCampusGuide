@@ -76,7 +76,7 @@ fun <T> SearchBarWithProfile(
 
     suggestionKey: ((T) -> Any)? = null,
     suggestionContent: @Composable (T) -> Unit = {},
-
+    showProfile: Boolean = true
 ) {
     val textFocusRequester = focusRequester ?: remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
@@ -145,21 +145,23 @@ fun <T> SearchBarWithProfile(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 // Profile avatar
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFD4C4E8))
-                        .clickable(onClick = onProfileClick)
-                        .testTag("UserProfile"),
-                    contentAlignment = Alignment.Center
-                ) {
-                    AccessibleText(
-                        text = "A",
-                        fallbackColor = Color(0xFF6B4D8A),
-                        baseFontSizeSp = 14f,
-                        forceFontWeight = FontWeight.Medium
-                    )
+                if (showProfile){
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFD4C4E8))
+                            .clickable(onClick = onProfileClick)
+                            .testTag("UserProfile"),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        AccessibleText(
+                            text = "A",
+                            fallbackColor = Color(0xFF6B4D8A),
+                            baseFontSizeSp = 14f,
+                            forceFontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
