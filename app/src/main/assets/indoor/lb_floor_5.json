@@ -566,26 +566,6 @@
       "description": null
     },
     {
-      "id": "LB-5-255",
-      "label": "CLASS-ROOM",
-      "x": 320.11,
-      "y": 449.18,
-      "type": "ROOM",
-      "floor": 5,
-      "buildingCode": "LB",
-      "description": null
-    },
-    {
-      "id": "LB-5-227",
-      "label": "CLASS-ROOM",
-      "x": 274.75,
-      "y": 649.41,
-      "type": "ROOM",
-      "floor": 5,
-      "buildingCode": "LB",
-      "description": null
-    },
-    {
       "id": "LB-5-545",
       "label": "CLASS-ROOM",
       "x": 546.42,
@@ -791,6 +771,26 @@
       "x": 480.79,
       "y": 389.7,
       "type": "HALLWAY",
+      "floor": 5,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-5-522",
+      "label": "CLASS-ROOM",
+      "x": 299.58,
+      "y": 447.6,
+      "type": "ROOM",
+      "floor": 5,
+      "buildingCode": "LB",
+      "description": null
+    },
+    {
+      "id": "LB-5-527",
+      "label": "CLASS-ROOM",
+      "x": 272.26,
+      "y": 647.21,
+      "type": "ROOM",
       "floor": 5,
       "buildingCode": "LB",
       "description": null
@@ -1128,18 +1128,6 @@
       "isAccessible": true
     },
     {
-      "fromId": "LB-5-LB24",
-      "toId": "LB-5-255",
-      "weight": 25.62,
-      "isAccessible": true
-    },
-    {
-      "fromId": "LB-5-LB47",
-      "toId": "LB-5-227",
-      "weight": 57.58,
-      "isAccessible": true
-    },
-    {
       "fromId": "LB-5-LB40",
       "toId": "LB-5-545",
       "weight": 68.21,
@@ -1299,6 +1287,18 @@
       "fromId": "LB-5-LB43",
       "toId": "LB-5-LB58",
       "weight": 132.06,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-5-522",
+      "toId": "LB-5-LB24",
+      "weight": 46.19,
+      "isAccessible": true
+    },
+    {
+      "fromId": "LB-5-527",
+      "toId": "LB-5-LB47",
+      "weight": 60.04,
       "isAccessible": true
     }
   ]
