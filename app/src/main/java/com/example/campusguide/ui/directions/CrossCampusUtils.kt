@@ -1,6 +1,7 @@
 package com.example.campusguide.ui.directions
 
 import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
 
@@ -9,8 +10,8 @@ import com.google.android.gms.maps.model.LatLng
  * If [originBuilding] is null, falls back to detecting the campus from [originLatLng].
  */
 fun isCrossCampusRoute(
-    originBuilding: CampusBuilding?,
-    destinationBuilding: CampusBuilding?,
+    originBuilding: Suggestion?,
+    destinationBuilding: Suggestion?,
     originLatLng: LatLng? = null,
 ): Boolean {
     if (destinationBuilding == null) return false
@@ -61,7 +62,7 @@ fun recommendedCrossCampusMode(): TravelMode {
  */
 fun getCrossCampusMessage(mode: TravelMode): String {
     return when (mode) {
-        TravelMode.TRANSIT -> "Using Concordia Shuttle for cross-campus route"
+        TravelMode.TRANSIT -> "For cross-campus transit, the Concordia Shuttle is available between campuses"
         TravelMode.WALK -> "Walking cross-campus will take approximately 2 hours"
         TravelMode.DRIVE -> "Driving cross-campus may encounter traffic and parking challenges"
     }

@@ -1,7 +1,6 @@
-package com.example.campusguide.ui.screens
+package com.example.campusguide.ui.screens.map
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
@@ -18,18 +17,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
 import android.os.Build
-import android.os.Looper
 import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
@@ -41,25 +37,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.edit
 import com.example.campusguide.R
-import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
-import com.example.campusguide.ui.map.geoJson.GeoJsonStyle
 import com.example.campusguide.ui.map.models.BuildingInfo
 import com.example.campusguide.ui.directions.DirectionsStep
 import com.example.campusguide.ui.directions.DirectionsUiState
 import com.example.campusguide.ui.directions.GoogleRoutesRepository
-import com.example.campusguide.ui.directions.RouteRequest
 import com.example.campusguide.ui.map.utils.BuildingHit
-import com.example.campusguide.ui.map.utils.BuildingLocator
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -67,24 +60,16 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.*
 import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.CampusBuilding
-import com.example.campusguide.data.buildingSuggestions
-import com.example.campusguide.data.ALL_CAMPUS_BUILDINGS
-import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.directions.isCrossCampusRoute
-import com.example.campusguide.ui.directions.getCrossCampusMessage
-import com.example.campusguide.ui.directions.getCrossCampusErrorMessage
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.indoor.CrossFloorRouter
 import com.example.campusguide.indoor.IndoorGraphRegistry
@@ -95,42 +80,24 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import androidx.core.content.ContextCompat
+import com.example.campusguide.data.Suggestion
+import com.example.campusguide.ui.accessibility.LocalAccessibilityState
+import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
+import com.example.campusguide.ui.directions.detectCampus
+import com.example.campusguide.ui.screens.IndoorMapScreen
+import com.example.campusguide.ui.shuttle.ShuttleSchedule
+import com.example.campusguide.ui.viewmodels.UserLocationViewModel
+import com.google.android.gms.maps.model.AdvancedMarkerOptions
+import com.google.android.gms.maps.model.Polyline
 
-private const val PREFS_NAME = "campus_preferences"
-private const val KEY_SELECTED_CAMPUS = "selected_campus"
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
-
-data class DirectionsTopBarState(
-    val active: Boolean,
-    val originLabel: String = "Your location",
-    val destinationLabel: String = "",
-    val isCrossCampus: Boolean = false,
-    val selectedMode: TravelMode = TravelMode.DRIVE,
-    val routeSummary: String? = null,
-    val errorMessage: String? = null,
-    val legLabels: List<String> = emptyList(),
-    val legFallbackMessage: String? = null,
-    val isLoadingRoute: Boolean = false,
-    val showActions: Boolean = false,
-    val currentSteps: RouteLeg? = null,
-    val goEnabled: Boolean = true,
-    val showTravelModes: Boolean = true,
-    val goLabel: String = "Go",
-    val cancelLabel: String = "Cancel",
-    val indoorOriginNode: IndoorNode? = null,
-    val indoorDestinationNode: IndoorNode? = null,
-)
-
-data class ShuttleRouteResult(
-    val stop: ShuttleStop,
-    val route: com.example.campusguide.ui.directions.RouteResult?,
-)
 
 @Composable
 fun MapScreen(
     searchQuery: String = "",
-    topBarSelectedBuilding: CampusBuilding? = null,
+    topBarSelectedSuggestion: Suggestion? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
     topBarDirectionsDestinationBuilding: CampusBuilding? = null,
     onTopBarDirectionsDestinationConsumed: () -> Unit = {},
@@ -140,24 +107,25 @@ fun MapScreen(
     indoorOutdoorRouteRequest: IndoorOutdoorRouteRequest? = null,
     onIndoorOutdoorRouteRequested: (IndoorOutdoorRouteRequest) -> Unit = {},
     onIndoorOutdoorRouteRequestConsumed: () -> Unit = {},
-    indoorSearchFocusNodeTrigger: com.example.campusguide.indoor.IndoorNode? = null,
-    indoorSetStartTrigger: com.example.campusguide.indoor.IndoorNode? = null,
-    indoorSetDestTrigger: com.example.campusguide.indoor.IndoorNode? = null,
+    indoorSearchFocusNodeTrigger: IndoorNode? = null,
+    indoorSetStartTrigger: IndoorNode? = null,
+    indoorSetDestTrigger: IndoorNode? = null,
     onIndoorTriggerConsumed: () -> Unit = {},
     onIndoorTopCardActiveChanged: (Boolean) -> Unit = {},
-    onIndoorTopCardactiveChanged: (Boolean) -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
-    shuttleShowBothStops: Boolean = false,
-    onShuttleShowBothStopsConsumed: () -> Unit = {},
+    originPickTrigger: Int = 0,
+    myLocationTrigger: Int = 0,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val accessibilityState = LocalAccessibilityState.current
+
+    val userLocationViewModel: UserLocationViewModel = viewModel()
 
     // State management
     var googleMap by remember { mutableStateOf<GoogleMap?>(null) }
@@ -170,21 +138,18 @@ fun MapScreen(
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
     var pendingSearchQuery by remember { mutableStateOf(searchQuery) }
     var searchJob by remember { mutableStateOf<Job?>(null) }
-    var showProfile by remember { mutableStateOf(false) }
-    var showAccessibility by remember { mutableStateOf(false) }
     var controlsVisible = viewModel.controlsVisible
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
 
     val repo = remember { GoogleRoutesRepository() }
     var directionsUiState by remember { mutableStateOf(DirectionsUiState()) }
     var travelMode by rememberSaveable { mutableStateOf(TravelMode.DRIVE) }
     var isPickingOrigin by remember { mutableStateOf(false) }
-    var routePolylineRef by remember {
-        mutableStateOf<com.google.android.gms.maps.model.Polyline?>(null)
-    }
-    var defaultOrigin by remember { mutableStateOf(LatLng(45.4972, -73.5789)) }
+    val routePolylines = remember { mutableListOf<Polyline?>() }
     var routeRequestGeneration by remember { mutableIntStateOf(0) }
+
+    val defaultOrigin by userLocationViewModel.effectiveOrigin.collectAsState()
     // Track the selected building's LatLng for directions
     var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
@@ -193,7 +158,7 @@ fun MapScreen(
 
     // Track origin and destination buildings for cross-campus detection
     var originBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
-    var destinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var destinationBuilding by remember { mutableStateOf<Suggestion?>(null) }
     var legLabels by remember { mutableStateOf<List<String>>(emptyList()) }
     var legFallbackMessage by remember { mutableStateOf<String?>(null) }
     var topBarOriginOverride by remember { mutableStateOf<String?>(null) }
@@ -215,8 +180,33 @@ fun MapScreen(
     // Reserved for US-3.2: enables removing/updating markers when switching campuses
     val shuttleMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedShuttleStop by remember { mutableStateOf<ShuttleStop?>(null) }
-    var shuttleRouteResults by remember { mutableStateOf<List<ShuttleRouteResult>>(emptyList()) }
-    var showShuttleRouteDialog by remember { mutableStateOf(false) }
+
+
+    val locationSettingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { }
+
+    var routePolylineRef by remember {
+        mutableStateOf<Polyline?>(null)
+    }
+
+    val mapView = remember { MapView(context) }
+
+
+    // Get user location for default origin
+    LaunchedEffect(Unit) {
+        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!fineGranted && !coarseGranted) return@LaunchedEffect
+
+        userLocationViewModel.fetchUserLocation()
+    }
+
+    // Location services
+    val fusedLocationProviderClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
 
     // Indoor navigation state (US-5.1 – US-5.6)
     var indoorBuildingCode by remember { mutableStateOf<String?>(null) }
@@ -306,7 +296,9 @@ fun MapScreen(
     }
 
     fun findCampusBuilding(buildingCode: String): CampusBuilding? =
-        ALL_CAMPUS_BUILDINGS.firstOrNull { it.buildingCode.equals(buildingCode, ignoreCase = true) }
+        ALL_SUGGESTIONS
+            .filterIsInstance<CampusBuilding>()
+            .firstOrNull { it.buildingCode.equals(buildingCode, ignoreCase = true) }
 
     fun findAccessNode(buildingCode: String): IndoorNode? {
         val floors = IndoorGraphRegistry.floorsFor(buildingCode)
@@ -448,7 +440,7 @@ fun MapScreen(
     }
     // Sync travel mode from top bar selection
     LaunchedEffect(topBarTravelMode) {
-        travelMode = topBarTravelMode
+            travelMode = topBarTravelMode
         val step = directionsUiState.step
         if (step is DirectionsStep.ShowingRoute) {
             directionsUiState = directionsUiState.copy(
@@ -459,15 +451,21 @@ fun MapScreen(
                 )
             )
         }
-    }
 
+    }
 // Handle Go button from top bar
     LaunchedEffect(directionsGoTrigger) {
         if (directionsGoTrigger == 0) return@LaunchedEffect
+
+        routePolylines.forEach { it?.remove() }
+        routePolylines.clear()
+
         val requestGeneration = routeRequestGeneration
         val indoorState = indoorDirectionsState
         val indoorOrigin = indoorState?.indoorOriginNode ?: if (indoorState == null) latestIndoorOriginNode else null
         val indoorDestination = indoorState?.indoorDestinationNode ?: if (indoorState == null) latestIndoorDestinationNode else null
+
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         if (
             indoorBuildingCode != null &&
@@ -488,113 +486,72 @@ fun MapScreen(
             return@LaunchedEffect
         }
 
-        val step = directionsUiState.step as? DirectionsStep.PlanRoute
-        if (step == null) {
-            return@LaunchedEffect
-        }
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
+
+        centerOnOrigin(googleMap, step.origin, context)
+
+        val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
-        runCatching {
-            repo.getRoute(
-                RouteRequest(
-                    origin = step.origin,
-                    destination = step.destination,
-                    mode = travelMode,
+
+        val departure = canUseShuttle(step.origin, step.destination, travelMode)
+        if(departure != null){
+            drawRouteResult =
+                    drawRoute(
+                        step,
+                        step.origin,
+                        step.destination,
+                        "SHUTTLE",
+                        googleMap,
+                        getDirectionsUiState = { directionsUiState },
+                        onDirectionsUiStateChange = { directionsUiState = it },
+                        repo,
+                        isCrossCampus,
+                        requestGeneration,
+                        routeRequestGeneration,
+                        isIndoorOutdoorFlow,
+                        destinationBuilding,
+                        indoorOutdoorFallbackParts,
+                        onLegFallbackMessage = { legFallbackMessage = it },
+                        defaultOrigin,
+
+                        legLabels = legLabels,
+                        onLegLabels = { legLabels = it },
+                        departure = departure
+                    )
+
+        }
+        else {
+            drawRouteResult =
+                drawRoute(
+                    step,
+                    step.origin,
+                    step.destination,
+                    travelMode.name,
+                    googleMap,
+                    getDirectionsUiState = { directionsUiState },
+                    onDirectionsUiStateChange = { directionsUiState = it },
+                    repo,
+                    isCrossCampus,
+                    requestGeneration,
+                    routeRequestGeneration,
+                    isIndoorOutdoorFlow,
+                    destinationBuilding,
+                    indoorOutdoorFallbackParts,
+                    onLegFallbackMessage = { legFallbackMessage = it },
+                    defaultOrigin,
+                    legLabels = legLabels,
+                    onLegLabels = { legLabels = it }
                 )
-            )
-        }.onSuccess { route ->
-            if (requestGeneration != routeRequestGeneration) return@onSuccess
-            withContext(Dispatchers.Main) {
-                routePolylineRef?.remove()
-                routePolylineRef = googleMap?.addPolyline(
-                    PolylineOptions()
-                        .addAll(route.points)
-                        .color(0xFF1565C0.toInt())
-                        .width(12f)
-                )
-            }
+            
+        }
 
-            // Show helpful message for cross-campus routes
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-            if (isCrossCampus) {
-                scope.launch {
-                    snackbarHostState.showSnackbar(
-                        message = getCrossCampusMessage(travelMode),
-                        duration = SnackbarDuration.Short
-                    )
-                }
-            }
+        routePolylines.addAll(drawRouteResult.polylines)
 
-            directionsUiState = directionsUiState.copy(
-                isLoadingRoute = false,
-                step = DirectionsStep.ShowingRoute(
-                    origin = step.origin,
-                    destination = step.destination,
-                    buildingHit = step.buildingHit,
-                    route = route,
-                ),
-            )
-        }.onFailure { e ->
-            if (requestGeneration != routeRequestGeneration) return@onFailure
-            if (isIndoorOutdoorFlow) {
-                val fallbackRoute = runCatching {
-                    repo.getRoute(
-                        RouteRequest(
-                            origin = defaultOrigin,
-                            destination = step.destination,
-                            mode = TravelMode.DRIVE,
-                        )
-                    )
-                }.getOrNull()
-
-                if (fallbackRoute != null) {
-                    if (requestGeneration != routeRequestGeneration) return@onFailure
-                    withContext(Dispatchers.Main) {
-                        routePolylineRef?.remove()
-                        routePolylineRef = googleMap?.addPolyline(
-                            PolylineOptions()
-                                .addAll(fallbackRoute.points)
-                                .color(0xFF1565C0.toInt())
-                                .width(12f)
-                        )
-                    }
-
-                    val destinationCode = step.buildingHit?.id ?: destinationBuilding?.buildingCode ?: "destination"
-                    legLabels = buildList {
-                        addAll(legLabels)
-                        add("Fallback outdoor leg: Current location → $destinationCode")
-                    }
-                    val prefix = if (indoorOutdoorFallbackParts.isNotEmpty()) {
-                        "${indoorOutdoorFallbackParts.joinToString(". ")}. "
-                    } else {
-                        ""
-                    }
-                    legFallbackMessage = prefix + "Primary outdoor leg failed. Showing fallback route to destination building."
-
-                    directionsUiState = directionsUiState.copy(
-                        isLoadingRoute = false,
-                        errorMessage = null,
-                        step = DirectionsStep.ShowingRoute(
-                            origin = defaultOrigin,
-                            destination = step.destination,
-                            buildingHit = step.buildingHit,
-                            route = fallbackRoute,
-                        ),
-                    )
-                    return@onFailure
-                }
-            }
-
-            // Check if this is a cross-campus route and provide helpful error message
-            val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-            val errorMsg = if (isCrossCampus) {
-                getCrossCampusErrorMessage(travelMode)
-            } else {
-                e.message ?: "Failed to get route"
-            }
-
-            directionsUiState = directionsUiState.copy(
-                isLoadingRoute = false,
-                errorMessage = errorMsg,
+        scope.launch {
+            snackBarHostState.showSnackbar(
+                message = drawRouteResult.snackBarMessage,
+                duration = SnackbarDuration.Short
             )
         }
     }
@@ -602,6 +559,12 @@ fun MapScreen(
 // Handle Cancel from top bar
     LaunchedEffect(directionsCancelTrigger) {
         if (directionsCancelTrigger == 0) return@LaunchedEffect
+
+        routePolylines.forEach { it?.remove() }
+        routePolylines.clear()
+
+
+
         suppressIndoorStateUpdates = true
         routeRequestGeneration++
         routePolylineRef?.remove()
@@ -609,7 +572,6 @@ fun MapScreen(
         onIndoorTriggerConsumed()
         onIndoorOverlayChanged(null)
         onIndoorTopCardActiveChanged(false)
-        onIndoorTopCardactiveChanged(false)
         indoorBuildingCode = null
         selectedBuildingInfo = null
         indoorDirectionsState = null
@@ -632,6 +594,29 @@ fun MapScreen(
             step = DirectionsStep.PickDestination,
             errorMessage = null,
         )
+        isPickingOrigin = false
+
+        searchMarker?.remove()
+        searchMarker = null
+
+    }
+
+// Handle origin pick mode trigger from top bar
+    LaunchedEffect(originPickTrigger) {
+        if (originPickTrigger == 0) return@LaunchedEffect
+        isPickingOrigin = true
+    }
+
+// Handle "My Location" trigger from top bar
+    LaunchedEffect(myLocationTrigger) {
+        if (myLocationTrigger == 0) return@LaunchedEffect
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(
+            step = step.copy(origin = defaultOrigin)
+        )
+        originDisplayName = null
+        originBuilding = null
+        isPickingOrigin = false
     }
 
 // Publish top-bar state to MainActivity whenever directions state changes
@@ -697,7 +682,11 @@ fun MapScreen(
         when (val step = directionsUiState.step) {
             is DirectionsStep.PlanRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+                val isCrossCampus = isCrossCampusRoute(originBuilding,
+                    destinationBuilding, step.origin)
+                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
+
+                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -711,6 +700,9 @@ fun MapScreen(
                         legFallbackMessage = legFallbackMessage,
                         isLoadingRoute = directionsUiState.isLoadingRoute,
                         showActions = true,
+                        isPickingOrigin = isPickingOrigin,
+                        canUseShuttle = canUseShuttle,
+                        shuttleStatus = shuttleStatus,
                         goEnabled = true,
                         showTravelModes = true,
                         goLabel = "Go",
@@ -720,7 +712,10 @@ fun MapScreen(
             }
             is DirectionsStep.ShowingRoute -> {
                 // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
+                val isCrossCampus = isCrossCampusRoute(originBuilding,
+                    destinationBuilding, step.origin)
+                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
+                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
 
                 onDirectionsTopBarState(
                     DirectionsTopBarState(
@@ -733,7 +728,10 @@ fun MapScreen(
                         legLabels = legLabels,
                         legFallbackMessage = legFallbackMessage,
                         showActions = false,
+                        route = step.route,
+                        canUseShuttle = canUseShuttle,
                         currentSteps = step.route.legs.firstOrNull(),
+                        shuttleStatus = shuttleStatus,
                         goEnabled = true,
                         showTravelModes = true,
                         goLabel = "Go",
@@ -767,49 +765,84 @@ fun MapScreen(
         }
     }
 
-    LaunchedEffect(topBarSelectedBuilding) {
-        val building = topBarSelectedBuilding ?: return@LaunchedEffect
-        isIndoorOutdoorFlow = false
-        indoorOutdoorFallbackParts = emptyList()
-        indoorFlowStartNode = null
-        indoorFlowStartAccessNode = null
-        indoorFlowEndAccessNode = null
-        indoorFlowEndNode = null
-        mapTapFocusNodeTrigger = null
-        mapTapSetStartNodeTrigger = null
-        mapTapSetDestNodeTrigger = null
-        legLabels = emptyList()
-        legFallbackMessage = null
-        topBarOriginOverride = null
-        topBarDestinationOverride = null
-        val latLng = resolveBuildingLatLng(building)
+    LaunchedEffect(topBarSelectedSuggestion) {
 
-        // Drop pin on the building
-        searchMarker?.remove()
-        searchMarker = googleMap?.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .title(building.buildingName)
-        )
-        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+        when (topBarSelectedSuggestion) {
+            is CampusBuilding -> {
 
-        // Set as To destination and open route panel
-        destinationBuilding = building  // Track for cross-campus detection
-        val hit = BuildingHit(
-            id = building.buildingCode,
-            properties = JSONObject().apply {
-                put("building-code", building.buildingCode)
-                put("building-name", building.buildingName)
-                put("address", building.address)
+                isIndoorOutdoorFlow = false
+                indoorOutdoorFallbackParts = emptyList()
+                indoorFlowStartNode = null
+                indoorFlowStartAccessNode = null
+                indoorFlowEndAccessNode = null
+                indoorFlowEndNode = null
+                mapTapFocusNodeTrigger = null
+                mapTapSetStartNodeTrigger = null
+                mapTapSetDestNodeTrigger = null
+                legLabels = emptyList()
+                legFallbackMessage = null
+                topBarOriginOverride = null
+                topBarDestinationOverride = null
+
+                val building = topBarSelectedSuggestion
+                val latLng = resolveBuildingLatLng(building)
+
+                // Drop pin on the building
+                searchMarker?.remove()
+                searchMarker = googleMap?.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title(building.buildingName)
+                )
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+                // Set as To destination and open route panel
+                destinationBuilding = building  // Track for cross-campus detection
+                val hit = BuildingHit(
+                    id = building.buildingCode,
+                    properties = JSONObject().apply {
+                        put("building-code", building.buildingCode)
+                        put("building-name", building.buildingName)
+                        put("address", building.address)
+                    }
+                )
+                directionsUiState = directionsUiState.copy(
+                    step = DirectionsStep.PlanRoute(
+                        origin = defaultOrigin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    )
+                )
             }
-        )
-        directionsUiState = directionsUiState.copy(
-            step = DirectionsStep.PlanRoute(
-                origin = defaultOrigin,
-                destination = latLng,
-                buildingHit = hit,
-            )
-        )
+
+            is ShuttleStop -> {
+                val stop = topBarSelectedSuggestion
+                val latLng = stop.latLng
+
+                googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+
+                // Set as To destination and open route panel
+                destinationBuilding = stop  // Track for cross-campus detection
+                val hit = BuildingHit(
+                    id = stop.id,
+                    properties = JSONObject().apply {
+                        put("building-code", stop.id)
+                        put("building-name", stop.name)
+                        put("address", stop.description)
+                    }
+                )
+                directionsUiState = directionsUiState.copy(
+                    step = DirectionsStep.PlanRoute(
+                        origin = defaultOrigin,
+                        destination = latLng,
+                        buildingHit = hit,
+                    )
+                )
+            }
+            else -> {
+                return@LaunchedEffect
+            }
+        }
         onTopBarBuildingConsumed()
     }
 
@@ -864,66 +897,7 @@ fun MapScreen(
         onTopBarDirectionsDestinationConsumed()
     }
 
-    LaunchedEffect(shuttleShowBothStops) {
-        if (!shuttleShowBothStops) return@LaunchedEffect
-        val stops = shuttleTracker.getShuttleStops()
-        if (stops.isEmpty()) {
-            onShuttleShowBothStopsConsumed()
-            scope.launch {
-                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
-            }
-            return@LaunchedEffect
-        }
-
-        val results = mutableListOf<ShuttleRouteResult>()
-        stops.forEach { stop ->
-            runCatching {
-                repo.getRoute(
-                    RouteRequest(
-                        origin = defaultOrigin,
-                        destination = stop.latLng,
-                        mode = travelMode,
-                    )
-                )
-            }.onSuccess { route ->
-                results.add(ShuttleRouteResult(stop = stop, route = route))
-            }.onFailure {
-                results.add(ShuttleRouteResult(stop = stop, route = null))
-            }
-        }
-
-        shuttleRouteResults = results
-        showShuttleRouteDialog = results.isNotEmpty()
-        onShuttleShowBothStopsConsumed()
-    }
-
-    // Get user location for default origin
-    LaunchedEffect(Unit) {
-        val fineGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) return@LaunchedEffect
-
-        val fused = LocationServices.getFusedLocationProviderClient(context)
-        runCatching {
-            fused.lastLocation
-                .addOnSuccessListener { loc ->
-                    if (loc != null) {
-                        defaultOrigin = LatLng(loc.latitude, loc.longitude)
-                    }
-                }
-        }.onFailure {
-            scope.launch {
-                snackbarHostState.showSnackbar("Could not retrieve your location")
-            }
-        }
-    }
-
-    // Location services
-    val fusedLocationProviderClient = remember {
-        LocationServices.getFusedLocationProviderClient(context)
-    }
-    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
-
+    val activity = LocalActivity.current
     // Permission handling
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -931,7 +905,12 @@ fun MapScreen(
         val fineLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
         val coarseLocationGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
 
+
         if (fineLocationGranted && coarseLocationGranted) {
+            activity?.let { act ->
+                checkLocationSettings(act, locationSettingsLauncher)
+            }
+
             googleMap?.let { map ->
                 if (ActivityCompat.checkSelfPermission(
                         context,
@@ -944,8 +923,9 @@ fun MapScreen(
                         fusedLocationProviderClient,
                         googleMap,
                         sgwOverlay,
-                        loyOverlay
-                    ) { callback ->
+                        loyOverlay,
+                        userLocationViewModel,
+                        ) { callback ->
                         locationCallback = callback
                     }
                 }
@@ -967,6 +947,9 @@ fun MapScreen(
                 )
             )
         }
+            // check accuracy directly
+            checkLocationSettings(context, locationSettingsLauncher)
+
     }
 
 
@@ -1000,7 +983,7 @@ fun MapScreen(
                     try {
                         val geocoder = Geocoder(context, Locale.getDefault())
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NOSONAR: minSdk=33, kept for explicit API clarity
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // NO SONAR: minSdk=33, kept for explicit API clarity
                             suspendCancellableCoroutine { cont ->
                                 geocoder.getFromLocationName(query, 1) { results ->
                                     cont.resume(results.firstOrNull())
@@ -1106,48 +1089,6 @@ fun MapScreen(
         }
     }
 
-    // Map controls
-    fun moveUp() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(0f, -200f))
-    }
-
-    fun moveDown() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(0f, 200f))
-    }
-
-    fun moveLeft() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(-200f, 0f))
-    }
-
-    fun moveRight() {
-        googleMap?.animateCamera(CameraUpdateFactory.scrollBy(200f, 0f))
-    }
-
-    fun zoomIn() {
-        googleMap?.animateCamera(CameraUpdateFactory.zoomIn())
-    }
-
-    fun zoomOut() {
-        googleMap?.animateCamera(CameraUpdateFactory.zoomOut())
-    }
-
-    fun recenter() {
-        googleMap?.let { map ->
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        val currentLatLng = LatLng(location.latitude, location.longitude)
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f))
-                    }
-                }
-            }
-        }
-    }
-
     // Dispose location tracking
     DisposableEffect(Unit) {
         onDispose {
@@ -1158,7 +1099,30 @@ fun MapScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .semantics {
+            stateDescription =
+                if (selectedCampus == Campus.LOYOLA)
+                    "Loyola map shown"
+                else
+                    "SGW map shown"
+        }) {
+
+        DisposableEffect(Unit) {
+            onDispose {
+                try {
+                    googleMap?.clear()
+                    mapView.onStop()
+                    mapView.onDestroy()
+                } catch (e: Exception) {
+                    // mapView was never fully initialized
+                }
+            }
+        }
+
         // Map View
         AndroidView(
             factory = { ctx ->
@@ -1172,14 +1136,18 @@ fun MapScreen(
                         loyOverlay = GeoJsonOverlay(ctx, idPropertyName = "buildingCode")
 
 
-
                         // Move camera to saved campus
                         val savedCampus = getSavedCampus(ctx)
                         val initialLocation = when (savedCampus) {
                             Campus.SGW -> LatLng(45.4972, -73.5789)
                             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
                         }
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, CAMPUS_ZOOM_LEVEL))
+                        map.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                initialLocation,
+                                CAMPUS_ZOOM_LEVEL
+                            )
+                        )
 
                         // Show location if permission granted
                         if (ActivityCompat.checkSelfPermission(
@@ -1199,10 +1167,11 @@ fun MapScreen(
                             val shuttleIcon = ShuttleMarkerFactory.create(ctx)
                             shuttleTracker.getShuttleStops().forEach { stop ->
                                 val marker = map.addMarker(
-                                    MarkerOptions()
+                                    AdvancedMarkerOptions()
                                         .position(stop.latLng)
                                         .icon(shuttleIcon)
-                                        .anchor(0.5f, 1.0f) // tip of pin points to coordinate
+                                        .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
+                                        .contentDescription(stop.id + "1")
                                 )
                                 if (marker != null) {
                                     marker.tag = stop
@@ -1211,13 +1180,13 @@ fun MapScreen(
                             }
                         } else {
                             scope.launch {
-                                snackbarHostState.showSnackbar("Shuttle stop data unavailable")
+                                snackBarHostState.showSnackbar("Shuttle stop data unavailable")
                             }
                         }
 
                         // Marker click: handle shuttle stop taps (US-3.1)
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
-                        map.setOnMarkerClickListener { marker -> // NOSONAR
+                        map.setOnMarkerClickListener { marker -> // NO SONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
@@ -1231,12 +1200,14 @@ fun MapScreen(
                         map.setOnPolygonClickListener { polygon ->
                             val overlayAndFeature = listOfNotNull(sgwOverlay, loyOverlay)
                                 .firstNotNullOfOrNull { overlay ->
-                                    overlay.getPolygonId(polygon)?.let { featureId -> overlay to featureId }
+                                    overlay.getPolygonId(polygon)
+                                        ?.let { featureId -> overlay to featureId }
                                 } ?: return@setOnPolygonClickListener
 
                             val activeOverlay = overlayAndFeature.first
                             val featureId = overlayAndFeature.second
-                            val props = activeOverlay.getBuildingProps()[featureId] ?: return@setOnPolygonClickListener
+                            val props = activeOverlay.getBuildingProps()[featureId]
+                                ?: return@setOnPolygonClickListener
                             val buildingInfo = BuildingInfo.fromJson(props)
 
                             // Calculate centroid for polygon click position
@@ -1259,6 +1230,7 @@ fun MapScreen(
                                         selectedBuildingLatLng = latLng
                                     }
                                 }
+
                                 is DirectionsStep.ShowingRoute -> {
                                     selectedBuildingInfo = null
                                     val tappedBuildingCode = buildingInfo?.buildingCode
@@ -1273,8 +1245,14 @@ fun MapScreen(
                                     mapTapSetDestNodeTrigger = null
 
                                     if (isIndoorOutdoorFlow && tappedBuildingCode != null) {
-                                        val isStartBuilding = tappedBuildingCode.equals(indoorFlowStartNode?.buildingCode, ignoreCase = true)
-                                        val isEndBuilding = tappedBuildingCode.equals(indoorFlowEndNode?.buildingCode, ignoreCase = true)
+                                        val isStartBuilding = tappedBuildingCode.equals(
+                                            indoorFlowStartNode?.buildingCode,
+                                            ignoreCase = true
+                                        )
+                                        val isEndBuilding = tappedBuildingCode.equals(
+                                            indoorFlowEndNode?.buildingCode,
+                                            ignoreCase = true
+                                        )
 
                                         when {
                                             isStartBuilding && indoorFlowStartNode != null && indoorFlowStartAccessNode != null -> {
@@ -1299,6 +1277,7 @@ fun MapScreen(
                                         indoorTriggerVersion++
                                     }
                                 }
+
                                 else -> {
                                     // PickDestination or ConfirmDestination: show bottom sheet
                                     selectedBuildingInfo = buildingInfo
@@ -1336,7 +1315,9 @@ fun MapScreen(
                                     fusedLocationProviderClient,
                                     map,
                                     sgwOverlay,
-                                    loyOverlay
+                                    loyOverlay,
+                                    userLocationViewModel
+
                                 ) { callback ->
                                     locationCallback = callback
                                 }
@@ -1347,7 +1328,9 @@ fun MapScreen(
                     }
                 }
             },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("mapView"),
             update = { mapView ->
                 mapView.onResume()
             }
@@ -1358,7 +1341,8 @@ fun MapScreen(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 10.dp),
+                .padding(start = 16.dp, bottom = 10.dp)
+                .ignoreFocusClearOnTouch(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -1393,12 +1377,14 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .testTag("mapControls")
+                    .semantics { contentDescription = "Map Controls" }
                     .padding(end = 16.dp, bottom = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 IconButton(
-                    onClick = { zoomIn() },
+                    onClick = { zoomIn(googleMap) },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -1414,7 +1400,7 @@ fun MapScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { moveLeft() },
+                        onClick = { moveLeft(googleMap) },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -1430,7 +1416,7 @@ fun MapScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(
-                            onClick = { moveUp() },
+                            onClick = { moveUp(googleMap) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1442,7 +1428,7 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { recenter() },
+                            onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1454,7 +1440,7 @@ fun MapScreen(
                         }
 
                         IconButton(
-                            onClick = { moveDown() },
+                            onClick = { moveDown(googleMap) },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
@@ -1467,7 +1453,7 @@ fun MapScreen(
                     }
 
                     IconButton(
-                        onClick = { moveRight() },
+                        onClick = { moveRight(googleMap) },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -1480,7 +1466,7 @@ fun MapScreen(
                 }
 
                 IconButton(
-                    onClick = { zoomOut() },
+                    onClick = { zoomOut(googleMap) },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -1522,31 +1508,6 @@ fun MapScreen(
             }
         }
 
-
-        // Profile/Accessibility Overlay
-        if (showProfile || showAccessibility) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            ) {
-                if (showAccessibility) {
-                    AccessibilityScreen(
-                        onBackClick = {
-                            showAccessibility = false
-                        }
-                    )
-                } else if (showProfile) {
-                    ProfileScreen(
-                        onBackClick = { showProfile = false },
-                        onProfileClick = { },
-                        onAccessibilityClick = { showAccessibility = true }
-                    )
-                }
-            }
-        }
-
         // Building Details Bottom Sheet
         selectedBuildingInfo?.let { info ->
             BuildingDetailsBottomSheet(
@@ -1562,9 +1523,9 @@ fun MapScreen(
                     val latLng = selectedBuildingLatLng ?: LatLng(45.4972, -73.5789)
 
                     // Find corresponding CampusBuilding for cross-campus detection
-                    destinationBuilding = ALL_CAMPUS_BUILDINGS.firstOrNull {
-                        it.buildingCode == info.buildingCode
-                    }
+                    destinationBuilding = ALL_SUGGESTIONS.firstOrNull {
+                        (it as? CampusBuilding)?.buildingCode == info.buildingCode
+                    } as? CampusBuilding
 
                     val buildingHit = BuildingHit(
                         id = info.buildingCode,
@@ -1597,67 +1558,86 @@ fun MapScreen(
             ShuttleStopInfoCard(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
-                onDismiss = { selectedShuttleStop = null }
-            )
-        }
-
-        if (showShuttleRouteDialog && shuttleRouteResults.isNotEmpty()) {
-            AlertDialog(
-                onDismissRequest = { showShuttleRouteDialog = false },
-                title = { Text("Choose shuttle stop") },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        shuttleRouteResults.forEach { result ->
-                            val duration = result.route?.durationSeconds?.let {
-                                val minutes = it / 60
-                                if (minutes < 60) "$minutes min" else "${minutes / 60} h ${minutes % 60} min"
-                            } ?: "Route unavailable"
-
-                            TextButton(
-                                onClick = {
-                                    showShuttleRouteDialog = false
-                                    result.route?.let { route ->
-                                        routePolylineRef?.remove()
-                                        routePolylineRef = googleMap?.addPolyline(
-                                            PolylineOptions()
-                                                .addAll(route.points)
-                                                .color(0xFF1565C0.toInt())
-                                                .width(12f)
-                                        )
-                                        directionsUiState = directionsUiState.copy(
-                                            step = DirectionsStep.ShowingRoute(
-                                                origin = defaultOrigin,
-                                                destination = result.stop.latLng,
-                                                route = route,
-                                                buildingHit = BuildingHit(
-                                                    id = result.stop.id,
-                                                    properties = JSONObject().apply {
-                                                        put("building-name", result.stop.name)
-                                                    }
-                                                )
-                                            )
-                                        )
-                                    }
-                                },
-                                enabled = result.route != null,
-                            ) {
-                                Text("${result.stop.name} • $duration")
-                            }
+                onDismiss = { selectedShuttleStop = null },
+                onDirectionsClick = {
+                    val hit = BuildingHit(
+                        id = stop.id,
+                        properties = JSONObject().apply {
+                            put("building-name", stop.name)
                         }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showShuttleRouteDialog = false }) {
-                        Text("Close")
-                    }
+                    )
+                    directionsUiState = directionsUiState.copy(
+                        step = DirectionsStep.PlanRoute(
+                            origin = defaultOrigin,
+                            destination = stop.latLng,
+                            buildingHit = hit
+                        )
+                    )
+                    selectedShuttleStop = null
                 }
             )
         }
 
+
+//        if (showShuttleRouteDialog && shuttleRouteResults.isNotEmpty()) {
+//            AlertDialog(
+//                onDismissRequest = { showShuttleRouteDialog = false },
+//                title = { Text("Choose shuttle stop") },
+//                text = {
+//                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+//                        shuttleRouteResults.forEach { result ->
+//                            val duration = result.route?.durationSeconds?.let {
+//                                val minutes = it / 60
+//                                if (minutes < 60) "$minutes min" else "${minutes / 60} h ${minutes % 60} min"
+//                            } ?: "Route unavailable"
+//
+//                            TextButton(
+//                                onClick = {
+//                                    showShuttleRouteDialog = false
+//                                    result.route?.let { route ->
+//                                        routePolylineRef?.remove()
+//                                        routePolylineRef = googleMap?.addPolyline(
+//                                            PolylineOptions()
+//                                                .addAll(route.points)
+//                                                .color(0xFF1565C0.toInt())
+//                                                .width(12f)
+//                                        )
+//                                        directionsUiState = directionsUiState.copy(
+//                                            step = DirectionsStep.ShowingRoute(
+//                                                origin = defaultOrigin,
+//                                                destination = result.stop.latLng,
+//                                                route = route,
+//                                                buildingHit = BuildingHit(
+//                                                    id = result.stop.id,
+//                                                    properties = JSONObject().apply {
+//                                                        put("building-name", result.stop.name)
+//                                                    }
+//                                                )
+//                                            )
+//                                        )
+//                                    }
+//                                },
+//                                enabled = result.route != null,
+//                            ) {
+//                                Text("${result.stop.name} • $duration")
+//                            }
+//                        }
+//                    }
+//                },
+//                confirmButton = {
+//                    TextButton(onClick = { showShuttleRouteDialog = false }) {
+//                        Text("Close")
+//                    }
+//                }
+//            )
+//        }
+
         SnackbarHost(
-            hostState = snackbarHostState,
+            hostState = snackBarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+
+
 
         // Indoor map overlay (US-5.1 – US-5.6)
         indoorBuildingCode?.let { code ->
@@ -1742,7 +1722,6 @@ fun MapScreen(
                     },
                     onTopCardActiveChanged = { active ->
                         onIndoorTopCardActiveChanged(active)
-                        onIndoorTopCardactiveChanged(active)
                     },
                     onCrossBuildingRouteRequested = { request ->
                         onIndoorOutdoorRouteRequested(request)
@@ -1763,192 +1742,7 @@ fun MapScreen(
                 )
             }
         }
-
-        // Single-card UX: top DirectionsTopBar only.
     }
 }
 
-private fun buildingTitle(
-    hit: BuildingHit?,
-    fallback: LatLng
-): String {
-    val props = hit?.properties
-    val name = props
-        ?.optString("building-name")
-        ?.takeIf { it.isNotBlank() }
 
-    return name ?: "Destination (${latLngShort(fallback)})"
-}
-
-private fun latLngShort(p: LatLng): String =
-    "%.5f, %.5f".format(p.latitude, p.longitude)
-
-// Helper Functions
-private fun getSavedCampus(context: Context): Campus {
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    val savedCampusName = prefs.getString(KEY_SELECTED_CAMPUS, Campus.SGW.name)
-    return try {
-        Campus.valueOf(savedCampusName ?: Campus.SGW.name)
-    } catch (e: IllegalArgumentException) {
-        Campus.SGW
-    }
-}
-
-private fun saveCampus(context: Context, campus: Campus) {
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit { putString(KEY_SELECTED_CAMPUS, campus.name) }
-}
-
-private fun loadGeoJson(context: Context, rawRes: Int): JSONObject {
-    val input = context.resources.openRawResource(rawRes)
-    val text = BufferedReader(InputStreamReader(input)).use { it.readText() }
-    return JSONObject(text)
-}
-
-private var defaultOverlayStyle = GeoJsonStyle(
-    fillColor = 0x80ffaca6.toInt(),
-    strokeColor = 0xFFbc4949.toInt(),
-    strokeWidth = 2f,
-    zIndex = 10f,
-    clickable = true,
-    markerColor = 0xFFbc4949.toInt(),
-    markerAlpha = 1f,
-    markerScale = 1.5f
-)
-
-private var highlightedOverlayStyle = GeoJsonStyle(
-    fillColor = 0xF0ffacaf.toInt(),
-    strokeColor = 0xFFbc4949.toInt(),
-    strokeWidth = 9f,
-    zIndex = 10f,
-    clickable = true,
-    markerColor = 0xFFbc4949.toInt(),
-    markerAlpha = 1f,
-    markerScale = 1.5f
-)
-
-private fun initializeOverlays(
-    campus: Campus,
-    sgwOverlay: GeoJsonOverlay,
-    loyOverlay: GeoJsonOverlay,
-    context: Context,
-    fusedLocationProviderClient: FusedLocationProviderClient,
-    googleMap: GoogleMap?,
-    sgwOverlayNullable: GeoJsonOverlay?,
-    loyOverlayNullable: GeoJsonOverlay?,
-    setCallback: (LocationCallback) -> Unit
-) {
-    sgwOverlay.setAllStyles(defaultOverlayStyle)
-    loyOverlay.setAllStyles(defaultOverlayStyle)
-
-
-
-    when (campus) {
-        Campus.SGW -> {
-            sgwOverlay.setBuildingsVisible(true)
-            loyOverlay.setBuildingsVisible(false)
-        }
-        Campus.LOYOLA -> {
-            loyOverlay.setBuildingsVisible(true)
-            sgwOverlay.setBuildingsVisible(false)
-        }
-    }
-
-    sgwOverlay.setMarkersVisible(false)
-    loyOverlay.setMarkersVisible(false)
-
-    startLocationTracking(
-        context,
-        fusedLocationProviderClient,
-        googleMap,
-        sgwOverlayNullable,
-        loyOverlayNullable,
-        setCallback
-    )
-}
-
-private fun startLocationTracking(
-    context: Context,
-    fusedLocationProviderClient: FusedLocationProviderClient,
-    googleMap: GoogleMap?,
-    sgwOverlay: GeoJsonOverlay?,
-    loyOverlay: GeoJsonOverlay?,
-    setCallback: (LocationCallback) -> Unit
-) {
-    if (ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED &&
-        ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        val callback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    val userLatLng = LatLng(location.latitude, location.longitude)
-                    highlightBuildingUserIsIn(userLatLng, sgwOverlay, loyOverlay)
-                }
-            }
-        }
-        setCallback(callback)
-
-        val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            TimeUnit.SECONDS.toMillis(10)
-        ).setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(5))
-            .build()
-
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            callback,
-            Looper.getMainLooper()
-        )
-    }
-}
-
-private fun highlightBuildingUserIsIn(
-    latLng: LatLng,
-    sgwOverlay: GeoJsonOverlay?,
-    loyOverlay: GeoJsonOverlay?
-) {
-    sgwOverlay?.let { sgw ->
-        loyOverlay?.let { loy ->
-            val sgwBuildingLocator = BuildingLocator(
-                sgw.getBuildings(),
-                sgw.getBuildingProps()
-            )
-            val loyBuildingLocator = BuildingLocator(
-                loy.getBuildings(),
-                loy.getBuildingProps()
-            )
-
-            val sgwIsHit = sgwBuildingLocator.pointInBuilding(latLng)
-            val loyIsHit = loyBuildingLocator.pointInBuilding(latLng)
-
-            sgw.setAllStyles(defaultOverlayStyle)
-            loy.setAllStyles(defaultOverlayStyle)
-
-            if (sgwIsHit) {
-                val building = sgwBuildingLocator.findBuilding(latLng)
-                building?.let {
-                    sgw.setStyleForFeature(it.id, highlightedOverlayStyle)
-                }
-            }
-            if (loyIsHit) {
-                val building = loyBuildingLocator.findBuilding(latLng)
-                building?.let {
-                    loy.setStyleForFeature(it.id, highlightedOverlayStyle)
-                }
-            }
-        }
-    }
-
-}
-
-private fun isLocationEnabled(context: Context): Boolean {
-    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-}

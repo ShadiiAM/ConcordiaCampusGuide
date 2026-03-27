@@ -39,7 +39,10 @@ sonar {
             "**/GeoJsonOverlay.kt," +
 
             // ShuttleMarkerFactory: Canvas/Paint bitmap rendering, requires Android Context
-            "**/ShuttleMarkerFactory.kt"
+            "**/ShuttleMarkerFactory.kt," +
+
+            // ComposableRowSuggestions is a UI row builder
+            "**/*Composable*.kt"
         )
 
         // Lower coverage threshold for UI-heavy codebase

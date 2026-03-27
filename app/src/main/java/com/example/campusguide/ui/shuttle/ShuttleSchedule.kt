@@ -2,6 +2,7 @@ package com.example.campusguide.ui.shuttle
 
 import com.example.campusguide.ui.components.Campus
 import java.time.DayOfWeek
+import java.time.Duration
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -9,6 +10,12 @@ import java.time.ZonedDateTime
 data class DepartureTime(val hour: Int, val minute: Int) {
     val localTime: LocalTime get() = LocalTime.of(hour, minute)
     override fun toString() = "%02d:%02d".format(hour, minute)
+}
+
+sealed class DepartureResult {
+    data class Soon(val departure: DepartureTime?) : DepartureResult()
+    data class TooFarAway(val departure: DepartureTime?) : DepartureResult()  // still today, but hours away
+    object NoMoreToday : DepartureResult()
 }
 
 object ShuttleSchedule {
@@ -70,9 +77,9 @@ object ShuttleSchedule {
      * Returns the next departure time for a given campus in real time.
      * Returns null if no more departures today (weekend or after last bus).
      */
-    fun nextDeparture(campus: Campus, now: ZonedDateTime = ZonedDateTime.now(ZoneId.of("America/Montreal"))): DepartureTime? {
+    fun nextDeparture(campus: Campus, now: ZonedDateTime = ZonedDateTime.now(ZoneId.of("America/Montreal"))): DepartureResult {
         val dow = now.dayOfWeek
-        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) return null
+        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) return DepartureResult.NoMoreToday
 
         val times = when (campus) {
             Campus.SGW     -> if (dow == DayOfWeek.FRIDAY) sgwFriday    else sgwMonThur
@@ -80,7 +87,17 @@ object ShuttleSchedule {
         }
 
         val currentTime = now.toLocalTime()
-        return times.firstOrNull { it.localTime.isAfter(currentTime) }
+        val closestDeparture =  times.firstOrNull { it.localTime.isAfter(currentTime) }
+
+        // Return null if next departure is more than 3 hours away
+        if (closestDeparture != null) {
+            val minutesUntilDeparture = Duration.between(currentTime, closestDeparture.localTime).toMinutes()
+            if (minutesUntilDeparture > 30) {return DepartureResult.TooFarAway(closestDeparture)}
+            return DepartureResult.Soon(closestDeparture)
+        }
+        else{
+            return DepartureResult.NoMoreToday
+        }
     }
 
     /**
@@ -88,8 +105,7 @@ object ShuttleSchedule {
      * "No more departures today. Next departure: DAY HH:mm" message.
      */
     fun nextDepartureNextDay(campus: Campus, now: ZonedDateTime = ZonedDateTime.now(ZoneId.of("America/Montreal"))): Pair<String, DepartureTime>? {
-        val dow = now.dayOfWeek
-        return when (dow) {
+        return when (val dow = now.dayOfWeek) {
             DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY -> {
                 val first = if (campus == Campus.SGW) sgwMonThur.first() else loyolaMonThur.first()
                 Pair("Mon", first)

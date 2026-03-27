@@ -51,6 +51,7 @@ import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.indoor.IndoorNodeType
 import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
+import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.ui.viewmodels.IndoorNavState
 import com.example.campusguide.ui.viewmodels.IndoorNavigationViewModel
 
@@ -79,9 +80,9 @@ private val PathStrokeWidth = 8f
 @Composable
 fun IndoorMapScreen(
     buildingCode: String = "H",
-    focusNode: com.example.campusguide.indoor.IndoorNode? = null,
-    setStartNode: com.example.campusguide.indoor.IndoorNode? = null,
-    setDestNode: com.example.campusguide.indoor.IndoorNode? = null,
+    focusNode: IndoorNode? = null,
+    setStartNode: IndoorNode? = null,
+    setDestNode: IndoorNode? = null,
     resetVersion: Int = 0,
     triggerVersion: Int = 0,
     hasExistingDestinationSelection: Boolean = false,

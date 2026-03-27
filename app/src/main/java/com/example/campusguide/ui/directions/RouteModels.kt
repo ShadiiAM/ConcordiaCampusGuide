@@ -16,6 +16,7 @@ data class RouteResult(
     val durationSeconds: Int? = null,
     val distanceMeters: Int? = null,
     val legs: List<RouteLeg> = emptyList(),
+    val isShuttleRoute: Boolean = false
 )
 
 data class RouteLeg(
@@ -29,6 +30,8 @@ data class RouteStep(
     val distanceMeters: Int? = null,
     val navigationInstruction: String? = null,
     val transitDetails: TransitDetails? = null,
+    val travelMode: TravelMode? = null,
+    val polyline: List<LatLng> = emptyList()
 )
 
 data class TransitDetails(
@@ -62,6 +65,6 @@ data class TransitLine(
 )
 
 data class TransitVehicle(
-    val name: String? = null,
+    val name: LocalizedText? = null,
     val type: String? = null,
 )

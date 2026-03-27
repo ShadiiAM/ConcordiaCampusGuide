@@ -1,29 +1,43 @@
 package com.example.campusguide.data
 
+import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.ui.components.Campus
+import com.google.android.gms.maps.model.LatLng
+
+
+sealed class Suggestion(
+    open val campus: Campus?
+
+) {
+
+    /** True if the suggestion is relevant for the given query. */
+    fun matches(query: String): Boolean = score(query) > 0          // same for all and doesn't change for children
+
+    open fun score(query: String): Int {
+        return -1
+    }
+}
+
 
 /**
  * A campus building entry used for autocomplete suggestions.
  * LatLng is NOT stored here — the caller resolves it from the GeoJSON overlay
  * using [buildingCode] as the feature ID, exactly like the polygon click handler does.
  */
-data class CampusBuilding(
+class CampusBuilding(
     val buildingCode: String,
     val buildingName: String,
     val address: String,
-    val campus: Campus,
-) {
+    override val campus: Campus,
+) : Suggestion(campus) {
     /** Shown in the text field after selection: "Henry F. Hall Building (H)" */
     val displayName: String get() = "$buildingName ($buildingCode)"
-
-    /** True if the building is relevant for the given query. */
-    fun matches(query: String): Boolean = score(query) > 0
 
     /**
      * Relevance score for ranking search results.
      * Higher = better match. Returns 0 if not relevant.
      */
-    fun score(query: String): Int {
+    override fun score(query: String): Int {
         val q = query.trim().lowercase()
         if (q.isEmpty()) return 0
         val code = buildingCode.lowercase()
@@ -43,13 +57,48 @@ data class CampusBuilding(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// All buildings — generated directly from your CSV files, no file I/O at runtime
-// ─────────────────────────────────────────────────────────────────────────────
 
-val ALL_CAMPUS_BUILDINGS: List<CampusBuilding> = listOf(
+data class ShuttleStop(
+    val id: String,
+    val name: String,
+    val description: String = "Concordia Shuttle Service",
+    override val campus: Campus,
+    val latLng: LatLng,
+    ) : Suggestion(campus) {
+
+    override fun score(query: String): Int {
+        val q = query.trim().lowercase()
+        if (q.isEmpty()) return 0
+        val description = description.lowercase()
+        val name = name.lowercase()
+        val nameWords = name.split(Regex("\\s+"))
+        return when {
+            name == q                                        -> 100   // exact full name
+            name.startsWith(q)                               -> 91   // name starts with query
+            nameWords.any { it.startsWith(q) }               -> 50   // any word in name starts with query
+            name.contains(q)                                 -> 30   // substring anywhere in name
+            description.contains(q)                          -> 20
+            else                                             -> 0
+        }
+    }
+}
+
+data class Indoor(
+    val node: IndoorNode,
+    val buildingCode: String,
+    val primaryLabel: String,
+    val secondaryLabel: String,
+    val tertiaryLabel: String,
+    override val campus: Campus? = null
+) : Suggestion(campus)
+
+private val SGW_STOP_LAT_LNG      = LatLng(45.4971, -73.5785)  // Hall Building front door, De Maisonneuve Blvd W
+private val LOYOLA_ARRIVAL_LAT_LNG   = LatLng(45.4579, -73.6389)  // Loyola stop — arriving from downtown
+private val LOYOLA_DEPARTURE_LAT_LNG = LatLng(45.4576, -73.6390)  // Loyola stop — departing to downtown
+
+val ALL_SUGGESTIONS: List<Suggestion> = listOf(
     // SGW
-    CampusBuilding("B",  "B Annex",                                                        "2160 Bishop St.",              Campus.SGW),
+    CampusBuilding("B", "B Annex", "2160 Bishop St.", Campus.SGW),
     CampusBuilding("CI", "CI Annex",                                                       "2149 Mackay St.",              Campus.SGW),
     CampusBuilding("CL", "CL Annex",                                                       "1665 Ste-Catherine St. W.",    Campus.SGW),
     CampusBuilding("D",  "D Annex",                                                        "2140 Bishop St.",              Campus.SGW),
@@ -113,29 +162,28 @@ val ALL_CAMPUS_BUILDINGS: List<CampusBuilding> = listOf(
     CampusBuilding("TA", "Terrebonne Building",                              "7079 de Terrebonne St.", Campus.LOYOLA),
     CampusBuilding("VE", "Vanier Extension",                                 "7141 Sherbrooke St. W.", Campus.LOYOLA),
     CampusBuilding("VL", "Vanier Library Building",                          "7141 Sherbrooke St. W.", Campus.LOYOLA),
+
+    // Shuttle Stops
+
+    ShuttleStop("sgw_shuttle",    "SGW Shuttle Stop",                                       "Henry F. Hall Building, 1455 De Maisonneuve Blvd. W.", Campus.SGW,SGW_STOP_LAT_LNG),
+    ShuttleStop("loyola_shuttle_arrival",    "Loyola Shuttle Stop (Arrival)",                                        "Loyola Chapel, 7137 Sherbrooke St. W. — Drop-off from downtown" ,  Campus.LOYOLA, LOYOLA_ARRIVAL_LAT_LNG),
+    ShuttleStop("loyola_shuttle_departure",    "Loyola Shuttle Stop (Departure)",           "Loyola Chapel, 7137 Sherbrooke St. W. — Pick-up to downtown", Campus.LOYOLA, LOYOLA_DEPARTURE_LAT_LNG)
 )
 
-/**
- * Returns up to [max] buildings matching [query].
- * Scoped to [activeCampus] unless [crossCampus] is true.
- */
-/**
- * Returns up to [max] buildings matching [query], ranked by relevance.
- * Scoped to [activeCampus] unless [crossCampus] is true.
- */
-fun buildingSuggestions(
+
+fun fullSuggestions(
     query: String,
     activeCampus: Campus,
-    crossCampus: Boolean,
+    crossCampus: Boolean = true,
     max: Int = 8,
-): List<CampusBuilding> {
+): List<Suggestion> {
     val q = query.trim()
     if (q.isEmpty()) return emptyList()
-    val pool = if (crossCampus) ALL_CAMPUS_BUILDINGS
-    else ALL_CAMPUS_BUILDINGS.filter { it.campus == activeCampus }
+    val pool = if (crossCampus) ALL_SUGGESTIONS
+    else ALL_SUGGESTIONS.filter { it.campus == activeCampus }
     return pool
-        .mapNotNull { b -> val s = b.score(q); if (s > 0) b to s else null }
+        .mapNotNull { suggestions -> val s = suggestions.score(q); if (s > 0) suggestions to s else null }
         .sortedByDescending { (_, s) -> s }
-        .map { (b, _) -> b }
+        .map { (suggestions, _) -> suggestions }
         .take(max)
 }

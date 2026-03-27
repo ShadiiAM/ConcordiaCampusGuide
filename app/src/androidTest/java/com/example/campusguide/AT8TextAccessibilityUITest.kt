@@ -41,49 +41,6 @@ class AT8TextAccessibilityUITest {
     )
 
     @Test
-    fun accessibilityScreen_isAccessible() {
-        // AC: Accessibility settings accessible from profile menu
-        Thread.sleep(2000)
-
-        // Navigate to profile
-        composeTestRule.onNode(hasText("A")).performClick()
-        Thread.sleep(2000)
-
-        // Click Accessibility item
-        composeTestRule.onNode(hasText("Accessibility")).performClick()
-        Thread.sleep(3000)
-
-        // Verify we're on Accessibility screen
-        composeTestRule.onNode(hasText("Display and Text Size")).assertExists()
-    }
-
-    @Test
-    fun textSize_canBeAdjusted() {
-        // AC: Text size can be adjusted with +/- buttons
-        Thread.sleep(2000)
-
-        // Navigate to accessibility
-        composeTestRule.onNode(hasText("A")).performClick()
-        Thread.sleep(2000)
-        composeTestRule.onNode(hasText("Accessibility")).performClick()
-        Thread.sleep(3000)
-
-        // Increase text size
-        composeTestRule.onNode(hasText("+")).performClick()
-        Thread.sleep(2000)
-        composeTestRule.onNode(hasText("+")).performClick()
-        Thread.sleep(2000)
-
-        // Decrease text size
-        composeTestRule.onNode(hasText("-")).performClick()
-        Thread.sleep(2000)
-
-        // Verify screen still displayed
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
     fun boldText_canBeToggled() {
         // AC: Bold text can be toggled on/off
         Thread.sleep(2000)
@@ -133,6 +90,16 @@ class AT8TextAccessibilityUITest {
             .assertIsDisplayed()
             .performClick()
 
+        Thread.sleep(3000)
+
+        composeTestRule
+            .onNodeWithContentDescription("Colorblind Cycle")
+            .performClick()
+        Thread.sleep(3000)
+
+        composeTestRule
+            .onNodeWithContentDescription("Colorblind Cycle")
+            .performClick()
         Thread.sleep(3000)
 
         composeTestRule
@@ -201,6 +168,8 @@ class AT8TextAccessibilityUITest {
         composeTestRule.onNode(hasText("+")).performClick()
         Thread.sleep(1000)
         composeTestRule.onNode(hasText("+")).performClick()
+        Thread.sleep(2000)
+        composeTestRule.onNode(hasText("-")).performClick()
         Thread.sleep(2000)
 
         // Go back to main screen

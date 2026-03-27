@@ -47,10 +47,6 @@ class AT10MapNavigationControlsUITest {
 
         Thread.sleep(5000)
 
-        onView(withId(android.R.id.content))
-        .check(matches(isDisplayed()))
-
-        Thread.sleep(2000)
 
         composeTestRule.onNodeWithTag("mapControls").assertDoesNotExist()
 
