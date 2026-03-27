@@ -9,12 +9,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -26,16 +26,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.shuttle.DepartureResult
 
 
 @Composable
@@ -50,7 +53,11 @@ fun DirectionsTopBar(
     errorMessage: String? = null,
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
-    currentSteps: RouteLeg? = null,
+    route: RouteResult = RouteResult(points = emptyList()),
+    isPickingOrigin: Boolean = false,
+    onMyLocationClick: () -> Unit = {},
+    canUseShuttle: Boolean = false,
+    shuttleStatus: DepartureResult = DepartureResult.NoMoreToday,
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
@@ -63,6 +70,8 @@ fun DirectionsTopBar(
     showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
+    val currentSteps = route.legs.firstOrNull()
+
     val purple = Color(0xFF6B4D8A)
 
     // Local UI state: whether the step-by-step detail panel is open
@@ -200,6 +209,40 @@ fun DirectionsTopBar(
                         color = purple,
                         fontWeight = FontWeight.Medium,
                     )
+                }
+            }
+
+            //Shuttle Badge
+            if(selectedMode == TravelMode.TRANSIT) {
+                if (canUseShuttle) {
+                    Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color(0xFFE53935), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Path uses Concordia Shuttle",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFFE53935),
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                } else {
+                Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color.Blue, RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = if(shuttleStatus !is DepartureResult.Soon) "Regular Transit: Outside Concordia Shuttle Hours"
+                                    else "Regular Transit: Path not offered by Concordia Shuttle",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.Blue,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
                 }
             }
 
@@ -409,12 +452,20 @@ fun DirectionsTopBar(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.size(48.dp),
                                 ) {
-                                    Icon(
-                                        imageVector = directionIconFor(step.navigationInstruction),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(24.dp),
-                                    )
+                                    when (val icon = directionIconFor(step.navigationInstruction)) {
+                                        is AppIcon.Vector -> Icon(
+                                            imageVector = icon.imageVector,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                        is AppIcon.Drawable -> Icon(
+                                            painter = painterResource(icon.resId),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                    }
                                 }
                             }
 
@@ -428,14 +479,29 @@ fun DirectionsTopBar(
                                         color = Color.Black,
                                     )
                                 }
-                                step.distanceMeters?.let { m ->
-                                    val distanceText = if (m < 1000) "$m m"
-                                    else "${"%.1f".format(m / 1000.0)} km"
-                                    Text(
-                                        text = distanceText,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF4D4D4D),
-                                    )
+
+                                Row{
+                                    step.distanceMeters?.let { m ->
+                                        val distanceText = if (m < 1000) "$m m"
+                                        else "${"%.1f".format(m / 1000.0)} km"
+                                        Text(
+                                            text = distanceText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    step.durationSeconds?.let { s ->
+                                        val durationText = if (s < 60) "$s s"
+                                        else "${"%.0f".format(s / 60.0)} min"
+                                        Text(
+                                            text = durationText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -456,7 +522,10 @@ fun DirectionsTopBar(
                     Surface(
                         shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onCancelClick)
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .clickable(onClick = onCancelClick)
+                            .testTag("CancelButton")
                     ) {
                         Text(cancelLabel, modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
                             style = MaterialTheme.typography.labelLarge)
@@ -487,16 +556,18 @@ fun DirectionsTopBar(
 }
 
 /** Maps a navigation instruction string to a direction arrow icon. */
-private fun directionIconFor(instruction: String?): ImageVector {
-    val lower = instruction?.lowercase() ?: return Icons.Default.KeyboardArrowUp
+private fun directionIconFor(instruction: String?): AppIcon {
+    val lower = instruction?.lowercase() ?: return AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     return when {
-        "u-turn" in lower || "uturn" in lower     -> Icons.AutoMirrored.Filled.ArrowBack
-        "turn left" in lower || "left onto" in lower
+        ("u-turn" in lower || "uturn" in lower)     -> AppIcon.Drawable(R.drawable.u_turn_icon)
+        ("turn left" in lower || "left onto" in lower
                 || "slight left" in lower
-                || "keep left" in lower            -> Icons.Default.KeyboardArrowLeft
-        "turn right" in lower || "right onto" in lower
+                || "keep left" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft)
+        ("turn right" in lower || "right onto" in lower
                 || "slight right" in lower
-                || "keep right" in lower           -> Icons.Default.KeyboardArrowRight
-        else                                       -> Icons.Default.KeyboardArrowUp
+                || "keep right" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowRight)
+        ("bus" in lower || "concordia shuttle" in lower)      -> AppIcon.Drawable(R.drawable.ic_directions_bus)
+        ("walk to destination" in lower|| "walk to shuttle stop" in lower) -> AppIcon.Drawable(R.drawable.ic_directions_walk)
+        else                                        -> AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     }
 }

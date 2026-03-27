@@ -54,7 +54,7 @@ class NavigationBarTest {
                     NavigationBar(
                         currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
                         content = {
-                            SearchBarWithProfile(
+                            SearchBarWithProfile<Nothing>(
                             )
                         }
                     )
@@ -80,7 +80,7 @@ class NavigationBarTest {
                     NavigationBar(
                         currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
                         content = {
-                            SearchBarWithProfile(
+                            SearchBarWithProfile<Nothing>(
                             )
                         }
                     )
@@ -108,7 +108,7 @@ class NavigationBarTest {
                     NavigationBar(
                         currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
                         content = {
-                            SearchBarWithProfile(
+                            SearchBarWithProfile<Nothing>(
                             )
                         }
                     )
@@ -195,7 +195,7 @@ class NavigationBarTest {
                 NavigationBar(
                     currentDestination = rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
                     content = {
-                        SearchBarWithProfile(
+                        SearchBarWithProfile<Nothing>(
                         )
                     }
                 )

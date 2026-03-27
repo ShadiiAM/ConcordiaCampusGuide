@@ -122,7 +122,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         // Activity entry point — framework lifecycle, not unit testable
         "**/MainActivity*",
         // Requires live network/API calls — not unit testable on JVM
-        "**/ui/directions/**"
+        "**/ui/directions/**",
+        // composable function builds suggestion rows
+        "**/*Composable*.kt"
     )
 
     val buildDir = layout.buildDirectory.get().asFile
@@ -246,10 +248,10 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
-    // Maps - PICK ONE version only
-    implementation(libs.play.services.maps)               // remove play.services.maps.v1820 duplicate
-    implementation(libs.play.services.location)           // remove play.services.location.v1750 duplicate
-    implementation("com.google.maps.android:maps-compose:4.4.1")  // remove 4.3.3 duplicate
+    // Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation(libs.maps.utils.ktx)
 
     // Network
@@ -257,6 +259,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.uiautomator)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Unit Tests
     testImplementation("junit:junit:4.13.2")

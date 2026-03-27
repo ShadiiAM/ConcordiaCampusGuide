@@ -13,7 +13,6 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import com.example.campusguide.ui.accessibility.AccessibleText
 
 enum class Campus {
@@ -47,48 +45,6 @@ fun CampusToggle(
             .requiredHeight(height = 48.dp)
             .clip(shape = RoundedCornerShape(16.dp))
     ) {
-        // SGW Chip
-        InputChip(
-            label = {
-                AccessibleText(
-                    text = "SGW",
-                    baseFontSizeSp = 14f,
-                    fallbackColor = if (selectedCampus == Campus.SGW)
-                        MaterialTheme.colorScheme.onSecondary
-                    else
-                        MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically)
-                )
-            },
-            leadingIcon = if (showIcon) {
-                {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "SGW Campus",
-                        tint = if (selectedCampus == Campus.SGW)
-                            MaterialTheme.colorScheme.onSecondary
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            } else null,
-            shape = RoundedCornerShape(24.dp),
-            colors = FilterChipDefaults.filterChipColors(
-                containerColor = if (selectedCampus == Campus.SGW)
-                    MaterialTheme.colorScheme.secondary
-                else
-                    MaterialTheme.colorScheme.secondaryContainer,
-                selectedContainerColor = MaterialTheme.colorScheme.secondary,
-                labelColor = if (selectedCampus == Campus.SGW)
-                    MaterialTheme.colorScheme.onSecondary
-                else
-                    MaterialTheme.colorScheme.onSecondaryContainer
-            ),
-            selected = selectedCampus == Campus.SGW,
-            onClick = { onCampusSelected(Campus.SGW) },
-            modifier = Modifier.weight(weight = 0.5f)
-        )
 
         // Loyola Chip
         InputChip(
@@ -130,6 +86,49 @@ fun CampusToggle(
             ),
             selected = selectedCampus == Campus.LOYOLA,
             onClick = { onCampusSelected(Campus.LOYOLA) },
+            modifier = Modifier.weight(weight = 0.5f)
+        )
+
+        // SGW Chip
+        InputChip(
+            label = {
+                AccessibleText(
+                    text = "SGW",
+                    baseFontSizeSp = 14f,
+                    fallbackColor = if (selectedCampus == Campus.SGW)
+                        MaterialTheme.colorScheme.onSecondary
+                    else
+                        MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.wrapContentHeight(align = Alignment.CenterVertically)
+                )
+            },
+            leadingIcon = if (showIcon) {
+                {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "SGW Campus",
+                        tint = if (selectedCampus == Campus.SGW)
+                            MaterialTheme.colorScheme.onSecondary
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            } else null,
+            shape = RoundedCornerShape(24.dp),
+            colors = FilterChipDefaults.filterChipColors(
+                containerColor = if (selectedCampus == Campus.SGW)
+                    MaterialTheme.colorScheme.secondary
+                else
+                    MaterialTheme.colorScheme.secondaryContainer,
+                selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                labelColor = if (selectedCampus == Campus.SGW)
+                    MaterialTheme.colorScheme.onSecondary
+                else
+                    MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+            selected = selectedCampus == Campus.SGW,
+            onClick = { onCampusSelected(Campus.SGW) },
             modifier = Modifier.weight(weight = 0.5f)
         )
     }
