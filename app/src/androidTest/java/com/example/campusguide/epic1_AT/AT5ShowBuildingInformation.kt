@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -7,6 +9,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +24,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT7BuildingInfoPopupIUITest {
+class AT5ShowBuildingInformation {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
@@ -29,7 +32,7 @@ class AT7BuildingInfoPopupIUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @Test
@@ -38,7 +41,7 @@ class AT7BuildingInfoPopupIUITest {
         // ACTION: Just wait, no interaction needed
         Thread.sleep(4000)
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 
@@ -51,7 +54,7 @@ class AT7BuildingInfoPopupIUITest {
         // Wait to show popup with building name and code
         Thread.sleep(5000)
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 
@@ -67,7 +70,7 @@ class AT7BuildingInfoPopupIUITest {
         // ACTION: DISMISS the popup (tap X or tap outside)
         Thread.sleep(5000)
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 
@@ -86,7 +89,7 @@ class AT7BuildingInfoPopupIUITest {
         // Wait to show second building popup updated
         Thread.sleep(4000)
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 }

@@ -1,4 +1,4 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
 import android.Manifest
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
+import com.example.campusguide.MainActivity
 //import androidx.test.uiautomator.UiSelector
 //import com.google.android.gms.maps.model.*
 //import org.junit.Before

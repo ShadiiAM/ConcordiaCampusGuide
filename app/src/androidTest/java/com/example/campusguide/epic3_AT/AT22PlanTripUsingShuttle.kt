@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic3_AT
 
+import android.Manifest
+import android.R
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -14,21 +16,24 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
+/**
+ * Acceptance Test for US-3.5: Plan a trip between SGW and loyola using the shuttle
+ */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT20PlanTripUsingShuttle {
+class AT22PlanTripUsingShuttle {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
     @get:Rule
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @get:Rule
@@ -37,7 +42,7 @@ class AT20PlanTripUsingShuttle {
     @Test
     fun showAllShuttleCustomRouteLooks() {
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(5000)
@@ -86,7 +91,7 @@ class AT20PlanTripUsingShuttle {
 
     @Test
     fun showShuttleTransitRoute() {
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(5000)

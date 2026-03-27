@@ -1,4 +1,4 @@
-package com.example.campusguide
+package com.example.campusguide.epic3_AT
 
 import android.Manifest
 import android.R
@@ -19,13 +19,17 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiSelector
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Acceptance Test for US-3.4: Get directions to a shuttle stop
+ */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT19GetDirectionToShuttleStop {
+class AT21GetDirectionToShuttleStop {
 
 
     @get:Rule

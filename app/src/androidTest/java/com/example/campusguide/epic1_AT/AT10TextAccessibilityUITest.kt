@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import android.content.Intent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
@@ -15,6 +17,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +32,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT8TextAccessibilityUITest {
+class AT10TextAccessibilityUITest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -37,7 +40,7 @@ class AT8TextAccessibilityUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @Test
@@ -62,7 +65,7 @@ class AT8TextAccessibilityUITest {
         Thread.sleep(3000)
 
         // Verify screen displayed
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 
@@ -113,7 +116,7 @@ class AT8TextAccessibilityUITest {
         Thread.sleep(3000)
 
         // Verify screen displayed
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         composeTestRule
@@ -140,7 +143,7 @@ class AT8TextAccessibilityUITest {
 
         composeTestRule.waitForIdle()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(5000)
@@ -189,7 +192,7 @@ class AT8TextAccessibilityUITest {
         Thread.sleep(2000)
 
         // Verify app functional with larger text
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
     }
 

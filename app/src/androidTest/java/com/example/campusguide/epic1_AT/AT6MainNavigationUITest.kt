@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -11,6 +13,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +26,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT5MainNavigationUITest {
+class AT6MainNavigationUITest {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
@@ -34,7 +37,7 @@ class AT5MainNavigationUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @Test
@@ -55,7 +58,7 @@ class AT5MainNavigationUITest {
         Thread.sleep(1000)
 
         // Verify app didn't crash
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
 
@@ -68,13 +71,13 @@ class AT5MainNavigationUITest {
         // Wait for profile screen to load and show it clearly
 
         // Verify we're on profile screen
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(5000)
         composeTestRule.onNodeWithContentDescription("Back").performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(3000)

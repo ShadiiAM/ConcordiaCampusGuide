@@ -1,7 +1,15 @@
-package com.example.campusguide.ui.directions
+package com.example.campusguide.epic2_AT
 
-import androidx.compose.ui.test.*
+import android.Manifest
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
@@ -11,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * E2E test for cross-campus routing (SGW <-> Loyola).
+ * E2E test for cross-campus routing (SGW <-> Loyola) US-2.5.
  *
  * Strategy: explicitly set BOTH origin and destination via the BuildingAutocompleteFields in
  * the "Route options" panel. This makes tests GPS-independent (no reliance on emulator location).
@@ -23,14 +31,14 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class CrossCampusRoutingE2ETest {
+class AT15CrossCampusRoutingTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     /**

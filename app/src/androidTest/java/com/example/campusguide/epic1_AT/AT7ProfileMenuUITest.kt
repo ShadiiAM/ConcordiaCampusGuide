@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -11,6 +13,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +26,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT6ProfileMenuUITest {
+class AT7ProfileMenuUITest {
 
 
     @get:Rule
@@ -34,13 +37,13 @@ class AT6ProfileMenuUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @Test
     fun acceptanceTest6() {
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         // AC: Tapping profile icon navigates to User settings screen
@@ -57,49 +60,49 @@ class AT6ProfileMenuUITest {
 
         composeTestRule.onNodeWithContentDescription("Back").performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(3000)
 
         composeTestRule.onNode(hasText("Calendar")).performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
         Thread.sleep(2000)
 
         // Click profile icon (has text "A")
         composeTestRule.onNode(hasText("A")).performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)
 
         composeTestRule.onNodeWithContentDescription("Back").performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)
 
         composeTestRule.onNode(hasText("POI")).performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
         Thread.sleep(2000)
 
         // Click profile icon (has text "A")
         composeTestRule.onNode(hasText("A")).performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)
 
         composeTestRule.onNodeWithContentDescription("Back").performClick()
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
 
         Thread.sleep(2000)

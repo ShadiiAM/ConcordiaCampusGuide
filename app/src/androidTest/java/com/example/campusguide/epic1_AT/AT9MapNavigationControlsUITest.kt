@@ -1,30 +1,34 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Acceptance Test for US-1.8: Accessibility search bar
+ * UI Tests for Map Navigation Controls. US-1.9
+ *
+ * These tests verify the functionality of map navigation controls
+ * such as zoom in and zoom out.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT9AccessibilityButtonUITest {
+class AT9MapNavigationControlsUITest {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
@@ -32,51 +36,26 @@ class AT9AccessibilityButtonUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
+
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
 
     @Test
-    fun accessibleSearchButtonUITest() {
+    fun mapNavigationControlsTest() {
 
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
+        onView(withId(R.id.content))
+        .check(matches(isDisplayed()))
 
         Thread.sleep(5000)
 
-        // Click the accessibility search button
-        composeTestRule.onNodeWithContentDescription("Bottom search button").performClick()
 
-        Thread.sleep(3000)
-
-
-        // Type into the focused field
-        composeTestRule
-            .onNodeWithTag("searchBar")
-            .assertIsFocused()
-            .performTextInput("Accessible Button Worked!")
-
-        composeTestRule.onNodeWithTag("searchBar")
-            .assertTextEquals("Accessible Button Worked!")
-
-        onView(withId(android.R.id.content))
-            .check(matches(isDisplayed()))
-
-        Thread.sleep(2000)
-
-
-        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
-        Thread.sleep(2000)
-        composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
-
-
-        composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
-        Thread.sleep(2000)
         composeTestRule.onNodeWithTag("mapControls").assertDoesNotExist()
 
         composeTestRule.onNodeWithContentDescription("Toggle Controls").performClick()
         Thread.sleep(2000)
+
         composeTestRule.onNodeWithTag("mapControls").assertIsDisplayed()
 
         composeTestRule.onNodeWithContentDescription("Zoom In").performClick()
@@ -99,6 +78,19 @@ class AT9AccessibilityButtonUITest {
 
         Thread.sleep(2000)
 
+        composeTestRule.onNodeWithContentDescription("Up").performClick()
+        composeTestRule.onNodeWithContentDescription("Up").performClick()
+
+        Thread.sleep(2000)
+
+        composeTestRule.onNodeWithContentDescription("Down").performClick()
+        composeTestRule.onNodeWithContentDescription("Down").performClick()
+
+        Thread.sleep(2000)
+
+        composeTestRule.onNodeWithContentDescription("Recenter").performClick()
+
+        Thread.sleep(5000)
 
     }
 }

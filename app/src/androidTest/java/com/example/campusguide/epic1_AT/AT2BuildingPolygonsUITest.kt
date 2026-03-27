@@ -1,5 +1,7 @@
-package com.example.campusguide
+package com.example.campusguide.epic1_AT
 
+import android.Manifest
+import android.R
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
@@ -10,19 +12,20 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
+import com.example.campusguide.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Acceptance Test for US-1.1: View SGW and Loyola Campus Maps
+ * Acceptance Test for US-1.2: Render Campus Building Shapes (Polygons)
  *
- * US-1.1 is about VIEWING the campus map, not switching between campuses.
- * Campus switching is covered in US-1.3.
+ * Tests verify that building polygons are rendered on the map.
+ * Visual verification of polygon rendering is done via GIF recording.
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AT1ViewCampusMapsUITest {
+class AT2BuildingPolygonsUITest {
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
@@ -30,20 +33,26 @@ class AT1ViewCampusMapsUITest {
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
+        Manifest.permission.ACCESS_FINE_LOCATION
     )
 
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
 
+
     @Test
-    fun appOpens_displaysDefaultCampusMap() {
-        // AC: App opens for first time and displays campus map with default campus
+    fun mapLoads_withBuildingPolygons() {
+        // AC: Building polygons for campus are rendered on map
+        // Visual verification: GIF shows polygons loaded with map
         Thread.sleep(3000)
 
-        onView(withId(android.R.id.content))
+        onView(withId(R.id.content))
             .check(matches(isDisplayed()))
             .check(matches(isEnabled()))
+
+        composeTestRule.onNodeWithContentDescription("Loyola Campus").performClick()
+
+        Thread.sleep(2000)
 
         composeTestRule
             .onNodeWithContentDescription("Toggle Controls")
@@ -51,11 +60,11 @@ class AT1ViewCampusMapsUITest {
 
         Thread.sleep(2000)
 
-        // map is usable and can move
-        composeTestRule.onNodeWithContentDescription("Right").performClick()
-        composeTestRule.onNodeWithContentDescription("Right").performClick()
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
+        composeTestRule.onNodeWithContentDescription("Left").performClick()
 
         Thread.sleep(2000)
+
 
     }
 }
