@@ -1134,6 +1134,7 @@ fun MapScreen(
                         // Initialize overlays
                         sgwOverlay = GeoJsonOverlay(ctx, idPropertyName = "buildingCode")
                         loyOverlay = GeoJsonOverlay(ctx, idPropertyName = "buildingCode")
+                        map.uiSettings.isMapToolbarEnabled = false
 
 
                         // Move camera to saved campus
