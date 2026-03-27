@@ -1187,6 +1187,7 @@ fun MapScreen(
 
                         // Marker click: handle shuttle stop taps (US-3.1)
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
+                        @Suppress("PotentialBehaviorOverride")
                         map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
