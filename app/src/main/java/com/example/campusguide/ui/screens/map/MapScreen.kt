@@ -1187,7 +1187,7 @@ fun MapScreen(
 
                         // Marker click: handle shuttle stop taps (US-3.1)
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
-                        map.setOnMarkerClickListener { marker -> // NO SONAR
+                        map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
@@ -1580,58 +1580,6 @@ fun MapScreen(
         }
 
 
-//        if (showShuttleRouteDialog && shuttleRouteResults.isNotEmpty()) {
-//            AlertDialog(
-//                onDismissRequest = { showShuttleRouteDialog = false },
-//                title = { Text("Choose shuttle stop") },
-//                text = {
-//                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-//                        shuttleRouteResults.forEach { result ->
-//                            val duration = result.route?.durationSeconds?.let {
-//                                val minutes = it / 60
-//                                if (minutes < 60) "$minutes min" else "${minutes / 60} h ${minutes % 60} min"
-//                            } ?: "Route unavailable"
-//
-//                            TextButton(
-//                                onClick = {
-//                                    showShuttleRouteDialog = false
-//                                    result.route?.let { route ->
-//                                        routePolylineRef?.remove()
-//                                        routePolylineRef = googleMap?.addPolyline(
-//                                            PolylineOptions()
-//                                                .addAll(route.points)
-//                                                .color(0xFF1565C0.toInt())
-//                                                .width(12f)
-//                                        )
-//                                        directionsUiState = directionsUiState.copy(
-//                                            step = DirectionsStep.ShowingRoute(
-//                                                origin = defaultOrigin,
-//                                                destination = result.stop.latLng,
-//                                                route = route,
-//                                                buildingHit = BuildingHit(
-//                                                    id = result.stop.id,
-//                                                    properties = JSONObject().apply {
-//                                                        put("building-name", result.stop.name)
-//                                                    }
-//                                                )
-//                                            )
-//                                        )
-//                                    }
-//                                },
-//                                enabled = result.route != null,
-//                            ) {
-//                                Text("${result.stop.name} • $duration")
-//                            }
-//                        }
-//                    }
-//                },
-//                confirmButton = {
-//                    TextButton(onClick = { showShuttleRouteDialog = false }) {
-//                        Text("Close")
-//                    }
-//                }
-//            )
-//        }
 
         SnackbarHost(
             hostState = snackBarHostState,
