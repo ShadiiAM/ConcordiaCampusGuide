@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,21 +25,19 @@ import com.example.campusguide.ui.viewmodels.ScheduleViewModel
 fun OpenDataScheduleSection(viewModel: ScheduleViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        if (uiState is ScheduleUiState.Idle) {
+            viewModel.loadSchedule("*", "2264")
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         when (uiState) {
-            is ScheduleUiState.Idle -> {
-                Button(
-                    onClick = { viewModel.loadSchedule("*", "2264") },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text(stringResource(R.string.open_data_load_schedule))
-                }
-            }
-            is ScheduleUiState.Loading -> {
+            is ScheduleUiState.Idle, is ScheduleUiState.Loading -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -56,7 +55,9 @@ fun OpenDataScheduleSection(viewModel: ScheduleViewModel) {
             is ScheduleUiState.Success -> {
                 val courses = (uiState as ScheduleUiState.Success).courses
                 if (courses.isEmpty()) {
-                    Text(stringResource(R.string.open_data_empty))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.open_data_empty))
+                    }
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp)

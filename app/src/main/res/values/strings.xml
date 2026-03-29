@@ -30,4 +30,9 @@
     <string name="calendar_directions">Directions to classroom</string>
 
     <string name="calendar_course_header">%s %s (%s) %s</string>
+
+    <!-- Open Data Strings -->
+    <string name="open_data_loading">Loading schedule data...</string>
+    <string name="open_data_empty">No schedule data found.</string>
+    <string name="open_data_retry">Retry</string>
 </resources>
