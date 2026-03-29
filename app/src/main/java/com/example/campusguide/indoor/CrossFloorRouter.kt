@@ -308,7 +308,7 @@ object CrossFloorRouter {
      */
     private fun canonicalKey(node: IndoorNode): String {
         // Remove the floor-number segment: "H-1-ELEV1" → "H-ELEV1"
-        val parts = node.id.split("-")
+        val parts = node.id.split("-"). filter {it.isNotEmpty()}
         return if (parts.size >= 3) "${parts[0]}-${parts.drop(2).joinToString("-")}" else node.id
     }
 }
