@@ -313,7 +313,6 @@ fun IndoorMapScreen(
                         if (node.type == IndoorNodeType.POI) {
                             poiInfoNode = node
                         } else {
-                            // Default first map tap (before top card appears) sets destination.
                             if (!topCardActive) {
                                 if (hasExistingDestinationSelection) {
                                     viewModel.selectOrigin(node)
@@ -880,12 +879,11 @@ private fun NodeInfoDialog(node: IndoorNode, onDismiss: () -> Unit) {
 // POI info popup
 @Composable
 private fun PoiInfoPopup(node: IndoorNode, onDismiss: () -> Unit) {
-    // Use the node's JSON description if available, otherwise infer from label
     val details = node.description ?: poiInferredDescription(node.label)
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.testTag("poiInfoPopup"),
-        containerColor = Color(0xFF6650A4),  // Purple, matching the mockup
+        containerColor = Color(0xFF6650A4),
         title = {
             Text(
                 text = poiDisplayName(node.label),
