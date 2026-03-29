@@ -4,6 +4,1174 @@
   "imageWidth": 4944,
   "imageHeight": 1704,
   "imageName": "cc_floor_1.png",
-  "nodes": [],
-  "edges": []
+  "nodes": [
+    {
+      "id": "CC-1-101",
+      "label": "CLASS-ROOM",
+      "x": 3832.89,
+      "y": 1058.08,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-106",
+      "label": "CLASS-ROOM",
+      "x": 3694.05,
+      "y": 735.32,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-107",
+      "label": "CLASS-ROOM",
+      "x": 3330.9,
+      "y": 996.4,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-109",
+      "label": "CLASS-ROOM",
+      "x": 3219,
+      "y": 1182.89,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-111",
+      "label": "CLASS-ROOM",
+      "x": 2791.07,
+      "y": 1019.96,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-112",
+      "label": "CLASS-ROOM",
+      "x": 2999.15,
+      "y": 584.17,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-112-1",
+      "label": "CLASS-ROOM",
+      "x": 2549.62,
+      "y": 699.99,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-112-2",
+      "label": "CLASS-ROOM",
+      "x": 2545.7,
+      "y": 523.32,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-115",
+      "label": "CLASS-ROOM",
+      "x": 2141.32,
+      "y": 1031.74,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-116",
+      "label": "CLASS-ROOM",
+      "x": 2125.61,
+      "y": 709.8,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-117",
+      "label": "CLASS-ROOM",
+      "x": 1627.01,
+      "y": 1088.66,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-119",
+      "label": "CLASS-ROOM",
+      "x": 1191.23,
+      "y": 1090.63,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-120",
+      "label": "CLASS-ROOM",
+      "x": 1338.45,
+      "y": 627.36,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-122",
+      "label": "CLASS-ROOM",
+      "x": 1122.52,
+      "y": 625.4,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-ENTRY-MAIN-1",
+      "label": "MAIN-ENTRY",
+      "x": 506.78,
+      "y": 620.51,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-ENTRY-MAIN-2",
+      "label": "MAIN-ENTRY",
+      "x": 503.46,
+      "y": 956.27,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-ENTRY-MAIN-3",
+      "label": "MAIN-ENTRY",
+      "x": 4555.85,
+      "y": 796.7,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-ENTRY-MAIN-4",
+      "label": "MAIN-ENTRY",
+      "x": 4555.85,
+      "y": 966.24,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC1",
+      "label": "HALLWAY-JUNCTION",
+      "x": 501.65,
+      "y": 867.81,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC2",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4557.9,
+      "y": 880.78,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC3",
+      "label": "HALLWAY-JUNCTION",
+      "x": 806.42,
+      "y": 868.78,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC4",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1143.64,
+      "y": 869.86,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC5",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1253.9,
+      "y": 870.21,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC6",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1727.28,
+      "y": 871.72,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC7",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1912.1,
+      "y": 872.31,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC8",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2369.27,
+      "y": 873.77,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC9",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2547.62,
+      "y": 874.34,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC10",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2602.73,
+      "y": 874.52,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC11",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2998.31,
+      "y": 875.79,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC12",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3212.31,
+      "y": 876.47,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC13",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3322.55,
+      "y": 876.82,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC14",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3468.47,
+      "y": 877.29,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC15",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3838.08,
+      "y": 878.47,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC16",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4110.45,
+      "y": 879.34,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC17",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4399.03,
+      "y": 880.27,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC18",
+      "label": "HALLWAY-JUNCTION",
+      "x": 754.56,
+      "y": 757.57,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC19",
+      "label": "HALLWAY-JUNCTION",
+      "x": 809.68,
+      "y": 955.35,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC20",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1150.13,
+      "y": 961.84,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC21",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1260.37,
+      "y": 965.08,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC22",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1146.89,
+      "y": 796.48,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC23",
+      "label": "HALLWAY-JUNCTION",
+      "x": 809.68,
+      "y": 799.72,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC24",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1257.13,
+      "y": 796.48,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC25",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1467.89,
+      "y": 1000.75,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC26",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1727.28,
+      "y": 961.84,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC27",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1714.31,
+      "y": 793.23,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC28",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1912.1,
+      "y": 796.48,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC29",
+      "label": "HALLWAY-JUNCTION",
+      "x": 1915.34,
+      "y": 958.6,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC30",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2382.25,
+      "y": 961.84,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC31",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2356.31,
+      "y": 793.23,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC32",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2609.22,
+      "y": 793.23,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC33",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2554.09,
+      "y": 608.42,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC34",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3001.55,
+      "y": 796.48,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC35",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3001.55,
+      "y": 961.84,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC36",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3196.09,
+      "y": 712.17,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC37",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3461.97,
+      "y": 786.75,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC38",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3844.57,
+      "y": 789.99,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC39",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3841.33,
+      "y": 971.57,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC40",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4149.36,
+      "y": 751.08,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC41",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4103.97,
+      "y": 702.45,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC42",
+      "label": "HALLWAY-JUNCTION",
+      "x": 4065.06,
+      "y": 640.84,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC43",
+      "label": "HALLWAY-JUNCTION",
+      "x": 2548.61,
+      "y": 959.54,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC44",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3215.77,
+      "y": 969.83,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-STAIR-1",
+      "label": "STAIR",
+      "x": 4399.49,
+      "y": 960.57,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-STAIR-2",
+      "label": "STAIR",
+      "x": 3193.56,
+      "y": 636.54,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-STAIR-3",
+      "label": "STAIR",
+      "x": 1717.04,
+      "y": 646.56,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-ELEVATOR",
+      "label": "ELEVATOR",
+      "x": 3307.14,
+      "y": 773.5,
+      "type": "ELEVATOR",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC45",
+      "label": "WATER-FOUNTAIN",
+      "x": 3919.09,
+      "y": 788.97,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC47",
+      "label": "HALLWAY-JUNCTION",
+      "x": 3920.42,
+      "y": 878.73,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC48",
+      "label": "BATHROOM-F",
+      "x": 4063.78,
+      "y": 560.66,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC49",
+      "label": "BATHROOM-F",
+      "x": 4233.68,
+      "y": 711.98,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    },
+    {
+      "id": "CC-1-CC50",
+      "label": "BATHROOM-M",
+      "x": 793.19,
+      "y": 623.05,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "CC",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "CC-1-ENTRY-MAIN-1",
+      "toId": "CC-1-CC1",
+      "weight": 247.35,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-ENTRY-MAIN-2",
+      "toId": "CC-1-CC1",
+      "weight": 88.48,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-ENTRY-MAIN-3",
+      "toId": "CC-1-CC2",
+      "weight": 84.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-ENTRY-MAIN-4",
+      "toId": "CC-1-CC2",
+      "weight": 85.48,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC1",
+      "toId": "CC-1-CC3",
+      "weight": 304.77,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC3",
+      "toId": "CC-1-CC4",
+      "weight": 337.22,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC4",
+      "toId": "CC-1-CC5",
+      "weight": 110.26,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC5",
+      "toId": "CC-1-CC6",
+      "weight": 473.38,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC6",
+      "toId": "CC-1-CC7",
+      "weight": 184.82,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC7",
+      "toId": "CC-1-CC8",
+      "weight": 457.17,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC8",
+      "toId": "CC-1-CC9",
+      "weight": 178.35,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC9",
+      "toId": "CC-1-CC10",
+      "weight": 55.11,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC10",
+      "toId": "CC-1-CC11",
+      "weight": 395.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC11",
+      "toId": "CC-1-CC12",
+      "weight": 214,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC12",
+      "toId": "CC-1-CC13",
+      "weight": 110.24,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC13",
+      "toId": "CC-1-CC14",
+      "weight": 145.92,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC14",
+      "toId": "CC-1-CC15",
+      "weight": 369.61,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC16",
+      "toId": "CC-1-CC17",
+      "weight": 288.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC17",
+      "toId": "CC-1-CC2",
+      "weight": 158.87,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC3",
+      "toId": "CC-1-CC23",
+      "weight": 69.14,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC23",
+      "toId": "CC-1-CC18",
+      "weight": 69.39,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC3",
+      "toId": "CC-1-CC19",
+      "weight": 86.63,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC4",
+      "toId": "CC-1-CC22",
+      "weight": 73.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC22",
+      "toId": "CC-1-122",
+      "weight": 172.81,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC4",
+      "toId": "CC-1-CC20",
+      "weight": 92.21,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC20",
+      "toId": "CC-1-119",
+      "weight": 135.19,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC5",
+      "toId": "CC-1-CC21",
+      "weight": 95.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC21",
+      "toId": "CC-1-119",
+      "weight": 143.33,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC21",
+      "toId": "CC-1-CC25",
+      "weight": 210.56,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC25",
+      "toId": "CC-1-117",
+      "weight": 181.79,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC26",
+      "toId": "CC-1-117",
+      "weight": 161.67,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC24",
+      "toId": "CC-1-120",
+      "weight": 187.66,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC5",
+      "toId": "CC-1-CC24",
+      "weight": 73.8,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC6",
+      "toId": "CC-1-CC26",
+      "weight": 90.12,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC6",
+      "toId": "CC-1-CC27",
+      "weight": 79.55,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC7",
+      "toId": "CC-1-CC29",
+      "weight": 86.35,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC7",
+      "toId": "CC-1-CC28",
+      "weight": 75.83,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC8",
+      "toId": "CC-1-CC31",
+      "weight": 81.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC8",
+      "toId": "CC-1-CC30",
+      "weight": 89.02,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC10",
+      "toId": "CC-1-CC32",
+      "weight": 81.55,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC43",
+      "toId": "CC-1-CC9",
+      "weight": 85.21,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC11",
+      "toId": "CC-1-CC35",
+      "weight": 86.11,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC11",
+      "toId": "CC-1-CC34",
+      "weight": 79.38,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC12",
+      "toId": "CC-1-CC36",
+      "weight": 165.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC12",
+      "toId": "CC-1-CC44",
+      "weight": 93.42,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC13",
+      "toId": "CC-1-107",
+      "weight": 119.87,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC34",
+      "toId": "CC-1-112",
+      "weight": 212.32,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC32",
+      "toId": "CC-1-112-1",
+      "weight": 110.66,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC32",
+      "toId": "CC-1-CC33",
+      "weight": 192.86,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC33",
+      "toId": "CC-1-112-2",
+      "weight": 85.51,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC28",
+      "toId": "CC-1-116",
+      "weight": 230.43,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC29",
+      "toId": "CC-1-115",
+      "weight": 237.52,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC30",
+      "toId": "CC-1-115",
+      "weight": 250.87,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC31",
+      "toId": "CC-1-116",
+      "weight": 245.32,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC43",
+      "toId": "CC-1-111",
+      "weight": 249.87,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC35",
+      "toId": "CC-1-111",
+      "weight": 218.36,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC44",
+      "toId": "CC-1-109",
+      "weight": 213.08,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC14",
+      "toId": "CC-1-CC37",
+      "weight": 90.77,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC15",
+      "toId": "CC-1-CC38",
+      "weight": 88.72,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC15",
+      "toId": "CC-1-CC39",
+      "weight": 93.16,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC39",
+      "toId": "CC-1-101",
+      "weight": 86.92,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC16",
+      "toId": "CC-1-CC40",
+      "weight": 134.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC16",
+      "toId": "CC-1-CC41",
+      "weight": 177.01,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC41",
+      "toId": "CC-1-CC42",
+      "weight": 72.87,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC38",
+      "toId": "CC-1-106",
+      "weight": 160.14,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC37",
+      "toId": "CC-1-106",
+      "weight": 237.71,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC27",
+      "toId": "CC-1-STAIR-3",
+      "weight": 146.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC36",
+      "toId": "CC-1-STAIR-2",
+      "weight": 75.67,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC17",
+      "toId": "CC-1-STAIR-1",
+      "weight": 80.3,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-ELEVATOR",
+      "toId": "CC-1-CC13",
+      "weight": 104.46,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC15",
+      "toId": "CC-1-CC47",
+      "weight": 82.34,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC47",
+      "toId": "CC-1-CC16",
+      "weight": 190.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC47",
+      "toId": "CC-1-CC45",
+      "weight": 89.77,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC42",
+      "toId": "CC-1-CC48",
+      "weight": 80.19,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC40",
+      "toId": "CC-1-CC49",
+      "weight": 92.94,
+      "isAccessible": true
+    },
+    {
+      "fromId": "CC-1-CC50",
+      "toId": "CC-1-CC18",
+      "weight": 139.96,
+      "isAccessible": true
+    }
+  ]
 }
