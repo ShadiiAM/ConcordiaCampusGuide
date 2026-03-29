@@ -5,8 +5,6 @@ import org.junit.Test
 
 class PoiUtilsTest {
 
-    // ── poiDisplayName ────────────────────────────────────────────────────────
-
     @Test
     fun poiDisplayName_bathroomM_returnsMensWashroom() {
         assertEquals("Men's Washroom", poiDisplayName("BATHROOM-M"))
@@ -56,8 +54,6 @@ class PoiUtilsTest {
     fun poiDisplayName_unknownLabel_returnsCapitalisedFallback() {
         assertEquals("Some poi", poiDisplayName("SOME-POI"))
     }
-
-    // ── poiInferredDescription ────────────────────────────────────────────────
 
     @Test
     fun poiInferredDescription_bathroomM_returnsMensWashroom() {

@@ -1,16 +1,5 @@
 package com.example.campusguide.ui.screens
 
-/**
- * Utility functions for indoor POI labels (US-5.5).
- * Extracted as internal so they can be covered by unit tests.
- */
-
-/**
- * Returns a human-readable display name for a POI node based on its label.
- * Matches the naming conventions defined in the indoor graph data:
- * BATHROOM-M, BATHROOM-F, BATHROOM-WC, BATHROOM-MWC, BATHROOM-FWC,
- * WATER-FOUNTAIN, EMERGENCY-STAIR-{n}, etc.
- */
 internal fun poiDisplayName(label: String): String = when {
     label == "BATHROOM-M"     -> "Men's Washroom"
     label == "BATHROOM-F"     -> "Women's Washroom"
@@ -25,10 +14,6 @@ internal fun poiDisplayName(label: String): String = when {
     else -> label.replace("-", " ").lowercase().replaceFirstChar { it.uppercase() }
 }
 
-/**
- * Returns a meaningful description for a POI when no JSON description is set.
- * Based on the label naming conventions (BATHROOM-M, BATHROOM-MWC, etc.).
- */
 internal fun poiInferredDescription(label: String): String = when {
     label == "BATHROOM-M"     -> "Men's washroom"
     label == "BATHROOM-F"     -> "Women's washroom"

@@ -678,8 +678,6 @@ private fun FloorMapContent(
                 modifier           = Modifier.fillMaxSize()
             )
 
-            // Canvas for nodes and path overlay — must match image's ContentScale.Fit layout
-            // Accessibility: describe all POIs on this floor for screen readers
             val poisOnFloor = graph.nodes.filter { it.type == IndoorNodeType.POI }
             val poiAccessibilityDesc = if (poisOnFloor.isEmpty()) {
                 "Floor map overlay. No points of interest on this floor."
@@ -755,10 +753,6 @@ private fun FloorMapContent(
                 }
             }
 
-            // ── Invisible tappable overlays for POI nodes ─────────────────
-            // Mirrors the Canvas ContentScale.Fit transform so each overlay
-            // sits exactly on top of its drawn icon. Tests and TalkBack find
-            // each node via contentDescription "POI: <display name>".
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 val containerW = constraints.maxWidth.toFloat()
                 val containerH = constraints.maxHeight.toFloat()
@@ -772,7 +766,7 @@ private fun FloorMapContent(
                 val drawTop  = (containerH - drawH) / 2f
                 val pxScaleX = drawW / graph.imageWidth
                 val pxScaleY = drawH / graph.imageHeight
-                val hitPx    = NodeRadius * 1.8f * 2f  // same footprint as drawn icon
+                val hitPx    = NodeRadius * 1.8f * 2f
 
                 val density = LocalDensity.current
                 for (node in poisOnFloor) {
@@ -1050,7 +1044,6 @@ private fun findNearestNode(
     return best
 }
 
-// poiDisplayName and poiInferredDescription are in PoiUtils.kt
 
 /**
  * Draws a recognisable pictogram icon for a POI node directly on the canvas
