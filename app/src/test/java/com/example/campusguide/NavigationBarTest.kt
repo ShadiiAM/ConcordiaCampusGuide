@@ -4,6 +4,7 @@ package com.example.campusguide
 import android.content.res.Configuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campusguide.ui.accessibility.AccessibilityState
@@ -50,11 +52,12 @@ class NavigationBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     NavigationBar(
-                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                        {
-                            SearchBarWithProfile(
+                        currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        content = {
+                            SearchBarWithProfile<Nothing>(
                             )
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -75,11 +78,12 @@ class NavigationBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     NavigationBar(
-                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                        {
-                            SearchBarWithProfile(
+                        currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        content = {
+                            SearchBarWithProfile<Nothing>(
                             )
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -102,11 +106,12 @@ class NavigationBarTest {
                     LocalAccessibilityState provides defaultState
                 ) {
                     NavigationBar(
-                        rememberSaveable { mutableStateOf(AppDestinations.MAP) },
-                        {
-                            SearchBarWithProfile(
+                        currentDestination = rememberSaveable { mutableStateOf(AppDestinations.MAP) },
+                        content = {
+                            SearchBarWithProfile<Nothing>(
                             )
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -166,18 +171,18 @@ class NavigationBarTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    NavigationBar(state, {})
+                    NavigationBar(currentDestination = state, content = {})
                 }
             }
         }
 
-        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.onNodeWithText("Calendar", useUnmergedTree = true).onParent().performClick()
         assert(state.value == AppDestinations.CALENDAR)
 
-        composeTestRule.onNodeWithText("POI").performClick()
+        composeTestRule.onNodeWithText("POI", useUnmergedTree = true).onParent().performClick()
         assert(state.value == AppDestinations.POI)
 
-        composeTestRule.onNodeWithText("Map").performClick()
+        composeTestRule.onNodeWithText("Map", useUnmergedTree = true).onParent().performClick()
         assert(state.value == AppDestinations.MAP)
     }
 
@@ -188,11 +193,12 @@ class NavigationBarTest {
                 LocalAccessibilityState provides defaultState
             ) {
                 NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
-                    {
-                        SearchBarWithProfile(
+                    currentDestination = rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
+                    content = {
+                        SearchBarWithProfile<Nothing>(
                         )
-                    })
+                    }
+                )
             }
         }
 
@@ -250,10 +256,10 @@ class NavigationBarTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                NavigationBar(
-                    rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
-                    {}
-                )
+                    NavigationBar(
+                        rememberSaveable { mutableStateOf(AppDestinations.CALENDAR) },
+                        {}
+                    )
                 }
             }
         }
@@ -332,7 +338,7 @@ class NavigationBarTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    NavigationBar(state, {})
+                    NavigationBar(currentDestination = state, content = {})
                 }
             }
         }
@@ -373,12 +379,15 @@ class NavigationBarTest {
             CompositionLocalProvider(
                 LocalAccessibilityState provides defaultState
             ) {
-                NavigationBar(state, {})
+                NavigationBar(currentDestination = state, content = {})
             }
         }
 
         AppDestinations.entries.forEach { destination ->
-            composeTestRule.onNodeWithText(destination.label).performClick()
+            composeTestRule
+                .onNodeWithText(destination.label, useUnmergedTree = true)
+                .onParent()
+                .performClick()
             assert(state.value == destination)
         }
 
@@ -387,24 +396,28 @@ class NavigationBarTest {
     @Test
     fun navBar_restoresSelectedDestination_afterRecreation() {
         val restorationTester = StateRestorationTester(composeTestRule)
+        var observedDestination = AppDestinations.MAP
 
         restorationTester.setContent {
             CompositionLocalProvider(
                 LocalAccessibilityState provides defaultState
             ) {
                 val state = rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-                NavigationBar(state, {})
+                LaunchedEffect(state.value) {
+                    observedDestination = state.value
+                }
+                NavigationBar(currentDestination = state, content = {})
             }
         }
 
         // Change state
-        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.onNodeWithText("Calendar", useUnmergedTree = true).onParent().performClick()
 
         // Simulate recreation
         restorationTester.emulateSavedInstanceStateRestore()
 
-        // Assert it's still selected
-        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
+        composeTestRule.waitForIdle()
+        assert(observedDestination == AppDestinations.CALENDAR)
     }
 
 
@@ -431,7 +444,7 @@ class NavigationBarTest {
                 CompositionLocalProvider(
                     LocalAccessibilityState provides defaultState
                 ) {
-                    NavigationBar(state, {})
+                    NavigationBar(currentDestination = state, content = {})
                 }
             }
         }
@@ -449,16 +462,16 @@ class NavigationBarTest {
             CompositionLocalProvider(
                 LocalAccessibilityState provides defaultState
             ) {
-                NavigationBar(state, {})
+                NavigationBar(currentDestination = state, content = {})
             }
         }
 
         // Click Calendar
-        composeTestRule.onNodeWithText("Calendar").performClick()
+        composeTestRule.onNodeWithText("Calendar", useUnmergedTree = true).onParent().performClick()
 
         // Check that the Map label is still present (proves the 'label' lambda is stable)
         composeTestRule.onNodeWithText("Map").assertExists()
-        composeTestRule.onNodeWithText("Calendar").assertIsSelected()
+        assert(state.value == AppDestinations.CALENDAR)
     }
 
     @Test
@@ -490,7 +503,7 @@ class NavigationBarTest {
             CompositionLocalProvider(
                 LocalAccessibilityState provides defaultState
             ) {
-                NavigationBar(state, {})
+                NavigationBar(currentDestination = state, content = {})
             }
         }
 

@@ -67,7 +67,7 @@ class ShuttleTrackerTest {
 
     @Test
     fun `custom data source is used via Strategy pattern`() {
-        val customStop = ShuttleStop("custom", "Custom Stop", Campus.SGW, LatLng(0.0, 0.0))
+        val customStop = ShuttleStop("custom", "Custom Stop", "Concordia Shuttle Service", Campus.SGW, LatLng(0.0, 0.0))
         val customSource = object : ShuttleDataSource {
             override fun getShuttleStops() = listOf(customStop)
         }

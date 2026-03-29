@@ -9,13 +9,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,16 +26,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteLeg
+import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.shuttle.DepartureResult
 
 
 @Composable
@@ -50,13 +53,25 @@ fun DirectionsTopBar(
     errorMessage: String? = null,
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
-    currentSteps: RouteLeg? = null,
+    route: RouteResult = RouteResult(points = emptyList()),
     isPickingOrigin: Boolean = false,
-    onOriginClick: () -> Unit = {},
     onMyLocationClick: () -> Unit = {},
+    canUseShuttle: Boolean = false,
+    shuttleStatus: DepartureResult = DepartureResult.NoMoreToday,
     onGoClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+    showTravelModes: Boolean = true,
+    goLabel: String = "Go",
+    cancelLabel: String = "Cancel",
+    onOriginClick: (() -> Unit)? = null,
+    onDestinationClick: (() -> Unit)? = null,
+    goEnabled: Boolean = true,
+    showCloseIcon: Boolean = true,
+    extraContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
+    val currentSteps = route.legs.firstOrNull()
+
     val purple = Color(0xFF6B4D8A)
 
     // Local UI state: whether the step-by-step detail panel is open
@@ -64,6 +79,10 @@ fun DirectionsTopBar(
 
     // Collapse detail panel whenever a new route loads or steps disappear
     if (currentSteps == null) showStepDetails = false
+
+    val handleBack: () -> Unit = {
+        if (showStepDetails) showStepDetails = false else onBackClick()
+    }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -74,95 +93,106 @@ fun DirectionsTopBar(
     ) {
         Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
 
-            // Origin line
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = if (!isPickingOrigin) Modifier.clickable(onClick = onOriginClick) else Modifier
-            ) {
-                Box(
+            // Row 1: back arrow + origin/destination + close
+            Row(verticalAlignment = Alignment.Top) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = if (showStepDetails) "Back to summary" else "Back to search",
                     modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isPickingOrigin) Color(0xFF1A73E8).copy(alpha = 0.4f)
-                            else Color(0xFF1A73E8)
-                        )
+                        .size(24.dp)
+                        .clickable(onClick = handleBack)
+                        .padding(top = 2.dp)
                 )
-                Spacer(Modifier.width(8.dp))
-                if (isPickingOrigin) {
-                    Text(
-                        text = "Choose location from map",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Surface(
-                        shape = RoundedCornerShape(50),
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .clickable(onClick = onMyLocationClick)
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = if (onOriginClick != null) {
+                            Modifier
+                                .clickable(onClick = onOriginClick)
+                                .semantics { contentDescription = "Change start position" }
+                        } else {
+                            Modifier
+                        }
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF1A73E8))
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = originLabel,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (onOriginClick != null) {
+                            Spacer(Modifier.width(8.dp))
                             Icon(
-                                imageVector = Icons.Default.LocationOn,
+                                imageVector = Icons.Default.Edit,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(14.dp)
-                            )
-                            Text(
-                                text = "My Location",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
                             )
                         }
                     }
-                } else {
-                    Text(
-                        text = originLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                    repeat(3) {
+                        Box(
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                                .size(2.dp, 4.dp)
+                                .background(Color.Gray.copy(alpha = 0.5f))
+                        )
+                        Spacer(Modifier.height(2.dp))
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = if (onDestinationClick != null) {
+                            Modifier
+                                .clickable(onClick = onDestinationClick)
+                                .semantics { contentDescription = "Change destination" }
+                        } else {
+                            Modifier
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_poi),
+                            contentDescription = null,
+                            tint = Color(0xFFD32F2F),
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = destinationLabel,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        if (onDestinationClick != null) {
+                            Spacer(Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+                }
+                if (showCloseIcon) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close directions",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable(onClick = handleBack)
                     )
                 }
-            }
-
-            // Dotted connector
-            repeat(3) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .size(2.dp, 4.dp)
-                        .background(Color.Gray.copy(alpha = 0.5f))
-                )
-                Spacer(Modifier.height(2.dp))
-            }
-
-            // Row 3: destination line
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_poi),
-                    contentDescription = null,
-                    tint = Color(0xFFD32F2F),
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = destinationLabel,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
             }
 
             // Cross-campus badge
@@ -182,8 +212,42 @@ fun DirectionsTopBar(
                 }
             }
 
+            //Shuttle Badge
+            if(selectedMode == TravelMode.TRANSIT) {
+                if (canUseShuttle) {
+                    Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color(0xFFE53935), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Path uses Concordia Shuttle",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color(0xFFE53935),
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                } else {
+                Spacer(Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(1.5.dp, Color.Blue, RoundedCornerShape(6.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = if(shuttleStatus !is DepartureResult.Soon) "Regular Transit: Outside Concordia Shuttle Hours"
+                                    else "Regular Transit: Path not offered by Concordia Shuttle",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.Blue,
+                            fontWeight = FontWeight.Medium,
+                        )
+                    }
+                }
+            }
+
             // Travel mode chips — hidden while viewing step details
-            if (!showStepDetails) {
+            if (!showStepDetails && showTravelModes) {
                 Spacer(Modifier.height(10.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -388,12 +452,20 @@ fun DirectionsTopBar(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.size(48.dp),
                                 ) {
-                                    Icon(
-                                        imageVector = directionIconFor(step.navigationInstruction),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(24.dp),
-                                    )
+                                    when (val icon = directionIconFor(step.navigationInstruction)) {
+                                        is AppIcon.Vector -> Icon(
+                                            imageVector = icon.imageVector,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                        is AppIcon.Drawable -> Icon(
+                                            painter = painterResource(icon.resId),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(24.dp),
+                                        )
+                                    }
                                 }
                             }
 
@@ -407,20 +479,37 @@ fun DirectionsTopBar(
                                         color = Color.Black,
                                     )
                                 }
-                                step.distanceMeters?.let { m ->
-                                    val distanceText = if (m < 1000) "$m m"
-                                    else "${"%.1f".format(m / 1000.0)} km"
-                                    Text(
-                                        text = distanceText,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF4D4D4D),
-                                    )
+
+                                Row{
+                                    step.distanceMeters?.let { m ->
+                                        val distanceText = if (m < 1000) "$m m"
+                                        else "${"%.1f".format(m / 1000.0)} km"
+                                        Text(
+                                            text = distanceText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    step.durationSeconds?.let { s ->
+                                        val durationText = if (s < 60) "$s s"
+                                        else "${"%.0f".format(s / 60.0)} min"
+                                        Text(
+                                            text = durationText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color(0xFF4D4D4D),
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+
+            extraContent?.invoke(this)
 
             // Cancel — shown during planning, step details, or when a route is loaded; Go — only during planning
             if (showActions || showStepDetails || routeSummary != null) {
@@ -433,9 +522,12 @@ fun DirectionsTopBar(
                     Surface(
                         shape = RoundedCornerShape(50),
                         color = MaterialTheme.colorScheme.surfaceVariant,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onCancelClick)
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .clickable(onClick = onCancelClick)
+                            .testTag("CancelButton")
                     ) {
-                        Text("Cancel", modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
+                        Text(cancelLabel, modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
                             style = MaterialTheme.typography.labelLarge)
                     }
                     if (showActions) {
@@ -445,11 +537,11 @@ fun DirectionsTopBar(
                             color = purple,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .clickable(enabled = !isLoadingRoute, onClick = onGoClick)
+                                .clickable(enabled = !isLoadingRoute && goEnabled, onClick = onGoClick)
                                 .semantics { contentDescription = "Start navigation" }
                         ) {
                             Text(
-                                text = if (isLoadingRoute) "…" else "Go",
+                                text = if (isLoadingRoute) "…" else goLabel,
                                 modifier = Modifier.padding(horizontal = 22.dp, vertical = 8.dp),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = Color.White,
@@ -464,16 +556,18 @@ fun DirectionsTopBar(
 }
 
 /** Maps a navigation instruction string to a direction arrow icon. */
-private fun directionIconFor(instruction: String?): ImageVector {
-    val lower = instruction?.lowercase() ?: return Icons.Default.KeyboardArrowUp
+private fun directionIconFor(instruction: String?): AppIcon {
+    val lower = instruction?.lowercase() ?: return AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     return when {
-        "u-turn" in lower || "uturn" in lower     -> Icons.AutoMirrored.Filled.ArrowBack
-        "turn left" in lower || "left onto" in lower
+        ("u-turn" in lower || "uturn" in lower)     -> AppIcon.Drawable(R.drawable.u_turn_icon)
+        ("turn left" in lower || "left onto" in lower
                 || "slight left" in lower
-                || "keep left" in lower            -> Icons.Default.KeyboardArrowLeft
-        "turn right" in lower || "right onto" in lower
+                || "keep left" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft)
+        ("turn right" in lower || "right onto" in lower
                 || "slight right" in lower
-                || "keep right" in lower           -> Icons.Default.KeyboardArrowRight
-        else                                       -> Icons.Default.KeyboardArrowUp
+                || "keep right" in lower)           -> AppIcon.Vector(Icons.AutoMirrored.Filled.KeyboardArrowRight)
+        ("bus" in lower || "concordia shuttle" in lower)      -> AppIcon.Drawable(R.drawable.ic_directions_bus)
+        ("walk to destination" in lower|| "walk to shuttle stop" in lower) -> AppIcon.Drawable(R.drawable.ic_directions_walk)
+        else                                        -> AppIcon.Vector(Icons.Default.KeyboardArrowUp)
     }
 }

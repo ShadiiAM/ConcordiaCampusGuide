@@ -1,0 +1,2211 @@
+{
+  "buildingCode": "VL",
+  "floor": 1,
+  "imageWidth": 1024,
+  "imageHeight": 1024,
+  "imageName": "vl_floor_1.png",
+  "nodes": [
+    {
+      "id": "VL-1-VL1",
+      "label": "HALLWAY-JUNCTION",
+      "x": 793.45,
+      "y": 486.73,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL2",
+      "label": "HALLWAY-JUNCTION",
+      "x": 794,
+      "y": 547.34,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL3",
+      "label": "HALLWAY-JUNCTION",
+      "x": 620.42,
+      "y": 490.03,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL4",
+      "label": "HALLWAY-JUNCTION",
+      "x": 619.87,
+      "y": 350.62,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL5",
+      "label": "HALLWAY-JUNCTION",
+      "x": 742.75,
+      "y": 348.42,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL6",
+      "label": "HALLWAY-JUNCTION",
+      "x": 509.11,
+      "y": 351.72,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL8",
+      "label": "HALLWAY-JUNCTION",
+      "x": 242.24,
+      "y": 349.57,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL9",
+      "label": "HALLWAY-JUNCTION",
+      "x": 510.4,
+      "y": 468.39,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL10",
+      "label": "HALLWAY-JUNCTION",
+      "x": 255.09,
+      "y": 472.41,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL11",
+      "label": "HALLWAY-JUNCTION",
+      "x": 255.89,
+      "y": 641.81,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL15",
+      "label": "HALLWAY-JUNCTION",
+      "x": 100.94,
+      "y": 641.81,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL16",
+      "label": "HALLWAY-JUNCTION",
+      "x": 105.75,
+      "y": 862.42,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL17",
+      "label": "HALLWAY-JUNCTION",
+      "x": 105,
+      "y": 910.08,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL18",
+      "label": "HALLWAY-JUNCTION",
+      "x": 68.63,
+      "y": 911.04,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL19",
+      "label": "HALLWAY-JUNCTION",
+      "x": 106.91,
+      "y": 956.02,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL20",
+      "label": "HALLWAY-JUNCTION",
+      "x": 287.8,
+      "y": 955.06,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL21",
+      "label": "HALLWAY-JUNCTION",
+      "x": 285.89,
+      "y": 830.64,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL22",
+      "label": "HALLWAY-JUNCTION",
+      "x": 343.31,
+      "y": 829.68,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL23",
+      "label": "HALLWAY-JUNCTION",
+      "x": 343.31,
+      "y": 791.4,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL24",
+      "label": "HALLWAY-JUNCTION",
+      "x": 401.69,
+      "y": 788.53,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL25",
+      "label": "HALLWAY-JUNCTION",
+      "x": 404.57,
+      "y": 817.24,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL26",
+      "label": "HALLWAY-JUNCTION",
+      "x": 583.54,
+      "y": 816.28,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL27",
+      "label": "HALLWAY-JUNCTION",
+      "x": 583.54,
+      "y": 652.62,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL28",
+      "label": "HALLWAY-JUNCTION",
+      "x": 715.62,
+      "y": 650.71,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL29",
+      "label": "HALLWAY-JUNCTION",
+      "x": 714.66,
+      "y": 549.25,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL30",
+      "label": "HALLWAY-JUNCTION",
+      "x": 785.56,
+      "y": 547.24,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL31",
+      "label": "HALLWAY-JUNCTION",
+      "x": 786.55,
+      "y": 745.73,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL32",
+      "label": "HALLWAY-JUNCTION",
+      "x": 584.25,
+      "y": 580.15,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL33",
+      "label": "HALLWAY-JUNCTION",
+      "x": 618.47,
+      "y": 150.97,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL34",
+      "label": "HALLWAY-JUNCTION",
+      "x": 809.87,
+      "y": 149.74,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL35",
+      "label": "HALLWAY-JUNCTION",
+      "x": 283.53,
+      "y": 150.56,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL41",
+      "label": "HALLWAY-JUNCTION",
+      "x": 742.28,
+      "y": 150.17,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL42",
+      "label": "HALLWAY-JUNCTION",
+      "x": 590.89,
+      "y": 150.94,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL43",
+      "label": "HALLWAY-JUNCTION",
+      "x": 560.93,
+      "y": 150.9,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL44",
+      "label": "HALLWAY-JUNCTION",
+      "x": 404.83,
+      "y": 150.71,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL45",
+      "label": "HALLWAY-JUNCTION",
+      "x": 448.98,
+      "y": 150.76,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL46",
+      "label": "HALLWAY-JUNCTION",
+      "x": 484.72,
+      "y": 150.8,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL47",
+      "label": "HALLWAY-JUNCTION",
+      "x": 504.17,
+      "y": 150.83,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL48",
+      "label": "HALLWAY-JUNCTION",
+      "x": 404.3,
+      "y": 99.62,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL49",
+      "label": "HALLWAY-JUNCTION",
+      "x": 484.72,
+      "y": 96.99,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL50",
+      "label": "HALLWAY-JUNCTION",
+      "x": 404.48,
+      "y": 116.97,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL51",
+      "label": "HALLWAY-JUNCTION",
+      "x": 304.96,
+      "y": 150.59,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL52",
+      "label": "HALLWAY-JUNCTION",
+      "x": 333.87,
+      "y": 150.62,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL53",
+      "label": "HALLWAY-JUNCTION",
+      "x": 421.12,
+      "y": 150.73,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL54",
+      "label": "HALLWAY-JUNCTION",
+      "x": 618.83,
+      "y": 202.11,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL55",
+      "label": "HALLWAY-JUNCTION",
+      "x": 619.7,
+      "y": 326.16,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL56",
+      "label": "HALLWAY-JUNCTION",
+      "x": 721.26,
+      "y": 348.8,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL57",
+      "label": "HALLWAY-JUNCTION",
+      "x": 720.19,
+      "y": 150.31,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL58",
+      "label": "HALLWAY-JUNCTION",
+      "x": 753.84,
+      "y": 150.1,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL59",
+      "label": "HALLWAY-JUNCTION",
+      "x": 649.24,
+      "y": 150.77,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL60",
+      "label": "HALLWAY-JUNCTION",
+      "x": 509.45,
+      "y": 382.42,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL61",
+      "label": "HALLWAY-JUNCTION",
+      "x": 162.03,
+      "y": 467.58,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL62",
+      "label": "HALLWAY-JUNCTION",
+      "x": 162.29,
+      "y": 503.52,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL63",
+      "label": "HALLWAY-JUNCTION",
+      "x": 233.65,
+      "y": 501.96,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL64",
+      "label": "HALLWAY-JUNCTION",
+      "x": 171.41,
+      "y": 503.32,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL65",
+      "label": "HALLWAY-JUNCTION",
+      "x": 221.41,
+      "y": 502.23,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL66",
+      "label": "HALLWAY-JUNCTION",
+      "x": 255.48,
+      "y": 555.61,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL67",
+      "label": "HALLWAY-JUNCTION",
+      "x": 255.59,
+      "y": 578.01,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL68",
+      "label": "HALLWAY-JUNCTION",
+      "x": 116.19,
+      "y": 641.81,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL69",
+      "label": "HALLWAY-JUNCTION",
+      "x": 101.88,
+      "y": 684.79,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL70",
+      "label": "HALLWAY-JUNCTION",
+      "x": 102.46,
+      "y": 711.35,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL71",
+      "label": "HALLWAY-JUNCTION",
+      "x": 103.5,
+      "y": 759.03,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL72",
+      "label": "HALLWAY-JUNCTION",
+      "x": 104.47,
+      "y": 803.55,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL73",
+      "label": "HALLWAY-JUNCTION",
+      "x": 105.37,
+      "y": 844.71,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL74",
+      "label": "HALLWAY-JUNCTION",
+      "x": 287.27,
+      "y": 920.22,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL75",
+      "label": "HALLWAY-JUNCTION",
+      "x": 286.68,
+      "y": 882.12,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL76",
+      "label": "HALLWAY-JUNCTION",
+      "x": 583.54,
+      "y": 790.67,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL77",
+      "label": "HALLWAY-JUNCTION",
+      "x": 583.54,
+      "y": 674.41,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL78",
+      "label": "HALLWAY-JUNCTION",
+      "x": 661.65,
+      "y": 651.49,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL79",
+      "label": "HALLWAY-JUNCTION",
+      "x": 715.23,
+      "y": 609.26,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL80",
+      "label": "HALLWAY-JUNCTION",
+      "x": 734.6,
+      "y": 548.68,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL81",
+      "label": "HALLWAY-JUNCTION",
+      "x": 785.87,
+      "y": 608.72,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL82",
+      "label": "HALLWAY-JUNCTION",
+      "x": 786.01,
+      "y": 636.47,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL83",
+      "label": "HALLWAY-JUNCTION",
+      "x": 786.52,
+      "y": 738.7,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-1",
+      "label": "CLASS-ROOM",
+      "x": 620.29,
+      "y": 674.55,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-2",
+      "label": "CLASS-ROOM",
+      "x": 621.13,
+      "y": 790.21,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-3",
+      "label": "CLASS-ROOM",
+      "x": 328.95,
+      "y": 882.24,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-4",
+      "label": "CLASS-ROOM",
+      "x": 328.95,
+      "y": 919.28,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-5",
+      "label": "CLASS-ROOM",
+      "x": 59.97,
+      "y": 844.83,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-6",
+      "label": "CLASS-ROOM",
+      "x": 59.22,
+      "y": 804.05,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-101-7",
+      "label": "CLASS-ROOM",
+      "x": 58.47,
+      "y": 758.41,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-6",
+      "label": "CLASS-ROOM",
+      "x": 62.01,
+      "y": 682.77,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-102-2",
+      "label": "CLASS-ROOM",
+      "x": 115.07,
+      "y": 617.48,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-102-3",
+      "label": "CLASS-ROOM",
+      "x": 171.42,
+      "y": 532.02,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-102-4",
+      "label": "CLASS-ROOM",
+      "x": 123.94,
+      "y": 533.06,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-194-3",
+      "label": "CLASS-ROOM",
+      "x": 229.53,
+      "y": 556.15,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-122",
+      "label": "CLASS-ROOM",
+      "x": 417.3,
+      "y": 384.71,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-122-1",
+      "label": "CLASS-ROOM",
+      "x": 254.81,
+      "y": 435.4,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-124",
+      "label": "CLASS-ROOM",
+      "x": 254.81,
+      "y": 377.88,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-104",
+      "label": "CLASS-ROOM",
+      "x": 662.9,
+      "y": 710.01,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-104-1",
+      "label": "CLASS-ROOM",
+      "x": 664.35,
+      "y": 789.95,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-103-1",
+      "label": "CLASS-ROOM",
+      "x": 752.65,
+      "y": 608.64,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-140",
+      "label": "CLASS-ROOM",
+      "x": 824.96,
+      "y": 739.45,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-197-1",
+      "label": "CLASS-ROOM",
+      "x": 830.04,
+      "y": 636.98,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-106-1",
+      "label": "CLASS-ROOM",
+      "x": 769.42,
+      "y": 438.64,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-106-2",
+      "label": "CLASS-ROOM",
+      "x": 769.42,
+      "y": 389.68,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-120",
+      "label": "CLASS-ROOM",
+      "x": 775.95,
+      "y": 348.17,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-112",
+      "label": "CLASS-ROOM",
+      "x": 676.03,
+      "y": 202.32,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-110",
+      "label": "CLASS-ROOM",
+      "x": 683.14,
+      "y": 323.16,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-116",
+      "label": "CLASS-ROOM",
+      "x": 720.24,
+      "y": 305.97,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-118",
+      "label": "CLASS-ROOM",
+      "x": 722.23,
+      "y": 227.46,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-121",
+      "label": "CLASS-ROOM",
+      "x": 648.45,
+      "y": 89.55,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-126",
+      "label": "CLASS-ROOM",
+      "x": 451.23,
+      "y": 239.37,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-121-1",
+      "label": "CLASS-ROOM",
+      "x": 559.51,
+      "y": 117.01,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-121-2",
+      "label": "CLASS-ROOM",
+      "x": 557.79,
+      "y": 65.89,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-121-3",
+      "label": "CLASS-ROOM",
+      "x": 752.37,
+      "y": 87.8,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-127-1",
+      "label": "CLASS-ROOM",
+      "x": 503.66,
+      "y": 115.29,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-127-2",
+      "label": "CLASS-ROOM",
+      "x": 484.76,
+      "y": 69.33,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-127-3",
+      "label": "CLASS-ROOM",
+      "x": 449.97,
+      "y": 67.61,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-127-4",
+      "label": "CLASS-ROOM",
+      "x": 404.01,
+      "y": 68.04,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-127-5",
+      "label": "CLASS-ROOM",
+      "x": 331.85,
+      "y": 99.4,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-128",
+      "label": "CLASS-ROOM",
+      "x": 330.99,
+      "y": 241.15,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-1230",
+      "label": "CLASS-ROOM",
+      "x": 305.64,
+      "y": 193.04,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL84",
+      "label": "HALLWAY",
+      "x": 254.33,
+      "y": 349.67,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL85",
+      "label": "HALLWAY",
+      "x": 729.99,
+      "y": 439.64,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-VL86",
+      "label": "HALLWAY",
+      "x": 736.86,
+      "y": 390.53,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-MAIN-ENTRY",
+      "label": "MAIN-ENTRY",
+      "x": 946.09,
+      "y": 486.04,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-ELEVATOR",
+      "label": "ELEVATOR",
+      "x": 223.43,
+      "y": 530.08,
+      "type": "ELEVATOR",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-87",
+      "label": "HALLWAY-JUNCTION",
+      "x": 618.77,
+      "y": 193.67,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-88",
+      "label": "HALLWAY-JUNCTION",
+      "x": 619.57,
+      "y": 308.27,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-1",
+      "label": "STAIR-1",
+      "x": 567.72,
+      "y": 194.47,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-2",
+      "label": "STAIR-2",
+      "x": 570.13,
+      "y": 308.67,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-3",
+      "label": "STAIR-3",
+      "x": 251.05,
+      "y": 150.87,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-4",
+      "label": "STAIR-4",
+      "x": 221.65,
+      "y": 349.92,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-93",
+      "label": "BATHROOM-WC",
+      "x": 677.07,
+      "y": 219.15,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-94",
+      "label": "BATHROOM-WC",
+      "x": 682.31,
+      "y": 306.82,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-95",
+      "label": "BATHROOM-F",
+      "x": 722.94,
+      "y": 243.13,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-96",
+      "label": "BATHROOM-M",
+      "x": 720.56,
+      "y": 292.04,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-98",
+      "label": "WATER-FOUNTAIN",
+      "x": 651.37,
+      "y": 273.75,
+      "type": "POI",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-99",
+      "label": "HALLWAY-JUNCTION",
+      "x": 619.34,
+      "y": 275.34,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-5",
+      "label": "STAIR-5",
+      "x": 59.02,
+      "y": 953.41,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-6",
+      "label": "STAIR-6",
+      "x": 373.36,
+      "y": 816.17,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-STAIR-7",
+      "label": "STAIR-7",
+      "x": 835.86,
+      "y": 149.86,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "VL-1-VL1",
+      "toId": "VL-1-VL3",
+      "weight": 173.06,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL3",
+      "toId": "VL-1-VL4",
+      "weight": 139.41,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL9",
+      "toId": "VL-1-VL10",
+      "weight": 255.34,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL16",
+      "toId": "VL-1-VL17",
+      "weight": 47.67,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL17",
+      "toId": "VL-1-VL18",
+      "weight": 36.38,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL17",
+      "toId": "VL-1-VL19",
+      "weight": 45.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL19",
+      "toId": "VL-1-VL20",
+      "weight": 180.89,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL21",
+      "toId": "VL-1-VL22",
+      "weight": 57.43,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL22",
+      "toId": "VL-1-VL23",
+      "weight": 38.28,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL23",
+      "toId": "VL-1-VL24",
+      "weight": 58.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL24",
+      "toId": "VL-1-VL25",
+      "weight": 28.85,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL25",
+      "toId": "VL-1-VL26",
+      "weight": 178.97,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL32",
+      "toId": "VL-1-VL27",
+      "weight": 72.47,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL32",
+      "toId": "VL-1-VL3",
+      "weight": 97.11,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL30",
+      "toId": "VL-1-VL2",
+      "weight": 8.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL32",
+      "weight": 134.02,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL3",
+      "weight": 111.3,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL3",
+      "toId": "VL-1-VL9",
+      "weight": 112.13,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL1",
+      "toId": "VL-1-VL29",
+      "weight": 100.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL1",
+      "toId": "VL-1-VL32",
+      "weight": 229.11,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL4",
+      "weight": 220.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL9",
+      "weight": 219.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL6",
+      "weight": 285.08,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL3",
+      "toId": "VL-1-VL6",
+      "weight": 177.54,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL3",
+      "toId": "VL-1-VL5",
+      "weight": 187.13,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL3",
+      "toId": "VL-1-VL2",
+      "weight": 182.8,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL4",
+      "toId": "VL-1-VL6",
+      "weight": 110.77,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL33",
+      "toId": "VL-1-VL42",
+      "weight": 27.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL42",
+      "toId": "VL-1-VL43",
+      "weight": 29.96,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL46",
+      "toId": "VL-1-VL45",
+      "weight": 35.74,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL43",
+      "toId": "VL-1-VL47",
+      "weight": 56.76,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL47",
+      "toId": "VL-1-VL46",
+      "weight": 19.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL46",
+      "toId": "VL-1-VL49",
+      "weight": 53.81,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL44",
+      "toId": "VL-1-VL50",
+      "weight": 33.74,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL50",
+      "toId": "VL-1-VL48",
+      "weight": 17.35,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL51",
+      "toId": "VL-1-VL35",
+      "weight": 21.43,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL44",
+      "toId": "VL-1-VL52",
+      "weight": 70.96,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL52",
+      "toId": "VL-1-VL51",
+      "weight": 28.91,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL45",
+      "toId": "VL-1-VL53",
+      "weight": 27.86,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL53",
+      "toId": "VL-1-VL44",
+      "weight": 16.29,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL4",
+      "toId": "VL-1-VL55",
+      "weight": 24.46,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL4",
+      "toId": "VL-1-VL56",
+      "weight": 101.41,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL56",
+      "toId": "VL-1-VL5",
+      "weight": 21.49,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL57",
+      "toId": "VL-1-VL41",
+      "weight": 22.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL41",
+      "toId": "VL-1-VL58",
+      "weight": 11.56,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL58",
+      "toId": "VL-1-VL34",
+      "weight": 56.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL33",
+      "toId": "VL-1-VL59",
+      "weight": 30.77,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL59",
+      "toId": "VL-1-VL57",
+      "weight": 70.95,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL6",
+      "toId": "VL-1-VL60",
+      "weight": 30.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL60",
+      "toId": "VL-1-VL9",
+      "weight": 85.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL10",
+      "toId": "VL-1-VL61",
+      "weight": 93.19,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL61",
+      "toId": "VL-1-VL62",
+      "weight": 35.94,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL62",
+      "toId": "VL-1-VL64",
+      "weight": 9.12,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL64",
+      "toId": "VL-1-VL65",
+      "weight": 50.01,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL65",
+      "toId": "VL-1-VL63",
+      "weight": 12.24,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL10",
+      "toId": "VL-1-VL66",
+      "weight": 83.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL66",
+      "toId": "VL-1-VL67",
+      "weight": 22.4,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL67",
+      "toId": "VL-1-VL11",
+      "weight": 63.8,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL11",
+      "toId": "VL-1-VL68",
+      "weight": 139.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL68",
+      "toId": "VL-1-VL15",
+      "weight": 15.25,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL15",
+      "toId": "VL-1-VL69",
+      "weight": 42.99,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL69",
+      "toId": "VL-1-VL70",
+      "weight": 26.57,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL70",
+      "toId": "VL-1-VL71",
+      "weight": 47.69,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL71",
+      "toId": "VL-1-VL72",
+      "weight": 44.53,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL72",
+      "toId": "VL-1-VL73",
+      "weight": 41.17,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL73",
+      "toId": "VL-1-VL16",
+      "weight": 17.71,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL20",
+      "toId": "VL-1-VL74",
+      "weight": 34.84,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL74",
+      "toId": "VL-1-VL75",
+      "weight": 38.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL75",
+      "toId": "VL-1-VL21",
+      "weight": 51.49,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL26",
+      "toId": "VL-1-VL76",
+      "weight": 25.61,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL76",
+      "toId": "VL-1-VL77",
+      "weight": 116.26,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL77",
+      "toId": "VL-1-VL27",
+      "weight": 21.79,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL27",
+      "toId": "VL-1-VL78",
+      "weight": 78.12,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL78",
+      "toId": "VL-1-VL28",
+      "weight": 53.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL79",
+      "weight": 60.01,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL79",
+      "toId": "VL-1-VL28",
+      "weight": 41.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL29",
+      "toId": "VL-1-VL80",
+      "weight": 19.95,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL80",
+      "toId": "VL-1-VL30",
+      "weight": 50.98,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL30",
+      "toId": "VL-1-VL81",
+      "weight": 61.48,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL81",
+      "toId": "VL-1-VL82",
+      "weight": 27.75,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL82",
+      "toId": "VL-1-VL83",
+      "weight": 102.23,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL83",
+      "toId": "VL-1-VL31",
+      "weight": 7.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL6",
+      "toId": "VL-1-VL84",
+      "weight": 254.79,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL84",
+      "toId": "VL-1-VL8",
+      "weight": 12.09,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL85",
+      "toId": "VL-1-VL29",
+      "weight": 110.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL5",
+      "toId": "VL-1-VL86",
+      "weight": 42.52,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL86",
+      "toId": "VL-1-VL85",
+      "weight": 49.59,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL82",
+      "toId": "VL-1-197-1",
+      "weight": 44.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL83",
+      "toId": "VL-1-140",
+      "weight": 38.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL79",
+      "toId": "VL-1-103-1",
+      "weight": 37.43,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL78",
+      "toId": "VL-1-104",
+      "weight": 58.53,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL77",
+      "toId": "VL-1-101-1",
+      "weight": 36.75,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL76",
+      "toId": "VL-1-101-2",
+      "weight": 37.59,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL76",
+      "toId": "VL-1-104-1",
+      "weight": 80.81,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL75",
+      "toId": "VL-1-101-3",
+      "weight": 42.27,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL74",
+      "toId": "VL-1-101-4",
+      "weight": 41.69,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL73",
+      "toId": "VL-1-101-5",
+      "weight": 45.4,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL72",
+      "toId": "VL-1-101-6",
+      "weight": 45.25,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL71",
+      "toId": "VL-1-101-7",
+      "weight": 45.03,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL69",
+      "toId": "VL-1-102",
+      "weight": 39.92,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL68",
+      "toId": "VL-1-102-2",
+      "weight": 24.36,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL66",
+      "toId": "VL-1-194-3",
+      "weight": 25.96,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL64",
+      "toId": "VL-1-102-3",
+      "weight": 28.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL10",
+      "toId": "VL-1-122-1",
+      "weight": 37.01,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL84",
+      "toId": "VL-1-124",
+      "weight": 28.21,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL60",
+      "toId": "VL-1-122",
+      "weight": 92.18,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-102-3",
+      "toId": "VL-1-102-4",
+      "weight": 47.49,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL85",
+      "toId": "VL-1-106-1",
+      "weight": 39.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL86",
+      "toId": "VL-1-106-2",
+      "weight": 32.57,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL5",
+      "toId": "VL-1-120",
+      "weight": 33.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL56",
+      "toId": "VL-1-116",
+      "weight": 42.84,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL55",
+      "toId": "VL-1-110",
+      "weight": 63.51,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-112",
+      "toId": "VL-1-VL54",
+      "weight": 57.2,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL57",
+      "toId": "VL-1-118",
+      "weight": 77.18,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL58",
+      "toId": "VL-1-121-3",
+      "weight": 62.32,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL59",
+      "toId": "VL-1-121",
+      "weight": 61.23,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL43",
+      "toId": "VL-1-121-1",
+      "weight": 33.92,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL47",
+      "toId": "VL-1-127-1",
+      "weight": 35.54,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL49",
+      "toId": "VL-1-127-2",
+      "weight": 27.66,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-121",
+      "toId": "VL-1-121-2",
+      "weight": 93.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL45",
+      "toId": "VL-1-127-3",
+      "weight": 83.16,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL48",
+      "toId": "VL-1-127-4",
+      "weight": 31.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL48",
+      "toId": "VL-1-127-5",
+      "weight": 72.45,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL51",
+      "toId": "VL-1-1230",
+      "weight": 42.46,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL52",
+      "toId": "VL-1-128",
+      "weight": 90.58,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL45",
+      "toId": "VL-1-126",
+      "weight": 88.64,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-MAIN-ENTRY",
+      "toId": "VL-1-VL1",
+      "weight": 152.64,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-ELEVATOR",
+      "toId": "VL-1-ELEVATOR",
+      "weight": 27.92,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL54",
+      "toId": "VL-1-87",
+      "weight": 8.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-87",
+      "toId": "VL-1-VL33",
+      "weight": 42.7,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL55",
+      "toId": "VL-1-88",
+      "weight": 17.89,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-87",
+      "toId": "VL-1-STAIR-1",
+      "weight": 51.06,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-88",
+      "toId": "VL-1-STAIR-2",
+      "weight": 49.44,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL35",
+      "toId": "VL-1-STAIR-3",
+      "weight": 32.48,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL8",
+      "toId": "VL-1-STAIR-4",
+      "weight": 20.59,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-94",
+      "toId": "VL-1-88",
+      "weight": 62.76,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL54",
+      "toId": "VL-1-93",
+      "weight": 60.68,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL57",
+      "toId": "VL-1-95",
+      "weight": 92.86,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-96",
+      "toId": "VL-1-VL56",
+      "weight": 56.76,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-88",
+      "toId": "VL-1-99",
+      "weight": 32.93,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-99",
+      "toId": "VL-1-VL54",
+      "weight": 73.23,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-99",
+      "toId": "VL-1-98",
+      "weight": 32.07,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL25",
+      "toId": "VL-1-STAIR-6",
+      "weight": 31.23,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL19",
+      "toId": "VL-1-STAIR-5",
+      "weight": 47.96,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VL-1-VL34",
+      "toId": "VL-1-STAIR-7",
+      "weight": 25.99,
+      "isAccessible": true
+    }
+  ]
+}

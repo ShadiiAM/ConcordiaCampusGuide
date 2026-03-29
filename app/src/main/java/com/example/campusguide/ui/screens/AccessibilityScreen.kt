@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,12 +39,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.R
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
@@ -252,6 +255,95 @@ fun AccessibilityScreen(
                         checked = accessibilityState.isBoldEnabled,
                         onCheckedChange = { checked ->
                             accessibilityState.setBold(checked)
+                            persist()
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color(0xFF6B4D8A),
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = Color.LightGray
+                        )
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFE8E0F0)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_poi),
+                        contentDescription = "Directions",
+                        tint = Color(0xFF6B4D8A),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                AccessibleText(
+                    text = "Directions",
+                    baseFontSizeSp = 16f,
+                    forceFontWeight = FontWeight.Bold,
+                    fallbackColor = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SettingRow(
+                icon = {
+                    AccessibleText(
+                        text = "S",
+                        baseFontSizeSp = 16f,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                label = "Avoid stairs",
+                action = {
+                    Switch(
+                        checked = accessibilityState.avoidStairs,
+                        onCheckedChange = { checked ->
+                            accessibilityState.updateAvoidStairs(checked)
+                            persist()
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color(0xFF6B4D8A),
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = Color.LightGray
+                        )
+                    )
+                }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SettingRow(
+                icon = {
+                    AccessibleText(
+                        text = "E",
+                        baseFontSizeSp = 16f,
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                label = "Avoid escalators",
+                action = {
+                    Switch(
+                        checked = accessibilityState.avoidEscalators,
+                        onCheckedChange = { checked ->
+                            accessibilityState.updateAvoidEscalators(checked)
                             persist()
                         },
                         colors = SwitchDefaults.colors(

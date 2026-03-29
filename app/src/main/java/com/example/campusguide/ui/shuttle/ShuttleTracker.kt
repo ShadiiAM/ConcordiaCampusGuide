@@ -23,8 +23,6 @@ class ShuttleTracker(private val dataSource: ShuttleDataSource = StaticShuttleDa
 
     fun getShuttleStops(): List<ShuttleStop> = safeGetShuttleStops()
 
-    fun getNextShuttle(): String? = null
-
     fun getNextShuttleForCampus(campus: Campus): String? {
         val next = ShuttleSchedule.nextDeparture(campus)
         if (next != null) return next.toString()
