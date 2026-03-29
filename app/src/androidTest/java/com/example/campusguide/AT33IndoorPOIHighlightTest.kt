@@ -44,31 +44,30 @@ class AT33IndoorPOIHighlightTest {
     /** Opens the LB building indoor map by searching for a room and selecting it. */
     private fun openLBIndoorMap() {
         onView(withId(android.R.id.content)).check(matches(isDisplayed()))
-        Thread.sleep(4000) // let map fully load
+        Thread.sleep(4000)
 
         composeTestRule.onNodeWithTag("searchBar").performClick()
         Thread.sleep(1500)
         composeTestRule.onNodeWithTag("searchBar").performTextInput("LB")
-        Thread.sleep(3000) // let suggestions appear
+        Thread.sleep(3000)
 
-        // Indoor LB room suggestions have contentDescription "LB.XXX, Classroom, LB floor Y"
+
         composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule
                 .onAllNodesWithContentDescription("LB floor", substring = true)
                 .fetchSemanticsNodes().isNotEmpty()
         }
-        Thread.sleep(1500) // pause so GIF shows suggestions clearly
+        Thread.sleep(1500)
         composeTestRule
             .onAllNodesWithContentDescription("LB floor", substring = true)[0]
             .performClick()
 
-        // Wait for indoor map canvas to appear
         composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule
                 .onNodeWithContentDescription("Floor map overlay", substring = true)
                 .isDisplayed()
         }
-        Thread.sleep(1500) // pause so GIF shows indoor map loading
+        Thread.sleep(1500)
     }
 
     // ── AC1 ───────────────────────────────────────────────────────────────────
@@ -83,7 +82,6 @@ class AT33IndoorPOIHighlightTest {
         composeTestRule.onNodeWithText("3").performClick()
         Thread.sleep(2000)
 
-        // Canvas accessibility label must mention both washroom and water fountain
         composeTestRule
             .onNodeWithContentDescription("Washroom", substring = true)
             .assertIsDisplayed()
@@ -92,7 +90,7 @@ class AT33IndoorPOIHighlightTest {
             .onNodeWithContentDescription("Water Fountain", substring = true)
             .assertIsDisplayed()
 
-        Thread.sleep(4000) // hold on result for GIF
+        Thread.sleep(4000)
     }
 
     // ── AC2 ───────────────────────────────────────────────────────────────────
@@ -132,7 +130,7 @@ class AT33IndoorPOIHighlightTest {
             .onNodeWithContentDescription("Floor map overlay", substring = true)
             .assertIsDisplayed()
 
-        Thread.sleep(4000) // hold on result for GIF
+        Thread.sleep(4000)
     }
 
     // ── AC3 ───────────────────────────────────────────────────────────────────
@@ -147,11 +145,9 @@ class AT33IndoorPOIHighlightTest {
     fun ac3_tapPoiIconShowsInfoPopup() {
         openLBIndoorMap()
 
-        // Switch to floor 3 (has Water Fountain nodes)
         composeTestRule.onNodeWithText("3").performClick()
         Thread.sleep(2000)
 
-        // Wait for the POI overlay to be present
         composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule
                 .onAllNodesWithContentDescription("POI: Water Fountain", substring = false)
@@ -159,35 +155,30 @@ class AT33IndoorPOIHighlightTest {
         }
         Thread.sleep(1500) // pause so GIF shows the map before tapping
 
-        // Tap the Water Fountain POI overlay
         composeTestRule
             .onAllNodesWithContentDescription("POI: Water Fountain")[0]
             .performClick()
 
-        // Popup must appear
         composeTestRule.waitUntil(timeoutMillis = 5000) {
             composeTestRule.onNodeWithTag("poiInfoPopup").isDisplayed()
         }
 
-        // Popup title must say "Water Fountain"
         composeTestRule
             .onNodeWithText("Water Fountain")
             .assertIsDisplayed()
 
-        // Close button must be visible
         composeTestRule
             .onNodeWithText("Close")
             .assertIsDisplayed()
 
-        Thread.sleep(4000) // hold on popup for GIF
+        Thread.sleep(4000)
 
-        // Dismiss and verify map is still visible
         composeTestRule.onNodeWithText("Close").performClick()
         Thread.sleep(1500)
 
         composeTestRule
             .onAllNodesWithContentDescription("POI: Water Fountain", substring = false)
             .fetchSemanticsNodes()
-            .also { assert(it.isNotEmpty()) } // map still visible after close
+            .also { assert(it.isNotEmpty()) }
     }
 }
