@@ -232,8 +232,8 @@ private fun CourseListView(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(courses, key = { it.subject + it.catalog + it.section + it.termCode }) { course ->
-                    val courseId = "${course.subject}-${course.catalog}-${course.section}-${course.termCode}"
+                items(courses, key = { it.subject + it.catalog + it.section + it.termCode + it.componentCode }) { course ->
+                    val courseId = "${course.subject}-${course.catalog}-${course.section}-${course.termCode}-${course.componentCode}"
                     val isConfirming = confirmingCourseId.value == courseId
                     CourseCard(
                         course = course,
@@ -296,6 +296,7 @@ private fun AddCourseView(
             val errorMsg = when(errorType) {
                 is CalendarError.NotFound -> stringResource(R.string.calendar_error_not_found)
                 is CalendarError.Network -> stringResource(R.string.calendar_error_network)
+                is CalendarError.AlreadyTracked -> stringResource(R.string.calendar_error_already_tracked)
                 is CalendarError.Unknown -> errorType.message
             }
             AccessibleText(text = errorMsg, fallbackColor = MaterialTheme.colorScheme.error, baseFontSizeSp = 14f)

@@ -23,6 +23,7 @@
     <string name="calendar_success_added">Successfully added course</string>
     <string name="calendar_error_not_found">Course or section not found.</string>
     <string name="calendar_error_network">Network Error: Check connection.</string>
+    <string name="calendar_error_already_tracked">This course is already being tracked.</string>
 
     <string name="calendar_location_label">Location: %s</string>
     <string name="calendar_location_unknown">Unknown</string>

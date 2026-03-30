@@ -20,6 +20,7 @@ import java.util.Locale
 sealed class CalendarError {
     object NotFound : CalendarError()
     object Network : CalendarError()
+    object AlreadyTracked : CalendarError()
     data class Unknown(val message: String) : CalendarError()
 }
 
@@ -163,17 +164,32 @@ class CalendarViewModel(
                 val matchedComponents = repository.fetchAndFilterCourse(subject, catalog, termCode, section)
 
                 if (matchedComponents.isNotEmpty()) {
-                    val newTrackedCourses = uiState.trackedCourses + matchedComponents
-                    uiState = uiState.copy(
-                        trackedCourses = newTrackedCourses,
-                        lastAddedCourses = matchedComponents,
-                        // Clear fields on success
-                        termCode = "",
-                        subject = "",
-                        catalog = "",
-                        section = ""
-                    )
-                    saveTrackedCourses(newTrackedCourses)
+                    // Check if any of the matched components are already tracked
+                    val alreadyTracked = matchedComponents.any { matched ->
+                        uiState.trackedCourses.any { tracked ->
+                            tracked.subject == matched.subject &&
+                            tracked.catalog == matched.catalog &&
+                            tracked.section == matched.section &&
+                            tracked.termCode == matched.termCode &&
+                            tracked.componentCode == matched.componentCode
+                        }
+                    }
+
+                    if (alreadyTracked) {
+                        uiState = uiState.copy(error = CalendarError.AlreadyTracked)
+                    } else {
+                        val newTrackedCourses = uiState.trackedCourses + matchedComponents
+                        uiState = uiState.copy(
+                            trackedCourses = newTrackedCourses,
+                            lastAddedCourses = matchedComponents,
+                            // Clear fields on success
+                            termCode = "",
+                            subject = "",
+                            catalog = "",
+                            section = ""
+                        )
+                        saveTrackedCourses(newTrackedCourses)
+                    }
                 } else {
                     uiState = uiState.copy(error = CalendarError.NotFound)
                 }
