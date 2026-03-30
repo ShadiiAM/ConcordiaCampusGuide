@@ -11,6 +11,8 @@ internal fun poiDisplayName(label: String): String = when {
         val num = label.removePrefix("EMERGENCY-STAIR").trimStart('-')
         if (num.isNotEmpty()) "Emergency Staircase $num" else "Emergency Staircase"
     }
+    label.contains("ELEVATOR", ignoreCase = true)  -> "Elevator"
+    label.contains("ESCALATOR", ignoreCase = true) -> "Escalator"
     else -> label.replace("-", " ").lowercase().replaceFirstChar { it.uppercase() }
 }
 
@@ -21,6 +23,8 @@ internal fun poiInferredDescription(label: String): String = when {
     label == "BATHROOM-MWC"   -> "Men's washroom · wheelchair accessible stall available"
     label == "BATHROOM-FWC"   -> "Women's washroom · wheelchair accessible stall available"
     label == "WATER-FOUNTAIN" -> "Drinking water available"
-    label.startsWith("EMERGENCY-STAIR") -> "Emergency exit staircase · not for regular use"
+    label.startsWith("EMERGENCY-STAIR") -> "Emergency exit staircase"
+    label.contains("ELEVATOR", ignoreCase = true)  -> "Takes you between floors · wheelchair accessible"
+    label.contains("ESCALATOR", ignoreCase = true) -> "Takes you between floors"
     else -> label.replace("-", " ").lowercase().replaceFirstChar { it.uppercase() }
 }

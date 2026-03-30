@@ -310,7 +310,9 @@ fun IndoorMapScreen(
                     selectionMode     = selectionMode,
                     crossFloorHint    = crossFloorInstruction,
                     onNodeTapped      = { node ->
-                        if (node.type == IndoorNodeType.POI) {
+                        if (node.type == IndoorNodeType.POI ||
+                            node.type == IndoorNodeType.ELEVATOR ||
+                            node.type == IndoorNodeType.ESCALATOR) {
                             poiInfoNode = node
                         } else {
                             if (!topCardActive) {
@@ -1172,19 +1174,18 @@ private fun DrawScope.drawPoiIcon(
         }
 
         label.startsWith("EMERGENCY-STAIR") -> {
-            // ── Three descending stair steps ─────────────────────────────
-            val stepW  = radius * 0.34f
-            val stepH  = radius * 0.28f
-            val startX = cx - radius * 0.50f
-            val startY = cy - radius * 0.40f
-            for (i in 0..2) {
-                val topLeft = Offset(startX + i * stepW, startY + i * stepH)
-                val sz      = Size(stepW, stepH * (3 - i).toFloat())
-                drawRect(color = outline, topLeft = topLeft,
-                    size = Size(sz.width + stroke.width, sz.height + stroke.width),
-                    style = stroke)
-                drawRect(color = fill, topLeft = topLeft, size = sz)
+            val s = radius * 0.33f
+            val stairPath = Path().apply {
+                moveTo(cx - s * 1.5f, cy + s * 1.5f)
+                lineTo(cx - s * 0.5f, cy + s * 1.5f)
+                lineTo(cx - s * 0.5f, cy + s * 0.5f)
+                lineTo(cx + s * 0.5f, cy + s * 0.5f)
+                lineTo(cx + s * 0.5f, cy - s * 0.5f)
+                lineTo(cx + s * 1.5f, cy - s * 0.5f)
+                lineTo(cx + s * 1.5f, cy - s * 1.5f)
             }
+            drawPath(path = stairPath, color = outline, style = Stroke(width = stroke.width * 1.4f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
+            drawPath(path = stairPath, color = fill,    style = Stroke(width = stroke.width * 0.7f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
         }
     }
 }
