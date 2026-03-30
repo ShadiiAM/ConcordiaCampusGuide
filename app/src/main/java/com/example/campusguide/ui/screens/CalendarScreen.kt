@@ -24,6 +24,7 @@ import com.example.campusguide.R
 import com.example.campusguide.ServiceLocator
 import com.example.campusguide.data.Course
 import com.example.campusguide.ui.accessibility.AccessibleText
+import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.theme.success
 import com.example.campusguide.ui.viewmodels.CalendarError
 import com.example.campusguide.ui.viewmodels.CalendarUiState
@@ -175,7 +176,8 @@ private fun AddCourseView(
 ) {
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        .padding(16.dp)
+        .ignoreFocusClearOnTouch(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         LabeledTextField(
             label = stringResource(R.string.calendar_input_term_label),
             placeholder = stringResource(R.string.calendar_input_term_placeholder),
