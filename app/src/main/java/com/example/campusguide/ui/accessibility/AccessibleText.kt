@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -40,6 +41,7 @@ fun AccessibleText(
         fontSize = finalSize,
         fontWeight = effectiveWeight,
         modifier = modifier,
-        color = color
+        color = color,
+        lineHeight = finalSize,
     )
 }

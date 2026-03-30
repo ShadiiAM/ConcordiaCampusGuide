@@ -10,7 +10,14 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.core.app.ActivityCompat
 import androidx.core.content.edit
+import com.example.campusguide.data.ALL_SUGGESTIONS
+import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.indoor.CrossFloorRouter
+import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorNode
+import com.example.campusguide.indoor.IndoorNodeType
+import com.example.campusguide.indoor.IndoorPathfinder
+import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.RouteResult
@@ -35,6 +42,8 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
+import kotlin.collections.first
+import kotlin.collections.isNullOrEmpty
 
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
@@ -254,6 +263,74 @@ fun checkLocationSettings(
         }
 }
 
+
+
+
+fun buildRouteSummary(distanceMeters: Int?, durationSeconds: Int?): String {
+    val dist = distanceMeters?.let {
+        if (it >= 1000) "${"%.1f".format(it / 1000.0)} km" else "$it m"
+    }
+    val dur = durationSeconds?.let {
+        val mins = it / 60
+        if (mins < 60) "$mins min" else "${mins / 60} h ${mins % 60} min"
+    }
+    return listOfNotNull(dur, dist).joinToString(" · ")
+}
+
+fun findCampusBuilding(buildingCode: String): CampusBuilding? =
+    ALL_SUGGESTIONS
+        .filterIsInstance<CampusBuilding>()
+        .firstOrNull { it.buildingCode.equals(buildingCode, ignoreCase = true) }
+
+fun findAccessNode(buildingCode: String): IndoorNode? {
+    val floors = IndoorGraphRegistry.floorsFor(buildingCode)
+    val nodes = floors
+        .mapNotNull { IndoorGraphRegistry.get(buildingCode, it) }
+        .flatMap { it.nodes }
+
+    fun firstOf(type: IndoorNodeType): IndoorNode? = nodes.firstOrNull { it.type == type }
+
+    return firstOf(IndoorNodeType.ENTRY)
+        ?: firstOf(IndoorNodeType.ELEVATOR)
+        ?: firstOf(IndoorNodeType.RAMP)
+        ?: firstOf(IndoorNodeType.STAIRCASE)
+        ?: firstOf(IndoorNodeType.ESCALATOR)
+        ?: nodes.firstOrNull { it.type != IndoorNodeType.HALLWAY }
+}
+
+fun hasIndoorLegPath(from: IndoorNode, to: IndoorNode, accessibilityState: AccessibilityState): Boolean {
+    if (from.buildingCode != to.buildingCode) return false
+    if (from.id == to.id) return true
+
+    val requireAccessible = accessibilityState.avoidStairs || accessibilityState.avoidEscalators
+    return if (from.floor == to.floor) {
+        val graph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
+        val path = IndoorPathfinder.findPath(
+            graph = graph,
+            originId = from.id,
+            destinationId = to.id,
+            requireAccessible = requireAccessible,
+            avoidStairs = accessibilityState.avoidStairs,
+            avoidEscalators = accessibilityState.avoidEscalators,
+        )
+        !path.isEmpty && path.totalWeight != Float.MAX_VALUE
+    } else {
+        val originGraph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
+        val destinationGraph = IndoorGraphRegistry.get(to.buildingCode, to.floor) ?: return false
+        CrossFloorRouter.route(
+            originFloorGraph = originGraph,
+            destinationFloorGraph = destinationGraph,
+            originId = from.id,
+            destinationId = to.id,
+            requireAccessible = requireAccessible,
+            avoidStairs = accessibilityState.avoidStairs,
+            avoidEscalators = accessibilityState.avoidEscalators,
+            preferEscalators = !accessibilityState.avoidEscalators,
+        ) != null
+    }
+}
+
+
 data class DirectionsTopBarState(
     val active: Boolean,
     val originLabel: String = "Your location",
@@ -280,3 +357,4 @@ data class DirectionsTopBarState(
     val indoorOriginNode: IndoorNode? = null,
     val indoorDestinationNode: IndoorNode? = null,
 )
+

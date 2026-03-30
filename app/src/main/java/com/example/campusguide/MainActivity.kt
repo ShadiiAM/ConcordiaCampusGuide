@@ -76,6 +76,7 @@ import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
+import com.example.campusguide.ui.screens.POIScreen
 import com.example.campusguide.ui.viewmodels.BuildingRow
 
 class MainActivity : ComponentActivity() {
@@ -539,10 +540,95 @@ fun ConcordiaCampusGuideApp() {
                                         CalendarScreen()
                                     }
                                     AppDestinations.POI -> {
-                                        Greeting("POI Screen", modifier)
+                                        POIScreen(
+                                            viewModel = viewModel,
+                                            searchQuery = "$mapViewmodel.searchQuery#$mapViewmodel.searchCounter",
+                                            onDirectionsTopBarState = { state ->
+                                                directionsTopBarState = state
+                                            },
+                                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                                            directionsCancelTrigger = directionsCancelTrigger,
+                                            topBarTravelMode = topBarTravelMode,
+                                            topBarDirectionsDestinationBuilding = topBarDirectionsDestinationBuilding,
+                                            onTopBarDirectionsDestinationConsumed = {
+                                                topBarDirectionsDestinationBuilding = null
+                                            },
+                                            onBottomSearchClick = {
+                                                try {
+                                                    searchFocusRequester.requestFocus()
+                                                } catch (_: IllegalStateException) {
+                                                }
+                                            },
+                                            topBarSelectedPOISuggestion = mapViewmodel.topBarSelectedSuggestion,
+                                            onTopBarBuildingConsumed = {
+                                                mapViewmodel.topBarSelectedSuggestion = null
+                                            },
+
+                                            )
+                                        if (directionsTopBarState.active) {
+                                            DirectionsTopBar(
+                                                modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
+                                                    .ignoreFocusClearOnTouch(),
+                                                originLabel = directionsTopBarState.originLabel,
+                                                destinationLabel = directionsTopBarState.destinationLabel,
+                                                isCrossCampus = directionsTopBarState.isCrossCampus,
+                                                selectedMode = directionsTopBarState.selectedMode,
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
+                                                routeSummary = directionsTopBarState.routeSummary,
+                                                errorMessage = directionsTopBarState.errorMessage,
+                                                showActions = directionsTopBarState.showActions,
+                                                isLoadingRoute = directionsTopBarState.isLoadingRoute,
+                                                showTravelModes = directionsTopBarState.showTravelModes,
+                                                goEnabled = directionsTopBarState.goEnabled,
+                                                goLabel = directionsTopBarState.goLabel,
+                                                cancelLabel = directionsTopBarState.cancelLabel,
+                                                onGoClick = { directionsGoTrigger++ },
+                                                onCancelClick = {
+                                                    directionsCancelTrigger++
+                                                    topBarTravelMode = TravelMode.DRIVE
+                                                    clearDirectionsAndIndoorState()
+                                                },
+                                                onBackClick = {
+                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
+                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
+                                                    directionsEditMode = null
+                                                    directionsDestinationSuggestions = emptyList()
+                                                    indoorDirectionsQuery = ""
+                                                    indoorDirectionsSuggestions = emptyList()
+                                                },
+                                                shuttleStatus = directionsTopBarState.shuttleStatus,
+                                                canUseShuttle = directionsTopBarState.canUseShuttle,
+                                                route = directionsTopBarState.route
+                                            )
+                                        }else{
+
+                                            val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+                                                BuildingRow(
+                                                    suggestion = suggestion,
+                                                    nearestId =  nearestId,
+                                                    userLatLng = userLatLng,
+                                                    onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
+                                                    onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
+                                                    onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
+                                                )
+                                            }
+
+                                            SearchBarWithProfile(
+                                                modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
+                                                focusRequester = searchFocusRequester,
+                                                onSearchQueryChange = mapViewmodel::onPOISearchQueryChange,
+                                                onSearchSubmit = mapViewmodel::onPOISearchSubmit,
+                                                onProfileClick = { showProfile = true },
+                                                suggestions = mapViewmodel.topBarSuggestions,
+
+                                                suggestionContent = suggestionContent,
+                                                suggestionKey = mapViewmodel.suggestionKey,
+                                            )
+
+                                        }
+
+
                                     }
-
-
 
                                 }
                             }
