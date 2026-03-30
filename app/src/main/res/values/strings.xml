@@ -25,11 +25,15 @@
     <string name="calendar_error_network">Network Error: Check connection.</string>
 
     <string name="calendar_location_label">Location: %s</string>
+    <string name="calendar_location_unknown">Unknown</string>
     <string name="calendar_remove_course">Remove course</string>
     <string name="calendar_confirm_removal">Confirm removal</string>
     <string name="calendar_directions">Directions to classroom</string>
 
     <string name="calendar_course_header">%s %s (%s) %s</string>
+    <string name="calendar_refresh_failed">Some courses failed to update.</string>
+    <string name="calendar_refresh_success">All courses updated.</string>
+    <string name="calendar_refreshing">Refreshing schedules…</string>
 
     <!-- Open Data Strings -->
     <string name="open_data_loading">Loading schedule data...</string>

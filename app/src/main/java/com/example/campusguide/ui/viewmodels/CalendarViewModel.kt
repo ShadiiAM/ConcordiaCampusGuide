@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campusguide.data.CalendarRepository
+import com.example.campusguide.data.CalendarStorage
 import com.example.campusguide.data.Course
 import com.example.campusguide.ui.screens.CalendarTab
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Calendar
@@ -21,7 +23,9 @@ sealed class CalendarError {
 
 data class CalendarUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val error: CalendarError? = null,
+    val refreshError: Boolean = false,
     val lastAddedCourses: List<Course>? = null,
     val trackedCourses: List<Course> = emptyList(),
     val termCode: String = "",
@@ -30,7 +34,10 @@ data class CalendarUiState(
     val section: String = ""
 )
 
-class CalendarViewModel(private val repository: CalendarRepository) : ViewModel() {
+class CalendarViewModel(
+    private val repository: CalendarRepository,
+    private val storage: CalendarStorage? = null
+) : ViewModel() {
 
     var uiState by mutableStateOf(CalendarUiState())
         private set
@@ -44,10 +51,31 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
         set(value) {
             if (_selectedTab != value) {
                 // Clear success and error states when navigating between tabs
-                uiState = uiState.copy(lastAddedCourses = null, error = null)
+                uiState = uiState.copy(lastAddedCourses = null, error = null, refreshError = false)
                 _selectedTab = value
             }
         }
+
+    init {
+        loadTrackedCourses()
+    }
+
+    private fun loadTrackedCourses() {
+        storage?.let {
+            viewModelScope.launch {
+                val courses = it.trackedCourses.first()
+                uiState = uiState.copy(trackedCourses = courses)
+            }
+        }
+    }
+
+    private fun saveTrackedCourses(courses: List<Course>) {
+        storage?.let {
+            viewModelScope.launch {
+                it.saveCourses(courses)
+            }
+        }
+    }
 
     /**
      * automatically updates whenever trackedCourses or selectedDate changes.
@@ -89,9 +117,10 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
             try {
                 val matchedComponents = repository.fetchAndFilterCourse(subject, catalog, termCode, section)
 
-                uiState = if (matchedComponents.isNotEmpty()) {
-                    uiState.copy(
-                        trackedCourses = uiState.trackedCourses + matchedComponents,
+                if (matchedComponents.isNotEmpty()) {
+                    val newTrackedCourses = uiState.trackedCourses + matchedComponents
+                    uiState = uiState.copy(
+                        trackedCourses = newTrackedCourses,
                         lastAddedCourses = matchedComponents,
                         // Clear fields on success
                         termCode = "",
@@ -99,8 +128,9 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
                         catalog = "",
                         section = ""
                     )
+                    saveTrackedCourses(newTrackedCourses)
                 } else {
-                    uiState.copy(error = CalendarError.NotFound)
+                    uiState = uiState.copy(error = CalendarError.NotFound)
                 }
             } catch (_: IOException) {
                 uiState = uiState.copy(error = CalendarError.Network)
@@ -112,9 +142,47 @@ class CalendarViewModel(private val repository: CalendarRepository) : ViewModel(
         }
     }
 
+    fun refreshSchedules() {
+        if (uiState.trackedCourses.isEmpty()) return
+
+        viewModelScope.launch {
+            uiState = uiState.copy(isRefreshing = true, refreshError = false)
+            val updatedCourses = mutableListOf<Course>()
+            var anyFailed = false
+
+            uiState.trackedCourses.forEach { course ->
+                try {
+                    val fresh = repository.fetchAndFilterCourse(
+                        course.subject,
+                        course.catalog,
+                        course.termCode,
+                        course.section
+                    )
+                    if (fresh.isNotEmpty()) {
+                        updatedCourses.addAll(fresh)
+                    } else {
+                        updatedCourses.add(course)
+                        anyFailed = true
+                    }
+                } catch (e: Exception) {
+                    updatedCourses.add(course)
+                    anyFailed = true
+                }
+            }
+
+            val finalCourses = updatedCourses.distinct()
+            uiState = uiState.copy(
+                trackedCourses = finalCourses,
+                isRefreshing = false,
+                refreshError = anyFailed
+            )
+            saveTrackedCourses(finalCourses)
+        }
+    }
+
     fun removeCourse(course: Course) {
-        uiState = uiState.copy(
-            trackedCourses = uiState.trackedCourses.filter { it != course }
-        )
+        val newTrackedCourses = uiState.trackedCourses.filter { it != course }
+        uiState = uiState.copy(trackedCourses = newTrackedCourses)
+        saveTrackedCourses(newTrackedCourses)
     }
 }
