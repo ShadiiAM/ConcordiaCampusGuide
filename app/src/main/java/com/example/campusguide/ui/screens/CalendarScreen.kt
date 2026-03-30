@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import com.example.campusguide.ui.theme.success
 import com.example.campusguide.ui.viewmodels.CalendarError
 import com.example.campusguide.ui.viewmodels.CalendarUiState
 import com.example.campusguide.ui.viewmodels.CalendarViewModel
+import com.example.campusguide.ui.viewmodels.NextCourseResult
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -68,7 +70,9 @@ fun CalendarScreen() {
                 CalendarTab.DAILY_SCHEDULE -> DailyScheduleView(
                     date = viewModel.selectedDate,
                     coursesForDay = viewModel.coursesForSelectedDay,
-                    onIncrementDate = { viewModel.incrementDate(it) }
+                    nextUpcoming = viewModel.nextUpcomingCourse,
+                    onIncrementDate = { viewModel.incrementDate(it) },
+                    onFindNextClass = { viewModel.jumpToNextClass() }
                 )
                 CalendarTab.COURSE_LIST -> CourseListView(
                     courses = uiState.trackedCourses,
@@ -97,38 +101,74 @@ fun CalendarScreen() {
 private fun DailyScheduleView(
     date: Calendar, 
     coursesForDay: List<Course>, 
-    onIncrementDate: (Int) -> Unit
+    nextUpcoming: NextCourseResult?,
+    onIncrementDate: (Int) -> Unit,
+    onFindNextClass: () -> Unit
 ) {
     val sortedCourses = remember(coursesForDay) {
         coursesForDay.sortedBy { it.startTime }
     }
 
-    val currentTime = Calendar.getInstance()
-    val isToday = remember(date) {
-        val today = Calendar.getInstance()
-        date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-        date.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
-    }
-
-    // Find the next class: the first class whose end time is after "now"
-    val nextCourse = remember(sortedCourses, isToday) {
-        if (!isToday) return@remember null
-        val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val nowStr = timeFormat.format(currentTime.time)
-        sortedCourses.firstOrNull { it.endTime > nowStr }
+    val isShowingNextDay = remember(date, nextUpcoming) {
+        nextUpcoming != null &&
+        date.get(Calendar.YEAR) == nextUpcoming.date.get(Calendar.YEAR) &&
+        date.get(Calendar.DAY_OF_YEAR) == nextUpcoming.date.get(Calendar.DAY_OF_YEAR)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         DateSelector(date, onIncrementDate)
 
-        if (sortedCourses.isEmpty()) {
-            EmptyStateMessage(stringResource(R.string.calendar_empty_schedule))
-        } else {
-            LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(sortedCourses) { course ->
-                    CourseCard(
-                        course = course,
-                        isUpcoming = course == nextCourse
+        Box(modifier = Modifier.weight(1f)) {
+            if (sortedCourses.isEmpty()) {
+                EmptyStateMessage(stringResource(R.string.calendar_empty_schedule))
+            } else {
+                LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    items(sortedCourses) { course ->
+                        val isHighlighted = isShowingNextDay && course == nextUpcoming?.course
+                        CourseCard(
+                            course = course,
+                            isUpcoming = isHighlighted
+                        )
+                    }
+                }
+            }
+        }
+
+        // Find Next Class Button
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            tonalElevation = 4.dp,
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (nextUpcoming == null) {
+                    AccessibleText(
+                        text = stringResource(R.string.calendar_no_upcoming_classes),
+                        fallbackColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        baseFontSizeSp = 14f,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
+                Button(
+                    onClick = onFindNextClass,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    AccessibleText(
+                        text = stringResource(R.string.calendar_find_next_class),
+                        fallbackColor = Color.White,
+                        baseFontSizeSp = 16f
                     )
                 }
             }
@@ -288,6 +328,9 @@ fun CourseCard(
     val alpha = if (isPast) 0.5f else 1f
     val colorScheme = MaterialTheme.colorScheme
 
+    // Highlight color for next class
+    val highlightColor = Color.Red
+
     // Button colors based on confirmation state
     val buttonContainerColor = if (showRemoveAction && isConfirmingAction) {
         colorScheme.error
@@ -304,10 +347,10 @@ fun CourseCard(
     Column(modifier = Modifier.fillMaxWidth()) {
         if (isUpcoming) {
             AccessibleText(
-                text = "UPCOMING CLASS",
+                text = "NEXT CLASS",
                 baseFontSizeSp = 12f,
                 forceFontWeight = FontWeight.Bold,
-                fallbackColor = colorScheme.primary,
+                fallbackColor = highlightColor,
                 modifier = Modifier.padding(bottom = 4.dp, start = 4.dp)
             )
         }
@@ -317,7 +360,7 @@ fun CourseCard(
                 .fillMaxWidth()
                 .border(
                     width = if (isUpcoming) 3.dp else 1.dp,
-                    color = if (isUpcoming) colorScheme.primary else colorScheme.outlineVariant.copy(alpha = alpha),
+                    color = if (isUpcoming) highlightColor else colorScheme.outlineVariant.copy(alpha = alpha),
                     shape = RoundedCornerShape(12.dp)
                 ),
             colors = CardDefaults.cardColors(containerColor = colorScheme.surface.copy(alpha = alpha))

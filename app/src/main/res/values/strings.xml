@@ -35,6 +35,9 @@
     <string name="calendar_refresh_success">All courses updated.</string>
     <string name="calendar_refreshing">Refreshing schedules…</string>
 
+    <string name="calendar_find_next_class">Find next class</string>
+    <string name="calendar_no_upcoming_classes">No upcoming classes found.</string>
+
     <!-- Open Data Strings -->
     <string name="open_data_loading">Loading schedule data...</string>
     <string name="open_data_empty">No schedule data found.</string>

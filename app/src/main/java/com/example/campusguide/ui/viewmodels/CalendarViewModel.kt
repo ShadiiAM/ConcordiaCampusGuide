@@ -13,7 +13,9 @@ import com.example.campusguide.ui.screens.CalendarTab
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 sealed class CalendarError {
     object NotFound : CalendarError()
@@ -32,6 +34,11 @@ data class CalendarUiState(
     val subject: String = "",
     val catalog: String = "",
     val section: String = ""
+)
+
+data class NextCourseResult(
+    val course: Course,
+    val date: Calendar
 )
 
 class CalendarViewModel(
@@ -83,6 +90,44 @@ class CalendarViewModel(
     val coursesForSelectedDay by derivedStateOf {
         val dayOfWeek = selectedDate.get(Calendar.DAY_OF_WEEK)
         uiState.trackedCourses.filter { it.meetsOn(dayOfWeek) }
+    }
+
+    /**
+     * Computes the next class across the next 7 days.
+     */
+    val nextUpcomingCourse by derivedStateOf {
+        val now = Calendar.getInstance()
+        val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val nowTimeStr = timeFormat.format(now.time)
+
+        for (i in 0..7) {
+            val checkDate = (now.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, i) }
+            val dayOfWeek = checkDate.get(Calendar.DAY_OF_WEEK)
+            
+            val coursesOnDay = uiState.trackedCourses
+                .filter { it.meetsOn(dayOfWeek) }
+                .sortedBy { it.startTime }
+
+            val nextOnThisDay = if (i == 0) {
+                // Today: first class starting after now
+                coursesOnDay.firstOrNull { it.startTime > nowTimeStr }
+            } else {
+                // Future day: first class of the day
+                coursesOnDay.firstOrNull()
+            }
+
+            if (nextOnThisDay != null) {
+                return@derivedStateOf NextCourseResult(nextOnThisDay, checkDate)
+            }
+        }
+        null
+    }
+
+    fun jumpToNextClass() {
+        nextUpcomingCourse?.let { result ->
+            selectedDate = result.date
+            selectedTab = CalendarTab.DAILY_SCHEDULE
+        }
     }
 
     fun incrementDate(days: Int) {
