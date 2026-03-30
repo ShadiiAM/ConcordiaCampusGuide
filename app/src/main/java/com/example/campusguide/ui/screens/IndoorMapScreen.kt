@@ -1077,13 +1077,6 @@ private fun findNearestNode(
 
 
 /**
- * Draws a recognisable pictogram icon for a POI node directly on the canvas
- * (no circle background). Each icon is drawn twice — white outline first,
- * then PoiColor fill — so it stands out on any floor-plan background.
- *
- * - Washrooms       → person silhouette (circle head + triangle body)
- * - Water fountain  → teardrop / water-drop shape
- * - Emergency stair → three descending stair steps
  */
 private fun DrawScope.drawPoiIcon(
     label: String,
@@ -1134,27 +1127,21 @@ private fun DrawScope.drawPoiIcon(
         }
 
         label.startsWith("BATHROOM") -> {
-            // ── Person silhouette ────────────────────────────────────────
             val headR  = radius * 0.28f
             val headCy = cy - radius * 0.36f
-
-            // White halo then filled head
             drawCircle(color = outline, radius = headR + stroke.width, center = Offset(cx, headCy))
             drawCircle(color = fill,    radius = headR,                 center = Offset(cx, headCy))
-
             val bodyPath = Path().apply {
                 moveTo(cx,                  cy - radius * 0.05f)
                 lineTo(cx - radius * 0.32f, cy + radius * 0.54f)
                 lineTo(cx + radius * 0.32f, cy + radius * 0.54f)
                 close()
             }
-            // White outline stroke, then solid fill
             drawPath(path = bodyPath, color = outline, style = stroke)
             drawPath(path = bodyPath, color = fill)
         }
 
         label == "WATER-FOUNTAIN" -> {
-            // ── Teardrop / water-drop ────────────────────────────────────
             val dropPath = Path().apply {
                 moveTo(cx, cy - radius * 0.54f)
                 cubicTo(
