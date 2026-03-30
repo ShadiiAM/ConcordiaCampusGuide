@@ -88,7 +88,7 @@ class PoiUtilsTest {
     @Test
     fun poiInferredDescription_emergencyStair_returnsEmergencyExitDescription() {
         assertEquals(
-            "Emergency exit staircase · not for regular use",
+            "Emergency exit staircase",
             poiInferredDescription("EMERGENCY-STAIR-1")
         )
     }
@@ -96,7 +96,7 @@ class PoiUtilsTest {
     @Test
     fun poiInferredDescription_emergencyStairNoNumber_returnsEmergencyExitDescription() {
         assertEquals(
-            "Emergency exit staircase · not for regular use",
+            "Emergency exit staircase",
             poiInferredDescription("EMERGENCY-STAIR")
         )
     }
