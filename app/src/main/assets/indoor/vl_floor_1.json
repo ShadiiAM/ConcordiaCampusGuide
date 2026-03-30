@@ -746,7 +746,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-1",
+      "id": "VL-1-101.1",
       "label": "CLASS-ROOM",
       "x": 620.29,
       "y": 674.55,
@@ -756,7 +756,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-2",
+      "id": "VL-1-101.2",
       "label": "CLASS-ROOM",
       "x": 621.13,
       "y": 790.21,
@@ -766,7 +766,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-3",
+      "id": "VL-1-101.3",
       "label": "CLASS-ROOM",
       "x": 328.95,
       "y": 882.24,
@@ -776,7 +776,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-4",
+      "id": "VL-1-101.4",
       "label": "CLASS-ROOM",
       "x": 328.95,
       "y": 919.28,
@@ -786,7 +786,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-5",
+      "id": "VL-1-101.5",
       "label": "CLASS-ROOM",
       "x": 59.97,
       "y": 844.83,
@@ -796,7 +796,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-6",
+      "id": "VL-1-101.6",
       "label": "CLASS-ROOM",
       "x": 59.22,
       "y": 804.05,
@@ -806,7 +806,7 @@
       "description": null
     },
     {
-      "id": "VL-1-101-7",
+      "id": "VL-1-101.7",
       "label": "CLASS-ROOM",
       "x": 58.47,
       "y": 758.41,
@@ -816,17 +816,7 @@
       "description": null
     },
     {
-      "id": "VL-1-STAIR-6",
-      "label": "CLASS-ROOM",
-      "x": 62.01,
-      "y": 682.77,
-      "type": "ROOM",
-      "floor": 1,
-      "buildingCode": "VL",
-      "description": null
-    },
-    {
-      "id": "VL-1-102-2",
+      "id": "VL-1-102.2",
       "label": "CLASS-ROOM",
       "x": 115.07,
       "y": 617.48,
@@ -836,7 +826,7 @@
       "description": null
     },
     {
-      "id": "VL-1-102-3",
+      "id": "VL-1-102.3",
       "label": "CLASS-ROOM",
       "x": 171.42,
       "y": 532.02,
@@ -846,7 +836,7 @@
       "description": null
     },
     {
-      "id": "VL-1-102-4",
+      "id": "VL-1-102.4",
       "label": "CLASS-ROOM",
       "x": 123.94,
       "y": 533.06,
@@ -856,7 +846,7 @@
       "description": null
     },
     {
-      "id": "VL-1-194-3",
+      "id": "VL-1-194.3",
       "label": "CLASS-ROOM",
       "x": 229.53,
       "y": 556.15,
@@ -876,7 +866,7 @@
       "description": null
     },
     {
-      "id": "VL-1-122-1",
+      "id": "VL-1-122.1",
       "label": "CLASS-ROOM",
       "x": 254.81,
       "y": 435.4,
@@ -906,7 +896,7 @@
       "description": null
     },
     {
-      "id": "VL-1-104-1",
+      "id": "VL-1-104.1",
       "label": "CLASS-ROOM",
       "x": 664.35,
       "y": 789.95,
@@ -916,7 +906,7 @@
       "description": null
     },
     {
-      "id": "VL-1-103-1",
+      "id": "VL-1-103.1",
       "label": "CLASS-ROOM",
       "x": 752.65,
       "y": 608.64,
@@ -936,7 +926,7 @@
       "description": null
     },
     {
-      "id": "VL-1-197-1",
+      "id": "VL-1-197.1",
       "label": "CLASS-ROOM",
       "x": 830.04,
       "y": 636.98,
@@ -946,7 +936,7 @@
       "description": null
     },
     {
-      "id": "VL-1-106-1",
+      "id": "VL-1-106.1",
       "label": "CLASS-ROOM",
       "x": 769.42,
       "y": 438.64,
@@ -956,7 +946,7 @@
       "description": null
     },
     {
-      "id": "VL-1-106-2",
+      "id": "VL-1-106.2",
       "label": "CLASS-ROOM",
       "x": 769.42,
       "y": 389.68,
@@ -1036,7 +1026,7 @@
       "description": null
     },
     {
-      "id": "VL-1-121-1",
+      "id": "VL-1-121.1",
       "label": "CLASS-ROOM",
       "x": 559.51,
       "y": 117.01,
@@ -1046,7 +1036,7 @@
       "description": null
     },
     {
-      "id": "VL-1-121-2",
+      "id": "VL-1-121.2",
       "label": "CLASS-ROOM",
       "x": 557.79,
       "y": 65.89,
@@ -1056,7 +1046,7 @@
       "description": null
     },
     {
-      "id": "VL-1-121-3",
+      "id": "VL-1-121.3",
       "label": "CLASS-ROOM",
       "x": 752.37,
       "y": 87.8,
@@ -1066,7 +1056,7 @@
       "description": null
     },
     {
-      "id": "VL-1-127-1",
+      "id": "VL-1-127.1",
       "label": "CLASS-ROOM",
       "x": 503.66,
       "y": 115.29,
@@ -1076,7 +1066,7 @@
       "description": null
     },
     {
-      "id": "VL-1-127-2",
+      "id": "VL-1-127.2",
       "label": "CLASS-ROOM",
       "x": 484.76,
       "y": 69.33,
@@ -1086,7 +1076,7 @@
       "description": null
     },
     {
-      "id": "VL-1-127-3",
+      "id": "VL-1-127.3",
       "label": "CLASS-ROOM",
       "x": 449.97,
       "y": 67.61,
@@ -1096,7 +1086,7 @@
       "description": null
     },
     {
-      "id": "VL-1-127-4",
+      "id": "VL-1-127.4",
       "label": "CLASS-ROOM",
       "x": 404.01,
       "y": 68.04,
@@ -1106,7 +1096,7 @@
       "description": null
     },
     {
-      "id": "VL-1-127-5",
+      "id": "VL-1-127.5",
       "label": "CLASS-ROOM",
       "x": 331.85,
       "y": 99.4,
@@ -1316,21 +1306,31 @@
       "description": null
     },
     {
-      "id": "VL-1-STAIR-6",
-      "label": "STAIR-6",
-      "x": 373.36,
-      "y": 816.17,
+      "id": "VL-1-STAIR-7",
+      "label": "STAIR-7",
+      "x": 835.86,
+      "y": 149.86,
       "type": "STAIRCASE",
       "floor": 1,
       "buildingCode": "VL",
       "description": null
     },
     {
-      "id": "VL-1-STAIR-7",
-      "label": "STAIR-7",
-      "x": 835.86,
-      "y": 149.86,
-      "type": "STAIRCASE",
+      "id": "VL-1-102",
+      "label": "CLASS-ROOM",
+      "x": 60.77,
+      "y": 664.35,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VL",
+      "description": null
+    },
+    {
+      "id": "VL-1-103",
+      "label": "CLASS-ROOM",
+      "x": 434.43,
+      "y": 670.3,
+      "type": "ROOM",
       "floor": 1,
       "buildingCode": "VL",
       "description": null
@@ -1861,7 +1861,7 @@
     },
     {
       "fromId": "VL-1-VL82",
-      "toId": "VL-1-197-1",
+      "toId": "VL-1-197.1",
       "weight": 44.03,
       "isAccessible": true
     },
@@ -1873,7 +1873,7 @@
     },
     {
       "fromId": "VL-1-VL79",
-      "toId": "VL-1-103-1",
+      "toId": "VL-1-103.1",
       "weight": 37.43,
       "isAccessible": true
     },
@@ -1885,49 +1885,49 @@
     },
     {
       "fromId": "VL-1-VL77",
-      "toId": "VL-1-101-1",
+      "toId": "VL-1-101.1",
       "weight": 36.75,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL76",
-      "toId": "VL-1-101-2",
+      "toId": "VL-1-101.2",
       "weight": 37.59,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL76",
-      "toId": "VL-1-104-1",
+      "toId": "VL-1-104.1",
       "weight": 80.81,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL75",
-      "toId": "VL-1-101-3",
+      "toId": "VL-1-101.3",
       "weight": 42.27,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL74",
-      "toId": "VL-1-101-4",
+      "toId": "VL-1-101.4",
       "weight": 41.69,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL73",
-      "toId": "VL-1-101-5",
+      "toId": "VL-1-101.5",
       "weight": 45.4,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL72",
-      "toId": "VL-1-101-6",
+      "toId": "VL-1-101.6",
       "weight": 45.25,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL71",
-      "toId": "VL-1-101-7",
+      "toId": "VL-1-101.7",
       "weight": 45.03,
       "isAccessible": true
     },
@@ -1939,25 +1939,25 @@
     },
     {
       "fromId": "VL-1-VL68",
-      "toId": "VL-1-102-2",
+      "toId": "VL-1-102.2",
       "weight": 24.36,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL66",
-      "toId": "VL-1-194-3",
+      "toId": "VL-1-194.3",
       "weight": 25.96,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL64",
-      "toId": "VL-1-102-3",
+      "toId": "VL-1-102.3",
       "weight": 28.7,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL10",
-      "toId": "VL-1-122-1",
+      "toId": "VL-1-122.1",
       "weight": 37.01,
       "isAccessible": true
     },
@@ -1974,20 +1974,20 @@
       "isAccessible": true
     },
     {
-      "fromId": "VL-1-102-3",
-      "toId": "VL-1-102-4",
+      "fromId": "VL-1-102.3",
+      "toId": "VL-1-102.4",
       "weight": 47.49,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL85",
-      "toId": "VL-1-106-1",
+      "toId": "VL-1-106.1",
       "weight": 39.44,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL86",
-      "toId": "VL-1-106-2",
+      "toId": "VL-1-106.2",
       "weight": 32.57,
       "isAccessible": true
     },
@@ -2023,7 +2023,7 @@
     },
     {
       "fromId": "VL-1-VL58",
-      "toId": "VL-1-121-3",
+      "toId": "VL-1-121.3",
       "weight": 62.32,
       "isAccessible": true
     },
@@ -2035,43 +2035,43 @@
     },
     {
       "fromId": "VL-1-VL43",
-      "toId": "VL-1-121-1",
+      "toId": "VL-1-121.1",
       "weight": 33.92,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL47",
-      "toId": "VL-1-127-1",
+      "toId": "VL-1-127.1",
       "weight": 35.54,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL49",
-      "toId": "VL-1-127-2",
+      "toId": "VL-1-127.2",
       "weight": 27.66,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-121",
-      "toId": "VL-1-121-2",
+      "toId": "VL-1-121.2",
       "weight": 93.7,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL45",
-      "toId": "VL-1-127-3",
+      "toId": "VL-1-127.3",
       "weight": 83.16,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL48",
-      "toId": "VL-1-127-4",
+      "toId": "VL-1-127.4",
       "weight": 31.58,
       "isAccessible": true
     },
     {
       "fromId": "VL-1-VL48",
-      "toId": "VL-1-127-5",
+      "toId": "VL-1-127.5",
       "weight": 72.45,
       "isAccessible": true
     },
@@ -2187,12 +2187,6 @@
       "fromId": "VL-1-99",
       "toId": "VL-1-98",
       "weight": 32.07,
-      "isAccessible": true
-    },
-    {
-      "fromId": "VL-1-VL25",
-      "toId": "VL-1-STAIR-6",
-      "weight": 31.23,
       "isAccessible": true
     },
     {
