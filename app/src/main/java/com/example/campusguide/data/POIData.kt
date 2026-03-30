@@ -1,6 +1,5 @@
 package com.example.campusguide.data
 
-import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.DayOfWeek
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder.distanceBetween
 import com.google.android.gms.maps.model.LatLng
@@ -15,11 +14,23 @@ data class OutsidePOI(
     val address: String
 ): Suggestion() {
 
-    fun filterPOI(userLocation: LatLng, distanceLimit: Float, categoriesIncluded: List<POIType>, rating: Double ): Boolean{
+    fun filterPOI(userLocation: LatLng, poiFilters: POIFilterValues ): Boolean{
 
-        val passDistanceCheck = distanceBetween(userLocation, this.latLng) <= distanceLimit
-        val passCategoryCheck = this.category in categoriesIncluded
-        val passRatingCheck = this.rating >= rating
+        val passDistanceCheck = if(poiFilters.distanceLimit == 0.0f){
+            true
+        }else{
+            distanceBetween(userLocation, this.latLng) <= poiFilters.distanceLimit
+
+        }
+
+        val passCategoryCheck = if(poiFilters.categoriesIncluded.isEmpty()){
+            true
+        }
+        else {
+            this.category in poiFilters.categoriesIncluded
+        }
+
+        val passRatingCheck = this.rating >= poiFilters.rating
 
         return passDistanceCheck && passCategoryCheck && passRatingCheck
     }
@@ -46,10 +57,14 @@ data class OutsidePOI(
         }
     }
 
-
-
-
 }
+
+
+data class POIFilterValues(
+    var distanceLimit: Float = 0.0f,
+    var rating: Double = 0.0,
+    val categoriesIncluded: Set<POIType> = emptySet()
+)
 
 enum class POIType {
     Cafe,
@@ -164,7 +179,7 @@ val ALL_POI: List<OutsidePOI> = listOf(
 
     OutsidePOI("McCord Stewart Museum", "Historical exhibits of costumes, objects & photos on popular subjects from hockey to Inuit art. Might require reservation",
         POIType.Museum,
-        WorkingHours(10.0, 17.0, listOf(DayOfWeek.MONDAY)),
+        WorkingHours(10.0, 17.0, listOf(DayOfWeek.Monday)),
         4.4,
         LatLng(45.50436895488742, -73.57341268465662),
         "690 Sherbrooke St W, Montreal, H3A 1E9"
@@ -172,7 +187,7 @@ val ALL_POI: List<OutsidePOI> = listOf(
 
     OutsidePOI("Montreal Museum of Fine Arts", "Spacious museum showcasing Québec & Canadian visual works, plus international contemporary art. Might require reservation",
         POIType.Museum,
-        WorkingHours(10.0, 17.0, listOf(DayOfWeek.MONDAY)),
+        WorkingHours(10.0, 17.0, listOf(DayOfWeek.Monday)),
         4.7,
         LatLng(45.49861214158194, -73.5793786423283),
         "1380 Sherbrooke St W, Montreal, H3G 1J5"
@@ -253,3 +268,5 @@ fun fullPOISuggestions(
         .map { (suggestions, _) -> suggestions }
         .take(max)
 }
+
+

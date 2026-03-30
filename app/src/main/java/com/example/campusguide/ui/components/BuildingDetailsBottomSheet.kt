@@ -558,14 +558,14 @@ enum class OpenStatus {
 private fun getCurrentTime(): CurrentTime {
     val calendar = Calendar.getInstance()
     val day = when (calendar.get(Calendar.DAY_OF_WEEK)) {
-        Calendar.SUNDAY -> DayOfWeek.SUNDAY
-        Calendar.MONDAY -> DayOfWeek.MONDAY
-        Calendar.TUESDAY -> DayOfWeek.TUESDAY
-        Calendar.WEDNESDAY -> DayOfWeek.WEDNESDAY
-        Calendar.THURSDAY -> DayOfWeek.THURSDAY
-        Calendar.FRIDAY -> DayOfWeek.FRIDAY
-        Calendar.SATURDAY -> DayOfWeek.SATURDAY
-        else -> DayOfWeek.MONDAY
+        Calendar.SUNDAY -> DayOfWeek.Sunday
+        Calendar.MONDAY -> DayOfWeek.Monday
+        Calendar.TUESDAY -> DayOfWeek.Tuesday
+        Calendar.WEDNESDAY -> DayOfWeek.Wednesday
+        Calendar.THURSDAY -> DayOfWeek.Thursday
+        Calendar.FRIDAY -> DayOfWeek.Friday
+        Calendar.SATURDAY -> DayOfWeek.Saturday
+        else -> DayOfWeek.Monday
     }
     return CurrentTime(
         dayOfWeek = day,
@@ -577,9 +577,9 @@ private fun getCurrentTime(): CurrentTime {
 private fun isLineForCurrentDay(line: String, currentDay: DayOfWeek): Boolean {
     return when {
         line.contains("Monday-Friday", ignoreCase = true) ->
-            currentDay in listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+            currentDay in listOf(DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday)
         line.contains("Saturday-Sunday", ignoreCase = true) || line.contains("Saturday and Sunday", ignoreCase = true) ->
-            currentDay in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
+            currentDay in listOf(DayOfWeek.Saturday, DayOfWeek.Sunday)
         line.contains("Daily", ignoreCase = true) || line.contains("24/7", ignoreCase = true) ->
             true
         else -> false
@@ -635,7 +635,7 @@ private fun checkIfOpen(hours: String, currentTime: CurrentTime): OpenStatus {
 }
 
 enum class DayOfWeek {
-    SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
+    Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
 }
 
 @Composable

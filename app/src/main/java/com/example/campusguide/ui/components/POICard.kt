@@ -50,13 +50,32 @@ fun POICard(
     onDirectionsClick: (() -> Unit)? = null
 ) {
 
-    val (colorToUse, iconToUse) = when(poi.category){
-        POIType.Cafe -> Pair(CafePink, R.drawable.cafe_icon)
-        POIType.Metro -> Pair(MetroBlue, R.drawable.metro_icon)
-        POIType.Restaurant -> Pair(RestaurantRed, R.drawable.restaurant_icon)
-        POIType.Museum -> Pair(MuseumYellow, R.drawable.museum_icon)
-        POIType.Grocery -> Pair(GroceryStoreOrange, R.drawable.grocery_icon)
-        POIType.Park -> Pair(ParkGreen, R.drawable.park_icon)
+    val iconDetails = getPOIColorAndDrawable(poi.category)
+
+    val openingHour = poi.workingHours.openingHour.toInt()
+    val openingMinute = ((poi.workingHours.openingHour - openingHour) * 60).toInt()
+    val startingHoursText =
+        if(poi.workingHours.openingHour < 12) {
+            "${openingHour}:%02d am".format(openingMinute)
+        }else{
+            "${openingHour}:%02d pm".format(openingMinute)
+        }
+
+
+    val closingHour = poi.workingHours.closingHour.toInt()
+    val closingMinute = ((poi.workingHours.closingHour - closingHour) * 60).toInt()
+    val closingHoursText =
+        if(poi.workingHours.closingHour < 12) {
+            "${closingHour}:%02d am".format(closingMinute)
+        }else{
+            "${closingHour}:%02d pm".format(closingMinute)
+        }
+
+
+    val workingHoursText = if(poi.workingHours.closedDays.isNotEmpty()){
+        "Working Hours: $startingHoursText-$closingHoursText. \nClosed on: ${poi.workingHours.closedDays.joinToString(", ")}"
+    }else{
+        "Working Hours: $startingHoursText-$closingHoursText. \nOpen all week"
     }
 
     AlertDialog(
@@ -70,11 +89,11 @@ fun POICard(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(colorToUse),
+                        .background(iconDetails.first),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(iconToUse),
+                        painter = painterResource(iconDetails.second),
                         contentDescription = "poiCardIcon",
                         tint = Color.Black,
                         modifier = Modifier.size(32.dp)
@@ -94,7 +113,7 @@ fun POICard(
                     )
                     Box(
                         modifier = Modifier
-                            .border(1.5.dp, colorToUse, RoundedCornerShape(6.dp))
+                            .border(1.5.dp, iconDetails.first, RoundedCornerShape(6.dp))
                             .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
                         Row{
@@ -125,6 +144,12 @@ fun POICard(
                     baseFontSizeSp = 14f,
                     forceFontWeight = FontWeight.SemiBold
                 )
+
+                AccessibleText(
+                    text = workingHoursText,
+                    baseFontSizeSp = 14f,
+                    forceFontWeight = FontWeight.SemiBold
+                )
             }
         },
         confirmButton = {
@@ -138,7 +163,7 @@ fun POICard(
                             onDirectionsClick()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorToUse,
+                            containerColor = iconDetails.first,
                             contentColor = Color.Black
                         )
 
@@ -151,4 +176,21 @@ fun POICard(
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = RoundedCornerShape(28.dp)
     )
+}
+
+
+
+fun getPOIColorAndDrawable(type: POIType): Pair<Color, Int>{
+
+    val (colorToUse, iconToUse) = when(type){
+        POIType.Cafe -> Pair(CafePink, R.drawable.cafe_icon)
+        POIType.Metro -> Pair(MetroBlue, R.drawable.metro_icon)
+        POIType.Restaurant -> Pair(RestaurantRed, R.drawable.restaurant_icon)
+        POIType.Museum -> Pair(MuseumYellow, R.drawable.museum_icon)
+        POIType.Grocery -> Pair(GroceryStoreOrange, R.drawable.grocery_icon)
+        POIType.Park -> Pair(ParkGreen, R.drawable.park_icon)
+    }
+
+    return Pair(colorToUse, iconToUse)
+
 }

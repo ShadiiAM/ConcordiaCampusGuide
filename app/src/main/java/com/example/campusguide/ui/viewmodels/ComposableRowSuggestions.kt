@@ -38,6 +38,7 @@ import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.POIType
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.Suggestion
+import com.example.campusguide.ui.components.getPOIColorAndDrawable
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
 
@@ -210,14 +211,7 @@ fun BuildingRow(
         }
 
         is OutsidePOI ->{
-            val iconToUse = when(suggestion.category){
-                POIType.Cafe -> R.drawable.cafe_icon
-                POIType.Metro -> R.drawable.metro_icon
-                POIType.Restaurant -> R.drawable.restaurant_icon
-                POIType.Museum -> R.drawable.museum_icon
-                POIType.Grocery -> R.drawable.grocery_icon
-                POIType.Park ->  R.drawable.park_icon
-            }
+            val iconToUse = getPOIColorAndDrawable(suggestion.category).second
 
             Row(
                 modifier = Modifier

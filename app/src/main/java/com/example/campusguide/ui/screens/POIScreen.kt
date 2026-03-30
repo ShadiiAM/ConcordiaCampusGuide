@@ -28,8 +28,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,9 +53,8 @@ import com.example.campusguide.R
 import com.example.campusguide.data.ALL_POI
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.OutsidePOI
-import com.example.campusguide.data.POIType
+import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.data.Suggestion
-import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
@@ -88,7 +85,6 @@ import com.example.campusguide.ui.screens.map.saveCampus
 import com.example.campusguide.ui.screens.map.zoomIn
 import com.example.campusguide.ui.screens.map.zoomOut
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
-import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.location.LocationCallback
@@ -101,24 +97,21 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import kotlin.collections.mutableListOf
 
 @Composable
 fun POIScreen(
-    searchQuery: String = "",
     topBarSelectedPOISuggestion: Suggestion? = null,
     onTopBarBuildingConsumed: () -> Unit = {},
-    topBarDirectionsDestinationBuilding: CampusBuilding? = null,
-    onTopBarDirectionsDestinationConsumed: () -> Unit = {},
     onBottomSearchClick: () -> Unit = {},
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
+    poiFilters: POIFilterValues = POIFilterValues()
 ) {
 
 
@@ -138,8 +131,6 @@ fun POIScreen(
 
     var selectedCampus by rememberSaveable { mutableStateOf(getSavedCampus(context)) }
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
-    var pendingSearchQuery by remember { mutableStateOf(searchQuery) }
-    var searchJob by remember { mutableStateOf<Job?>(null) }
     var controlsVisible = viewModel.controlsVisible
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -151,8 +142,6 @@ fun POIScreen(
     var routeRequestGeneration by remember { mutableIntStateOf(0) }
 
     val defaultOrigin by userLocationViewModel.effectiveOrigin.collectAsState()
-    // Track the selected building's LatLng for directions
-    var selectedBuildingLatLng by remember { mutableStateOf<LatLng?>(null) }
 
     // Autocomplete state (cross-campus always enabled per US-2.5 AC4)
     var originDisplayName by remember { mutableStateOf<String?>(null) }
@@ -170,11 +159,6 @@ fun POIScreen(
     // Reserved for US-3.2: enables removing/updating markers when switching campuses
     val poiMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedPOI by remember { mutableStateOf<OutsidePOI?>(null) }
-
-
-    var rating by remember { mutableDoubleStateOf(0.0) }
-    var distanceLimit by remember { mutableFloatStateOf(10000f) }
-    var categoriesIncluded = remember { mutableListOf<POIType>() }
 
 
     val locationSettingsLauncher = rememberLauncherForActivityResult(
@@ -458,26 +442,6 @@ fun POIScreen(
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Location services
     val fusedLocationProviderClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -518,9 +482,16 @@ fun POIScreen(
                             map.uiSettings.isMyLocationButtonEnabled = false
                             map.uiSettings.isZoomControlsEnabled = false
 
+                            val savedCampus = getSavedCampus(ctx)
+                            val initialLocation = when (savedCampus) {
+                                Campus.SGW -> LatLng(45.4972, -73.5789)
+                                Campus.LOYOLA -> LatLng(45.4582, -73.6402)
+                            }
+
+
                             map.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
-                                    defaultOrigin,
+                                    initialLocation,
                                     campusLevelZoom
                                 )
                             )
@@ -535,10 +506,14 @@ fun POIScreen(
                             }
 
 
-                            // Add POI markers (US-3.1)
+                            // Add POI markers and filter (EPIC 6)
+                            ALL_POI.forEach { poi ->
 
-                            if (distanceLimit >= 10000 && categoriesIncluded.isEmpty() && rating <= 0.0) {
-                                ALL_POI.forEach { poi ->
+                                if (poi.filterPOI(
+                                        defaultOrigin,
+                                        poiFilters
+                                    )
+                                ) {
                                     val poiIcon = MapMarkerFactory.create(ctx, poi.category.toString())
                                     val marker = map.addMarker(
                                         AdvancedMarkerOptions()
@@ -552,33 +527,6 @@ fun POIScreen(
                                         poiMarkerMap[poi.name] = marker
                                     }
                                 }
-                            } else {
-
-                                ALL_POI.forEach { poi ->
-
-                                    if (poi.filterPOI(
-                                            defaultOrigin,
-                                            distanceLimit,
-                                            categoriesIncluded,
-                                            rating
-                                        )
-                                    ) {
-                                        val poiIcon = MapMarkerFactory.create(ctx, poi.category.toString())
-                                        val marker = map.addMarker(
-                                            AdvancedMarkerOptions()
-                                                .position(poi.latLng)
-                                                .icon(poiIcon)
-                                                .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
-                                                .contentDescription(poi.name + " POI")
-                                        )
-                                        if (marker != null) {
-                                            marker.tag = poi
-                                            poiMarkerMap[poi.name] = marker
-                                        }
-                                    }
-                                }
-
-
                             }
 
                             // Marker click: handle shuttle stop taps (US-3.1)
@@ -607,6 +555,33 @@ fun POIScreen(
             )
 
 
+            LaunchedEffect(poiFilters) {
+                googleMap?.clear()
+                // Add POI markers and filter (EPIC 6)
+                ALL_POI.forEach { poi ->
+
+                    if (poi.filterPOI(
+                            defaultOrigin,
+                            poiFilters
+                        )
+                    ) {
+                        val poiIcon = MapMarkerFactory.create(context, poi.category.toString())
+                        val marker = googleMap?.addMarker(
+                            AdvancedMarkerOptions()
+                                .position(poi.latLng)
+                                .icon(poiIcon)
+                                .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
+                                .contentDescription(poi.name + " POI")
+                        )
+                        if (marker != null) {
+                            marker.tag = poi
+                            poiMarkerMap[poi.name] = marker
+                        }
+                    }
+                }
+
+            }
+
             selectedPOI?.let { poi ->
                 POICard(
                     poi = poi,
@@ -626,6 +601,7 @@ fun POIScreen(
                             )
                         )
                         selectedPOI = null
+                        topBarDestinationOverride = poi.name
                     }
                 )
             }
