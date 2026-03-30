@@ -556,7 +556,8 @@ fun POIScreen(
 
 
             LaunchedEffect(poiFilters) {
-                googleMap?.clear()
+                val map = googleMap ?: return@LaunchedEffect
+                map.clear()
                 // Add POI markers and filter (EPIC 6)
                 ALL_POI.forEach { poi ->
 
@@ -566,7 +567,7 @@ fun POIScreen(
                         )
                     ) {
                         val poiIcon = MapMarkerFactory.create(context, poi.category.toString())
-                        val marker = googleMap?.addMarker(
+                        val marker = map.addMarker(
                             AdvancedMarkerOptions()
                                 .position(poi.latLng)
                                 .icon(poiIcon)
