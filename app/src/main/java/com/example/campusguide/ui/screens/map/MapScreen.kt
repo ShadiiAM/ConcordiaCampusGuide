@@ -24,7 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.draw.clip
@@ -44,7 +43,7 @@ import androidx.core.app.ActivityCompat
 import com.example.campusguide.R
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
-import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.MapBottomSearchBar
 import com.example.campusguide.ui.components.MapControlsPanel
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.models.BuildingInfo
@@ -79,7 +78,6 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.MapMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
-import androidx.core.content.ContextCompat
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
@@ -196,10 +194,7 @@ fun MapScreen(
 
     // Get user location for default origin
     LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) return@LaunchedEffect
-
+        if (!hasLocationPermission(context)) return@LaunchedEffect
         userLocationViewModel.fetchUserLocation()
     }
 
@@ -1278,39 +1273,15 @@ fun MapScreen(
 
 
         // Campus Toggle + round search shortcut button (same row)
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 10.dp)
-                .ignoreFocusClearOnTouch(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable(onClick = onBottomSearchClick)
-                    .semantics { contentDescription = "Bottom search button" },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            CampusToggle(
-                selectedCampus = selectedCampus,
-                onCampusSelected = { campus ->
-                    selectedCampus = campus
-                    saveCampus(context, campus)
-                    switchCampus(campus)
-                },
-                showIcon = true
-            )
-        }
+        MapBottomSearchBar(
+            selectedCampus = selectedCampus,
+            onCampusSelected = { campus ->
+                selectedCampus = campus
+                saveCampus(context, campus)
+                switchCampus(campus)
+            },
+            onBottomSearchClick = onBottomSearchClick,
+        )
 
         // Map Controls
         MapControlsPanel(

@@ -48,7 +48,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import com.example.campusguide.ui.screens.map.hasLocationPermission
 import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
@@ -176,9 +176,7 @@ fun ConcordiaCampusGuideApp() {
     )
 
     LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) {
+        if (!hasLocationPermission(context)) {
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -186,7 +184,6 @@ fun ConcordiaCampusGuideApp() {
                 )
             )
         }
-
     }
 
     LaunchedEffect(directionsTopBarState.active) {

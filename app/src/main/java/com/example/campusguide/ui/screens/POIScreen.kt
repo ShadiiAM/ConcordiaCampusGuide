@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -33,7 +27,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
@@ -42,7 +35,6 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.R
 import com.example.campusguide.data.ALL_POI
@@ -52,10 +44,9 @@ import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
-import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.MapBottomSearchBar
 import com.example.campusguide.ui.components.MapControlsPanel
 import com.example.campusguide.ui.components.POICard
-import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.DirectionsStep
 import com.example.campusguide.ui.directions.DirectionsUiState
 import com.example.campusguide.ui.directions.GoogleRoutesRepository
@@ -72,6 +63,7 @@ import com.example.campusguide.ui.screens.map.canUseShuttle
 import com.example.campusguide.ui.screens.map.centerOnOrigin
 import com.example.campusguide.ui.screens.map.drawRoute
 import com.example.campusguide.ui.screens.map.getSavedCampus
+import com.example.campusguide.ui.screens.map.hasLocationPermission
 import com.example.campusguide.ui.screens.map.saveCampus
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
@@ -163,16 +155,7 @@ fun POIScreen(
 
     // Get user location for default origin
     LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) return@LaunchedEffect
-
+        if (!hasLocationPermission(context)) return@LaunchedEffect
         userLocationViewModel.fetchUserLocation()
     }
 
@@ -577,39 +560,15 @@ fun POIScreen(
 
 
         // Campus Toggle + round search shortcut button (same row)
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 10.dp)
-                .ignoreFocusClearOnTouch(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable(onClick = onBottomSearchClick)
-                    .semantics { contentDescription = "Bottom search button" },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            CampusToggle(
-                selectedCampus = selectedCampus,
-                onCampusSelected = { campus ->
-                    selectedCampus = campus
-                    saveCampus(context, campus)
-                    switchCampus(campus)
-                },
-                showIcon = true
-            )
-        }
+        MapBottomSearchBar(
+            selectedCampus = selectedCampus,
+            onCampusSelected = { campus ->
+                selectedCampus = campus
+                saveCampus(context, campus)
+                switchCampus(campus)
+            },
+            onBottomSearchClick = onBottomSearchClick,
+        )
 
         MapControlsPanel(
             googleMap = googleMap,

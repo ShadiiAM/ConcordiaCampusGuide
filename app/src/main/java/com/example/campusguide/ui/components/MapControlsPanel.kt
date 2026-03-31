@@ -1,5 +1,7 @@
 package com.example.campusguide.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -10,11 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -32,6 +39,43 @@ import com.example.campusguide.ui.screens.map.zoomIn
 import com.example.campusguide.ui.screens.map.zoomOut
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.GoogleMap
+
+@Composable
+fun BoxScope.MapBottomSearchBar(
+    selectedCampus: Campus,
+    onCampusSelected: (Campus) -> Unit,
+    onBottomSearchClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .align(Alignment.BottomStart)
+            .padding(start = 16.dp, bottom = 10.dp)
+            .ignoreFocusClearOnTouch(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .clickable(onClick = onBottomSearchClick)
+                .semantics { contentDescription = "Bottom search button" },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        CampusToggle(
+            selectedCampus = selectedCampus,
+            onCampusSelected = onCampusSelected,
+            showIcon = true
+        )
+    }
+}
 
 @Composable
 fun BoxScope.MapControlsPanel(

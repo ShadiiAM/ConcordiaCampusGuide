@@ -46,6 +46,16 @@ import java.util.concurrent.TimeUnit
 private const val PREFS_NAME = "campus_preferences"
 private const val KEY_SELECTED_CAMPUS = "selected_campus"
 
+internal fun hasLocationPermission(context: Context): Boolean {
+    val fineGranted = ActivityCompat.checkSelfPermission(
+        context, Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+    val coarseGranted = ActivityCompat.checkSelfPermission(
+        context, Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+    return fineGranted || coarseGranted
+}
+
 // Helper Functions
 internal fun getSavedCampus(context: Context): Campus {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
