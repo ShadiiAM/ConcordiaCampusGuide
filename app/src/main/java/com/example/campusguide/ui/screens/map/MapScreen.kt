@@ -34,11 +34,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -47,6 +45,7 @@ import com.example.campusguide.R
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.MapControlsPanel
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.models.BuildingInfo
 import com.example.campusguide.ui.directions.DirectionsStep
@@ -1314,140 +1313,12 @@ fun MapScreen(
         }
 
         // Map Controls
-        if (controlsVisible) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .testTag("mapControls")
-                    .semantics { contentDescription = "Map Controls" }
-                    .padding(end = 16.dp, bottom = 60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { zoomIn(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_in_button),
-                        contentDescription = "Zoom In",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { moveLeft(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.left_button),
-                            contentDescription = "Left",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        IconButton(
-                            onClick = { moveUp(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.up_button),
-                                contentDescription = "Up",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.recenter_button),
-                                contentDescription = "Recenter",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { moveDown(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.down_button),
-                                contentDescription = "Down",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = { moveRight(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.right_button),
-                            contentDescription = "Right",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = { zoomOut(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_out_button),
-                        contentDescription = "Zoom Out",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                IconButton(
-                    onClick = { viewModel.controlsVisible = !controlsVisible },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.panel_button),
-                        contentDescription = "Toggle Controls",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        } else {
-            IconButton(
-                onClick = { viewModel.controlsVisible = true },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 60.dp)
-                    .size(50.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.panel_button),
-                    contentDescription = "Toggle Controls",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        MapControlsPanel(
+            googleMap = googleMap,
+            fusedLocationProviderClient = fusedLocationProviderClient,
+            controlsVisible = controlsVisible,
+            onToggleControls = { viewModel.controlsVisible = !controlsVisible },
+        )
 
         // Building Details Bottom Sheet
         selectedBuildingInfo?.let { info ->

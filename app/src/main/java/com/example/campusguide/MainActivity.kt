@@ -218,6 +218,17 @@ fun ConcordiaCampusGuideApp() {
     }
 
 
+    val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+        BuildingRow(
+            suggestion = suggestion,
+            nearestId = nearestId,
+            userLatLng = userLatLng,
+            onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
+            onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
+            onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
+        )
+    }
+
     when {
         showAccessibility -> {
             AccessibilityScreen(
@@ -372,17 +383,6 @@ fun ConcordiaCampusGuideApp() {
 
                                                     if (directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION) {
 
-                                                        val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                            BuildingRow(
-                                                                suggestion = suggestion,
-                                                                nearestId =  nearestId,
-                                                                userLatLng = userLatLng,
-                                                                onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
-                                                                onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
-                                                                onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
-                                                            )
-                                                        }
-
                                                         if(!mapViewmodel.searchVanish){
 
                                                             SearchBarWithProfile(
@@ -522,17 +522,6 @@ fun ConcordiaCampusGuideApp() {
                                             )
                                         } else{
 
-                                            val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                BuildingRow(
-                                                    suggestion = suggestion,
-                                                    nearestId =  nearestId,
-                                                    userLatLng = userLatLng,
-                                                    onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
-                                                    onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
-                                                    onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
-                                                )
-                                            }
-
                                             SearchBarWithProfile(
                                                 modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
                                                 focusRequester = searchFocusRequester,
@@ -613,17 +602,6 @@ fun ConcordiaCampusGuideApp() {
                                         }else{
 
                                             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-
-                                                val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                    BuildingRow(
-                                                        suggestion = suggestion,
-                                                        nearestId =  nearestId,
-                                                        userLatLng = userLatLng,
-                                                        onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
-                                                        onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
-                                                        onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
-                                                    )
-                                                }
 
                                                 SearchBarWithProfile(
                                                     modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),

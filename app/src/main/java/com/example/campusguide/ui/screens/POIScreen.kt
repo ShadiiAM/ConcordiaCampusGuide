@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -37,10 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -58,6 +53,7 @@ import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.MapControlsPanel
 import com.example.campusguide.ui.components.POICard
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.DirectionsStep
@@ -76,14 +72,7 @@ import com.example.campusguide.ui.screens.map.canUseShuttle
 import com.example.campusguide.ui.screens.map.centerOnOrigin
 import com.example.campusguide.ui.screens.map.drawRoute
 import com.example.campusguide.ui.screens.map.getSavedCampus
-import com.example.campusguide.ui.screens.map.moveDown
-import com.example.campusguide.ui.screens.map.moveLeft
-import com.example.campusguide.ui.screens.map.moveRight
-import com.example.campusguide.ui.screens.map.moveUp
-import com.example.campusguide.ui.screens.map.recenter
 import com.example.campusguide.ui.screens.map.saveCampus
-import com.example.campusguide.ui.screens.map.zoomIn
-import com.example.campusguide.ui.screens.map.zoomOut
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
@@ -507,27 +496,7 @@ fun POIScreen(
 
 
                             // Add POI markers and filter (EPIC 6)
-                            ALL_POI.forEach { poi ->
-
-                                if (poi.filterPOI(
-                                        defaultOrigin,
-                                        poiFilters
-                                    )
-                                ) {
-                                    val poiIcon = MapMarkerFactory.create(ctx, poi.category.toString())
-                                    val marker = map.addMarker(
-                                        AdvancedMarkerOptions()
-                                            .position(poi.latLng)
-                                            .icon(poiIcon)
-                                            .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
-                                            .contentDescription(poi.name + " POI")
-                                    )
-                                    if (marker != null) {
-                                        marker.tag = poi
-                                        poiMarkerMap[poi.name] = marker
-                                    }
-                                }
-                            }
+                            addPOIMarkersToMap(map, ctx, defaultOrigin, poiFilters, poiMarkerMap)
 
                             // Marker click: handle shuttle stop taps (US-3.1)
                             // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
@@ -559,28 +528,7 @@ fun POIScreen(
                 val map = googleMap ?: return@LaunchedEffect
                 map.clear()
                 // Add POI markers and filter (EPIC 6)
-                ALL_POI.forEach { poi ->
-
-                    if (poi.filterPOI(
-                            defaultOrigin,
-                            poiFilters
-                        )
-                    ) {
-                        val poiIcon = MapMarkerFactory.create(context, poi.category.toString())
-                        val marker = map.addMarker(
-                            AdvancedMarkerOptions()
-                                .position(poi.latLng)
-                                .icon(poiIcon)
-                                .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
-                                .contentDescription(poi.name + " POI")
-                        )
-                        if (marker != null) {
-                            marker.tag = poi
-                            poiMarkerMap[poi.name] = marker
-                        }
-                    }
-                }
-
+                addPOIMarkersToMap(map, context, defaultOrigin, poiFilters, poiMarkerMap)
             }
 
             selectedPOI?.let { poi ->
@@ -663,140 +611,37 @@ fun POIScreen(
             )
         }
 
-        if (controlsVisible) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .testTag("mapControls")
-                    .semantics { contentDescription = "Map Controls" }
-                    .padding(end = 16.dp, bottom = 60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { zoomIn(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_in_button),
-                        contentDescription = "Zoom In",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+        MapControlsPanel(
+            googleMap = googleMap,
+            fusedLocationProviderClient = fusedLocationProviderClient,
+            controlsVisible = controlsVisible,
+            onToggleControls = { viewModel.controlsVisible = !controlsVisible },
+        )
+    }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { moveLeft(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.left_button),
-                            contentDescription = "Left",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+}
 
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        IconButton(
-                            onClick = { moveUp(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.up_button),
-                                contentDescription = "Up",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.recenter_button),
-                                contentDescription = "Recenter",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { moveDown(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.down_button),
-                                contentDescription = "Down",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = { moveRight(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.right_button),
-                            contentDescription = "Right",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = { zoomOut(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_out_button),
-                        contentDescription = "Zoom Out",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                IconButton(
-                    onClick = { viewModel.controlsVisible = !controlsVisible },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.panel_button),
-                        contentDescription = "Toggle Controls",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        } else {
-            IconButton(
-                onClick = { viewModel.controlsVisible = true },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 60.dp)
-                    .size(50.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.panel_button),
-                    contentDescription = "Toggle Controls",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.fillMaxSize()
-                )
+private fun addPOIMarkersToMap(
+    map: GoogleMap,
+    context: android.content.Context,
+    defaultOrigin: com.google.android.gms.maps.model.LatLng,
+    poiFilters: POIFilterValues,
+    poiMarkerMap: MutableMap<String, com.google.android.gms.maps.model.Marker>,
+) {
+    ALL_POI.forEach { poi ->
+        if (poi.filterPOI(defaultOrigin, poiFilters)) {
+            val poiIcon = MapMarkerFactory.create(context, poi.category.toString())
+            val marker = map.addMarker(
+                AdvancedMarkerOptions()
+                    .position(poi.latLng)
+                    .icon(poiIcon)
+                    .anchor(0.5f, 1.0f) // tip of pinpoints to coordinate
+                    .contentDescription(poi.name + " POI")
+            )
+            if (marker != null) {
+                marker.tag = poi
+                poiMarkerMap[poi.name] = marker
             }
         }
     }
-
 }
