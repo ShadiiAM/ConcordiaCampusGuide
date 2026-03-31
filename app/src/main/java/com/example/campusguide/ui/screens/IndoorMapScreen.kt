@@ -691,7 +691,11 @@ private fun FloorMapContent(
                 modifier           = Modifier.fillMaxSize()
             )
 
-            val poisOnFloor = graph.nodes.filter { it.type == IndoorNodeType.POI }
+            val poisOnFloor = graph.nodes.filter {
+                it.type == IndoorNodeType.POI ||
+                it.type == IndoorNodeType.ELEVATOR ||
+                it.type == IndoorNodeType.ESCALATOR
+            }
             val poiAccessibilityDesc = if (poisOnFloor.isEmpty()) {
                 "Floor map overlay. No points of interest on this floor."
             } else {
