@@ -256,4 +256,3 @@ ConcordiaCampusGuide/
 └── settings.gradle.kts
 ```
 
-
