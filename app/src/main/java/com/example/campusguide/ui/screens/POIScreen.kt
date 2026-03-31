@@ -196,56 +196,28 @@ fun POIScreen(
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         val departure = canUseShuttle(step.origin, step.destination, travelMode)
-        if(departure != null){
-            drawRouteResult =
-                drawRoute(
-                    step,
-                    step.origin,
-                    step.destination,
-                    "SHUTTLE",
-                    googleMap,
-                    getDirectionsUiState = { directionsUiState },
-                    onDirectionsUiStateChange = { directionsUiState = it },
-                    repo,
-                    isCrossCampus,
-                    requestGeneration,
-                    routeRequestGeneration,
-                    isIndoorOutdoorFlow,
-                    destinationBuilding,
-                    indoorOutdoorFallbackParts,
-                    onLegFallbackMessage = { legFallbackMessage = it },
-                    defaultOrigin,
 
-                    legLabels = legLabels,
-                    onLegLabels = { legLabels = it },
-                    departure = departure
-                )
-
-        }
-        else {
-            drawRouteResult =
-                drawRoute(
-                    step,
-                    step.origin,
-                    step.destination,
-                    travelMode.name,
-                    googleMap,
-                    getDirectionsUiState = { directionsUiState },
-                    onDirectionsUiStateChange = { directionsUiState = it },
-                    repo,
-                    isCrossCampus,
-                    requestGeneration,
-                    routeRequestGeneration,
-                    isIndoorOutdoorFlow,
-                    destinationBuilding,
-                    indoorOutdoorFallbackParts,
-                    onLegFallbackMessage = { legFallbackMessage = it },
-                    defaultOrigin,
-                    legLabels = legLabels,
-                    onLegLabels = { legLabels = it }
-                )
-
-        }
+        drawRouteResult = drawRoute(
+            step,
+            step.origin,
+            step.destination,
+            if (departure != null) "SHUTTLE" else travelMode.name,
+            googleMap,
+            getDirectionsUiState = { directionsUiState },
+            onDirectionsUiStateChange = { directionsUiState = it },
+            repo,
+            isCrossCampus,
+            requestGeneration,
+            routeRequestGeneration,
+            isIndoorOutdoorFlow,
+            destinationBuilding,
+            indoorOutdoorFallbackParts,
+            onLegFallbackMessage = { legFallbackMessage = it },
+            defaultOrigin,
+            legLabels = legLabels,
+            onLegLabels = { legLabels = it },
+            departure = departure
+        )
 
         routePolylines.addAll(drawRouteResult.polylines)
 
@@ -329,62 +301,45 @@ fun POIScreen(
     ) {
 
         when (val step = directionsUiState.step) {
-            is DirectionsStep.PlanRoute -> {
-                // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding,
-                    destinationBuilding, step.origin)
-                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
+            is DirectionsStep.PlanRoute, is DirectionsStep.ShowingRoute -> {
+                val origin = if (step is DirectionsStep.PlanRoute) step.origin else (step as DirectionsStep.ShowingRoute).origin
+                val destination = if (step is DirectionsStep.PlanRoute) step.destination else (step as DirectionsStep.ShowingRoute).destination
+                val buildingHit = if (step is DirectionsStep.PlanRoute) step.buildingHit else (step as DirectionsStep.ShowingRoute).buildingHit
 
-                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
+                val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, origin)
+                val canUseShuttle = canUseShuttle(origin, destination, travelMode) != null
+                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(destination))
 
-                onDirectionsTopBarState(
-                    DirectionsTopBarState(
-                        active = true,
-                        originLabel = topBarOriginOverride ?: (originDisplayName ?: "Your location"),
-                        destinationLabel = topBarDestinationOverride ?: buildingTitle(step.buildingHit, step.destination),
-                        isCrossCampus = isCrossCampus,
-                        selectedMode = travelMode,
-                        errorMessage = directionsUiState.errorMessage,
-                        legLabels = legLabels,
-                        legFallbackMessage = legFallbackMessage,
-                        isLoadingRoute = directionsUiState.isLoadingRoute,
-                        showActions = true,
-                        canUseShuttle = canUseShuttle,
-                        shuttleStatus = shuttleStatus,
-                        goEnabled = true,
-                        showTravelModes = true,
-                        goLabel = "Go",
-                        cancelLabel = "Cancel",
-                    )
+                val baseState = DirectionsTopBarState(
+                    active = true,
+                    originLabel = topBarOriginOverride ?: (originDisplayName ?: "Your location"),
+                    destinationLabel = topBarDestinationOverride ?: buildingTitle(buildingHit, destination),
+                    isCrossCampus = isCrossCampus,
+                    selectedMode = travelMode,
+                    legLabels = legLabels,
+                    legFallbackMessage = legFallbackMessage,
+                    canUseShuttle = canUseShuttle,
+                    shuttleStatus = shuttleStatus,
+                    goEnabled = true,
+                    showTravelModes = true,
+                    goLabel = "Go",
+                    cancelLabel = "Cancel",
                 )
-            }
-            is DirectionsStep.ShowingRoute -> {
-                // Automatically detect cross-campus routes
-                val isCrossCampus = isCrossCampusRoute(originBuilding,
-                    destinationBuilding, step.origin)
-                val canUseShuttle = canUseShuttle(step.origin, step.destination, travelMode) != null
-                val shuttleStatus = ShuttleSchedule.nextDeparture(detectCampus(step.destination))
 
                 onDirectionsTopBarState(
-                    DirectionsTopBarState(
-                        active = true,
-                        originLabel = topBarOriginOverride ?: (originDisplayName ?: "Your location"),
-                        destinationLabel = topBarDestinationOverride ?: buildingTitle(step.buildingHit, step.destination),
-                        isCrossCampus = isCrossCampus,
-                        selectedMode = travelMode,
-                        routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
-                        legLabels = legLabels,
-                        legFallbackMessage = legFallbackMessage,
-                        showActions = false,
-                        route = step.route,
-                        canUseShuttle = canUseShuttle,
-                        currentSteps = step.route.legs.firstOrNull(),
-                        shuttleStatus = shuttleStatus,
-                        goEnabled = true,
-                        showTravelModes = true,
-                        goLabel = "Go",
-                        cancelLabel = "Cancel",
-                    )
+                    when (step) {
+                        is DirectionsStep.PlanRoute -> baseState.copy(
+                            showActions = true,
+                            errorMessage = directionsUiState.errorMessage,
+                            isLoadingRoute = directionsUiState.isLoadingRoute,
+                            )
+                        is DirectionsStep.ShowingRoute -> baseState.copy(
+                            showActions = false,
+                            routeSummary = buildRouteSummary(step.route.distanceMeters, step.route.durationSeconds),
+                            route = step.route,
+                            currentSteps = step.route.legs.firstOrNull(),
+                        )
+                    }
                 )
             }
             else -> {
