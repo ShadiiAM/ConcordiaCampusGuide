@@ -137,7 +137,6 @@ fun IndoorMapScreen(
     }
 
     var infoNode by remember { mutableStateOf<IndoorNode?>(null) }
-    // POI info popup
     var poiInfoNode by remember { mutableStateOf<IndoorNode?>(null) }
 
     // Keep building state stable across overlay open/close and apply incoming triggers atomically.
@@ -894,7 +893,6 @@ private fun NodeInfoDialog(node: IndoorNode, onDismiss: () -> Unit) {
     )
 }
 
-// POI info popup
 @Composable
 private fun PoiInfoPopup(
     node: IndoorNode,
@@ -1085,9 +1083,8 @@ private fun DrawScope.drawPoiIcon(
     radius: Float,
     type: IndoorNodeType = IndoorNodeType.POI
 ) {
-    val fill    = PoiColor
-    val outline = Color.White
-    val stroke  = Stroke(width = radius * 0.22f)
+    val fill   = PoiColor
+    val stroke = Stroke(width = radius * 0.22f)
 
     when {
         type == IndoorNodeType.ELEVATOR -> {
@@ -1095,8 +1092,7 @@ private fun DrawScope.drawPoiIcon(
             val boxW = radius * 0.7f
             val boxLeft = cx - boxW / 2f
             val boxTop  = cy - boxH / 2f
-            drawRect(color = outline, topLeft = Offset(boxLeft, boxTop), size = Size(boxW, boxH), style = stroke)
-            drawRect(color = fill,    topLeft = Offset(boxLeft, boxTop), size = Size(boxW, boxH))
+            drawRect(color = fill, topLeft = Offset(boxLeft, boxTop), size = Size(boxW, boxH))
             val arrowW = boxW * 0.35f
             val upTip   = Offset(cx, boxTop + boxH * 0.18f)
             val upLeft  = Offset(cx - arrowW, boxTop + boxH * 0.40f)
@@ -1104,10 +1100,10 @@ private fun DrawScope.drawPoiIcon(
             val downTip   = Offset(cx, boxTop + boxH * 0.82f)
             val downLeft  = Offset(cx - arrowW, boxTop + boxH * 0.60f)
             val downRight = Offset(cx + arrowW, boxTop + boxH * 0.60f)
-            val upArrow = Path().apply { moveTo(upTip.x, upTip.y); lineTo(upLeft.x, upLeft.y); lineTo(upRight.x, upRight.y); close() }
+            val upArrow   = Path().apply { moveTo(upTip.x, upTip.y); lineTo(upLeft.x, upLeft.y); lineTo(upRight.x, upRight.y); close() }
             val downArrow = Path().apply { moveTo(downTip.x, downTip.y); lineTo(downLeft.x, downLeft.y); lineTo(downRight.x, downRight.y); close() }
-            drawPath(path = upArrow,   color = outline)
-            drawPath(path = downArrow, color = outline)
+            drawPath(path = upArrow,   color = Color.White)
+            drawPath(path = downArrow, color = Color.White)
         }
 
         type == IndoorNodeType.ESCALATOR -> {
@@ -1117,27 +1113,23 @@ private fun DrawScope.drawPoiIcon(
             val startY = cy + radius * 0.20f
             for (i in 0..2) {
                 val topLeft = Offset(startX + i * stepW, startY - i * stepH)
-                val sz      = Size(stepW, stepH)
-                drawRect(color = outline, topLeft = topLeft, size = Size(sz.width + stroke.width, sz.height + stroke.width), style = stroke)
-                drawRect(color = fill,    topLeft = topLeft, size = sz)
+                drawRect(color = fill, topLeft = topLeft, size = Size(stepW, stepH))
             }
             val lineStart = Offset(startX, startY + stepH)
             val lineEnd   = Offset(startX + 3 * stepW, startY - 2 * stepH)
-            drawLine(color = outline, start = lineStart, end = lineEnd, strokeWidth = stroke.width)
+            drawLine(color = Color.White, start = lineStart, end = lineEnd, strokeWidth = stroke.width)
         }
 
         label.startsWith("BATHROOM") -> {
             val headR  = radius * 0.28f
             val headCy = cy - radius * 0.36f
-            drawCircle(color = outline, radius = headR + stroke.width, center = Offset(cx, headCy))
-            drawCircle(color = fill,    radius = headR,                 center = Offset(cx, headCy))
+            drawCircle(color = fill, radius = headR, center = Offset(cx, headCy))
             val bodyPath = Path().apply {
                 moveTo(cx,                  cy - radius * 0.05f)
                 lineTo(cx - radius * 0.32f, cy + radius * 0.54f)
                 lineTo(cx + radius * 0.32f, cy + radius * 0.54f)
                 close()
             }
-            drawPath(path = bodyPath, color = outline, style = stroke)
             drawPath(path = bodyPath, color = fill)
         }
 
@@ -1156,7 +1148,6 @@ private fun DrawScope.drawPoiIcon(
                 )
                 close()
             }
-            drawPath(path = dropPath, color = outline, style = stroke)
             drawPath(path = dropPath, color = fill)
         }
 
@@ -1171,8 +1162,7 @@ private fun DrawScope.drawPoiIcon(
                 lineTo(cx + s * 1.5f, cy - s * 0.5f)
                 lineTo(cx + s * 1.5f, cy - s * 1.5f)
             }
-            drawPath(path = stairPath, color = outline, style = Stroke(width = stroke.width * 1.4f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
-            drawPath(path = stairPath, color = fill,    style = Stroke(width = stroke.width * 0.7f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
+            drawPath(path = stairPath, color = fill, style = Stroke(width = stroke.width * 0.7f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
         }
     }
 }
