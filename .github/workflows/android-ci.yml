@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build-test-lint:
-    runs-on: [self-hosted, X64, Linux]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -46,6 +46,8 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Unit tests (Debug)
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+UseG1GC"
         run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: Android Lint (Debug)
