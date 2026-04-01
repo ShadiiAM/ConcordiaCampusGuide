@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 
 
 sealed class Suggestion(
-    open val campus: Campus?
+    open val campus: Campus? = null
 
 ) {
 

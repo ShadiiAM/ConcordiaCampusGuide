@@ -13,7 +13,7 @@ concurrency:
 jobs:
   lint:
     name: Android Lint
-    runs-on: [self-hosted, X64, Linux]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
@@ -56,7 +56,7 @@ jobs:
   test-and-coverage:
     name: Tests and Coverage
     needs: lint
-    runs-on: [self-hosted, X64, Linux]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
