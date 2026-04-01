@@ -132,14 +132,7 @@ object CrossFloorRouter {
 
         for ((floor, graph) in graphs) {
             graph.nodes
-                .filter { node ->
-                    node.type == transferType &&
-                            (
-                                    transferType != IndoorNodeType.ESCALATOR ||
-                                            (goingUp && node.label.equals("ESCALATOR UP", ignoreCase = true)) ||
-                                            (!goingUp && node.label.equals("ESCALATOR DOWN", ignoreCase = true))
-                                    )
-                }
+                .filter { node -> node.type == transferType }
                 .forEach { transferNode ->
                     val anchor = addAnchor(transferNode, isTransfer = true)
                     transferAnchorsByFloor.getOrPut(floor) { mutableListOf() }.add(anchor)
