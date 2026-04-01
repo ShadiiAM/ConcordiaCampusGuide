@@ -76,7 +76,8 @@ fun <T> SearchBarWithProfile(
 
     suggestionKey: ((T) -> Any)? = null,
     suggestionContent: @Composable (T) -> Unit = {},
-    showProfile: Boolean = true
+    showProfile: Boolean = true,
+    onFocusChange: (Boolean) -> Unit = {},
 ) {
     val textFocusRequester = focusRequester ?: remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
@@ -127,6 +128,7 @@ fun <T> SearchBarWithProfile(
                             .focusRequester(textFocusRequester)
                             .onFocusChanged { focusState ->
                                 isFocused = focusState.isFocused
+                                onFocusChange(isFocused)
                             },
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
