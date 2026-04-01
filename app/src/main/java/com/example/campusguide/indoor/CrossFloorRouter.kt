@@ -128,9 +128,18 @@ object CrossFloorRouter {
         val endAnchor = addAnchor(destinationNode, isTransfer = false)
 
         val transferAnchorsByFloor = mutableMapOf<Int, MutableList<Anchor>>()
+        val goingUp = destinationFloorGraph.floor > originFloorGraph.floor
+
         for ((floor, graph) in graphs) {
             graph.nodes
-                .filter { it.type == transferType }
+                .filter { node ->
+                    node.type == transferType &&
+                            (
+                                    transferType != IndoorNodeType.ESCALATOR ||
+                                            (goingUp && node.label.equals("ESCALATOR UP", ignoreCase = true)) ||
+                                            (!goingUp && node.label.equals("ESCALATOR DOWN", ignoreCase = true))
+                                    )
+                }
                 .forEach { transferNode ->
                     val anchor = addAnchor(transferNode, isTransfer = true)
                     transferAnchorsByFloor.getOrPut(floor) { mutableListOf() }.add(anchor)

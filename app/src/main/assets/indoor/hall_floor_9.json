@@ -1377,9 +1377,9 @@
     },
     {
       "id": "H-9-ESCALATOR-DOWN-2",
-      "label": "ESCALATOR UP",
-      "x": 486.74,
-      "y": 446.77,
+      "label": "ESCALATOR DOWN",
+      "x": 490.32,
+      "y": 438.45,
       "type": "ESCALATOR",
       "floor": 9,
       "buildingCode": "H",
@@ -2236,7 +2236,7 @@
     {
       "fromId": "H-9-ESCALATOR-DOWN-2",
       "toId": "H-9-H3",
-      "weight": 56.23,
+      "weight": 47.48,
       "isAccessible": true
     }
   ]

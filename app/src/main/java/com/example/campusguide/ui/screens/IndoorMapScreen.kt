@@ -962,7 +962,8 @@ private fun formatIndoorTopCardLabel(node: IndoorNode?): String? {
         node.type == IndoorNodeType.STAIRCASE ||
         node.type == IndoorNodeType.ELEVATOR ||
         node.type == IndoorNodeType.RAMP ||
-        node.type == IndoorNodeType.POI
+        node.type == IndoorNodeType.POI ||
+        node.type == IndoorNodeType.ENTRY
     ) {
         return node.label
     }
