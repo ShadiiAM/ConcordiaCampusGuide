@@ -76,16 +76,6 @@
       "description": null
     },
     {
-      "id": "H-8-ESCALATOR-DOWN",
-      "label": "ESCALATOR DOWN",
-      "x": 532.8,
-      "y": 378.39,
-      "type": "ESCALATOR",
-      "floor": 8,
-      "buildingCode": "H",
-      "description": null
-    },
-    {
       "id": "H-8-812",
       "label": "ROOM",
       "x": 401.82,
@@ -936,16 +926,6 @@
       "description": null
     },
     {
-      "id": "H-8-ESCALATOR-UP-23",
-      "label": "ESCALATOR UP",
-      "x": 538.64,
-      "y": 605.13,
-      "type": "ESCALATOR",
-      "floor": 8,
-      "buildingCode": "H",
-      "description": null
-    },
-    {
       "id": "H-8-H42",
       "label": "HALLWAY JUNCTION",
       "x": 846.24,
@@ -1044,15 +1024,29 @@
       "floor": 8,
       "buildingCode": "H",
       "description": null
+    },
+    {
+      "id": "H-8-ESCALATOR-UP-2",
+      "label": "ESCALATOR UP",
+      "x": 541.61,
+      "y": 410.64,
+      "type": "ESCALATOR",
+      "floor": 8,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-8-ESCALATOR-DOWN-2",
+      "label": "ESCALATOR DOWN",
+      "x": 538.56,
+      "y": 584.51,
+      "type": "ESCALATOR",
+      "floor": 8,
+      "buildingCode": "H",
+      "description": null
     }
   ],
   "edges": [
-    {
-      "fromId": "H-8-ESCALATOR-DOWN",
-      "toId": "H-8-H9",
-      "weight": 63.42,
-      "isAccessible": true
-    },
     {
       "fromId": "H-8-H11",
       "toId": "H-8-H10",
@@ -1264,12 +1258,6 @@
       "isAccessible": true
     },
     {
-      "fromId": "H-8-ESCALATOR-UP-23",
-      "toId": "H-8-H40",
-      "weight": 67.82,
-      "isAccessible": true
-    },
-    {
       "fromId": "H-8-H28",
       "toId": "H-8-H42",
       "weight": 102.34,
@@ -1279,18 +1267,6 @@
       "fromId": "H-8-H42",
       "toId": "H-8-H30",
       "weight": 74.52,
-      "isAccessible": true
-    },
-    {
-      "fromId": "H-8-H42",
-      "toId": "H-8-ESCALATOR-UP-23",
-      "weight": 307.93,
-      "isAccessible": true
-    },
-    {
-      "fromId": "H-8-H40",
-      "toId": "H-8-H43",
-      "weight": 162.5,
       "isAccessible": true
     },
     {
@@ -1693,6 +1669,30 @@
       "fromId": "H-8-822",
       "toId": "H-8-H17",
       "weight": 83.66,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-8-H45",
+      "toId": "H-8-H40",
+      "weight": 163.85,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-8-ESCALATOR-DOWN-2",
+      "toId": "H-8-H40",
+      "weight": 73.34,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-8-H43",
+      "toId": "H-8-ESCALATOR-DOWN-2",
+      "weight": 100.49,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-8-H9",
+      "toId": "H-8-ESCALATOR-UP-2",
+      "weight": 79.57,
       "isAccessible": true
     }
   ]

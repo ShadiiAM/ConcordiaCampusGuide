@@ -958,6 +958,16 @@ private fun findNearestNode(
 private fun formatIndoorTopCardLabel(node: IndoorNode?): String? {
     if (node == null) return null
 
+    if (node.type == IndoorNodeType.ESCALATOR ||
+        node.type == IndoorNodeType.STAIRCASE ||
+        node.type == IndoorNodeType.ELEVATOR ||
+        node.type == IndoorNodeType.RAMP ||
+        node.type == IndoorNodeType.POI ||
+        node.type == IndoorNodeType.ENTRY
+    ) {
+        return node.label
+    }
+
     val idParts = node.id.split("-").filter { it.isNotBlank() }
     val roomPart = idParts.lastOrNull()?.trim()
     val buildingPart = node.buildingCode.trim().uppercase()
