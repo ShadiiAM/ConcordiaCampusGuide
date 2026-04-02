@@ -35,7 +35,6 @@ import com.example.campusguide.R
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Indoor
 import com.example.campusguide.data.OutsidePOI
-import com.example.campusguide.data.POIType
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.getPOIColorAndDrawable
@@ -46,6 +45,8 @@ import com.google.android.gms.maps.model.LatLng
 fun BuildingRow(
     suggestion: Suggestion,
     nearestId: String?,
+    nearestPOIName: String?,
+
     userLatLng: LatLng?,
     onSuggestionSelected: (Suggestion) -> Unit,
     onIndoorSetAsStart: (Indoor) -> Unit,
@@ -212,7 +213,7 @@ fun BuildingRow(
 
         is OutsidePOI ->{
             val iconToUse = getPOIColorAndDrawable(suggestion.category).second
-
+            val isNearest = suggestion.name == nearestPOIName
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -239,10 +240,32 @@ fun BuildingRow(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text(
-                        suggestion.name,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (isNearest) {
+                            Surface(
+                                shape = RoundedCornerShape(4.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.border(
+                                    width = 1.5.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                            ) {
+                                Text(
+                                    text = "Nearest",
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                            Spacer(Modifier.width(6.dp))
+                        }
+                        Text(
+                            suggestion.name,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                     Text(
                         suggestion.address,
                         style = MaterialTheme.typography.labelSmall,

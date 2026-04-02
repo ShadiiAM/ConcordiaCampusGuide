@@ -270,3 +270,8 @@ fun fullPOISuggestions(
 }
 
 
+fun find(userLatLng: LatLng, pois: List<OutsidePOI>): String? {
+    if (pois.isEmpty()) return null
+
+    return pois.minByOrNull { distanceBetween(userLatLng, it.latLng) }?.name
+}
