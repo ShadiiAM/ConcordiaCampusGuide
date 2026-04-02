@@ -121,23 +121,7 @@ fun BuildingRow(
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (isNearest) {
-                                Surface(
-                                    shape = RoundedCornerShape(4.dp),
-                                    color = MaterialTheme.colorScheme.surface,
-                                    modifier = Modifier.border(
-                                        width = 1.5.dp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                ) {
-                                    Text(
-                                        text = "Nearest",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                    )
-                                }
+                                NearestBadge()
                                 Spacer(Modifier.width(6.dp))
                             }
                             Text(
@@ -242,23 +226,7 @@ fun BuildingRow(
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (isNearest) {
-                            Surface(
-                                shape = RoundedCornerShape(4.dp),
-                                color = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.border(
-                                    width = 1.5.dp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(4.dp)
-                                )
-                            ) {
-                                Text(
-                                    text = "Nearest",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
+                            NearestBadge()
                             Spacer(Modifier.width(6.dp))
                         }
                         Text(
@@ -278,4 +246,26 @@ fun BuildingRow(
         }
     }
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+
+@Composable
+private fun NearestBadge() {
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.border(
+            width = 1.5.dp,
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(4.dp)
+        )
+    ) {
+        Text(
+            text = "Nearest",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
+    }
 }
