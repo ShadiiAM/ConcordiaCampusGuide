@@ -398,14 +398,13 @@ fun MapScreen(
         val indoorOrigin = indoorState?.indoorOriginNode ?: if (indoorState == null) latestIndoorOriginNode else null
         val indoorDestination = indoorState?.indoorDestinationNode ?: if (indoorState == null) latestIndoorDestinationNode else null
 
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
-
         if (
             indoorBuildingCode != null &&
             indoorOrigin != null &&
             indoorDestination != null &&
             !indoorOrigin.buildingCode.equals(indoorDestination.buildingCode, ignoreCase = true)
         ) {
+            directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
             mapTapFocusNodeTrigger = null
             mapTapSetStartNodeTrigger = null
             mapTapSetDestNodeTrigger = null
@@ -420,12 +419,12 @@ fun MapScreen(
         }
 
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
         var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
 
         centerOnOrigin(googleMap, step.origin, context)
 
         val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         val departure = canUseShuttle(step.origin, step.destination, travelMode)
         if(departure != null){
@@ -525,6 +524,7 @@ fun MapScreen(
         topBarDestinationOverride = null
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
+            isLoadingRoute = false,
             errorMessage = null,
         )
         isPickingOrigin = false
