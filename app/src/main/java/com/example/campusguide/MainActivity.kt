@@ -24,10 +24,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -66,7 +74,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
+import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.Course
+import com.example.campusguide.data.Indoor
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.components.FocusClearWrapper
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
@@ -137,7 +148,8 @@ fun ConcordiaCampusGuideApp() {
     val nearestId by userLocationViewModel.nearestId.collectAsState()
 
     val mapViewmodel: MapSearchViewModel = viewModel()
-    var showProfile by remember {mutableStateOf(false)}
+    var showProfile by remember { mutableStateOf(false) }
+    var unknownBuildingCourse by remember { mutableStateOf<Course?>(null) }
 
     var currentDestination = remember { mutableStateOf(AppDestinations.MAP) }
 
@@ -536,7 +548,48 @@ fun ConcordiaCampusGuideApp() {
 
 
                                     AppDestinations.CALENDAR -> {
-                                        CalendarScreen()
+                                        CalendarScreen(
+                                            onDirectionsToCourse = { course ->
+                                                val indoorResults = if (course.room.isNotBlank() && course.buildingCode.isNotBlank()) {
+                                                    IndoorRoomSearchService.search(
+                                                        query = course.room,
+                                                        scope = IndoorRoomSearchService.Scope.Building,
+                                                        buildingCode = course.buildingCode,
+                                                        limit = 1
+                                                    )
+                                                } else emptyList()
+
+                                                if (indoorResults.isNotEmpty()) {
+                                                    val result = indoorResults.first()
+                                                    val indoor = Indoor(
+                                                        node = result.node,
+                                                        buildingCode = result.buildingCode,
+                                                        primaryLabel = result.primaryLabel,
+                                                        secondaryLabel = result.typeLabel,
+                                                        tertiaryLabel = result.locationLabel
+                                                    )
+                                                    mapViewmodel.openIndoorBuildingCode = result.buildingCode.uppercase()
+                                                    mapViewmodel.pendingIndoorDestination = result.node
+                                                    mapViewmodel.indoorSetDestTrigger = result.node
+                                                    currentDestination.value = AppDestinations.MAP
+                                                } else {
+                                                    val building = ALL_SUGGESTIONS
+                                                        .filterIsInstance<CampusBuilding>()
+                                                        .firstOrNull {
+                                                            it.buildingCode.equals(
+                                                                course.buildingCode,
+                                                                ignoreCase = true
+                                                            )
+                                                        }
+                                                    if (building != null) {
+                                                        mapViewmodel.navigateToMapWithSuggestion(building)
+                                                        currentDestination.value = AppDestinations.MAP
+                                                    } else {
+                                                        unknownBuildingCourse = course
+                                                    }
+                                                }
+                                            }
+                                        )
                                     }
                                     AppDestinations.POI -> {
                                         Greeting("POI Screen", modifier)
@@ -548,11 +601,112 @@ fun ConcordiaCampusGuideApp() {
                             }
                         }
                     )
+
+                    unknownBuildingCourse?.let { course ->
+                        UnknownBuildingDialog(
+                            course = course,
+                            onBuildingSelected = { building ->
+                                mapViewmodel.navigateToMapWithSuggestion(building)
+                                currentDestination.value = AppDestinations.MAP
+                                unknownBuildingCourse = null
+                            },
+                            onDismiss = { unknownBuildingCourse = null }
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UnknownBuildingDialog(
+    course: Course,
+    onBuildingSelected: (CampusBuilding) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val allBuildings = remember {
+        ALL_SUGGESTIONS.filterIsInstance<CampusBuilding>()
+            .sortedBy { it.buildingName }
+    }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Building not recognized",
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        text = {
+            Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Could not find building \"${course.buildingCode}\" in the app's building dataset. " +
+                           "Please select the building for your class to view directions.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedBuilding?.displayName ?: "Select building",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth(),
+                        singleLine = true
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        allBuildings.forEach { building ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(
+                                            text = building.displayName,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = building.campus.name,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    selectedBuilding = building
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { selectedBuilding?.let { onBuildingSelected(it) } },
+                enabled = selectedBuilding != null
+            ) {
+                Text("Go")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Exit")
+            }
+        }
+    )
+}
+
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
     data class Drawable(@param:DrawableRes val resId: Int) : AppIcon()

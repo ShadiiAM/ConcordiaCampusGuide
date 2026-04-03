@@ -44,7 +44,7 @@ enum class CalendarTab(val labelResId: Int) {
 }
 
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
     val context = LocalContext.current
     val viewModel: CalendarViewModel = viewModel {
         CalendarViewModel(
@@ -58,6 +58,7 @@ fun CalendarScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .background(MaterialTheme.colorScheme.background)
     ) {
         CalendarHeader(
@@ -72,7 +73,8 @@ fun CalendarScreen() {
                     coursesForDay = viewModel.coursesForSelectedDay,
                     nextUpcoming = viewModel.nextUpcomingCourse,
                     onIncrementDate = { viewModel.incrementDate(it) },
-                    onFindNextClass = { viewModel.jumpToNextClass() }
+                    onFindNextClass = { viewModel.jumpToNextClass() },
+                    onDirectionsToCourse = onDirectionsToCourse
                 )
                 CalendarTab.COURSE_LIST -> CourseListView(
                     courses = uiState.trackedCourses,
@@ -99,11 +101,12 @@ fun CalendarScreen() {
 
 @Composable
 private fun DailyScheduleView(
-    date: Calendar, 
-    coursesForDay: List<Course>, 
+    date: Calendar,
+    coursesForDay: List<Course>,
     nextUpcoming: NextCourseResult?,
     onIncrementDate: (Int) -> Unit,
-    onFindNextClass: () -> Unit
+    onFindNextClass: () -> Unit,
+    onDirectionsToCourse: (Course) -> Unit = {}
 ) {
     val sortedCourses = remember(coursesForDay) {
         coursesForDay.sortedBy { it.startTime }
@@ -127,7 +130,8 @@ private fun DailyScheduleView(
                         val isHighlighted = isShowingNextDay && course == nextUpcoming?.course
                         CourseCard(
                             course = course,
-                            isUpcoming = isHighlighted
+                            isUpcoming = isHighlighted,
+                            onActionClick = { onDirectionsToCourse(course) }
                         )
                     }
                 }
