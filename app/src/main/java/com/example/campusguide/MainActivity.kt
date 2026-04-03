@@ -676,6 +676,95 @@ fun ConcordiaCampusGuideApp() {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UnknownBuildingDialog(
+    course: Course,
+    onBuildingSelected: (CampusBuilding) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val allBuildings = remember {
+        ALL_SUGGESTIONS.filterIsInstance<CampusBuilding>()
+            .sortedBy { it.buildingName }
+    }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Building not recognized",
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Could not find building \"${course.buildingCode}\" in the app's building dataset. " +
+                           "Please select the building for your class to view directions.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedBuilding?.displayName ?: "Select building",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth(),
+                        singleLine = true
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        allBuildings.forEach { building ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(
+                                            text = building.displayName,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = building.campus.name,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    selectedBuilding = building
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { selectedBuilding?.let { onBuildingSelected(it) } },
+                enabled = selectedBuilding != null
+            ) {
+                Text("Go")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Exit")
+            }
+        }
+    )
+}
+
 @Composable
 private fun SharedDirectionsTopBar(
     state: DirectionsTopBarState,
