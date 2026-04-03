@@ -126,7 +126,6 @@ fun ConcordiaCampusGuideApp() {
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
     var directionsGoTrigger by remember { mutableIntStateOf(0) }
     var directionsCancelTrigger by remember { mutableIntStateOf(0) }
-    var searchMarkerClearTrigger by remember { mutableIntStateOf(0) }
     var originPickTrigger by remember { mutableIntStateOf(0) }
     var myLocationTrigger by remember { mutableIntStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
@@ -296,7 +295,6 @@ fun ConcordiaCampusGuideApp() {
                                             },  // ← add
                                             directionsGoTrigger = directionsGoTrigger,                              // ← add
                                             directionsCancelTrigger = directionsCancelTrigger,                      // ← add
-                                            searchMarkerClearTrigger = searchMarkerClearTrigger,
                                             onIndoorOverlayChanged = { mapViewmodel.openIndoorBuildingCode = it },
                                             requestedIndoorBuildingCode = mapViewmodel.openIndoorBuildingCode,
                                             indoorOutdoorRouteRequest = mapViewmodel.indoorOutdoorRouteRequest,
@@ -345,13 +343,9 @@ fun ConcordiaCampusGuideApp() {
                                                     clearDirectionsAndIndoorState()
                                                 },
                                                 onBackClick = {
-                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
-                                                    directionsEditMode = null
-                                                    directionsDestinationSuggestions = emptyList()
-                                                    indoorDirectionsQuery = ""
-                                                    indoorDirectionsSuggestions = emptyList()
-                                                    searchMarkerClearTrigger++
+                                                    directionsCancelTrigger++
+                                                    topBarTravelMode = TravelMode.DRIVE
+                                                    clearDirectionsAndIndoorState()
                                                 },
                                                 shuttleStatus = directionsTopBarState.shuttleStatus,
                                                 canUseShuttle = directionsTopBarState.canUseShuttle,
@@ -549,7 +543,6 @@ fun ConcordiaCampusGuideApp() {
                                             },
                                             directionsGoTrigger = directionsGoTrigger,                              // ← add
                                             directionsCancelTrigger = directionsCancelTrigger,
-                                            searchMarkerClearTrigger = searchMarkerClearTrigger,
                                             topBarTravelMode = topBarTravelMode,
                                             onBottomSearchClick = {
                                                 try {
@@ -590,13 +583,9 @@ fun ConcordiaCampusGuideApp() {
                                                     clearDirectionsAndIndoorState()
                                                 },
                                                 onBackClick = {
-                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
-                                                    directionsEditMode = null
-                                                    directionsDestinationSuggestions = emptyList()
-                                                    indoorDirectionsQuery = ""
-                                                    indoorDirectionsSuggestions = emptyList()
-                                                    searchMarkerClearTrigger++
+                                                    directionsCancelTrigger++
+                                                    topBarTravelMode = TravelMode.DRIVE
+                                                    clearDirectionsAndIndoorState()
                                                 },
                                                 shuttleStatus = directionsTopBarState.shuttleStatus,
                                                 canUseShuttle = directionsTopBarState.canUseShuttle,

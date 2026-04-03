@@ -101,7 +101,6 @@ private var highlightedOverlayStyle = GeoJsonStyle(
 )
 
 internal fun initializeOverlays(
-    campus: Campus,
     sgwOverlay: GeoJsonOverlay,
     loyOverlay: GeoJsonOverlay,
     context: Context,
@@ -117,16 +116,8 @@ internal fun initializeOverlays(
 
 
 
-    when (campus) {
-        Campus.SGW -> {
-            sgwOverlay.setBuildingsVisible(true)
-            loyOverlay.setBuildingsVisible(false)
-        }
-        Campus.LOYOLA -> {
-            loyOverlay.setBuildingsVisible(true)
-            sgwOverlay.setBuildingsVisible(false)
-        }
-    }
+    sgwOverlay.setBuildingsVisible(true)
+    loyOverlay.setBuildingsVisible(true)
 
     sgwOverlay.setMarkersVisible(false)
     loyOverlay.setMarkersVisible(false)

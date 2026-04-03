@@ -115,7 +115,6 @@ fun MapScreen(
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
-    searchMarkerClearTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
     originPickTrigger: Int = 0,
@@ -533,12 +532,6 @@ fun MapScreen(
         searchMarker?.remove()
         searchMarker = null
 
-    }
-
-    LaunchedEffect(searchMarkerClearTrigger) {
-        if (searchMarkerClearTrigger == 0) return@LaunchedEffect
-        searchMarker?.remove()
-        searchMarker = null
     }
 
 // Handle origin pick mode trigger from top bar
@@ -1250,7 +1243,6 @@ fun MapScreen(
                                     Campus.LOYOLA -> loyAttached = true
                                 }
                                 initializeOverlays(
-                                    activeCampus,
                                     sgwOverlay!!,
                                     loyOverlay!!,
                                     ctx,
@@ -1262,6 +1254,40 @@ fun MapScreen(
 
                                 ) { callback ->
                                     locationCallback = callback
+                                }
+                            }
+                        }
+
+                        // Pre-load inactive campus overlay in the background
+                        scope.launch(Dispatchers.IO) {
+                            val activeCampus = getSavedCampus(ctx)
+                            val inactiveCampus = when (activeCampus) {
+                                Campus.SGW -> Campus.LOYOLA
+                                Campus.LOYOLA -> Campus.SGW
+                            }
+                            val inactiveJson = loadGeoJson(
+                                ctx,
+                                when (inactiveCampus) {
+                                    Campus.SGW -> R.raw.sgw_buildings
+                                    Campus.LOYOLA -> R.raw.loy_buildings
+                                }
+                            )
+                            when (inactiveCampus) {
+                                Campus.SGW -> sgwOverlay?.attachToMapAsync(map, inactiveJson)
+                                Campus.LOYOLA -> loyOverlay?.attachToMapAsync(map, inactiveJson)
+                            }
+                            withContext(Dispatchers.Main) {
+                                when (inactiveCampus) {
+                                    Campus.SGW -> {
+                                        sgwAttached = true
+                                        sgwOverlay?.setAllStyles(defaultOverlayStyle)
+                                        sgwOverlay?.setMarkersVisible(false)
+                                    }
+                                    Campus.LOYOLA -> {
+                                        loyAttached = true
+                                        loyOverlay?.setAllStyles(defaultOverlayStyle)
+                                        loyOverlay?.setMarkersVisible(false)
+                                    }
                                 }
                             }
                         }
