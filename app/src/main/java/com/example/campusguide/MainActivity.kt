@@ -80,7 +80,6 @@ import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Course
-import com.example.campusguide.data.Indoor
 import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.components.FocusClearWrapper
@@ -538,13 +537,6 @@ fun ConcordiaCampusGuideApp() {
 
                                                 if (indoorResults.isNotEmpty()) {
                                                     val result = indoorResults.first()
-                                                    val indoor = Indoor(
-                                                        node = result.node,
-                                                        buildingCode = result.buildingCode,
-                                                        primaryLabel = result.primaryLabel,
-                                                        secondaryLabel = result.typeLabel,
-                                                        tertiaryLabel = result.locationLabel
-                                                    )
                                                     mapViewmodel.openIndoorBuildingCode = result.buildingCode.uppercase()
                                                     mapViewmodel.pendingIndoorDestination = result.node
                                                     mapViewmodel.indoorSetDestTrigger = result.node
