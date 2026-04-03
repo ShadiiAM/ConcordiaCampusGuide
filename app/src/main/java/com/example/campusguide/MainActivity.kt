@@ -2,7 +2,6 @@ package com.example.campusguide
 
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -145,6 +144,7 @@ fun ConcordiaCampusGuideApp() {
     val userLocationViewModel = viewModel<UserLocationViewModel>()
     val userLatLng by userLocationViewModel.userLatLng.collectAsState()
     val nearestId by userLocationViewModel.nearestId.collectAsState()
+    val nearestPOIName by userLocationViewModel.nearestPOIName.collectAsState()
 
     val mapViewmodel: MapSearchViewModel = viewModel()
     var showProfile by remember {mutableStateOf(false)}
@@ -219,6 +219,7 @@ fun ConcordiaCampusGuideApp() {
         BuildingRow(
             suggestion = suggestion,
             nearestId = nearestId,
+            nearestPOIName = nearestPOIName,
             userLatLng = userLatLng,
             onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
             onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
