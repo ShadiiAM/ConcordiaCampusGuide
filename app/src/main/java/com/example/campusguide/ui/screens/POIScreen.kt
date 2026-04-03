@@ -90,6 +90,7 @@ fun POIScreen(
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
+    searchMarkerClearTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
     poiFilters: POIFilterValues = POIFilterValues()
@@ -254,8 +255,11 @@ fun POIScreen(
 
     }
 
-
-
+    LaunchedEffect(searchMarkerClearTrigger) {
+        if (searchMarkerClearTrigger == 0) return@LaunchedEffect
+        searchMarker?.remove()
+        searchMarker = null
+    }
 
     LaunchedEffect(topBarSelectedPOISuggestion) {
 

@@ -126,6 +126,7 @@ fun ConcordiaCampusGuideApp() {
     var directionsTopBarState by remember { mutableStateOf(DirectionsTopBarState(active = false)) }
     var directionsGoTrigger by remember { mutableIntStateOf(0) }
     var directionsCancelTrigger by remember { mutableIntStateOf(0) }
+    var searchMarkerClearTrigger by remember { mutableIntStateOf(0) }
     var originPickTrigger by remember { mutableIntStateOf(0) }
     var myLocationTrigger by remember { mutableIntStateOf(0) }
     var topBarTravelMode by remember { mutableStateOf(TravelMode.DRIVE) }
@@ -295,6 +296,7 @@ fun ConcordiaCampusGuideApp() {
                                             },  // ← add
                                             directionsGoTrigger = directionsGoTrigger,                              // ← add
                                             directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                                            searchMarkerClearTrigger = searchMarkerClearTrigger,
                                             onIndoorOverlayChanged = { mapViewmodel.openIndoorBuildingCode = it },
                                             requestedIndoorBuildingCode = mapViewmodel.openIndoorBuildingCode,
                                             indoorOutdoorRouteRequest = mapViewmodel.indoorOutdoorRouteRequest,
@@ -349,6 +351,7 @@ fun ConcordiaCampusGuideApp() {
                                                     directionsDestinationSuggestions = emptyList()
                                                     indoorDirectionsQuery = ""
                                                     indoorDirectionsSuggestions = emptyList()
+                                                    searchMarkerClearTrigger++
                                                 },
                                                 shuttleStatus = directionsTopBarState.shuttleStatus,
                                                 canUseShuttle = directionsTopBarState.canUseShuttle,
@@ -546,6 +549,7 @@ fun ConcordiaCampusGuideApp() {
                                             },
                                             directionsGoTrigger = directionsGoTrigger,                              // ← add
                                             directionsCancelTrigger = directionsCancelTrigger,
+                                            searchMarkerClearTrigger = searchMarkerClearTrigger,
                                             topBarTravelMode = topBarTravelMode,
                                             onBottomSearchClick = {
                                                 try {
@@ -592,6 +596,7 @@ fun ConcordiaCampusGuideApp() {
                                                     directionsDestinationSuggestions = emptyList()
                                                     indoorDirectionsQuery = ""
                                                     indoorDirectionsSuggestions = emptyList()
+                                                    searchMarkerClearTrigger++
                                                 },
                                                 shuttleStatus = directionsTopBarState.shuttleStatus,
                                                 canUseShuttle = directionsTopBarState.canUseShuttle,

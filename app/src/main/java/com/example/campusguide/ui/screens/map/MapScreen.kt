@@ -115,6 +115,7 @@ fun MapScreen(
     onDirectionsTopBarState: (DirectionsTopBarState) -> Unit = {},
     directionsGoTrigger: Int = 0,
     directionsCancelTrigger: Int = 0,
+    searchMarkerClearTrigger: Int = 0,
     topBarTravelMode: TravelMode = TravelMode.DRIVE,
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
     originPickTrigger: Int = 0,
@@ -532,6 +533,12 @@ fun MapScreen(
         searchMarker?.remove()
         searchMarker = null
 
+    }
+
+    LaunchedEffect(searchMarkerClearTrigger) {
+        if (searchMarkerClearTrigger == 0) return@LaunchedEffect
+        searchMarker?.remove()
+        searchMarker = null
     }
 
 // Handle origin pick mode trigger from top bar
