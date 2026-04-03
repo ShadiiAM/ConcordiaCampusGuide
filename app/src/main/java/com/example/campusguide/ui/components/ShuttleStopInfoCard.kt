@@ -24,7 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.shuttle.DepartureResult
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 
 private val ShuttleBlue = Color(0xFF1565C0)
 
@@ -35,6 +39,14 @@ fun ShuttleStopInfoCard(
     onDismiss: () -> Unit,
     onDirectionsClick: (() -> Unit)? = null
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent("ShuttleStopInfoCardAppeared") {
+        param("component_name", "ShuttleStopInfoCard")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("ShuttleStopInfoCardAppeared")
+
     var showSchedule by remember { mutableStateOf(false) }
 
     if (showSchedule) {

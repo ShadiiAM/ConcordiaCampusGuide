@@ -35,12 +35,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.AppIcon
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.shuttle.DepartureResult
-
-
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 @Composable
 fun DirectionsTopBar(
     modifier: Modifier = Modifier,
@@ -70,6 +72,15 @@ fun DirectionsTopBar(
     showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent("DirectionsTopBarAppeared") {
+        param("component_name", "DirectionsTopBar")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("DirectionsTopBarAppeared")
+
+
     val currentSteps = route.legs.firstOrNull()
 
     val purple = Color(0xFF6B4D8A)

@@ -37,6 +37,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.ALL_POI
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.OutsidePOI
@@ -77,6 +78,11 @@ import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.Polyline
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -95,6 +101,16 @@ fun POIScreen(
     poiFilters: POIFilterValues = POIFilterValues()
 ) {
 
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "POIScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenPOIActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("POIScreen")
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("POIScreen")
+    }
 
     val cameraAnimationDuration = 1500
     val campusLevelZoom = 15f

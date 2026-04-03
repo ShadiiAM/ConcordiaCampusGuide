@@ -35,9 +35,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.map.models.BuildingInfo
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import java.util.Calendar
 
 /**
@@ -85,6 +89,15 @@ fun BuildingDetailsBottomSheet(
     onDirectionsClick: (() -> Unit)? = null,
     onExploreIndoors: (() -> Unit)? = null
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent("BuildingDetailsBottomSheetAppeared") {
+        param("component_name", "BuildingDetailsBottomSheet")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("BuildingDetailsBottomSheetAppeared")
+
+
     var isExpanded by remember { mutableStateOf(false) }
 
     ModalBottomSheet(

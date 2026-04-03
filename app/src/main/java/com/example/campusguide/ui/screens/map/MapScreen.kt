@@ -63,6 +63,7 @@ import org.json.JSONObject
 import java.util.Locale
 import kotlin.coroutines.resume
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.ui.directions.TravelMode
@@ -87,6 +88,11 @@ import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.Polyline
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 import kotlin.div
 import kotlin.text.get
 
@@ -120,6 +126,18 @@ fun MapScreen(
     originPickTrigger: Int = 0,
     myLocationTrigger: Int = 0,
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "MapScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenMapActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("MapScreen")
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("MapScreen")
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val accessibilityState = LocalAccessibilityState.current

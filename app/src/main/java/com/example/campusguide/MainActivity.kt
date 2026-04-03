@@ -65,6 +65,7 @@ import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.TravelMode
@@ -83,10 +84,28 @@ import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.screens.POIScreen
 import com.example.campusguide.ui.viewmodels.BuildingRow
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.microsoft.clarity.Clarity
+import com.microsoft.clarity.ClarityConfig
+import com.microsoft.clarity.models.LogLevel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val config = ClarityConfig(
+            projectId = "w64gdg3j8h",
+            logLevel = LogLevel.None, // Note: Use "LogLevel.Verbose" value while testing to debug initialization issues.
+        )
+
+        Clarity.initialize(applicationContext, config)
+
+        val firebaseAnalytics = Firebase.analytics
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
+        UsabilityTrackerIRLUsers.userInteractionRecord("App Start")
+
         IndoorGraphRegistry.init(this)
         enableEdgeToEdge()
         setContent {

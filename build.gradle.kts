@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     id("org.sonarqube") version "7.2.2.6593"
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin) apply false
+    id("com.google.gms.google-services") version "4.4.4" apply false
+
 }
 
 sonar {

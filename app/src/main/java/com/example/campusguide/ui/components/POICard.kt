@@ -29,10 +29,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.POIType
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.shuttle.DepartureResult
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 
 
 private val CafePink = Color(0xFFFF7FF4)
@@ -49,6 +53,13 @@ fun POICard(
     onDismiss: () -> Unit,
     onDirectionsClick: (() -> Unit)? = null
 ) {
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent("POICardAppeared") {
+        param("component_name", "POICard")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("POICardAppeared")
+
 
     val iconDetails = getPOIColorAndDrawable(poi.category)
 

@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,8 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +53,19 @@ fun ProfileScreen(
     onProfileClick: () -> Unit = {},
     onAccessibilityClick: () -> Unit = {}
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "ProfileScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenProfileActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("ProfileScreen")
+
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("ProfileScreen")
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

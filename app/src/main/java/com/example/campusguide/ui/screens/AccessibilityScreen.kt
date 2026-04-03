@@ -47,12 +47,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import com.example.campusguide.ui.accessibility.AccessibilityState
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.ColorBlindMode
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +66,16 @@ import kotlinx.coroutines.launch
 fun AccessibilityScreen(
     onBackClick: () -> Unit = {}
 ) {
+    val firebaseAnalytics = Firebase.analytics
+
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "AccessibilityScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenAccessibilityActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("AccessibilityScreen")
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("AccessibilityScreen")
+    }
     var isBoldEnabled by remember { mutableStateOf(true) }
     val accessibilityState = LocalAccessibilityState.current
     val context = LocalContext.current

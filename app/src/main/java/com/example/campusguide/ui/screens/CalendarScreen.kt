@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,15 +39,29 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.example.campusguide.ui.theme.PurpleGrey80
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun CalendarScreen() {
-
+    val firebaseAnalytics = Firebase.analytics
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "CalendarScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenCalendarActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("CalendarScreen")
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("CalendarScreen")
+    }
     var date by remember { mutableStateOf(Calendar.getInstance()) }
     var viewMode by remember { mutableStateOf(CalendarViewMode.DAILY) }
 

@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.components.BottomCard
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.indoor.IndoorFloorGraph
@@ -58,6 +59,11 @@ import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.ui.viewmodels.IndoorNavState
 import com.example.campusguide.ui.viewmodels.IndoorNavigationViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
+import com.microsoft.clarity.Clarity
 
 // ─── Concordia brand colours ──────────────────────────────────────────────────
 private val ConcordiaRed    = Color(0xFF912338)
@@ -99,6 +105,16 @@ fun IndoorMapScreen(
     onClose: () -> Unit = {},
     providedViewModel: IndoorNavigationViewModel? = null,
 ) {
+    val firebaseAnalytics = Firebase.analytics
+    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
+        param(FirebaseAnalytics.Param.SCREEN_NAME, "IndoorMapScreen")
+        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenIndoorMapActivity")
+    }
+    UsabilityTrackerIRLUsers.userInteractionRecord("IndoorMapScreen")
+    LaunchedEffect(Unit) {
+        Clarity.setCurrentScreenName("IndoorMapScreen")
+    }
+
     val clearVersion = maxOf(resetVersion, clearTrigger)
     val viewModel = providedViewModel ?: viewModel<IndoorNavigationViewModel>(
         key = "indoor-nav-$clearVersion",
