@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -320,38 +321,15 @@ fun ConcordiaCampusGuideApp() {
                                         )
 
                                         if (directionsTopBarState.active) {
-                                            DirectionsTopBar(
-                                                modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
-                                                    .ignoreFocusClearOnTouch(),
-                                                originLabel = directionsTopBarState.originLabel,
-                                                destinationLabel = directionsTopBarState.destinationLabel,
-                                                isCrossCampus = directionsTopBarState.isCrossCampus,
-                                                selectedMode = directionsTopBarState.selectedMode,
-                                                onModeSelected = { mode -> topBarTravelMode = mode },
-                                                routeSummary = directionsTopBarState.routeSummary,
-                                                errorMessage = directionsTopBarState.errorMessage,
-                                                showActions = directionsTopBarState.showActions,
-                                                isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                                                showTravelModes = directionsTopBarState.showTravelModes,
-                                                goEnabled = directionsTopBarState.goEnabled,
-                                                goLabel = directionsTopBarState.goLabel,
-                                                cancelLabel = directionsTopBarState.cancelLabel,
+                                            SharedDirectionsTopBar(
+                                                state = directionsTopBarState,
                                                 onGoClick = { directionsGoTrigger++ },
-                                                onCancelClick = {
+                                                onCancelOrBackClick = {
                                                     directionsCancelTrigger++
                                                     topBarTravelMode = TravelMode.DRIVE
                                                     clearDirectionsAndIndoorState()
                                                 },
-                                                onBackClick = {
-                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
-                                                    directionsEditMode = null
-                                                    directionsDestinationSuggestions = emptyList()
-                                                    indoorDirectionsQuery = ""
-                                                    indoorDirectionsSuggestions = emptyList()
-                                                },
-                                                shuttleStatus = directionsTopBarState.shuttleStatus,
-                                                canUseShuttle = directionsTopBarState.canUseShuttle,
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
                                                 onOriginClick = if (mapViewmodel.openIndoorBuildingCode != null) {
                                                     {
                                                         directionsEditMode = if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) null else DirectionsEditMode.INDOOR_ORIGIN
@@ -516,7 +494,6 @@ fun ConcordiaCampusGuideApp() {
                                                         )
                                                     }
                                                 },
-                                                route = directionsTopBarState.route
                                             )
                                         } else{
 
@@ -563,39 +540,15 @@ fun ConcordiaCampusGuideApp() {
 
 
                                         if (directionsTopBarState.active) {
-                                            DirectionsTopBar(
-                                                modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
-                                                    .ignoreFocusClearOnTouch(),
-                                                originLabel = directionsTopBarState.originLabel,
-                                                destinationLabel = directionsTopBarState.destinationLabel,
-                                                isCrossCampus = directionsTopBarState.isCrossCampus,
-                                                selectedMode = directionsTopBarState.selectedMode,
-                                                onModeSelected = { mode -> topBarTravelMode = mode },
-                                                routeSummary = directionsTopBarState.routeSummary,
-                                                errorMessage = directionsTopBarState.errorMessage,
-                                                showActions = directionsTopBarState.showActions,
-                                                isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                                                showTravelModes = directionsTopBarState.showTravelModes,
-                                                goEnabled = directionsTopBarState.goEnabled,
-                                                goLabel = directionsTopBarState.goLabel,
-                                                cancelLabel = directionsTopBarState.cancelLabel,
+                                            SharedDirectionsTopBar(
+                                                state = directionsTopBarState,
                                                 onGoClick = { directionsGoTrigger++ },
-                                                onCancelClick = {
+                                                onCancelOrBackClick = {
                                                     directionsCancelTrigger++
                                                     topBarTravelMode = TravelMode.DRIVE
                                                     clearDirectionsAndIndoorState()
                                                 },
-                                                onBackClick = {
-                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
-                                                    directionsEditMode = null
-                                                    directionsDestinationSuggestions = emptyList()
-                                                    indoorDirectionsQuery = ""
-                                                    indoorDirectionsSuggestions = emptyList()
-                                                },
-                                                shuttleStatus = directionsTopBarState.shuttleStatus,
-                                                canUseShuttle = directionsTopBarState.canUseShuttle,
-                                                route = directionsTopBarState.route
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
                                             )
                                         }else{
 
@@ -658,6 +611,44 @@ fun ConcordiaCampusGuideApp() {
         }
     }
 }
+@Composable
+private fun SharedDirectionsTopBar(
+    state: DirectionsTopBarState,
+    onGoClick: () -> Unit,
+    onCancelOrBackClick: () -> Unit,
+    onModeSelected: (TravelMode) -> Unit,
+    onOriginClick: (() -> Unit)? = null,
+    onDestinationClick: (() -> Unit)? = null,
+    extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
+    DirectionsTopBar(
+        modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
+            .ignoreFocusClearOnTouch(),
+        originLabel = state.originLabel,
+        destinationLabel = state.destinationLabel,
+        isCrossCampus = state.isCrossCampus,
+        selectedMode = state.selectedMode,
+        onModeSelected = onModeSelected,
+        routeSummary = state.routeSummary,
+        errorMessage = state.errorMessage,
+        showActions = state.showActions,
+        isLoadingRoute = state.isLoadingRoute,
+        showTravelModes = state.showTravelModes,
+        goEnabled = state.goEnabled,
+        goLabel = state.goLabel,
+        cancelLabel = state.cancelLabel,
+        onGoClick = onGoClick,
+        onCancelClick = onCancelOrBackClick,
+        onBackClick = onCancelOrBackClick,
+        shuttleStatus = state.shuttleStatus,
+        canUseShuttle = state.canUseShuttle,
+        route = state.route,
+        onOriginClick = onOriginClick,
+        onDestinationClick = onDestinationClick,
+        extraContent = extraContent,
+    )
+}
+
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
     data class Drawable(@param:DrawableRes val resId: Int) : AppIcon()

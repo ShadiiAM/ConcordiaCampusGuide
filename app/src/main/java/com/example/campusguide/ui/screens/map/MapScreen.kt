@@ -398,14 +398,13 @@ fun MapScreen(
         val indoorOrigin = indoorState?.indoorOriginNode ?: if (indoorState == null) latestIndoorOriginNode else null
         val indoorDestination = indoorState?.indoorDestinationNode ?: if (indoorState == null) latestIndoorDestinationNode else null
 
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
-
         if (
             indoorBuildingCode != null &&
             indoorOrigin != null &&
             indoorDestination != null &&
             !indoorOrigin.buildingCode.equals(indoorDestination.buildingCode, ignoreCase = true)
         ) {
+            directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
             mapTapFocusNodeTrigger = null
             mapTapSetStartNodeTrigger = null
             mapTapSetDestNodeTrigger = null
@@ -420,12 +419,12 @@ fun MapScreen(
         }
 
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
         var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
 
         centerOnOrigin(googleMap, step.origin, context)
 
         val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         val departure = canUseShuttle(step.origin, step.destination, travelMode)
         if(departure != null){
@@ -525,6 +524,7 @@ fun MapScreen(
         topBarDestinationOverride = null
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
+            isLoadingRoute = false,
             errorMessage = null,
         )
         isPickingOrigin = false
@@ -1243,7 +1243,6 @@ fun MapScreen(
                                     Campus.LOYOLA -> loyAttached = true
                                 }
                                 initializeOverlays(
-                                    activeCampus,
                                     sgwOverlay!!,
                                     loyOverlay!!,
                                     ctx,
@@ -1255,6 +1254,40 @@ fun MapScreen(
 
                                 ) { callback ->
                                     locationCallback = callback
+                                }
+                            }
+                        }
+
+                        // Pre-load inactive campus overlay in the background
+                        scope.launch(Dispatchers.IO) {
+                            val activeCampus = getSavedCampus(ctx)
+                            val inactiveCampus = when (activeCampus) {
+                                Campus.SGW -> Campus.LOYOLA
+                                Campus.LOYOLA -> Campus.SGW
+                            }
+                            val inactiveJson = loadGeoJson(
+                                ctx,
+                                when (inactiveCampus) {
+                                    Campus.SGW -> R.raw.sgw_buildings
+                                    Campus.LOYOLA -> R.raw.loy_buildings
+                                }
+                            )
+                            when (inactiveCampus) {
+                                Campus.SGW -> sgwOverlay?.attachToMapAsync(map, inactiveJson)
+                                Campus.LOYOLA -> loyOverlay?.attachToMapAsync(map, inactiveJson)
+                            }
+                            withContext(Dispatchers.Main) {
+                                when (inactiveCampus) {
+                                    Campus.SGW -> {
+                                        sgwAttached = true
+                                        sgwOverlay?.setAllStyles(defaultOverlayStyle)
+                                        sgwOverlay?.setMarkersVisible(false)
+                                    }
+                                    Campus.LOYOLA -> {
+                                        loyAttached = true
+                                        loyOverlay?.setAllStyles(defaultOverlayStyle)
+                                        loyOverlay?.setMarkersVisible(false)
+                                    }
                                 }
                             }
                         }

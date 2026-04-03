@@ -180,20 +180,19 @@ fun POIScreen(
     LaunchedEffect(directionsGoTrigger) {
         if (directionsGoTrigger == 0) return@LaunchedEffect
 
+        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+
         routePolylines.forEach { it?.remove() }
         routePolylines.clear()
 
         val requestGeneration = routeRequestGeneration
 
         directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
-
-        val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
         var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
 
         centerOnOrigin(googleMap, step.origin, context)
 
         val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         val departure = canUseShuttle(step.origin, step.destination, travelMode)
 
@@ -246,6 +245,7 @@ fun POIScreen(
 
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
+            isLoadingRoute = false,
             errorMessage = null,
         )
 
@@ -253,9 +253,6 @@ fun POIScreen(
         searchMarker = null
 
     }
-
-
-
 
     LaunchedEffect(topBarSelectedPOISuggestion) {
 
