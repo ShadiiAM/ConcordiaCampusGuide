@@ -216,26 +216,6 @@
       "description": null
     },
     {
-      "id": "H-9-ESCALATOR-UP-89",
-      "label": "ESCALATOR",
-      "x": 486.68,
-      "y": 620.73,
-      "type": "ESCALATOR",
-      "floor": 9,
-      "buildingCode": "H",
-      "description": null
-    },
-    {
-      "id": "H-9-ESCALATOR-DOWN-98",
-      "label": "ESCALATOR",
-      "x": 477.02,
-      "y": 446.87,
-      "type": "ESCALATOR",
-      "floor": 9,
-      "buildingCode": "H",
-      "description": null
-    },
-    {
       "id": "H-9-902",
       "label": "CLASSROOM",
       "x": 337.84,
@@ -1077,40 +1057,40 @@
     },
     {
       "id": "H-9-998",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-3",
       "x": 267.59,
       "y": 332.57,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-985",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-2",
       "x": 716.47,
       "y": 718.6,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-975",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-4",
       "x": 298.1,
       "y": 718.6,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-990",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-1",
       "x": 720.27,
       "y": 291.35,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
@@ -1384,6 +1364,26 @@
       "floor": 9,
       "buildingCode": "H",
       "description": null
+    },
+    {
+      "id": "H-9-ESCALATOR-UP-2",
+      "label": "ESCALATOR UP",
+      "x": 487.99,
+      "y": 622.94,
+      "type": "ESCALATOR",
+      "floor": 9,
+      "buildingCode": "H",
+      "description": null
+    },
+    {
+      "id": "H-9-ESCALATOR-DOWN-2",
+      "label": "ESCALATOR DOWN",
+      "x": 490.32,
+      "y": 438.45,
+      "type": "ESCALATOR",
+      "floor": 9,
+      "buildingCode": "H",
+      "description": null
     }
   ],
   "edges": [
@@ -1433,18 +1433,6 @@
       "fromId": "H-9-H19",
       "toId": "H-9-H20",
       "weight": 58.33,
-      "isAccessible": true
-    },
-    {
-      "fromId": "H-9-ESCALATOR-DOWN-98",
-      "toId": "H-9-H3",
-      "weight": 62.62,
-      "isAccessible": true
-    },
-    {
-      "fromId": "H-9-ESCALATOR-UP-89",
-      "toId": "H-9-H14",
-      "weight": 34.83,
       "isAccessible": true
     },
     {
@@ -2237,6 +2225,18 @@
       "fromId": "H-9-H45",
       "toId": "H-9-960.2",
       "weight": 81.4,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-9-ESCALATOR-UP-2",
+      "toId": "H-9-H14",
+      "weight": 32.53,
+      "isAccessible": true
+    },
+    {
+      "fromId": "H-9-ESCALATOR-DOWN-2",
+      "toId": "H-9-H3",
+      "weight": 47.48,
       "isAccessible": true
     }
   ]

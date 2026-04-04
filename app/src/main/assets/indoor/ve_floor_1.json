@@ -4,6 +4,146 @@
   "imageWidth": 1024,
   "imageHeight": 1024,
   "imageName": "ve_floor_1.png",
-  "nodes": [],
-  "edges": []
+  "nodes": [
+    {
+      "id": "VE-1-VE1",
+      "label": "HALLWAY-JUNCTION",
+      "x": 695.26,
+      "y": 152.62,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-VE2",
+      "label": "HALLWAY-JUNCTION",
+      "x": 789.66,
+      "y": 151.88,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-VE3",
+      "label": "HALLWAY-JUNCTION",
+      "x": 808.84,
+      "y": 151.14,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-101",
+      "label": "CLASS-ROOM",
+      "x": 808.1,
+      "y": 86.98,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-103",
+      "label": "CLASS-ROOM",
+      "x": 700.05,
+      "y": 174.37,
+      "type": "ROOM",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-VE4",
+      "label": "HALLWAY-JUNCTION",
+      "x": 699.42,
+      "y": 152.59,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-STAIR-1",
+      "label": "STAIR",
+      "x": 724.72,
+      "y": 175.49,
+      "type": "STAIRCASE",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-VE5",
+      "label": "HALLWAY-JUNCTION",
+      "x": 724.72,
+      "y": 152.39,
+      "type": "HALLWAY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    },
+    {
+      "id": "VE-1-ENTRY-MAIN",
+      "label": "MAIN-ENTRY",
+      "x": 693.82,
+      "y": 152.62,
+      "type": "ENTRY",
+      "floor": 1,
+      "buildingCode": "VE",
+      "description": null
+    }
+  ],
+  "edges": [
+    {
+      "fromId": "VE-1-VE3",
+      "toId": "VE-1-VE2",
+      "weight": 19.19,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE4",
+      "toId": "VE-1-VE1",
+      "weight": 4.16,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE4",
+      "toId": "VE-1-103",
+      "weight": 21.79,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE3",
+      "toId": "VE-1-101",
+      "weight": 64.16,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE2",
+      "toId": "VE-1-VE5",
+      "weight": 64.94,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE5",
+      "toId": "VE-1-VE4",
+      "weight": 25.3,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-VE5",
+      "toId": "VE-1-STAIR-1",
+      "weight": 23.1,
+      "isAccessible": true
+    },
+    {
+      "fromId": "VE-1-ENTRY-MAIN",
+      "toId": "VE-1-VE1",
+      "weight": 1.44,
+      "isAccessible": true
+    }
+  ]
 }

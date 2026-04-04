@@ -5,11 +5,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.campusguide.data.ALL_POI
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Indoor
+import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.Suggestion
+import com.example.campusguide.data.fullPOISuggestions
 import com.example.campusguide.data.fullSuggestions
 import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.components.Campus
@@ -42,6 +45,7 @@ class MapSearchViewModel : ViewModel() {
             is CampusBuilding -> "b:${suggestion.buildingCode}"
             is ShuttleStop -> "s:${suggestion.id}"
             is Indoor -> "i:${suggestion.node.id}"
+            is OutsidePOI -> "poi:${suggestion.name}"
         }
     }
 
@@ -142,4 +146,21 @@ class MapSearchViewModel : ViewModel() {
 
     }
 
+    fun onPOISearchSubmit(query: String) {
+        val match = ALL_POI.firstOrNull { it.matches(query) }
+        searchQuery = ""
+        topBarSuggestions = emptyList()
+        if (match != null) {
+            navigateToMapWithSuggestion(match)
+        } else {
+            searchQuery = query
+            searchCounter++
+        }
+    }
+
+    fun onPOISearchQueryChange(query: String) {
+        topBarSuggestions = fullPOISuggestions(
+            query = query,
+        )
+    }
 }

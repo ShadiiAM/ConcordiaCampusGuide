@@ -1,8 +1,10 @@
 package com.example.campusguide.ui.viewmodels
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -30,8 +34,10 @@ import androidx.compose.ui.unit.sp
 import com.example.campusguide.R
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Indoor
+import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.Suggestion
+import com.example.campusguide.ui.components.getPOIColorAndDrawable
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
 
@@ -39,6 +45,8 @@ import com.google.android.gms.maps.model.LatLng
 fun BuildingRow(
     suggestion: Suggestion,
     nearestId: String?,
+    nearestPOIName: String?,
+
     userLatLng: LatLng?,
     onSuggestionSelected: (Suggestion) -> Unit,
     onIndoorSetAsStart: (Indoor) -> Unit,
@@ -113,23 +121,7 @@ fun BuildingRow(
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (isNearest) {
-                                Surface(
-                                    shape = RoundedCornerShape(4.dp),
-                                    color = MaterialTheme.colorScheme.surface,
-                                    modifier = Modifier.border(
-                                        width = 1.5.dp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                ) {
-                                    Text(
-                                        text = "Nearest",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                    )
-                                }
+                                NearestBadge()
                                 Spacer(Modifier.width(6.dp))
                             }
                             Text(
@@ -202,6 +194,78 @@ fun BuildingRow(
 
 
         }
+
+        is OutsidePOI ->{
+            val iconToUse = getPOIColorAndDrawable(suggestion.category).second
+            val isNearest = suggestion.name == nearestPOIName
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(suggestion.name)
+                    .clickable {
+                        onSuggestionSelected(suggestion)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(6))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(iconToUse),
+                        contentDescription = "poiCardIcon",
+                        tint = Color.Black,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (isNearest) {
+                            NearestBadge()
+                            Spacer(Modifier.width(6.dp))
+                        }
+                        Text(
+                            suggestion.name,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Text(
+                        suggestion.address,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            HorizontalDivider(thickness = 0.5.dp)
+
+        }
     }
     HorizontalDivider(thickness = 0.5.dp)
+}
+
+
+@Composable
+private fun NearestBadge() {
+    Surface(
+        shape = RoundedCornerShape(4.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.border(
+            width = 1.5.dp,
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(4.dp)
+        )
+    ) {
+        Text(
+            text = "Nearest",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+        )
+    }
 }
