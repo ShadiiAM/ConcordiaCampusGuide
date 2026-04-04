@@ -267,20 +267,20 @@
     },
     {
       "id": "H-8-890",
-      "label": "STAIRS 1",
+      "label": "EMERGENCY-STAIR-1",
       "x": 308.54,
       "y": 735.31,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-8-88",
-      "label": "STAIRS 2",
+      "label": "EMERGENCY-STAIR-2",
       "x": 303.8,
       "y": 299.48,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
@@ -497,20 +497,20 @@
     },
     {
       "id": "H-8-804",
-      "label": "BATHROOM-W",
+      "label": "BATHROOM-F",
       "x": 582.17,
       "y": 750.92,
-      "type": "ROOM",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-8-892",
-      "label": "BATHROOM",
+      "label": "BATHROOM-WC",
       "x": 596.3,
       "y": 668.08,
-      "type": "ROOM",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
@@ -520,7 +520,7 @@
       "label": "BATHROOM-M",
       "x": 391.44,
       "y": 710.46,
-      "type": "ROOM",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
@@ -607,20 +607,20 @@
     },
     {
       "id": "H-8-898",
-      "label": "STAIRS-3",
+      "label": "EMERGENCY-STAIR-3",
       "x": 773.74,
       "y": 710.42,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-8-875",
-      "label": "STAIRS-4",
+      "label": "EMERGENCY-STAIR-4",
       "x": 715.46,
       "y": 293.5,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 8,
       "buildingCode": "H",
       "description": null
