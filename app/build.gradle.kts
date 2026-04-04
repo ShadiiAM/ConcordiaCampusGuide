@@ -76,15 +76,14 @@ tasks.withType<Test> {
         excludes = listOf("jdk.internal.*")
     }
 
-    // Increase heap size to prevent OOM when running all tests
-    maxHeapSize = "4g"
+    maxHeapSize = "3g"
     jvmArgs(
-        "-XX:MaxMetaspaceSize=1g",
+        "-XX:MaxMetaspaceSize=512m",
         "-XX:+HeapDumpOnOutOfMemoryError",
-        "-XX:+UseParallelGC"
+        "-XX:+UseG1GC",
+        "-XX:SoftRefLRUPolicyMSPerMB=0"
     )
 
-    // Run all tests in single process - forking adds too much overhead
     maxParallelForks = 1
 }
 

@@ -44,7 +44,7 @@ enum class CalendarTab(val labelResId: Int) {
 }
 
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
     val context = LocalContext.current
     val viewModel: CalendarViewModel = viewModel {
         CalendarViewModel(
@@ -58,6 +58,7 @@ fun CalendarScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .statusBarsPadding()
             .background(MaterialTheme.colorScheme.background)
     ) {
         CalendarHeader(
@@ -72,7 +73,8 @@ fun CalendarScreen() {
                     coursesForDay = viewModel.coursesForSelectedDay,
                     nextUpcoming = viewModel.nextUpcomingCourse,
                     onIncrementDate = { viewModel.incrementDate(it) },
-                    onFindNextClass = { viewModel.jumpToNextClass() }
+                    onFindNextClass = { viewModel.jumpToNextClass() },
+                    onDirectionsToCourse = onDirectionsToCourse
                 )
                 CalendarTab.COURSE_LIST -> CourseListView(
                     courses = uiState.trackedCourses,
@@ -99,11 +101,12 @@ fun CalendarScreen() {
 
 @Composable
 private fun DailyScheduleView(
-    date: Calendar, 
-    coursesForDay: List<Course>, 
+    date: Calendar,
+    coursesForDay: List<Course>,
     nextUpcoming: NextCourseResult?,
     onIncrementDate: (Int) -> Unit,
-    onFindNextClass: () -> Unit
+    onFindNextClass: () -> Unit,
+    onDirectionsToCourse: (Course) -> Unit = {}
 ) {
     val sortedCourses = remember(coursesForDay) {
         coursesForDay.sortedBy { it.startTime }
@@ -111,8 +114,8 @@ private fun DailyScheduleView(
 
     val isShowingNextDay = remember(date, nextUpcoming) {
         nextUpcoming != null &&
-        date.get(Calendar.YEAR) == nextUpcoming.date.get(Calendar.YEAR) &&
-        date.get(Calendar.DAY_OF_YEAR) == nextUpcoming.date.get(Calendar.DAY_OF_YEAR)
+        date[Calendar.YEAR] == nextUpcoming.date[Calendar.YEAR] &&
+        date[Calendar.DAY_OF_YEAR] == nextUpcoming.date[Calendar.DAY_OF_YEAR]
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -127,7 +130,8 @@ private fun DailyScheduleView(
                         val isHighlighted = isShowingNextDay && course == nextUpcoming?.course
                         CourseCard(
                             course = course,
-                            isUpcoming = isHighlighted
+                            isUpcoming = isHighlighted,
+                            onActionClick = { onDirectionsToCourse(course) }
                         )
                     }
                 }
@@ -175,6 +179,8 @@ private fun DailyScheduleView(
         }
     }
 }
+
+private fun courseKey(course: Course) = "${course.classNumber}-${course.section}-${course.termCode}"
 
 @Composable
 private fun CourseListView(
@@ -232,19 +238,15 @@ private fun CourseListView(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(courses, key = { it.subject + it.catalog + it.section + it.termCode + it.componentCode }) { course ->
-                    val courseId = "${course.subject}-${course.catalog}-${course.section}-${course.termCode}-${course.componentCode}"
+                items(courses, key = { courseKey(it) }) { course ->
+                    val courseId = courseKey(course)
                     val isConfirming = confirmingCourseId.value == courseId
                     CourseCard(
                         course = course,
                         showRemoveAction = true,
                         isConfirmingAction = isConfirming,
                         onActionClick = {
-                            if (isConfirming) {
-                                onRemoveCourse(course)
-                            } else {
-                                confirmingCourseId.value = courseId
-                            }
+                            confirmingCourseId.value = if (isConfirming) null.also { onRemoveCourse(course) } else courseId
                         }
                     )
                 }
@@ -328,22 +330,7 @@ fun CourseCard(
 ) {
     val alpha = if (isPast) 0.5f else 1f
     val colorScheme = MaterialTheme.colorScheme
-
-    // Highlight color for next class
     val highlightColor = Color.Red
-
-    // Button colors based on confirmation state
-    val buttonContainerColor = if (showRemoveAction && isConfirmingAction) {
-        colorScheme.error
-    } else {
-        colorScheme.secondaryContainer
-    }
-
-    val buttonContentColor = if (showRemoveAction && isConfirmingAction) {
-        colorScheme.onError
-    } else {
-        colorScheme.onSecondaryContainer
-    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         if (isUpcoming) {
@@ -371,38 +358,54 @@ fun CourseCard(
                 AccessibleText(text = header, baseFontSizeSp = 18f, forceFontWeight = FontWeight.Bold)
                 AccessibleText(text = course.courseTitle, baseFontSizeSp = 14f, fallbackColor = colorScheme.onSurfaceVariant)
 
-                val locationText = if (course.buildingCode.isBlank() || course.room.isBlank()) {
-                    stringResource(R.string.calendar_location_unknown)
-                } else {
-                    "${course.locationCode}, ${course.buildingCode} ${course.room}"
-                }
+                val locationText = courseLocationText(course)
                 AccessibleText(text = stringResource(R.string.calendar_location_label, locationText), baseFontSizeSp = 14f, fallbackColor = colorScheme.onSurfaceVariant)
 
                 AccessibleText(text = "${course.startTime} - ${course.endTime}", baseFontSizeSp = 14f, fallbackColor = colorScheme.onSurfaceVariant)
 
                 if (showActionButton) {
                     Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = onActionClick,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = buttonContainerColor,
-                            contentColor = buttonContentColor
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.height(32.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
-                    ) {
-                        val buttonText = when {
-                            !showRemoveAction -> stringResource(R.string.calendar_directions)
-                            isConfirmingAction -> stringResource(R.string.calendar_confirm_removal)
-                            else -> stringResource(R.string.calendar_remove_course)
-                        }
-                        AccessibleText(text = buttonText, baseFontSizeSp = 12f)
-                    }
+                    CourseCardActionButton(
+                        showRemoveAction = showRemoveAction,
+                        isConfirmingAction = isConfirmingAction,
+                        onActionClick = onActionClick
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun courseLocationText(course: Course): String =
+    if (course.buildingCode.isBlank() || course.room.isBlank()) {
+        stringResource(R.string.calendar_location_unknown)
+    } else {
+        "${course.locationCode}, ${course.buildingCode} ${course.room}"
+    }
+
+@Composable
+private fun CourseCardActionButton(
+    showRemoveAction: Boolean,
+    isConfirmingAction: Boolean,
+    onActionClick: () -> Unit
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val containerColor = if (showRemoveAction && isConfirmingAction) colorScheme.error else colorScheme.secondaryContainer
+    val contentColor = if (showRemoveAction && isConfirmingAction) colorScheme.onError else colorScheme.onSecondaryContainer
+    val buttonText = when {
+        !showRemoveAction -> stringResource(R.string.calendar_directions)
+        isConfirmingAction -> stringResource(R.string.calendar_confirm_removal)
+        else -> stringResource(R.string.calendar_remove_course)
+    }
+    Button(
+        onClick = onActionClick,
+        colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.height(32.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+    ) {
+        AccessibleText(text = buttonText, baseFontSizeSp = 12f)
     }
 }
 
@@ -466,7 +469,7 @@ private fun DateSelector(date: Calendar, onIncrementDate: (Int) -> Unit) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             val dayOfWeek = date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
             val month = date.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
-            val dayOfMonth = date.get(Calendar.DAY_OF_MONTH)
+            val dayOfMonth = date[Calendar.DAY_OF_MONTH]
 
             val label = "$dayOfWeek, $month ${dayOfMonth}${getDayOfMonthSuffix(dayOfMonth)}"
 

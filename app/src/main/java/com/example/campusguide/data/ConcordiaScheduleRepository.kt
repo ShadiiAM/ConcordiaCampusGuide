@@ -10,12 +10,6 @@ class ConcordiaScheduleRepository(
 
     suspend fun getSchedule(subject: String, termCode: String): List<CourseSchedule> = withContext(Dispatchers.IO) {
         val cacheKey = "${subject}_${termCode}"
-        if (cache.containsKey(cacheKey)) {
-            return@withContext cache[cacheKey]!!
-        }
-
-        val schedule = apiService.getSchedule(subject, termCode)
-        cache[cacheKey] = schedule
-        schedule
+        cache.getOrPut(cacheKey) { apiService.getSchedule(subject, termCode) }
     }
 }

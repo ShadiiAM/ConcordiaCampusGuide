@@ -426,7 +426,7 @@
       "description": null
     },
     {
-      "id": "VL-2-201-1",
+      "id": "VL-2-201.1",
       "label": "CLASS-ROOM",
       "x": 672.12,
       "y": 482.23,
@@ -436,7 +436,7 @@
       "description": null
     },
     {
-      "id": "VL-2-202-1",
+      "id": "VL-2-202.1",
       "label": "CLASS-ROOM",
       "x": 61.25,
       "y": 840.14,
@@ -446,7 +446,7 @@
       "description": null
     },
     {
-      "id": "VL-2-202-30",
+      "id": "VL-2-202.30",
       "label": "CLASS-ROOM",
       "x": 275.64,
       "y": 405.09,
@@ -456,7 +456,7 @@
       "description": null
     },
     {
-      "id": "VL-2-203-1",
+      "id": "VL-2-203.1",
       "label": "CLASS-ROOM",
       "x": 664.94,
       "y": 439.17,
@@ -466,7 +466,7 @@
       "description": null
     },
     {
-      "id": "VL-2-203-2",
+      "id": "VL-2-203.2",
       "label": "CLASS-ROOM",
       "x": 656.87,
       "y": 381.77,
@@ -476,7 +476,7 @@
       "description": null
     },
     {
-      "id": "VL-2-203-3",
+      "id": "VL-2-203.3",
       "label": "CLASS-ROOM",
       "x": 699.93,
       "y": 416.75,
@@ -516,7 +516,7 @@
       "description": null
     },
     {
-      "id": "VL-2-297-1",
+      "id": "VL-2-297.1",
       "label": "CLASS-ROOM",
       "x": 825.36,
       "y": 656.01,
@@ -791,7 +791,7 @@
     },
     {
       "fromId": "VL-2-VL40",
-      "toId": "VL-2-297-1",
+      "toId": "VL-2-297.1",
       "weight": 44.78,
       "isAccessible": true
     },
@@ -809,25 +809,25 @@
     },
     {
       "fromId": "VL-2-VL39",
-      "toId": "VL-2-201-1",
+      "toId": "VL-2-201.1",
       "weight": 49.9,
       "isAccessible": true
     },
     {
       "fromId": "VL-2-VL37",
-      "toId": "VL-2-203-1",
+      "toId": "VL-2-203.1",
       "weight": 44.02,
       "isAccessible": true
     },
     {
       "fromId": "VL-2-VL29",
-      "toId": "VL-2-203-2",
+      "toId": "VL-2-203.2",
       "weight": 31.76,
       "isAccessible": true
     },
     {
       "fromId": "VL-2-VL38",
-      "toId": "VL-2-203-3",
+      "toId": "VL-2-203.3",
       "weight": 67.64,
       "isAccessible": true
     },
@@ -839,13 +839,13 @@
     },
     {
       "fromId": "VL-2-VL34",
-      "toId": "VL-2-202-30",
+      "toId": "VL-2-202.30",
       "weight": 60.64,
       "isAccessible": true
     },
     {
       "fromId": "VL-2-VL35",
-      "toId": "VL-2-202-1",
+      "toId": "VL-2-202.1",
       "weight": 65.53,
       "isAccessible": true
     },

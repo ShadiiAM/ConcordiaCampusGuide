@@ -23,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -36,13 +37,16 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.ui.components.BottomCard
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
@@ -132,8 +136,8 @@ fun IndoorMapScreen(
         }
     }
 
-    // Tapped-node info bottom sheet
     var infoNode by remember { mutableStateOf<IndoorNode?>(null) }
+    var poiInfoNode by remember { mutableStateOf<IndoorNode?>(null) }
 
     // Keep building state stable across overlay open/close and apply incoming triggers atomically.
     LaunchedEffect(buildingCode, focusNode, setStartNode, setDestNode, triggerVersion) {
@@ -305,24 +309,29 @@ fun IndoorMapScreen(
                     selectionMode     = selectionMode,
                     crossFloorHint    = crossFloorInstruction,
                     onNodeTapped      = { node ->
-                        // Default first map tap (before top card appears) sets destination.
-                        if (!topCardActive) {
-                            if (hasExistingDestinationSelection) {
-                                viewModel.selectOrigin(node)
-                                selectionMode = SelectionMode.DESTINATION
-                            } else {
-                                viewModel.selectDestination(node)
-                                selectionMode = SelectionMode.ORIGIN
-                            }
+                        if (node.type == IndoorNodeType.POI ||
+                            node.type == IndoorNodeType.ELEVATOR ||
+                            node.type == IndoorNodeType.ESCALATOR) {
+                            poiInfoNode = node
                         } else {
-                            when (selectionMode) {
-                                SelectionMode.ORIGIN -> {
+                            if (!topCardActive) {
+                                if (hasExistingDestinationSelection) {
                                     viewModel.selectOrigin(node)
                                     selectionMode = SelectionMode.DESTINATION
-                                }
-                                SelectionMode.DESTINATION -> {
+                                } else {
                                     viewModel.selectDestination(node)
                                     selectionMode = SelectionMode.ORIGIN
+                                }
+                            } else {
+                                when (selectionMode) {
+                                    SelectionMode.ORIGIN -> {
+                                        viewModel.selectOrigin(node)
+                                        selectionMode = SelectionMode.DESTINATION
+                                    }
+                                    SelectionMode.DESTINATION -> {
+                                        viewModel.selectDestination(node)
+                                        selectionMode = SelectionMode.ORIGIN
+                                    }
                                 }
                             }
                         }
@@ -337,6 +346,23 @@ fun IndoorMapScreen(
 
     infoNode?.let { node ->
         NodeInfoDialog(node = node, onDismiss = { infoNode = null })
+    }
+
+    poiInfoNode?.let { node ->
+        PoiInfoPopup(
+            node = node,
+            onDismiss = { poiInfoNode = null },
+            onSetAsOrigin = {
+                viewModel.selectOrigin(node)
+                selectionMode = SelectionMode.DESTINATION
+                poiInfoNode = null
+            },
+            onSetAsDestination = {
+                viewModel.selectDestination(node)
+                selectionMode = SelectionMode.ORIGIN
+                poiInfoNode = null
+            }
+        )
     }
 }
 
@@ -665,8 +691,20 @@ private fun FloorMapContent(
                 modifier           = Modifier.fillMaxSize()
             )
 
-            // Canvas for nodes and path overlay — must match image's ContentScale.Fit layout
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            val poisOnFloor = graph.nodes.filter {
+                it.type == IndoorNodeType.POI ||
+                it.type == IndoorNodeType.ELEVATOR ||
+                it.type == IndoorNodeType.ESCALATOR
+            }
+            val poiAccessibilityDesc = if (poisOnFloor.isEmpty()) {
+                "Floor map overlay. No points of interest on this floor."
+            } else {
+                val names = poisOnFloor.joinToString(", ") { poiDisplayName(it.label) }
+                "Floor map overlay. Points of interest: $names. Tap a marker to view details."
+            }
+            Canvas(modifier = Modifier
+                .fillMaxSize()
+                .semantics { contentDescription = poiAccessibilityDesc }) {
                 // Fit the image into canvas: compute draw rect matching ContentScale.Fit
                 val imgAspect  = graph.imageWidth.toFloat() / graph.imageHeight
                 val canvAspect = size.width / size.height
@@ -720,12 +758,53 @@ private fun FloorMapContent(
 
                     // Only draw a node marker for non-hallway nodes, or if the node is an origin/destination
                     if (!isHallway || isOrigin || isDest) {
-                        drawCircle(color = color, radius = radius, center = Offset(cx, cy))
-
-                        // Draw the white inner circle only for non-hallway path nodes and for origin/dest
-                        if ((isOnPath && !isHallway) || isOrigin || isDest) {
-                            drawCircle(color = Color.White, radius = radius * 0.5f, center = Offset(cx, cy))
+                        val isIconType = (node.type == IndoorNodeType.POI ||
+                                node.type == IndoorNodeType.ELEVATOR ||
+                                node.type == IndoorNodeType.ESCALATOR) && !isOrigin && !isDest
+                        if (isIconType) {
+                            drawPoiIcon(node.label, cx, cy, radius * 3.2f, node.type)
+                        } else {
+                            drawCircle(color = color, radius = radius, center = Offset(cx, cy))
+                            if ((isOnPath && !isHallway) || isOrigin || isDest) {
+                                drawCircle(color = Color.White, radius = radius * 0.5f, center = Offset(cx, cy))
+                            }
                         }
+                    }
+                }
+            }
+
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val containerW = constraints.maxWidth.toFloat()
+                val containerH = constraints.maxHeight.toFloat()
+                val imgAspect  = graph.imageWidth.toFloat() / graph.imageHeight
+                val canvAspect = if (containerH > 0f) containerW / containerH else 1f
+                val (drawW, drawH) = if (imgAspect > canvAspect)
+                    containerW to containerW / imgAspect
+                else
+                    containerH * imgAspect to containerH
+                val drawLeft = (containerW - drawW) / 2f
+                val drawTop  = (containerH - drawH) / 2f
+                val pxScaleX = drawW / graph.imageWidth
+                val pxScaleY = drawH / graph.imageHeight
+                val hitPx    = NodeRadius * 1.8f * 2f
+
+                val density = LocalDensity.current
+                for (node in poisOnFloor) {
+                    val cxPx = drawLeft + node.x * pxScaleX
+                    val cyPx = drawTop  + node.y * pxScaleY
+                    with(density) {
+                        Box(
+                            modifier = Modifier
+                                .offset(
+                                    x = (cxPx - hitPx / 2f).toDp(),
+                                    y = (cyPx - hitPx / 2f).toDp()
+                                )
+                                .size(hitPx.toDp())
+                                .semantics {
+                                    contentDescription = "POI: ${poiDisplayName(node.label)}"
+                                }
+                                .clickable { latestOnNodeTapped(node) }
+                        )
                     }
                 }
             }
@@ -814,6 +893,49 @@ private fun NodeInfoDialog(node: IndoorNode, onDismiss: () -> Unit) {
         },
         confirmButton = {
             TextButton(onClick = onDismiss) { Text("Close") }
+        }
+    )
+}
+
+@Composable
+private fun PoiInfoPopup(
+    node: IndoorNode,
+    onDismiss: () -> Unit,
+    onSetAsOrigin: () -> Unit,
+    onSetAsDestination: () -> Unit
+) {
+    val details = node.description ?: poiInferredDescription(node.label)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.testTag("poiInfoPopup"),
+        containerColor = Color(0xFF6650A4),
+        title = {
+            Text(
+                text = poiDisplayName(node.label),
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        },
+        text = {
+            Text(
+                text = "Details: $details",
+                color = Color.White
+            )
+        },
+        confirmButton = {
+            Row {
+                TextButton(onClick = onSetAsOrigin) {
+                    Text("Set as Start", color = Color.White)
+                }
+                TextButton(onClick = onSetAsDestination) {
+                    Text("Set as Destination", color = Color.White)
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Close", color = Color.White)
+            }
         }
     )
 }
@@ -955,8 +1077,112 @@ private fun findNearestNode(
     return best
 }
 
+
+/**
+ */
+private fun DrawScope.drawPoiIcon(
+    label: String,
+    cx: Float,
+    cy: Float,
+    radius: Float,
+    type: IndoorNodeType = IndoorNodeType.POI
+) {
+    val fill   = PoiColor
+    val stroke = Stroke(width = radius * 0.22f)
+
+    when {
+        type == IndoorNodeType.ELEVATOR -> {
+            val boxH = radius * 0.9f
+            val boxW = radius * 0.7f
+            val boxLeft = cx - boxW / 2f
+            val boxTop  = cy - boxH / 2f
+            drawRect(color = fill, topLeft = Offset(boxLeft, boxTop), size = Size(boxW, boxH))
+            val arrowW = boxW * 0.35f
+            val upTip   = Offset(cx, boxTop + boxH * 0.18f)
+            val upLeft  = Offset(cx - arrowW, boxTop + boxH * 0.40f)
+            val upRight = Offset(cx + arrowW, boxTop + boxH * 0.40f)
+            val downTip   = Offset(cx, boxTop + boxH * 0.82f)
+            val downLeft  = Offset(cx - arrowW, boxTop + boxH * 0.60f)
+            val downRight = Offset(cx + arrowW, boxTop + boxH * 0.60f)
+            val upArrow   = Path().apply { moveTo(upTip.x, upTip.y); lineTo(upLeft.x, upLeft.y); lineTo(upRight.x, upRight.y); close() }
+            val downArrow = Path().apply { moveTo(downTip.x, downTip.y); lineTo(downLeft.x, downLeft.y); lineTo(downRight.x, downRight.y); close() }
+            drawPath(path = upArrow,   color = Color.White)
+            drawPath(path = downArrow, color = Color.White)
+        }
+
+        type == IndoorNodeType.ESCALATOR -> {
+            val stepW  = radius * 0.34f
+            val stepH  = radius * 0.28f
+            val startX = cx - radius * 0.50f
+            val startY = cy + radius * 0.20f
+            for (i in 0..2) {
+                val topLeft = Offset(startX + i * stepW, startY - i * stepH)
+                drawRect(color = fill, topLeft = topLeft, size = Size(stepW, stepH))
+            }
+            val lineStart = Offset(startX, startY + stepH)
+            val lineEnd   = Offset(startX + 3 * stepW, startY - 2 * stepH)
+            drawLine(color = Color.White, start = lineStart, end = lineEnd, strokeWidth = stroke.width)
+        }
+
+        label.startsWith("BATHROOM") -> {
+            val headR  = radius * 0.28f
+            val headCy = cy - radius * 0.36f
+            drawCircle(color = fill, radius = headR, center = Offset(cx, headCy))
+            val bodyPath = Path().apply {
+                moveTo(cx,                  cy - radius * 0.05f)
+                lineTo(cx - radius * 0.32f, cy + radius * 0.54f)
+                lineTo(cx + radius * 0.32f, cy + radius * 0.54f)
+                close()
+            }
+            drawPath(path = bodyPath, color = fill)
+        }
+
+        label == "WATER-FOUNTAIN" -> {
+            val dropPath = Path().apply {
+                moveTo(cx, cy - radius * 0.54f)
+                cubicTo(
+                    cx + radius * 0.52f, cy - radius * 0.05f,
+                    cx + radius * 0.42f, cy + radius * 0.44f,
+                    cx, cy + radius * 0.54f
+                )
+                cubicTo(
+                    cx - radius * 0.42f, cy + radius * 0.44f,
+                    cx - radius * 0.52f, cy - radius * 0.05f,
+                    cx, cy - radius * 0.54f
+                )
+                close()
+            }
+            drawPath(path = dropPath, color = fill)
+        }
+
+        label.startsWith("EMERGENCY-STAIR") -> {
+            val s = radius * 0.33f
+            val stairPath = Path().apply {
+                moveTo(cx - s * 1.5f, cy + s * 1.5f)
+                lineTo(cx - s * 0.5f, cy + s * 1.5f)
+                lineTo(cx - s * 0.5f, cy + s * 0.5f)
+                lineTo(cx + s * 0.5f, cy + s * 0.5f)
+                lineTo(cx + s * 0.5f, cy - s * 0.5f)
+                lineTo(cx + s * 1.5f, cy - s * 0.5f)
+                lineTo(cx + s * 1.5f, cy - s * 1.5f)
+            }
+            drawPath(path = stairPath, color = fill, style = Stroke(width = stroke.width * 0.7f, cap = StrokeCap.Square, join = StrokeJoin.Miter))
+        }
+    }
+}
+
 private fun formatIndoorTopCardLabel(node: IndoorNode?): String? {
     if (node == null) return null
+
+    if (node.type == IndoorNodeType.ESCALATOR ||
+        node.type == IndoorNodeType.STAIRCASE ||
+        node.type == IndoorNodeType.ELEVATOR ||
+        node.type == IndoorNodeType.RAMP ||
+        node.type == IndoorNodeType.POI ||
+        node.type == IndoorNodeType.ENTRY
+    ) {
+        return node.label
+    }
 
     val idParts = node.id.split("-").filter { it.isNotBlank() }
     val roomPart = idParts.lastOrNull()?.trim()

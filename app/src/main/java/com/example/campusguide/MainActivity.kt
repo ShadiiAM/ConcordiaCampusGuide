@@ -2,7 +2,6 @@ package com.example.campusguide
 
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,10 +10,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,12 +23,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +56,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
+import com.example.campusguide.ui.screens.map.hasLocationPermission
 import com.example.campusguide.ui.accessibility.AccessibleAppRoot
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
@@ -62,11 +72,15 @@ import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import kotlinx.coroutines.launch
 import com.example.campusguide.ui.accessibility.AccessibilityPreferences
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
+import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.CampusBuilding
+import com.example.campusguide.data.Course
+import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.ui.components.DirectionsTopBar
 import com.example.campusguide.ui.components.FocusClearWrapper
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
@@ -74,8 +88,10 @@ import com.example.campusguide.ui.viewmodels.MapSearchViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorRoomSearchService
+import com.example.campusguide.ui.components.POIFilterTags
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
+import com.example.campusguide.ui.screens.POIScreen
 import com.example.campusguide.ui.viewmodels.BuildingRow
 
 class MainActivity : ComponentActivity() {
@@ -129,17 +145,26 @@ fun ConcordiaCampusGuideApp() {
     var indoorDirectionsQuery by rememberSaveable { mutableStateOf("") }
     var indoorDirectionsSuggestions by remember { mutableStateOf<List<IndoorRoomSearchService.Result>>(emptyList()) }
     var topBarDirectionsDestinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var poiFilterValues by remember { mutableStateOf(POIFilterValues()) }
+    var isSearchFocused by remember { mutableStateOf(false) }
+
+
 
     // Indoor overlay + search triggers
     val viewModel = viewModel<ControlsViewModel>()
     val userLocationViewModel = viewModel<UserLocationViewModel>()
     val userLatLng by userLocationViewModel.userLatLng.collectAsState()
     val nearestId by userLocationViewModel.nearestId.collectAsState()
+    val nearestPOIName by userLocationViewModel.nearestPOIName.collectAsState()
 
     val mapViewmodel: MapSearchViewModel = viewModel()
-    var showProfile by remember {mutableStateOf(false)}
+    var showProfile by remember { mutableStateOf(false) }
+    var unknownBuildingCourse by remember { mutableStateOf<Course?>(null) }
+
 
     var currentDestination = remember { mutableStateOf(AppDestinations.MAP) }
+
+
 
     val clearDirectionsAndIndoorState = {
         directionsTopBarState = DirectionsTopBarState(active = false)
@@ -163,9 +188,7 @@ fun ConcordiaCampusGuideApp() {
     )
 
     LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) {
+        if (!hasLocationPermission(context)) {
             locationPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -173,7 +196,6 @@ fun ConcordiaCampusGuideApp() {
                 )
             )
         }
-
     }
 
     LaunchedEffect(directionsTopBarState.active) {
@@ -204,6 +226,18 @@ fun ConcordiaCampusGuideApp() {
         userLocationViewModel.fetchUserLocation()
     }
 
+
+    val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
+        BuildingRow(
+            suggestion = suggestion,
+            nearestId = nearestId,
+            nearestPOIName = nearestPOIName,
+            userLatLng = userLatLng,
+            onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
+            onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
+            onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
+        )
+    }
 
     when {
         showAccessibility -> {
@@ -298,38 +332,15 @@ fun ConcordiaCampusGuideApp() {
                                         )
 
                                         if (directionsTopBarState.active) {
-                                            DirectionsTopBar(
-                                                modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
-                                                    .ignoreFocusClearOnTouch(),
-                                                originLabel = directionsTopBarState.originLabel,
-                                                destinationLabel = directionsTopBarState.destinationLabel,
-                                                isCrossCampus = directionsTopBarState.isCrossCampus,
-                                                selectedMode = directionsTopBarState.selectedMode,
-                                                onModeSelected = { mode -> topBarTravelMode = mode },
-                                                routeSummary = directionsTopBarState.routeSummary,
-                                                errorMessage = directionsTopBarState.errorMessage,
-                                                showActions = directionsTopBarState.showActions,
-                                                isLoadingRoute = directionsTopBarState.isLoadingRoute,
-                                                showTravelModes = directionsTopBarState.showTravelModes,
-                                                goEnabled = directionsTopBarState.goEnabled,
-                                                goLabel = directionsTopBarState.goLabel,
-                                                cancelLabel = directionsTopBarState.cancelLabel,
+                                            SharedDirectionsTopBar(
+                                                state = directionsTopBarState,
                                                 onGoClick = { directionsGoTrigger++ },
-                                                onCancelClick = {
+                                                onCancelOrBackClick = {
                                                     directionsCancelTrigger++
                                                     topBarTravelMode = TravelMode.DRIVE
                                                     clearDirectionsAndIndoorState()
                                                 },
-                                                onBackClick = {
-                                                    // X only dismisses the bar — Cancel button is the only way to cancel the route
-                                                    directionsTopBarState = directionsTopBarState.copy(active = false)
-                                                    directionsEditMode = null
-                                                    directionsDestinationSuggestions = emptyList()
-                                                    indoorDirectionsQuery = ""
-                                                    indoorDirectionsSuggestions = emptyList()
-                                                },
-                                                shuttleStatus = directionsTopBarState.shuttleStatus,
-                                                canUseShuttle = directionsTopBarState.canUseShuttle,
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
                                                 onOriginClick = if (mapViewmodel.openIndoorBuildingCode != null) {
                                                     {
                                                         directionsEditMode = if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) null else DirectionsEditMode.INDOOR_ORIGIN
@@ -358,17 +369,6 @@ fun ConcordiaCampusGuideApp() {
 
 
                                                     if (directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION) {
-
-                                                        val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                            BuildingRow(
-                                                                suggestion = suggestion,
-                                                                nearestId =  nearestId,
-                                                                userLatLng = userLatLng,
-                                                                onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
-                                                                onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
-                                                                onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
-                                                            )
-                                                        }
 
                                                         if(!mapViewmodel.searchVanish){
 
@@ -505,20 +505,8 @@ fun ConcordiaCampusGuideApp() {
                                                         )
                                                     }
                                                 },
-                                                route = directionsTopBarState.route
                                             )
                                         } else{
-
-                                            val suggestionContent: @Composable (Suggestion) -> Unit = { suggestion ->
-                                                BuildingRow(
-                                                    suggestion = suggestion,
-                                                    nearestId =  nearestId,
-                                                    userLatLng = userLatLng,
-                                                    onSuggestionSelected = { mapViewmodel.onSuggestionSelected(it) },
-                                                    onIndoorSetAsStart = { mapViewmodel.onIndoorSetAsStart(it) },
-                                                    onIndoorSetAsDestination = { mapViewmodel.onIndoorSetAsDestination(it) }
-                                                )
-                                            }
 
                                             SearchBarWithProfile(
                                                 modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
@@ -536,23 +524,277 @@ fun ConcordiaCampusGuideApp() {
 
 
                                     AppDestinations.CALENDAR -> {
-                                        CalendarScreen()
+                                        CalendarScreen(
+                                            onDirectionsToCourse = { course ->
+                                                val indoorResults = if (course.room.isNotBlank() && course.buildingCode.isNotBlank()) {
+                                                    IndoorRoomSearchService.search(
+                                                        query = course.room,
+                                                        scope = IndoorRoomSearchService.Scope.Building,
+                                                        buildingCode = course.buildingCode,
+                                                        limit = 1
+                                                    )
+                                                } else emptyList()
+
+                                                if (indoorResults.isNotEmpty()) {
+                                                    val result = indoorResults.first()
+                                                    mapViewmodel.openIndoorBuildingCode = result.buildingCode.uppercase()
+                                                    mapViewmodel.pendingIndoorDestination = result.node
+                                                    mapViewmodel.indoorSetDestTrigger = result.node
+                                                    currentDestination.value = AppDestinations.MAP
+                                                } else {
+                                                    val building = ALL_SUGGESTIONS
+                                                        .filterIsInstance<CampusBuilding>()
+                                                        .firstOrNull {
+                                                            it.buildingCode.equals(
+                                                                course.buildingCode,
+                                                                ignoreCase = true
+                                                            )
+                                                        }
+                                                    if (building != null) {
+                                                        mapViewmodel.navigateToMapWithSuggestion(building)
+                                                        currentDestination.value = AppDestinations.MAP
+                                                    } else {
+                                                        unknownBuildingCourse = course
+                                                    }
+                                                }
+                                            }
+                                        )
                                     }
                                     AppDestinations.POI -> {
-                                        Greeting("POI Screen", modifier)
+                                        POIScreen(
+                                            viewModel = viewModel,
+                                            onDirectionsTopBarState = { state ->
+                                                directionsTopBarState = state
+                                            },
+                                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                                            directionsCancelTrigger = directionsCancelTrigger,
+                                            topBarTravelMode = topBarTravelMode,
+                                            onBottomSearchClick = {
+                                                try {
+                                                    searchFocusRequester.requestFocus()
+                                                } catch (_: IllegalStateException) {
+                                                }
+                                            },
+                                            topBarSelectedPOISuggestion = mapViewmodel.topBarSelectedSuggestion,
+                                            onTopBarBuildingConsumed = {
+                                                mapViewmodel.topBarSelectedSuggestion = null
+                                            },
+                                            poiFilters = poiFilterValues
+                                            )
+
+
+
+                                        if (directionsTopBarState.active) {
+                                            SharedDirectionsTopBar(
+                                                state = directionsTopBarState,
+                                                onGoClick = { directionsGoTrigger++ },
+                                                onCancelOrBackClick = {
+                                                    directionsCancelTrigger++
+                                                    topBarTravelMode = TravelMode.DRIVE
+                                                    clearDirectionsAndIndoorState()
+                                                },
+                                                onModeSelected = { mode -> topBarTravelMode = mode },
+                                            )
+                                        }else{
+
+                                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+                                                SearchBarWithProfile(
+                                                    modifier = Modifier.padding(top = 35.dp).ignoreFocusClearOnTouch(),
+                                                    focusRequester = searchFocusRequester,
+                                                    onSearchQueryChange = mapViewmodel::onPOISearchQueryChange,
+                                                    onSearchSubmit = mapViewmodel::onPOISearchSubmit,
+                                                    onProfileClick = { showProfile = true },
+                                                    suggestions = mapViewmodel.topBarSuggestions,
+
+                                                    suggestionContent = suggestionContent,
+                                                    suggestionKey = mapViewmodel.suggestionKey,
+                                                    onFocusChange = { isSearchFocused = it }
+
+                                                )
+                                                if (!(isSearchFocused && mapViewmodel.topBarSuggestions.isNotEmpty())) {
+                                                    POIFilterTags(
+                                                        modifier = Modifier.fillMaxWidth()
+                                                            .wrapContentWidth(
+                                                                Alignment.CenterHorizontally
+                                                            ).padding(horizontal = 40.dp),
+                                                        poiFilters = poiFilterValues,
+                                                        onPOITagSelect = {
+                                                            poiFilterValues = poiFilterValues.copy(
+                                                                categoriesIncluded = poiFilterValues.categoriesIncluded + it
+                                                            )
+                                                        },
+                                                        onPOITagDismiss = {
+                                                            poiFilterValues = poiFilterValues.copy(
+                                                                categoriesIncluded = poiFilterValues.categoriesIncluded - it
+                                                            )
+                                                        },
+                                                        onPOIRatingClick = {
+                                                            poiFilterValues =
+                                                                poiFilterValues.copy(rating = (poiFilterValues.rating + 1.0) % 5)
+                                                        },
+                                                        onPOIDistanceClick = {
+                                                            poiFilterValues =
+                                                                poiFilterValues.copy(distanceLimit = (poiFilterValues.distanceLimit + 1000.0f) % 10000f)
+                                                        }
+                                                    )
+                                                }
+                                            }
+
+
+                                        }
+
+
                                     }
-
-
 
                                 }
                             }
                         }
                     )
+
+                    unknownBuildingCourse?.let { course ->
+                        UnknownBuildingDialog(
+                            course = course,
+                            onBuildingSelected = { building ->
+                                mapViewmodel.navigateToMapWithSuggestion(building)
+                                currentDestination.value = AppDestinations.MAP
+                                unknownBuildingCourse = null
+                            },
+                            onDismiss = { unknownBuildingCourse = null }
+                        )
+                    }
                 }
             }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UnknownBuildingDialog(
+    course: Course,
+    onBuildingSelected: (CampusBuilding) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val allBuildings = remember {
+        ALL_SUGGESTIONS.filterIsInstance<CampusBuilding>()
+            .sortedBy { it.buildingName }
+    }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Building not recognized",
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Could not find building \"${course.buildingCode}\" in the app's building dataset. " +
+                           "Please select the building for your class to view directions.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedBuilding?.displayName ?: "Select building",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth(),
+                        singleLine = true
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        allBuildings.forEach { building ->
+                            DropdownMenuItem(
+                                text = {
+                                    Column {
+                                        Text(
+                                            text = building.displayName,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = building.campus.name,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    selectedBuilding = building
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { selectedBuilding?.let { onBuildingSelected(it) } },
+                enabled = selectedBuilding != null
+            ) {
+                Text("Go")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Exit")
+            }
+        }
+    )
+}
+
+@Composable
+private fun SharedDirectionsTopBar(
+    state: DirectionsTopBarState,
+    onGoClick: () -> Unit,
+    onCancelOrBackClick: () -> Unit,
+    onModeSelected: (TravelMode) -> Unit,
+    onOriginClick: (() -> Unit)? = null,
+    onDestinationClick: (() -> Unit)? = null,
+    extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
+    DirectionsTopBar(
+        modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
+            .ignoreFocusClearOnTouch(),
+        originLabel = state.originLabel,
+        destinationLabel = state.destinationLabel,
+        isCrossCampus = state.isCrossCampus,
+        selectedMode = state.selectedMode,
+        onModeSelected = onModeSelected,
+        routeSummary = state.routeSummary,
+        errorMessage = state.errorMessage,
+        showActions = state.showActions,
+        isLoadingRoute = state.isLoadingRoute,
+        showTravelModes = state.showTravelModes,
+        goEnabled = state.goEnabled,
+        goLabel = state.goLabel,
+        cancelLabel = state.cancelLabel,
+        onGoClick = onGoClick,
+        onCancelClick = onCancelOrBackClick,
+        onBackClick = onCancelOrBackClick,
+        shuttleStatus = state.shuttleStatus,
+        canUseShuttle = state.canUseShuttle,
+        route = state.route,
+        onOriginClick = onOriginClick,
+        onDestinationClick = onDestinationClick,
+        extraContent = extraContent,
+    )
+}
+
 sealed class AppIcon {
     data class Vector(val imageVector: ImageVector) : AppIcon()
     data class Drawable(@param:DrawableRes val resId: Int) : AppIcon()
@@ -564,7 +806,7 @@ enum class AppDestinations(
 ) {
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
-    POI("POI", AppIcon.Drawable(R.drawable.ic_poi)),
+    POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
 }
 
 

@@ -7,8 +7,10 @@ import android.os.Looper
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.campusguide.data.ALL_POI
 import com.example.campusguide.data.ALL_SUGGESTIONS
 import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.data.find
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.google.android.gms.location.LocationCallback
@@ -37,6 +39,9 @@ class UserLocationViewModel(application: Application) : AndroidViewModel(applica
     private val _nearestShuttleId = MutableStateFlow<String?>(null)
     val nearestId: StateFlow<String?> = _nearestShuttleId
 
+
+    private val _nearestPOIName = MutableStateFlow<String?>(null)
+    val nearestPOIName: StateFlow<String?> = _nearestPOIName
     private val fusedClient = LocationServices.getFusedLocationProviderClient(application)
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -51,6 +56,7 @@ class UserLocationViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             userLatLng.collect { latLng ->
                 updateNearestId(latLng)
+                updateNearestPOI(latLng)
             }
         }
     }
@@ -76,6 +82,12 @@ class UserLocationViewModel(application: Application) : AndroidViewModel(applica
         val allShuttleStop = ShuttleTracker().getShuttleStops()
         _nearestShuttleId.value = userLatLng?.let {
             NearestShuttleStopFinder.find(it, allShuttleStop)?.stop?.id
+        }
+    }
+
+    fun updateNearestPOI(userLatLng: LatLng?) {
+        _nearestPOIName.value = userLatLng?.let {
+            find(it, ALL_POI)
         }
     }
 

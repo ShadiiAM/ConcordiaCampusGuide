@@ -24,7 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.draw.clip
@@ -34,11 +33,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -46,7 +43,8 @@ import androidx.core.app.ActivityCompat
 import com.example.campusguide.R
 import com.example.campusguide.ui.components.BuildingDetailsBottomSheet
 import com.example.campusguide.ui.components.Campus
-import com.example.campusguide.ui.components.CampusToggle
+import com.example.campusguide.ui.components.MapBottomSearchBar
+import com.example.campusguide.ui.components.MapControlsPanel
 import com.example.campusguide.ui.map.geoJson.GeoJsonOverlay
 import com.example.campusguide.ui.map.models.BuildingInfo
 import com.example.campusguide.ui.directions.DirectionsStep
@@ -77,10 +75,9 @@ import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.indoor.IndoorNodeType
 import com.example.campusguide.indoor.IndoorPathfinder
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
-import com.example.campusguide.ui.map.geoJson.ShuttleMarkerFactory
+import com.example.campusguide.ui.map.geoJson.MapMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
-import androidx.core.content.ContextCompat
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
@@ -90,6 +87,8 @@ import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.Polyline
+import kotlin.div
+import kotlin.text.get
 
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
@@ -195,10 +194,7 @@ fun MapScreen(
 
     // Get user location for default origin
     LaunchedEffect(Unit) {
-        val fineGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        if (!fineGranted && !coarseGranted) return@LaunchedEffect
-
+        if (!hasLocationPermission(context)) return@LaunchedEffect
         userLocationViewModel.fetchUserLocation()
     }
 
@@ -284,69 +280,6 @@ fun MapScreen(
             Campus.LOYOLA -> LatLng(45.4582, -73.6402)
         }
     }
-    fun buildRouteSummary(distanceMeters: Int?, durationSeconds: Int?): String {
-        val dist = distanceMeters?.let {
-            if (it >= 1000) "${"%.1f".format(it / 1000.0)} km" else "$it m"
-        }
-        val dur = durationSeconds?.let {
-            val mins = it / 60
-            if (mins < 60) "$mins min" else "${mins / 60} h ${mins % 60} min"
-        }
-        return listOfNotNull(dur, dist).joinToString(" · ")
-    }
-
-    fun findCampusBuilding(buildingCode: String): CampusBuilding? =
-        ALL_SUGGESTIONS
-            .filterIsInstance<CampusBuilding>()
-            .firstOrNull { it.buildingCode.equals(buildingCode, ignoreCase = true) }
-
-    fun findAccessNode(buildingCode: String): IndoorNode? {
-        val floors = IndoorGraphRegistry.floorsFor(buildingCode)
-        val nodes = floors
-            .mapNotNull { IndoorGraphRegistry.get(buildingCode, it) }
-            .flatMap { it.nodes }
-
-        fun firstOf(type: IndoorNodeType): IndoorNode? = nodes.firstOrNull { it.type == type }
-
-        return firstOf(IndoorNodeType.ENTRY)
-            ?: firstOf(IndoorNodeType.ELEVATOR)
-            ?: firstOf(IndoorNodeType.RAMP)
-            ?: firstOf(IndoorNodeType.STAIRCASE)
-            ?: firstOf(IndoorNodeType.ESCALATOR)
-            ?: nodes.firstOrNull { it.type != IndoorNodeType.HALLWAY }
-    }
-
-    fun hasIndoorLegPath(from: IndoorNode, to: IndoorNode): Boolean {
-        if (from.buildingCode != to.buildingCode) return false
-        if (from.id == to.id) return true
-
-        val requireAccessible = accessibilityState.avoidStairs || accessibilityState.avoidEscalators
-        return if (from.floor == to.floor) {
-            val graph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
-            val path = IndoorPathfinder.findPath(
-                graph = graph,
-                originId = from.id,
-                destinationId = to.id,
-                requireAccessible = requireAccessible,
-                avoidStairs = accessibilityState.avoidStairs,
-                avoidEscalators = accessibilityState.avoidEscalators,
-            )
-            !path.isEmpty && path.totalWeight != Float.MAX_VALUE
-        } else {
-            val originGraph = IndoorGraphRegistry.get(from.buildingCode, from.floor) ?: return false
-            val destinationGraph = IndoorGraphRegistry.get(to.buildingCode, to.floor) ?: return false
-            CrossFloorRouter.route(
-                originFloorGraph = originGraph,
-                destinationFloorGraph = destinationGraph,
-                originId = from.id,
-                destinationId = to.id,
-                requireAccessible = requireAccessible,
-                avoidStairs = accessibilityState.avoidStairs,
-                avoidEscalators = accessibilityState.avoidEscalators,
-                preferEscalators = !accessibilityState.avoidEscalators,
-            ) != null
-        }
-    }
 
     LaunchedEffect(indoorOutdoorRouteRequest) {
         val request = indoorOutdoorRouteRequest ?: return@LaunchedEffect
@@ -392,8 +325,8 @@ fun MapScreen(
         indoorFlowStartAccessNode = startAccess
         indoorFlowEndAccessNode = endAccess
 
-        val startIndoorOk = startAccess != null && hasIndoorLegPath(startNode, startAccess)
-        val endIndoorOk = endAccess != null && hasIndoorLegPath(endAccess, destinationNode)
+        val startIndoorOk = startAccess != null && hasIndoorLegPath(startNode, startAccess, accessibilityState)
+        val endIndoorOk = endAccess != null && hasIndoorLegPath(endAccess, destinationNode, accessibilityState)
 
         val plannedLegs = buildList {
             add("Indoor leg 1: ${startNode.label} → ${startAccess?.label ?: "building access point"}")
@@ -465,14 +398,13 @@ fun MapScreen(
         val indoorOrigin = indoorState?.indoorOriginNode ?: if (indoorState == null) latestIndoorOriginNode else null
         val indoorDestination = indoorState?.indoorDestinationNode ?: if (indoorState == null) latestIndoorDestinationNode else null
 
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
-
         if (
             indoorBuildingCode != null &&
             indoorOrigin != null &&
             indoorDestination != null &&
             !indoorOrigin.buildingCode.equals(indoorDestination.buildingCode, ignoreCase = true)
         ) {
+            directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
             mapTapFocusNodeTrigger = null
             mapTapSetStartNodeTrigger = null
             mapTapSetDestNodeTrigger = null
@@ -487,12 +419,12 @@ fun MapScreen(
         }
 
         val step = directionsUiState.step as? DirectionsStep.PlanRoute ?: return@LaunchedEffect
+        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
         var drawRouteResult = DrawRouteResult(emptyList(), "Failed to load route")
 
         centerOnOrigin(googleMap, step.origin, context)
 
         val isCrossCampus = isCrossCampusRoute(originBuilding, destinationBuilding, step.origin)
-        directionsUiState = directionsUiState.copy(isLoadingRoute = true, errorMessage = null)
 
         val departure = canUseShuttle(step.origin, step.destination, travelMode)
         if(departure != null){
@@ -592,6 +524,7 @@ fun MapScreen(
         topBarDestinationOverride = null
         directionsUiState = directionsUiState.copy(
             step = DirectionsStep.PickDestination,
+            isLoadingRoute = false,
             errorMessage = null,
         )
         isPickingOrigin = false
@@ -1134,6 +1067,7 @@ fun MapScreen(
                         // Initialize overlays
                         sgwOverlay = GeoJsonOverlay(ctx, idPropertyName = "buildingCode")
                         loyOverlay = GeoJsonOverlay(ctx, idPropertyName = "buildingCode")
+                        map.uiSettings.isMapToolbarEnabled = false
 
 
                         // Move camera to saved campus
@@ -1164,7 +1098,7 @@ fun MapScreen(
 
                         // Add shuttle stop markers (US-3.1)
                         if (shuttleTracker.isOperational()) {
-                            val shuttleIcon = ShuttleMarkerFactory.create(ctx)
+                            val shuttleIcon = MapMarkerFactory.create(ctx, "Shuttle")
                             shuttleTracker.getShuttleStops().forEach { stop ->
                                 val marker = map.addMarker(
                                     AdvancedMarkerOptions()
@@ -1186,7 +1120,8 @@ fun MapScreen(
 
                         // Marker click: handle shuttle stop taps (US-3.1)
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
-                        map.setOnMarkerClickListener { marker -> // NO SONAR
+                        @Suppress("PotentialBehaviorOverride")
+                        map.setOnMarkerClickListener { marker -> // NOSONAR
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
@@ -1308,7 +1243,6 @@ fun MapScreen(
                                     Campus.LOYOLA -> loyAttached = true
                                 }
                                 initializeOverlays(
-                                    activeCampus,
                                     sgwOverlay!!,
                                     loyOverlay!!,
                                     ctx,
@@ -1320,6 +1254,40 @@ fun MapScreen(
 
                                 ) { callback ->
                                     locationCallback = callback
+                                }
+                            }
+                        }
+
+                        // Pre-load inactive campus overlay in the background
+                        scope.launch(Dispatchers.IO) {
+                            val activeCampus = getSavedCampus(ctx)
+                            val inactiveCampus = when (activeCampus) {
+                                Campus.SGW -> Campus.LOYOLA
+                                Campus.LOYOLA -> Campus.SGW
+                            }
+                            val inactiveJson = loadGeoJson(
+                                ctx,
+                                when (inactiveCampus) {
+                                    Campus.SGW -> R.raw.sgw_buildings
+                                    Campus.LOYOLA -> R.raw.loy_buildings
+                                }
+                            )
+                            when (inactiveCampus) {
+                                Campus.SGW -> sgwOverlay?.attachToMapAsync(map, inactiveJson)
+                                Campus.LOYOLA -> loyOverlay?.attachToMapAsync(map, inactiveJson)
+                            }
+                            withContext(Dispatchers.Main) {
+                                when (inactiveCampus) {
+                                    Campus.SGW -> {
+                                        sgwAttached = true
+                                        sgwOverlay?.setAllStyles(defaultOverlayStyle)
+                                        sgwOverlay?.setMarkersVisible(false)
+                                    }
+                                    Campus.LOYOLA -> {
+                                        loyAttached = true
+                                        loyOverlay?.setAllStyles(defaultOverlayStyle)
+                                        loyOverlay?.setMarkersVisible(false)
+                                    }
                                 }
                             }
                         }
@@ -1338,175 +1306,23 @@ fun MapScreen(
 
 
         // Campus Toggle + round search shortcut button (same row)
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 10.dp)
-                .ignoreFocusClearOnTouch(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable(onClick = onBottomSearchClick)
-                    .semantics { contentDescription = "Bottom search button" },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            CampusToggle(
-                selectedCampus = selectedCampus,
-                onCampusSelected = { campus ->
-                    selectedCampus = campus
-                    saveCampus(context, campus)
-                    switchCampus(campus)
-                },
-                showIcon = true
-            )
-        }
+        MapBottomSearchBar(
+            selectedCampus = selectedCampus,
+            onCampusSelected = { campus ->
+                selectedCampus = campus
+                saveCampus(context, campus)
+                switchCampus(campus)
+            },
+            onBottomSearchClick = onBottomSearchClick,
+        )
 
         // Map Controls
-        if (controlsVisible) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .testTag("mapControls")
-                    .semantics { contentDescription = "Map Controls" }
-                    .padding(end = 16.dp, bottom = 60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { zoomIn(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_in_button),
-                        contentDescription = "Zoom In",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { moveLeft(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.left_button),
-                            contentDescription = "Left",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        IconButton(
-                            onClick = { moveUp(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.up_button),
-                                contentDescription = "Up",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.recenter_button),
-                                contentDescription = "Recenter",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { moveDown(googleMap) },
-                            modifier = Modifier.size(50.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.down_button),
-                                contentDescription = "Down",
-                                tint = Color.Unspecified,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = { moveRight(googleMap) },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.right_button),
-                            contentDescription = "Right",
-                            tint = Color.Unspecified,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = { zoomOut(googleMap) },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.zoom_out_button),
-                        contentDescription = "Zoom Out",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                IconButton(
-                    onClick = { viewModel.controlsVisible = !controlsVisible },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.panel_button),
-                        contentDescription = "Toggle Controls",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        } else {
-            IconButton(
-                onClick = { viewModel.controlsVisible = true },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 60.dp)
-                    .size(50.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.panel_button),
-                    contentDescription = "Toggle Controls",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+        MapControlsPanel(
+            googleMap = googleMap,
+            fusedLocationProviderClient = fusedLocationProviderClient,
+            controlsVisible = controlsVisible,
+            onToggleControls = { viewModel.controlsVisible = !controlsVisible },
+        )
 
         // Building Details Bottom Sheet
         selectedBuildingInfo?.let { info ->
@@ -1579,58 +1395,6 @@ fun MapScreen(
         }
 
 
-//        if (showShuttleRouteDialog && shuttleRouteResults.isNotEmpty()) {
-//            AlertDialog(
-//                onDismissRequest = { showShuttleRouteDialog = false },
-//                title = { Text("Choose shuttle stop") },
-//                text = {
-//                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-//                        shuttleRouteResults.forEach { result ->
-//                            val duration = result.route?.durationSeconds?.let {
-//                                val minutes = it / 60
-//                                if (minutes < 60) "$minutes min" else "${minutes / 60} h ${minutes % 60} min"
-//                            } ?: "Route unavailable"
-//
-//                            TextButton(
-//                                onClick = {
-//                                    showShuttleRouteDialog = false
-//                                    result.route?.let { route ->
-//                                        routePolylineRef?.remove()
-//                                        routePolylineRef = googleMap?.addPolyline(
-//                                            PolylineOptions()
-//                                                .addAll(route.points)
-//                                                .color(0xFF1565C0.toInt())
-//                                                .width(12f)
-//                                        )
-//                                        directionsUiState = directionsUiState.copy(
-//                                            step = DirectionsStep.ShowingRoute(
-//                                                origin = defaultOrigin,
-//                                                destination = result.stop.latLng,
-//                                                route = route,
-//                                                buildingHit = BuildingHit(
-//                                                    id = result.stop.id,
-//                                                    properties = JSONObject().apply {
-//                                                        put("building-name", result.stop.name)
-//                                                    }
-//                                                )
-//                                            )
-//                                        )
-//                                    }
-//                                },
-//                                enabled = result.route != null,
-//                            ) {
-//                                Text("${result.stop.name} • $duration")
-//                            }
-//                        }
-//                    }
-//                },
-//                confirmButton = {
-//                    TextButton(onClick = { showShuttleRouteDialog = false }) {
-//                        Text("Close")
-//                    }
-//                }
-//            )
-//        }
 
         SnackbarHost(
             hostState = snackBarHostState,
