@@ -408,4 +408,13 @@ class CalendarViewModelTest {
         assertEquals(expectedDate[Calendar.DAY_OF_YEAR], viewModel.selectedDate[Calendar.DAY_OF_YEAR])
         assertEquals(expectedDate[Calendar.YEAR], viewModel.selectedDate[Calendar.YEAR])
     }
+
+    @Test
+    fun `jumpToNextClass does not change selectedTab when nextUpcomingCourse is null`() {
+        viewModel.selectedTab = CalendarTab.COURSE_LIST
+
+        viewModel.jumpToNextClass()
+
+        assertEquals(CalendarTab.COURSE_LIST, viewModel.selectedTab)
+    }
 }
