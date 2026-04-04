@@ -38,6 +38,7 @@
 
     <string name="calendar_find_next_class">Find next class</string>
     <string name="calendar_no_upcoming_classes">No upcoming classes found.</string>
+    <string name="calendar_directions_to_next_class">Directions to next class</string>
 
     <!-- Open Data Strings -->
     <string name="open_data_loading">Loading schedule data...</string>
