@@ -138,7 +138,6 @@ private fun DailyScheduleView(
             }
         }
 
-        // Find Next Class Button
         Surface(
             modifier = Modifier.fillMaxWidth(),
             tonalElevation = 4.dp,
@@ -159,21 +158,42 @@ private fun DailyScheduleView(
                     )
                 }
 
-                Button(
-                    onClick = onFindNextClass,
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(Icons.Default.Search, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    AccessibleText(
-                        text = stringResource(R.string.calendar_find_next_class),
-                        fallbackColor = Color.White,
-                        baseFontSizeSp = 16f
-                    )
+                    Button(
+                        onClick = onFindNextClass,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                        Spacer(Modifier.width(4.dp))
+                        AccessibleText(
+                            text = stringResource(R.string.calendar_find_next_class),
+                            fallbackColor = Color.White,
+                            baseFontSizeSp = 14f
+                        )
+                    }
+
+                    Button(
+                        onClick = { nextUpcoming?.let { onDirectionsToCourse(it.course) } },
+                        enabled = nextUpcoming != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        AccessibleText(
+                            text = stringResource(R.string.calendar_directions_to_next_class),
+                            fallbackColor = Color.White,
+                            baseFontSizeSp = 14f
+                        )
+                    }
                 }
             }
         }
