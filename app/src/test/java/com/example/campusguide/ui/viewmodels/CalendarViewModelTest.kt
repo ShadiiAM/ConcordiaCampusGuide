@@ -380,4 +380,16 @@ class CalendarViewModelTest {
         assertNotNull(result)
         assertEquals(earlyDayCourse, result!!.course)
     }
+
+    @Test
+    fun `nextUpcomingCourse returns null when course meets no days of the week`() = runTest {
+        val course = makeCourse(
+            mondays = "N", tuesdays = "N", wednesdays = "N",
+            thursdays = "N", fridays = "N", saturdays = "N", sundays = "N",
+            startTime = "09:00:00"
+        )
+        seedCourse(course)
+
+        assertNull(viewModel.nextUpcomingCourse)
+    }
 }
