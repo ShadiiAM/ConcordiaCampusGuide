@@ -1137,6 +1137,65 @@ private fun DrawScope.drawPoiIcon(
             drawPath(path = bodyPath, color = fill)
         }
 
+        label == "HIVE-CAFE" -> {
+            val cupW = radius * 1.0f
+            val cupH = radius * 0.62f
+            val cupLeft = cx - cupW / 2f
+            val cupTop = cy - cupH * 0.15f
+
+            drawRect(color = fill, topLeft = Offset(cupLeft, cupTop), size = Size(cupW, cupH))
+
+            val handlePath = Path().apply {
+                moveTo(cupLeft + cupW, cy - cupH * 0.08f)
+                cubicTo(
+                    cx + cupW * 0.88f, cy - cupH * 0.28f,
+                    cx + cupW * 0.88f, cy + cupH * 0.35f,
+                    cupLeft + cupW, cy + cupH * 0.18f
+                )
+            }
+            drawPath(path = handlePath, color = fill, style = Stroke(width = stroke.width * 0.75f))
+
+            val steamTop = cupTop - radius * 0.55f
+            val steamBottom = cupTop - radius * 0.12f
+            listOf(-0.22f, 0f, 0.22f).forEach { dxFactor ->
+                val x = cx + radius * dxFactor
+                drawLine(
+                    color = fill,
+                    start = Offset(x, steamBottom),
+                    end = Offset(x, steamTop),
+                    strokeWidth = stroke.width * 0.45f,
+                    cap = StrokeCap.Round
+                )
+            }
+        }
+        label == "SITTING-AREA" -> {
+            val seatW = radius * 1.35f
+            val seatH = radius * 0.24f
+            val backH = radius * 0.55f
+            val legH = radius * 0.42f
+
+            val seatLeft = cx - seatW / 2f
+            val seatTop = cy + radius * 0.02f
+
+            drawRect(color = fill, topLeft = Offset(seatLeft, seatTop), size = Size(seatW, seatH))
+            drawRect(
+                color = fill,
+                topLeft = Offset(seatLeft, seatTop - backH),
+                size = Size(seatW, seatH)
+            )
+            val legW = seatW * 0.14f
+            drawRect(
+                color = fill,
+                topLeft = Offset(seatLeft + seatW * 0.12f, seatTop + seatH),
+                size = Size(legW, legH)
+            )
+            drawRect(
+                color = fill,
+                topLeft = Offset(seatLeft + seatW * 0.74f, seatTop + seatH),
+                size = Size(legW, legH)
+            )
+        }
+
         label == "WATER-FOUNTAIN" -> {
             val dropPath = Path().apply {
                 moveTo(cx, cy - radius * 0.54f)
