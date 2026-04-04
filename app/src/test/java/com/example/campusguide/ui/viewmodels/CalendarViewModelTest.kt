@@ -323,4 +323,22 @@ class CalendarViewModelTest {
     fun `nextUpcomingCourse is null when no courses are tracked`() {
         assertNull(viewModel.nextUpcomingCourse)
     }
+
+    @Test
+    fun `nextUpcomingCourse returns today course that has not started yet`() = runTest {
+        val course = makeCourse(
+            mondays = "Y", tuesdays = "Y", wednesdays = "Y",
+            thursdays = "Y", fridays = "Y", saturdays = "Y", sundays = "Y",
+            startTime = "23:59:59"
+        )
+        seedCourse(course)
+
+        val result = viewModel.nextUpcomingCourse
+
+        assertNotNull(result)
+        assertEquals(course, result!!.course)
+        val today = Calendar.getInstance()
+        assertEquals(today[Calendar.DAY_OF_YEAR], result.date[Calendar.DAY_OF_YEAR])
+        assertEquals(today[Calendar.YEAR], result.date[Calendar.YEAR])
+    }
 }
