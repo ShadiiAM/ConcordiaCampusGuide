@@ -392,4 +392,20 @@ class CalendarViewModelTest {
 
         assertNull(viewModel.nextUpcomingCourse)
     }
+
+    @Test
+    fun `jumpToNextClass updates selectedDate to date of next class`() = runTest {
+        val course = makeCourse(
+            mondays = "Y", tuesdays = "Y", wednesdays = "Y",
+            thursdays = "Y", fridays = "Y", saturdays = "Y", sundays = "Y",
+            startTime = "23:59:59"
+        )
+        seedCourse(course)
+        val expectedDate = viewModel.nextUpcomingCourse!!.date
+
+        viewModel.jumpToNextClass()
+
+        assertEquals(expectedDate[Calendar.DAY_OF_YEAR], viewModel.selectedDate[Calendar.DAY_OF_YEAR])
+        assertEquals(expectedDate[Calendar.YEAR], viewModel.selectedDate[Calendar.YEAR])
+    }
 }
