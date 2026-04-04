@@ -318,4 +318,9 @@ class CalendarViewModelTest {
 
         assertEquals(CalendarTab.DAILY_SCHEDULE, viewModel.selectedTab)
     }
+
+    @Test
+    fun `nextUpcomingCourse is null when no courses are tracked`() {
+        assertNull(viewModel.nextUpcomingCourse)
+    }
 }
