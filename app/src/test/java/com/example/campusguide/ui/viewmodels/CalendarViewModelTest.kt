@@ -341,4 +341,43 @@ class CalendarViewModelTest {
         assertEquals(today[Calendar.DAY_OF_YEAR], result.date[Calendar.DAY_OF_YEAR])
         assertEquals(today[Calendar.YEAR], result.date[Calendar.YEAR])
     }
+
+    @Test
+    fun `nextUpcomingCourse picks earliest course when multiple classes on same future day`() = runTest {
+        val tomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
+        val tomorrowDow = tomorrow[Calendar.DAY_OF_WEEK]
+        fun flag(dow: Int, target: Int) = if (dow == target) "Y" else "N"
+
+        val earlyDayCourse = makeCourse(
+            classNumber = "1", section = "AA",
+            mondays = flag(tomorrowDow, Calendar.MONDAY),
+            tuesdays = flag(tomorrowDow, Calendar.TUESDAY),
+            wednesdays = flag(tomorrowDow, Calendar.WEDNESDAY),
+            thursdays = flag(tomorrowDow, Calendar.THURSDAY),
+            fridays = flag(tomorrowDow, Calendar.FRIDAY),
+            saturdays = flag(tomorrowDow, Calendar.SATURDAY),
+            sundays = flag(tomorrowDow, Calendar.SUNDAY),
+            startTime = "09:00:00"
+        )
+        val laterCourse = makeCourse(
+            classNumber = "2", section = "BB",
+            mondays = flag(tomorrowDow, Calendar.MONDAY),
+            tuesdays = flag(tomorrowDow, Calendar.TUESDAY),
+            wednesdays = flag(tomorrowDow, Calendar.WEDNESDAY),
+            thursdays = flag(tomorrowDow, Calendar.THURSDAY),
+            fridays = flag(tomorrowDow, Calendar.FRIDAY),
+            saturdays = flag(tomorrowDow, Calendar.SATURDAY),
+            sundays = flag(tomorrowDow, Calendar.SUNDAY),
+            startTime = "11:00:00"
+        )
+        seedCourse(earlyDayCourse)
+        whenever(repository.fetchAndFilterCourse(any(), any(), any(), any())).thenReturn(listOf(laterCourse))
+        viewModel.updateInput("2241", "COMP", "232", "BB")
+        viewModel.addCourse()
+
+        val result = viewModel.nextUpcomingCourse
+
+        assertNotNull(result)
+        assertEquals(earlyDayCourse, result!!.course)
+    }
 }
