@@ -551,7 +551,7 @@ fun ConcordiaCampusGuideApp() {
                                                             )
                                                         }
                                                     if (building != null) {
-                                                        mapViewmodel.navigateToMapWithSuggestion(building)
+                                                        topBarDirectionsDestinationBuilding = building
                                                         currentDestination.value = AppDestinations.MAP
                                                     } else {
                                                         unknownBuildingCourse = course
