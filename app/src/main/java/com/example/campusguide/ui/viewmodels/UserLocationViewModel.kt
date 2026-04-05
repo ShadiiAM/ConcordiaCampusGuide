@@ -8,8 +8,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campusguide.data.ALL_POI
-import com.example.campusguide.data.ALL_SUGGESTIONS
-import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.data.find
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.example.campusguide.ui.shuttle.ShuttleTracker

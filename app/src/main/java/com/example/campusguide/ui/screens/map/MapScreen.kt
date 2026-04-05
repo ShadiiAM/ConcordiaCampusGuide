@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -21,15 +20,11 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.material3.*
@@ -72,26 +67,19 @@ import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.directions.isCrossCampusRoute
 import com.example.campusguide.data.ShuttleStop
-import com.example.campusguide.indoor.CrossFloorRouter
-import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorNode
-import com.example.campusguide.indoor.IndoorNodeType
-import com.example.campusguide.indoor.IndoorPathfinder
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.MapMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
-import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.detectCampus
 import com.example.campusguide.ui.screens.IndoorMapScreen
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
 import com.google.android.gms.maps.model.AdvancedMarkerOptions
 import com.google.android.gms.maps.model.Polyline
-import kotlin.div
-import kotlin.text.get
 
 private const val CAMERA_ANIMATION_DURATION_MS = 1500
 private const val CAMPUS_ZOOM_LEVEL = 15f
