@@ -25,6 +25,8 @@ android {
         // Default placeholder so processDebugUnitTestManifest never fails without local.properties.
         // The Secrets plugin overrides this with the real value from local.properties for the app build.
         manifestPlaceholders["MAPS_API_KEY"] = ""
+        buildConfigField("String", "CONCORDIA_API_USER", "\"\"")
+        buildConfigField("String", "CONCORDIA_API_KEY", "\"\"")
     }
 
     useLibrary("org.apache.http.legacy")
@@ -54,6 +56,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            isReturnDefaultValues = true
         }
     }
 }
@@ -258,6 +261,8 @@ dependencies {
 
     // Network
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.uiautomator)
