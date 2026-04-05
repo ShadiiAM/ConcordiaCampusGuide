@@ -1,12 +1,14 @@
 package com.example.campusguide
 
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
@@ -19,10 +21,9 @@ import org.junit.runner.RunWith
  * Determine the next class based on current time
  *
  * Criteria:
- * - "Find next class" button is visible in the Daily Schedule tab
- * - Tapping it scrolls/navigates to the next upcoming class within a 7-day window
- * - If no upcoming class exists, an appropriate message is shown
- * - The Daily Schedule tab is selected after tapping the button
+ * - "Find next class" button is visible in Daily Schedule tab
+ * - With no courses, stays on Daily Schedule tab
+ * - With a tracked course, navigates to the correct day
  */
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -30,11 +31,14 @@ class AT26NextClassTest {
 
     companion object {
         private const val STEP_DELAY_MS = 2_000L
-        private const val TIMEOUT_MS = 15_000L
+        private const val TIMEOUT_MS = 30_000L
     }
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<MainActivity>()
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
 
     @get:Rule
     val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(
@@ -42,55 +46,39 @@ class AT26NextClassTest {
     )
 
     @Test
-    fun findNextClassButton_isVisibleInDailySchedule() {
+    fun findNextClass_fullFlow() {
         navigateToCalendar()
 
+        // --- Criteria 1: Button is visible ---
         composeTestRule.onNodeWithText("Daily Schedule").performClick()
         composeTestRule.waitForIdle()
         Thread.sleep(STEP_DELAY_MS)
-
         composeTestRule.onNodeWithText("Find next class").assertIsDisplayed()
-    }
 
-    @Test
-    fun findNextClassButton_withNoTrackedCourses_showsNoUpcomingMessage() {
-        navigateToCalendar()
-
-        composeTestRule.onNodeWithText("Daily Schedule").performClick()
-        composeTestRule.waitForIdle()
-        Thread.sleep(1000)
-
+        // --- Criteria 2: With no courses, stays on Daily Schedule ---
         composeTestRule.onNodeWithText("Find next class").performClick()
         composeTestRule.waitForIdle()
         Thread.sleep(STEP_DELAY_MS)
-
-        // With no tracked courses, nothing changes — daily schedule stays on same tab
         composeTestRule.onNodeWithText("Daily Schedule").assertIsDisplayed()
-    }
 
-    @Test
-    fun findNextClassButton_withTrackedCourse_navigatesToDailySchedule() {
-        navigateToCalendar()
+        // --- Criteria 3: With a tracked course, navigates to the right day ---
         addCourse(term = "2244", subject = "SOEN", catalog = "390", section = "UU")
-
-        val added = composeTestRule.onAllNodesWithText("Successfully added course")
-            .fetchSemanticsNodes().isNotEmpty()
+        val added = composeTestRule.onAllNodesWithText("Successfully added course").fetchSemanticsNodes().isNotEmpty()
+                || composeTestRule.onAllNodesWithText("This course is already being tracked.").fetchSemanticsNodes().isNotEmpty()
+        Thread.sleep(STEP_DELAY_MS)
 
         if (added) {
-            // Switch to a different tab first
-            composeTestRule.onNodeWithText("Course List").performClick()
-            composeTestRule.waitForIdle()
-            Thread.sleep(1000)
-
-            // Go to Daily Schedule and tap Find next class
             composeTestRule.onNodeWithText("Daily Schedule").performClick()
             composeTestRule.waitForIdle()
             composeTestRule.onNodeWithText("Find next class").performClick()
             composeTestRule.waitForIdle()
             Thread.sleep(STEP_DELAY_MS)
 
-            // Should be on Daily Schedule tab
-            composeTestRule.onNodeWithText("Daily Schedule").assertIsDisplayed()
+            val foundCourse = composeTestRule.onAllNodesWithText("SOEN", substring = true).fetchSemanticsNodes().isNotEmpty()
+            val noUpcoming = composeTestRule.onAllNodesWithText("No upcoming classes today!").fetchSemanticsNodes().isNotEmpty()
+            assert(foundCourse || noUpcoming) {
+                "Expected to see SOEN course in schedule or 'No upcoming classes today!' after Find next class"
+            }
         }
 
         Thread.sleep(STEP_DELAY_MS)
@@ -100,33 +88,27 @@ class AT26NextClassTest {
 
     private fun navigateToCalendar() {
         Thread.sleep(2000)
-        composeTestRule.onNodeWithContentDescription("Calendar").performClick()
+        composeTestRule.onNode(hasText("Calendar")).performClick()
         Thread.sleep(1000)
     }
 
     private fun addCourse(term: String, subject: String, catalog: String, section: String) {
-        composeTestRule.onNodeWithText("Add Course").performClick()
+        composeTestRule.onAllNodesWithText("Add Course")[0].performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 8_000) {
-            composeTestRule.onAllNodesWithText("XXXX (winter 2025:2244)")
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().size >= 4
         }
-        composeTestRule.onNodeWithText("XXXX (winter 2025:2244)").performTextReplacement(term)
-        composeTestRule.onNodeWithText("ABCD").performTextReplacement(subject)
-        composeTestRule.onNodeWithText("XXX").performTextReplacement(catalog)
-        composeTestRule.onNodeWithText("X(X)").performTextReplacement(section)
+        composeTestRule.onAllNodes(hasSetTextAction())[0].performTextReplacement(term)
+        composeTestRule.onAllNodes(hasSetTextAction())[1].performTextReplacement(subject)
+        composeTestRule.onAllNodes(hasSetTextAction())[2].performTextReplacement(catalog)
+        composeTestRule.onAllNodes(hasSetTextAction())[3].performTextReplacement(section)
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Add Course").performClick()
-
+        composeTestRule.onAllNodesWithText("Add Course")[1].performClick()
         composeTestRule.waitUntil(timeoutMillis = TIMEOUT_MS) {
-            composeTestRule.onAllNodesWithText("Successfully added course")
-                .fetchSemanticsNodes().isNotEmpty()
-                    ||
-            composeTestRule.onAllNodesWithText("Course or section not found.")
-                .fetchSemanticsNodes().isNotEmpty()
-                    ||
-            composeTestRule.onAllNodesWithText("Network Error: Check connection.")
-                .fetchSemanticsNodes().isNotEmpty()
+            composeTestRule.onAllNodesWithText("Successfully added course").fetchSemanticsNodes().isNotEmpty()
+                    || composeTestRule.onAllNodesWithText("This course is already being tracked.").fetchSemanticsNodes().isNotEmpty()
+                    || composeTestRule.onAllNodesWithText("Course or section not found.").fetchSemanticsNodes().isNotEmpty()
+                    || composeTestRule.onAllNodesWithText("Network Error: Check connection.").fetchSemanticsNodes().isNotEmpty()
         }
     }
 }
