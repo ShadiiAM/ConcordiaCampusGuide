@@ -123,8 +123,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/ui/theme/**",
         // Activity entry point — framework lifecycle, not unit testable
         "**/MainActivity*",
-        // Requires live network/API calls — not unit testable on JVM
-        "**/ui/directions/**",
         // composable function builds suggestion rows
         "**/*Composable*.kt"
     )

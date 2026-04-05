@@ -51,17 +51,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import com.example.campusguide.data.CampusBuilding
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import com.example.campusguide.data.Indoor
-import com.example.campusguide.data.ShuttleStop
-import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
-import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun <T> SearchBarWithProfile(
