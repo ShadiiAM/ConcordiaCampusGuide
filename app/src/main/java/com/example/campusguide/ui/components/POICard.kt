@@ -55,39 +55,47 @@ fun POICard(
 ) {
     val firebaseAnalytics = Firebase.analytics
 
-    firebaseAnalytics.logEvent("POICardAppeared") {
-        param("component_name", "POICard")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("POICardAppeared")
-
-
     val iconDetails = getPOIColorAndDrawable(poi.category)
 
     val openingHour = poi.workingHours.openingHour.toInt()
     val openingMinute = ((poi.workingHours.openingHour - openingHour) * 60).toInt()
-    val startingHoursText =
-        if(poi.workingHours.openingHour < 12) {
-            "${openingHour}:%02d am".format(openingMinute)
-        }else{
-            "${openingHour}:%02d pm".format(openingMinute)
-        }
-
 
     val closingHour = poi.workingHours.closingHour.toInt()
     val closingMinute = ((poi.workingHours.closingHour - closingHour) * 60).toInt()
-    val closingHoursText =
-        if(poi.workingHours.closingHour < 12) {
-            "${closingHour}:%02d am".format(closingMinute)
-        }else{
-            "${closingHour}:%02d pm".format(closingMinute)
+
+    val openingHour12 = when (openingHour) {
+        0 -> 12
+        in 1..12 -> openingHour
+        else -> openingHour - 12
+    }
+
+    val startingHoursText =
+        if(openingHour < 12) {
+            "${openingHour12}:%02d am".format(openingMinute)
+        } else {
+            "${openingHour12}:%02d pm".format(openingMinute)
         }
 
+
+    val closingHour12 = when (closingHour) {
+        0 -> 12
+        in 1..12 -> closingHour
+        else -> closingHour - 12
+    }
+
+    val closingHoursText =
+        if(closingHour < 12) {
+            "${closingHour12}:%02d am".format(closingMinute)
+        } else {
+            "${closingHour12}:%02d pm".format(closingMinute)
+        }
 
     val workingHoursText = if(poi.workingHours.closedDays.isNotEmpty()){
         "Working Hours: $startingHoursText-$closingHoursText. \nClosed on: ${poi.workingHours.closedDays.joinToString(", ")}"
     }else{
         "Working Hours: $startingHoursText-$closingHoursText. \nOpen all week"
     }
+
 
     AlertDialog(
         onDismissRequest = {onDismiss()
