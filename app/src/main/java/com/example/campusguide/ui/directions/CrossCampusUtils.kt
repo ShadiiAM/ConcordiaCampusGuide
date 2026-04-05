@@ -1,6 +1,5 @@
 package com.example.campusguide.ui.directions
 
-import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
