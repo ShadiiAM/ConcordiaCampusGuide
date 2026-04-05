@@ -74,12 +74,14 @@ class MainActivityTest {
     fun appDestinations_enumHasCorrectValues() {
         // Test that AppDestinations enum has the expected values
         val destinations = AppDestinations.entries
-        assertEquals("Should have 3 destinations", 3, destinations.size)
+        assertEquals("Should have 4 destinations", 4, destinations.size)
 
         val labels = destinations.map { it.label }
         assertTrue("Should contain Map", labels.contains("Map"))
         assertTrue("Should contain Calendar", labels.contains("Calendar"))
         assertTrue("Should contain POI", labels.contains("POI"))
+        assertTrue("Should contain Settings", labels.contains("Settings"))
+
     }
 
     @Test
@@ -129,10 +131,13 @@ class MainActivityTest {
         val mapIcon = AppDestinations.MAP.icon
         val calendarIcon = AppDestinations.CALENDAR.icon
         val poiIcon = AppDestinations.POI.icon
+        val accessibilityIcon = AppDestinations.ACCESSIBILITY.icon
 
         assertNotNull("Map icon should exist", mapIcon)
         assertNotNull("Calendar icon should exist", calendarIcon)
         assertNotNull("POI icon should exist", poiIcon)
+        assertNotNull("POI icon should exist", accessibilityIcon)
+
     }
 
     @Test

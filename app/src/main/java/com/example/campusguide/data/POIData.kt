@@ -253,7 +253,138 @@ val ALL_POI: List<OutsidePOI> = listOf(
         "810 Rue Chatham, Montréal, H3J 0B8"
     ),
 
-)
+
+    // Loyola LOCATIONS
+
+    // Cafe
+
+    OutsidePOI("Second Cup Café", "$1-10 Coffee Shop with a nice outdoor sitting area",
+        POIType.Cafe,
+        WorkingHours(7.0, 21.0, emptyList()),
+        4.1,
+        LatLng(45.456243090046236, -73.64082071173569),
+        "7345 Sherbrooke St W #7335, Montreal, H4B 1R9"
+    ),
+
+    OutsidePOI("Infinithe", "A highly rated modern Bubble tea store",
+        POIType.Cafe,
+        WorkingHours(11.0, 20.0, listOf(DayOfWeek.Saturday, DayOfWeek.Sunday)),
+        4.7,
+        LatLng(45.45581420674896, -73.64121891543755),
+        "F945+8G Montreal"
+    ),
+
+    OutsidePOI("Le Café Artistique S&M inc", "$10–20 Cafe with a cozy artistic layout",
+        POIType.Cafe,
+        WorkingHours(9.0, 17.0, listOf(DayOfWeek.Sunday, DayOfWeek.Monday)),
+        5.0,
+        LatLng(45.45273215658671, -73.645018955915),
+        "F933+2X Montreal West"
+    ),
+
+    // Metro
+
+
+
+
+    // Restaurant
+
+    OutsidePOI("Cafe Restaurant Nab", "$20–30 Women Owned Fine dining Restaurant",
+        POIType.Restaurant,
+        WorkingHours(12.5, 21.0, listOf(DayOfWeek.Monday)),
+        4.9,
+        LatLng(45.47072477743451, -73.60861068503351),
+        "5563 Upper Lachine Rd, Montreal, H4A 2A6"
+    ),
+
+
+    OutsidePOI("Restaurant Kapsalon", "$10–20 Family Friendly Restaurant with great options for Uni students",
+        POIType.Restaurant,
+        WorkingHours(11.0, 23.0, emptyList()),
+        4.8,
+        LatLng(45.47773656888493, -73.61539130928905),
+        "3855 Bd Décarie, Montréal, H4A 3J6"
+    ),
+
+
+    OutsidePOI("House of Taste Restaurant Inc", "$10–20 Restaurant with great soup and steak options",
+        POIType.Restaurant,
+        WorkingHours(11.0, 21.0, listOf(DayOfWeek.Sunday)),
+        4.9,
+        LatLng(45.44186294334899, -73.68676920037689),
+        "2525A Rue Provost, Montréal, H8S 1R2"
+    ),
+
+
+    // Museum
+
+
+    // Grocery
+
+    OutsidePOI("Metro Somerled", "Big supermarket with all your needs",
+        POIType.Grocery,
+        WorkingHours(8.0, 22.0, listOf(DayOfWeek.Sunday)),
+        3.8,
+        LatLng(45.46759718212292, -73.63991881222348),
+        "6645 Av. Somerled, Montréal, QC H4V 1T3"
+    ),
+
+    OutsidePOI("IGA Lipari Côte-St-Luc", "Store with extensive variety of meats, fish, produce and baked goods.",
+        POIType.Grocery,
+        WorkingHours(8.0, 22.0, listOf(DayOfWeek.Sunday)),
+        3.9,
+        LatLng(45.4657913291042, -73.65270758481495),
+        "IGA Lipari Côte-St-Luc, Floor 1 of Côte-St-Luc Shopping center"
+    ),
+
+    OutsidePOI("Super C", "Wide aisles great variety on fruits and vegetables etc. Good place for shopping",
+        POIType.Grocery,
+        WorkingHours(8.0, 22.0, emptyList()),
+        3.9,
+        LatLng(45.457242840004604, -73.6287608232104),
+        "6900 Rue Saint-Jacques, Montréal, QC H4B 1V8"
+    ),
+
+
+
+
+    // Park
+
+    OutsidePOI("Parc Ronald", "Nice small park with a mcdonalds close by.",
+        POIType.Park,
+        WorkingHours(0.0, 23.0, emptyList()),
+        3.5,
+        LatLng(45.45509125004511, -73.63287718340497),
+        "7270 Rue Saint-Jacques, Montréal, QC H4B 1W1"
+    ),
+
+
+    OutsidePOI("Coffee Park", "Nice park with dogs allowed and a playground for kids.",
+        POIType.Park,
+        WorkingHours(6.0, 0.0, emptyList()),
+        4.2,
+        LatLng(45.45572342517109, -73.63952906181964),
+        "7330 Coffee St, Montreal, H4B 1K1"
+    ),
+
+    OutsidePOI("Loyola Park", "Large City park with dogs allowed and many attractions.",
+        POIType.Park,
+        WorkingHours(6.0, 0.0, emptyList()),
+        4.4,
+        LatLng(45.46129228044278, -73.64575178661111),
+        "4877 Av. Doherty, Montréal, H4V 2B2"
+    ),
+
+    OutsidePOI("William-Bowie Park", "Wide Wheelchair accessible park with dogs allowed.",
+        POIType.Park,
+        WorkingHours(6.0, 0.0, emptyList()),
+        4.4,
+        LatLng(45.45804133987836, -73.648584199302),
+        "4955 Trenholme Ave, Montreal, H4V 1Y2"
+    ),
+
+
+    )
 
 
 fun fullPOISuggestions(
