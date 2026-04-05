@@ -65,10 +65,7 @@ fun AccessibilityScreen(
     onBackClick: () -> Unit = {}
 ) {
     val firebaseAnalytics = Firebase.analytics
-    
-    LaunchedEffect(Unit) {
-        Clarity.setCurrentScreenName("AccessibilityScreen")
-    }
+
     var isBoldEnabled by remember { mutableStateOf(true) }
     val accessibilityState = LocalAccessibilityState.current
     val context = LocalContext.current

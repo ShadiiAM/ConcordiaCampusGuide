@@ -56,11 +56,6 @@ fun ProfileScreen(
 
     val firebaseAnalytics = Firebase.analytics
 
-
-    LaunchedEffect(Unit) {
-        Clarity.setCurrentScreenName("ProfileScreen")
-    }
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -117,7 +112,7 @@ fun ProfileScreen(
                 onClick ={
                     firebaseAnalytics.logEvent("profile_screen_accessibility_click", null)
                     UsabilityTrackerIRLUsers.userInteractionRecord("profile_screen_accessibility_click")
-
+                    Clarity.setCurrentScreenName("AccessibilityScreen")
                     onAccessibilityClick()}
             )
         }

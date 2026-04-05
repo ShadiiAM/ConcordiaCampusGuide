@@ -103,11 +103,6 @@ fun POIScreen(
 
     val firebaseAnalytics = Firebase.analytics
 
-
-    LaunchedEffect(Unit) {
-        Clarity.setCurrentScreenName("POIScreen")
-    }
-
     val cameraAnimationDuration = 1500
     val campusLevelZoom = 15f
 

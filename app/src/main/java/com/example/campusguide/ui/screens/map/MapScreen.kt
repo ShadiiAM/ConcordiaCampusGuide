@@ -129,10 +129,6 @@ fun MapScreen(
 
     val firebaseAnalytics = Firebase.analytics
 
-    LaunchedEffect(Unit) {
-        Clarity.setCurrentScreenName("MapScreen")
-    }
-
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val accessibilityState = LocalAccessibilityState.current

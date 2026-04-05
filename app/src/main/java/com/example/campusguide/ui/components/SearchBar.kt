@@ -66,6 +66,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
+import com.microsoft.clarity.Clarity
 
 @Composable
 fun <T> SearchBarWithProfile(
@@ -180,7 +181,7 @@ fun <T> SearchBarWithProfile(
 
                                 firebaseAnalytics.logEvent("search_bar_profile_click", null)
                                 UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_profile_click")
-
+                                Clarity.setCurrentScreenName("ProfileScreen")
                             })
                             .testTag("UserProfile"),
                         contentAlignment = Alignment.Center

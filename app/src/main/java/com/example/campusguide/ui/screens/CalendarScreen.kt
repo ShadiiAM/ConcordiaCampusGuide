@@ -62,12 +62,6 @@ fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
     }
     val firebaseAnalytics = Firebase.analytics
 
-    
-    LaunchedEffect(Unit) {
-        Clarity.setCurrentScreenName("CalendarScreen")
-    }
-
-
     val uiState = viewModel.uiState
 
     Column(

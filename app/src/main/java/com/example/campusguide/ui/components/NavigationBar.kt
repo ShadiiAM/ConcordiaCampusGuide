@@ -18,6 +18,7 @@ import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
+import com.microsoft.clarity.Clarity
 
 
 @Composable
@@ -53,7 +54,7 @@ fun NavigationBar(
                     onClick = { onDestinationSelected(it)
                         firebaseAnalytics.logEvent("navigation_bar_to_$it", null)
                         UsabilityTrackerIRLUsers.userInteractionRecord("navigation_bar_to_$it")
-
+                        Clarity.setCurrentScreenName("$it Screen")
                     }
                 )
             }
