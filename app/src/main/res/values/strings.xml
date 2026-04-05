@@ -1,4 +1,47 @@
 <resources>
     <string name="app_name">ConcordiaCampusGuide</string>
     <string name="title_activity_maps">MapsActivity</string>
+
+    <!-- Calendar Screen Strings -->
+    <string name="calendar_daily_schedule">Daily Schedule</string>
+    <string name="calendar_course_list">Course List</string>
+    <string name="calendar_add_course">Add Course</string>
+
+    <string name="calendar_empty_schedule">No upcoming classes today!</string>
+    <string name="calendar_empty_course_list">You aren\'t tracking any courses yet.\nGo to \'Add Course\' to begin.</string>
+
+    <string name="calendar_input_term_label">Input Term code (4 digits)*</string>
+    <string name="calendar_input_term_placeholder">XXXX (winter 2025:2244)</string>
+    <string name="calendar_input_subject_label">Input subject code (e.g., SOEN, COMM)*</string>
+    <string name="calendar_input_subject_placeholder">ABCD</string>
+    <string name="calendar_input_catalog_label">Input catalog number (e.g., 201)*</string>
+    <string name="calendar_input_catalog_placeholder">XXX</string>
+    <string name="calendar_input_section_label">Input section code (e.g., 50, UU)*</string>
+    <string name="calendar_input_section_placeholder">X(X)</string>
+
+    <string name="calendar_add_course_button">Add Course</string>
+    <string name="calendar_success_added">Successfully added course</string>
+    <string name="calendar_error_not_found">Course or section not found.</string>
+    <string name="calendar_error_network">Network Error: Check connection.</string>
+    <string name="calendar_error_already_tracked">This course is already being tracked.</string>
+
+    <string name="calendar_location_label">Location: %s</string>
+    <string name="calendar_location_unknown">Unknown</string>
+    <string name="calendar_remove_course">Remove course</string>
+    <string name="calendar_confirm_removal">Confirm removal</string>
+    <string name="calendar_directions">Directions to classroom</string>
+
+    <string name="calendar_course_header">%s %s (%s) %s</string>
+    <string name="calendar_refresh_failed">Some courses failed to update.</string>
+    <string name="calendar_refresh_success">All courses updated.</string>
+    <string name="calendar_refreshing">Refreshing schedules…</string>
+
+    <string name="calendar_find_next_class">Find next class</string>
+    <string name="calendar_no_upcoming_classes">No upcoming classes found.</string>
+    <string name="calendar_directions_to_next_class">Directions to next class</string>
+
+    <!-- Open Data Strings -->
+    <string name="open_data_loading">Loading schedule data...</string>
+    <string name="open_data_empty">No schedule data found.</string>
+    <string name="open_data_retry">Retry</string>
 </resources>
