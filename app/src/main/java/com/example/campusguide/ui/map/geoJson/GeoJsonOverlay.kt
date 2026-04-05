@@ -361,17 +361,23 @@ class GeoJsonOverlay(
         }
     }
 
+    /**
+     * Returns a stable string ID for a GeoJSON feature.
+     * Priority: properties[idPropertyName] > feature-level "id" > hash of the raw JSON.
+     * The hash fallback is deterministic within a session but should not be relied on
+     * for persistence since JSONObject key ordering can vary.
+     */
     private fun stableIdFor(feature: JSONObject): String {
-        // Prefer properties[idPropertyName]
+        // Prefer the configured property field (e.g. "id" or "building-code")
         val props = feature.optJSONObject("properties")
         val fromProp = props?.opt(idPropertyName)?.toString()?.takeIf { it.isNotBlank() }
         if (fromProp != null) return fromProp
 
-        // Then feature-level "id"
+        // Fall back to the top-level GeoJSON "id" field
         val id = feature.opt("id")?.toString()?.takeIf { it.isNotBlank() }
         if (id != null) return id
 
-        // fallback
+        // Last resort: hash the serialized feature so polygons can still be tracked
         return feature.toString().hashCode().toString()
     }
 

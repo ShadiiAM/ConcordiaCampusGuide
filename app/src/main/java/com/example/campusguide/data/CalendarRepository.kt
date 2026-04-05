@@ -23,10 +23,14 @@ interface CalendarRepository {
     ): List<Course>
 }
 
+/**
+ * Production implementation that calls the Concordia Open Data API.
+ * Uses Basic auth credentials stored in BuildConfig.
+ */
 class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) : CalendarRepository {
-    
-    private val json = Json { 
-        ignoreUnknownKeys = true 
+
+    private val json = Json {
+        ignoreUnknownKeys = true
         coerceInputValues = true
     }
 
@@ -38,12 +42,9 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
     ): List<Course> = withContext(Dispatchers.IO) {
         val cleanSubject = subject.trim().uppercase()
         val cleanCatalog = catalog.trim().uppercase()
-        val url = "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$cleanSubject/$cleanCatalog" // did not use courseID because value is hard to find
-
-        /*
-        to check what subject and catalog value is being used for the api
-        Log.d("CalendarRepo", "REQUESTING URL: $url")
-         */
+        // Wildcard for termCode in the URL; we filter the response ourselves because
+        // the API does not expose a reliable courseID for direct lookup.
+        val url = "https://opendata.concordia.ca/API/v1/course/schedule/filter/*/$cleanSubject/$cleanCatalog"
 
         val authHeader = Credentials.basic(BuildConfig.CONCORDIA_API_USER, BuildConfig.CONCORDIA_API_KEY)
 
@@ -55,13 +56,15 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 Log.e("CalendarRepo", "API Error: ${response.code} - ${response.message}")
+                // 4xx usually means the course doesn't exist; return empty rather than throwing
                 if (response.code in 400..499) return@withContext emptyList()
                 throw IOException("Server Error: ${response.code}")
             }
-            
+
             val body = response.body?.string()?.takeIf { it.isNotBlank() } ?: return@withContext emptyList()
             val results = json.decodeFromString<List<Course>>(body)
-            
+
+            // The API returns all sections; narrow down to the requested term and section
             results.filter {
                 it.termCode.trim() == termCode.trim() && it.section.trim().equals(section.trim(), ignoreCase = true)
             }
