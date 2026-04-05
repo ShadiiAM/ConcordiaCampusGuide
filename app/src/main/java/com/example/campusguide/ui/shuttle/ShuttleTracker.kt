@@ -23,10 +23,16 @@ class ShuttleTracker(private val dataSource: ShuttleDataSource = StaticShuttleDa
 
     fun getShuttleStops(): List<ShuttleStop> = safeGetShuttleStops()
 
+    /**
+     * Returns a human-readable string for the next shuttle from [campus], or null if
+     * no schedule data is available.
+     * Examples: "18:30", "Next Mon: 09:15"
+     */
     fun getNextShuttleForCampus(campus: Campus): String? {
         val next = ShuttleSchedule.nextDeparture(campus)
         if (next != null) return next.toString()
 
+        // No more buses today; show the first departure on the next operating day
         val nextDay = ShuttleSchedule.nextDepartureNextDay(campus) ?: return null
         return "Next ${nextDay.first}: ${nextDay.second}"
     }

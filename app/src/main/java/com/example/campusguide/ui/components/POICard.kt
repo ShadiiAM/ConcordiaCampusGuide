@@ -16,7 +16,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,12 +31,11 @@ import com.example.campusguide.R
 import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.POIType
 import com.example.campusguide.ui.accessibility.AccessibleText
-import com.example.campusguide.ui.shuttle.DepartureResult
 
 
 private val CafePink = Color(0xFFFF7FF4)
-private val MetroBlue = Color(0xFF1E88E5)
-private val RestaurantRed = Color(0xFFD32F2F)
+private val MetroBlue = Color(0xFF64B5F6)
+private val RestaurantRed = Color(0xFFEF5350)
 
 private val MuseumYellow = Color(0xFFFFF27F)
 private val GroceryStoreOrange = Color(0xFFFF9800)
@@ -54,23 +52,36 @@ fun POICard(
 
     val openingHour = poi.workingHours.openingHour.toInt()
     val openingMinute = ((poi.workingHours.openingHour - openingHour) * 60).toInt()
-    val startingHoursText =
-        if(poi.workingHours.openingHour < 12) {
-            "${openingHour}:%02d am".format(openingMinute)
-        }else{
-            "${openingHour}:%02d pm".format(openingMinute)
-        }
-
 
     val closingHour = poi.workingHours.closingHour.toInt()
     val closingMinute = ((poi.workingHours.closingHour - closingHour) * 60).toInt()
-    val closingHoursText =
-        if(poi.workingHours.closingHour < 12) {
-            "${closingHour}:%02d am".format(closingMinute)
-        }else{
-            "${closingHour}:%02d pm".format(closingMinute)
+
+    val openingHour12 = when (openingHour) {
+        0 -> 12
+        in 1..12 -> openingHour
+        else -> openingHour - 12
+    }
+
+    val startingHoursText =
+        if(openingHour < 12) {
+            "${openingHour12}:%02d am".format(openingMinute)
+        } else {
+            "${openingHour12}:%02d pm".format(openingMinute)
         }
 
+
+    val closingHour12 = when (closingHour) {
+        0 -> 12
+        in 1..12 -> closingHour
+        else -> closingHour - 12
+    }
+
+    val closingHoursText =
+        if(closingHour < 12) {
+            "${closingHour12}:%02d am".format(closingMinute)
+        } else {
+            "${closingHour12}:%02d pm".format(closingMinute)
+        }
 
     val workingHoursText = if(poi.workingHours.closedDays.isNotEmpty()){
         "Working Hours: $startingHoursText-$closingHoursText. \nClosed on: ${poi.workingHours.closedDays.joinToString(", ")}"

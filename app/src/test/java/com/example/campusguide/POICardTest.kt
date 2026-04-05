@@ -105,13 +105,13 @@ class POICardTest {
     @Test
     fun `POICard displays am for morning opening hour`() {
         setCard(makePOI(openingHour = 8.0, closingHour = 18.0))
-        composeTestRule.onNodeWithText("Working Hours: 8:00 am-18:00 pm. \nOpen all week").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Working Hours: 8:00 am-6:00 pm. \nOpen all week").assertIsDisplayed()
     }
 
     @Test
     fun `POICard displays half-hour minutes correctly`() {
         setCard(makePOI(openingHour = 7.5, closingHour = 17.5))
-        composeTestRule.onNodeWithText("Working Hours: 7:30 am-17:30 pm. \nOpen all week").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Working Hours: 7:30 am-5:30 pm. \nOpen all week").assertIsDisplayed()
     }
 
     @Test

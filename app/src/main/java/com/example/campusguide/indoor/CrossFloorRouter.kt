@@ -128,7 +128,6 @@ object CrossFloorRouter {
         val endAnchor = addAnchor(destinationNode, isTransfer = false)
 
         val transferAnchorsByFloor = mutableMapOf<Int, MutableList<Anchor>>()
-        val goingUp = destinationFloorGraph.floor > originFloorGraph.floor
 
         for ((floor, graph) in graphs) {
             graph.nodes
@@ -141,6 +140,8 @@ object CrossFloorRouter {
 
         if (transferAnchorsByFloor.isEmpty()) return null
 
+        // Build a compressed graph where nodes are anchors (start, end, transfer nodes)
+        // and edges are either horizontal paths (within a floor) or vertical jumps (floor changes).
         val adjacency = mutableMapOf<String, MutableList<EdgeInfo>>()
         fun addDirectedEdge(edge: EdgeInfo) {
             adjacency.getOrPut(edge.from) { mutableListOf() }.add(edge)
@@ -166,6 +167,7 @@ object CrossFloorRouter {
             )
         }
 
+        // Horizontal edges: run Dijkstra between every pair of anchors on the same floor
         for ((floor, floorAnchors) in transferAnchorsByFloor) {
             val graph = graphs[floor] ?: continue
             val anchorsOnFloor = buildList {
@@ -193,6 +195,8 @@ object CrossFloorRouter {
             }
         }
 
+        // Vertical edges: connect matching transfer nodes across floors (same shaft/stairwell).
+        // Cost is proportional to the number of floors traversed.
         val transferAnchors = anchors.filter { it.isTransfer }
         for (i in transferAnchors.indices) {
             for (j in i + 1 until transferAnchors.size) {

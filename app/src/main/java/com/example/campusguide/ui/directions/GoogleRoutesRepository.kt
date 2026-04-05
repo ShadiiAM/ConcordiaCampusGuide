@@ -47,8 +47,8 @@ class GoogleRoutesRepository(
             )
 
             val bodyStr = json.encodeToString(ComputeRoutesRequest.serializer(), bodyObj)
-            // Field mask varies by travel mode
 
+            // Base fields requested from the API for all travel modes
             var fieldMask =
                     "routes.duration," +
                     "routes.distanceMeters," +
@@ -61,6 +61,7 @@ class GoogleRoutesRepository(
                     "routes.legs.steps.travelMode," +
                     "routes.legs.steps.polyline.encodedPolyline,"
 
+            // Transit-specific fields are only requested when needed to avoid billing extra
             if (request.travelMode == "TRANSIT") {
                 fieldMask = fieldMask +
                     "routes.legs.steps.transitDetails.stopDetails," +
@@ -156,6 +157,8 @@ class GoogleRoutesRepository(
                                 stopCount = td.stopCount
                             )
                         }
+                                // The API uses the same WALK travelMode for walking legs inside transit routes,
+                        // so we infer it from the presence of transitDetails instead.
                         val travelMode = when {
                             step.transitDetails != null -> TravelMode.TRANSIT
                             request.travelMode == "DRIVE" -> TravelMode.DRIVE

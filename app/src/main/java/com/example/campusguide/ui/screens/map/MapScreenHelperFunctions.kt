@@ -109,6 +109,7 @@ internal fun initializeOverlays(
     sgwOverlayNullable: GeoJsonOverlay?,
     loyOverlayNullable: GeoJsonOverlay?,
     userLocationViewModel: UserLocationViewModel,
+    onBuildingDetected: (String?) -> Unit = {},
     setCallback: (LocationCallback) -> Unit,
 ) {
     sgwOverlay.setAllStyles(defaultOverlayStyle)
@@ -129,6 +130,7 @@ internal fun initializeOverlays(
         sgwOverlayNullable,
         loyOverlayNullable,
         userLocationViewModel,
+        onBuildingDetected,
         setCallback
     )
 }
@@ -140,6 +142,7 @@ internal fun startLocationTracking(
     sgwOverlay: GeoJsonOverlay?,
     loyOverlay: GeoJsonOverlay?,
     userLocationViewModel: UserLocationViewModel,
+    onBuildingDetected: (String?) -> Unit = {},
     setCallback: (LocationCallback) -> Unit
 ) {
     if (ActivityCompat.checkSelfPermission(
@@ -156,7 +159,7 @@ internal fun startLocationTracking(
                 locationResult.lastLocation?.let { location ->
                     val userLatLng = LatLng(location.latitude, location.longitude)
                     userLocationViewModel.onLocationUpdated(userLatLng)
-                    highlightBuildingUserIsIn(userLatLng, sgwOverlay, loyOverlay)
+                    onBuildingDetected(highlightBuildingUserIsIn(userLatLng, sgwOverlay, loyOverlay))
                 }
             }
         }
@@ -180,17 +183,11 @@ internal fun highlightBuildingUserIsIn(
     latLng: LatLng,
     sgwOverlay: GeoJsonOverlay?,
     loyOverlay: GeoJsonOverlay?
-) {
+): String? {
     sgwOverlay?.let { sgw ->
         loyOverlay?.let { loy ->
-            val sgwBuildingLocator = BuildingLocator(
-                sgw.getBuildings(),
-                sgw.getBuildingProps()
-            )
-            val loyBuildingLocator = BuildingLocator(
-                loy.getBuildings(),
-                loy.getBuildingProps()
-            )
+            val sgwBuildingLocator = BuildingLocator(sgw.getBuildings(), sgw.getBuildingProps())
+            val loyBuildingLocator = BuildingLocator(loy.getBuildings(), loy.getBuildingProps())
 
             val sgwIsHit = sgwBuildingLocator.pointInBuilding(latLng)
             val loyIsHit = loyBuildingLocator.pointInBuilding(latLng)
@@ -202,17 +199,19 @@ internal fun highlightBuildingUserIsIn(
                 val building = sgwBuildingLocator.findBuilding(latLng)
                 building?.let {
                     sgw.setStyleForFeature(it.id, highlightedOverlayStyle)
+                    return it.properties?.optString("buildingName")?.takeIf { n -> n.isNotBlank() } ?: it.id
                 }
             }
             if (loyIsHit) {
                 val building = loyBuildingLocator.findBuilding(latLng)
                 building?.let {
                     loy.setStyleForFeature(it.id, highlightedOverlayStyle)
+                    return it.properties?.optString("buildingName")?.takeIf { n -> n.isNotBlank() } ?: it.id
                 }
             }
         }
     }
-
+    return null
 }
 
 internal fun isLocationEnabled(context: Context): Boolean {

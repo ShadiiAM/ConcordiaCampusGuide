@@ -29,6 +29,13 @@ object IndoorRoomSearchService {
      * - Matches against node label and node id.
      * - Returns ROOM nodes only (hallways and other node types excluded).
      */
+    /**
+     * Searches loaded indoor graphs for rooms matching [query].
+     *
+     * @param scope [Scope.Global] searches all buildings; [Scope.Building] restricts to [buildingCode].
+     * @param limit Maximum number of results returned.
+     * @return Results sorted by score (best match first), then building, floor, and label.
+     */
     fun search(
         query: String,
         scope: Scope,
@@ -38,6 +45,7 @@ object IndoorRoomSearchService {
         val qRaw = query.trim()
         if (qRaw.isEmpty()) return emptyList()
 
+        // Normalize once so each node comparison doesn't repeat the work
         val q = normalize(qRaw)
         val candidates: Sequence<IndoorNode> = when (scope) {
             Scope.Building -> {
@@ -55,13 +63,13 @@ object IndoorRoomSearchService {
         }
 
         return candidates
-            .filter { node -> node.type == IndoorNodeType.ROOM }
+            .filter { node -> node.type == IndoorNodeType.ROOM }  // exclude hallways, elevators, etc.
             .mapNotNull { node ->
                 val nLabel = normalize(node.label)
                 val nId = normalize(node.id)
 
                 val score = scoreMatch(q, nLabel, nId)
-                if (score <= 0) return@mapNotNull null
+                if (score <= 0) return@mapNotNull null  // no match, skip this node
 
                 val floorLabel = formatFloorLabelShort(node.floor)
                 val typeLabel = "Classroom"

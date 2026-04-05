@@ -35,7 +35,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.AppIcon
 import com.example.campusguide.R
-import com.example.campusguide.ui.directions.RouteLeg
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.shuttle.DepartureResult
@@ -54,8 +53,6 @@ fun DirectionsTopBar(
     showActions: Boolean = false,
     isLoadingRoute: Boolean = false,
     route: RouteResult = RouteResult(points = emptyList()),
-    isPickingOrigin: Boolean = false,
-    onMyLocationClick: () -> Unit = {},
     canUseShuttle: Boolean = false,
     shuttleStatus: DepartureResult = DepartureResult.NoMoreToday,
     onGoClick: () -> Unit = {},

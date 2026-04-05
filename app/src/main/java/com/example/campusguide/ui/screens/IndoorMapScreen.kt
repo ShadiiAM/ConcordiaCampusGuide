@@ -10,11 +10,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -47,17 +45,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.ui.components.BottomCard
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.indoor.IndoorFloorGraph
 import com.example.campusguide.indoor.IndoorNode
 import com.example.campusguide.indoor.IndoorNodeType
-import com.example.campusguide.indoor.IndoorRoomSearchService
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
 import com.example.campusguide.ui.viewmodels.IndoorNavState
@@ -235,18 +230,6 @@ fun IndoorMapScreen(
                 indoorDestinationNode = destNode,
             )
         )
-    }
-
-    val inlineSuggestions = remember(topCardQuery) {
-        if (topCardQuery.isBlank()) {
-            emptyList()
-        } else {
-            IndoorRoomSearchService.search(
-                query = topCardQuery,
-                scope = IndoorRoomSearchService.Scope.Global,
-                limit = 8,
-            )
-        }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -1081,9 +1064,6 @@ private fun findNearestNode(
     return best
 }
 
-
-/**
- */
 private fun DrawScope.drawPoiIcon(
     label: String,
     cx: Float,
