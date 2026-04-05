@@ -21,6 +21,24 @@ object IndoorGraphLoader {
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    private val floorPlanDrawables = mapOf(
+        "cc_floor_1" to R.drawable.cc_floor_1,
+        "hall_floor_1" to R.drawable.hall_floor_1,
+        "hall_floor_2" to R.drawable.hall_floor_2,
+        "hall_floor_8" to R.drawable.hall_floor_8,
+        "hall_floor_9" to R.drawable.hall_floor_9,
+        "lb_floor_2" to R.drawable.lb_floor_2,
+        "lb_floor_3" to R.drawable.lb_floor_3,
+        "lb_floor_4" to R.drawable.lb_floor_4,
+        "lb_floor_5" to R.drawable.lb_floor_5,
+        "molson_floor_1" to R.drawable.molson_floor_1,
+        "molson_floor_s2" to R.drawable.molson_floor_s2,
+        "ve_floor_1" to R.drawable.ve_floor_1,
+        "ve_floor_2" to R.drawable.ve_floor_2,
+        "vl_floor_1" to R.drawable.vl_floor_1,
+        "vl_floor_2" to R.drawable.vl_floor_2,
+    )
+
     /**
      * Scans `assets/indoor/` and loads every `.json` file it finds.
      * Returns a list of [IndoorFloorGraph] ready to be registered.
@@ -64,22 +82,6 @@ object IndoorGraphLoader {
             edges                = dto.edges
         )
     }
-    private fun resolveFloorPlanDrawable(drawableName: String): Int = when (drawableName) {
-        "cc_floor_1" -> R.drawable.cc_floor_1
-        "hall_floor_1" -> R.drawable.hall_floor_1
-        "hall_floor_2" -> R.drawable.hall_floor_2
-        "hall_floor_8" -> R.drawable.hall_floor_8
-        "hall_floor_9" -> R.drawable.hall_floor_9
-        "lb_floor_2" -> R.drawable.lb_floor_2
-        "lb_floor_3" -> R.drawable.lb_floor_3
-        "lb_floor_4" -> R.drawable.lb_floor_4
-        "lb_floor_5" -> R.drawable.lb_floor_5
-        "molson_floor_1" -> R.drawable.molson_floor_1
-        "molson_floor_s2" -> R.drawable.molson_floor_s2
-        "ve_floor_1" -> R.drawable.ve_floor_1
-        "ve_floor_2" -> R.drawable.ve_floor_2
-        "vl_floor_1" -> R.drawable.vl_floor_1
-        "vl_floor_2" -> R.drawable.vl_floor_2
-        else -> 0
-    }
+    private fun resolveFloorPlanDrawable(drawableName: String): Int =
+        floorPlanDrawables[drawableName] ?: 0
 }
