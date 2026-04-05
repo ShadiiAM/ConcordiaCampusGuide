@@ -6,11 +6,14 @@ import com.example.campusguide.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
+import java.io.IOException
 
 class IndoorGraphLoaderTest {
 
@@ -94,6 +97,58 @@ class IndoorGraphLoaderTest {
         assertEquals(R.drawable.hall_floor_2, result.first().floorPlanDrawableRes)
         verify(assets).open(eq("indoor/good.json"))
         verify(assets).open(eq("indoor/bad.json"))
+    }
+
+    @Test
+    fun `loadAll ignores non-json files entirely`() {
+        val context = mock<Context>()
+        val assets = mock<AssetManager>()
+        whenever(context.assets).thenReturn(assets)
+        whenever(assets.list("indoor")).thenReturn(arrayOf("readme.md", "floors.csv", "preview.png"))
+
+        val result = IndoorGraphLoader.loadAll(context)
+
+        assertTrue(result.isEmpty())
+        verify(assets, never()).open(any())
+    }
+
+    @Test
+    fun `loadAll skips json file when asset open throws`() {
+        val context = mock<Context>()
+        val assets = mock<AssetManager>()
+        whenever(context.assets).thenReturn(assets)
+        whenever(assets.list("indoor")).thenReturn(arrayOf("broken.json", "good.json"))
+        whenever(assets.open(eq("indoor/broken.json"))).thenThrow(IOException("cannot open"))
+        whenever(assets.open(eq("indoor/good.json"))).thenReturn(
+            ByteArrayInputStream(minimalGraphJson("ve_floor_2.png").toByteArray())
+        )
+
+        val result = IndoorGraphLoader.loadAll(context)
+
+        assertEquals(1, result.size)
+        assertEquals(R.drawable.ve_floor_2, result.first().floorPlanDrawableRes)
+    }
+
+    @Test
+    fun `loadAll keeps successful entries when one json stream is malformed`() {
+        val context = mock<Context>()
+        val assets = mock<AssetManager>()
+        whenever(context.assets).thenReturn(assets)
+        whenever(assets.list("indoor")).thenReturn(arrayOf("a.json", "b.json", "c.json"))
+        whenever(assets.open(eq("indoor/a.json"))).thenReturn(
+            ByteArrayInputStream(minimalGraphJson("cc_floor_1.png").toByteArray())
+        )
+        whenever(assets.open(eq("indoor/b.json"))).thenReturn(
+            ByteArrayInputStream("{\"buildingCode\":\"H\"".toByteArray())
+        )
+        whenever(assets.open(eq("indoor/c.json"))).thenReturn(
+            ByteArrayInputStream(minimalGraphJson("vl_floor_1.png").toByteArray())
+        )
+
+        val result = IndoorGraphLoader.loadAll(context)
+
+        assertEquals(2, result.size)
+        assertEquals(listOf(R.drawable.cc_floor_1, R.drawable.vl_floor_1), result.map { it.floorPlanDrawableRes })
     }
 
     private fun minimalGraphJson(imageName: String): String =
