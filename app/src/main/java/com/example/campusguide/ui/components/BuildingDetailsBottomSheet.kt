@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -24,17 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.map.models.BuildingInfo
@@ -432,119 +424,6 @@ private fun CompactHoursDisplay(hours: String) {
         }
     }
 }
-
-@Composable
-private fun HoursLine(line: String, currentTime: CurrentTime) {
-    val uriHandler = LocalUriHandler.current
-
-    // Check if this line contains days or is additional info
-    val isHoursLine = line.contains(":", ignoreCase = false) &&
-                     (line.contains("Monday", ignoreCase = true) ||
-                      line.contains("Saturday", ignoreCase = true) ||
-                      line.contains("Sunday", ignoreCase = true) ||
-                      line.contains("Daily", ignoreCase = true))
-
-    if (isHoursLine) {
-        val isCurrentDay = isLineForCurrentDay(line, currentTime.dayOfWeek)
-        val openStatus = if (isCurrentDay) checkIfOpen(line, currentTime) else OpenStatus.NOT_TODAY
-
-        val backgroundColor = when {
-            !isCurrentDay -> Color.Transparent
-            openStatus == OpenStatus.OPEN -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-            openStatus == OpenStatus.CLOSED -> Color(0xFFF44336).copy(alpha = 0.2f)
-            else -> Color.Transparent
-        }
-        val textColor = when {
-            !isCurrentDay -> MaterialTheme.colorScheme.onSurface
-            openStatus == OpenStatus.OPEN -> Color(0xFF2E7D32)
-            openStatus == OpenStatus.CLOSED -> Color(0xFFC62828)
-            else -> MaterialTheme.colorScheme.onSurface
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp)
-                .background(
-                    color = backgroundColor,
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .padding(horizontal = 6.dp, vertical = 4.dp)
-        ) {
-            AccessibleText(
-                text = line,
-                baseFontSizeSp = 14f,
-                forceFontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
-                fallbackColor = textColor,
-                modifier = Modifier.semantics {
-                    contentDescription = if (isCurrentDay && openStatus != OpenStatus.NOT_TODAY) {
-                        when (openStatus) {
-                            OpenStatus.OPEN -> "$line, Currently open"
-                            OpenStatus.CLOSED -> "$line, Currently closed"
-                            else -> line
-                        }
-                    } else {
-                        line
-                    }
-                }
-            )
-        }
-    } else {
-        // Additional info lines (like "Check website for details") with clickable links
-        val annotatedString = buildAnnotatedString {
-            val urlPattern = Regex("(https?://[^\\s]+|[a-z]+\\.[a-z]+(?:\\.[a-z]+)?(?:/[^\\s]*)?)", RegexOption.IGNORE_CASE)
-            var lastIndex = 0
-
-            urlPattern.findAll(line).forEach { matchResult ->
-                // Add text before the URL
-                append(line.substring(lastIndex, matchResult.range.first))
-
-                // Add the URL as clickable
-                pushStringAnnotation(tag = "URL", annotation = matchResult.value)
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline
-                    )
-                ) {
-                    append(matchResult.value)
-                }
-                pop()
-
-                lastIndex = matchResult.range.last + 1
-            }
-
-            // Add remaining text
-            if (lastIndex < line.length) {
-                append(line.substring(lastIndex))
-            }
-        }
-
-        ClickableText(
-            text = annotatedString,
-            style = LocalTextStyle.current.copy(
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontStyle = FontStyle.Italic
-            ),
-            modifier = Modifier.padding(vertical = 2.dp),
-            onClick = { offset ->
-                annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                    .firstOrNull()?.let { annotation ->
-                        val url = annotation.item
-                        val fullUrl = if (!url.startsWith("http")) "https://$url" else url
-                        try {
-                            uriHandler.openUri(fullUrl)
-                        } catch (e: Exception) {
-                            // Handle error silently
-                        }
-                    }
-            }
-        )
-    }
-}
-
 data class CurrentTime(
     val dayOfWeek: DayOfWeek,
     val hour: Int,

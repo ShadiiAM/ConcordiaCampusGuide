@@ -4,6 +4,7 @@ import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.Campus
 import com.google.android.gms.maps.model.LatLng
+import java.util.Locale
 
 /**
  * Detects if a route is cross-campus based on building information.
@@ -101,7 +102,7 @@ fun formatRouteSummary(route: RouteResult): String {
 
     val distanceStr = route.distanceMeters?.let { meters ->
         val km = meters / 1000.0
-        String.format("%.1f km", km)
+        String.format(Locale.getDefault(), "%.1f km", km)
     } ?: "Unknown distance"
 
     return "$durationStr • $distanceStr"

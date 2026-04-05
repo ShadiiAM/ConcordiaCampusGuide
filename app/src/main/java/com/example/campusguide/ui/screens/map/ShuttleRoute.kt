@@ -233,7 +233,6 @@ suspend fun getShuttleRoute(origin: LatLng, destination: LatLng, repo: GoogleRou
         steps = listOf(shuttleStep)
     )
 
-    val allLegs = listOf(walkToShuttleLeg, shuttleLeg, walkFromShuttleLeg)
     val allPoints = walkToShuttleLeg.steps.flatMap { it.polyline } +
             shuttlePoints +
             walkFromShuttleLeg.steps.flatMap { it.polyline }

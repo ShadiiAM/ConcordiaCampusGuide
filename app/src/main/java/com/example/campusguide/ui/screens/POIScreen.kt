@@ -2,16 +2,8 @@ package com.example.campusguide.ui.screens
 
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -25,24 +17,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.campusguide.R
 import com.example.campusguide.data.ALL_POI
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.data.Suggestion
-import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.MapBottomSearchBar
 import com.example.campusguide.ui.components.MapControlsPanel
@@ -68,7 +55,6 @@ import com.example.campusguide.ui.screens.map.saveCampus
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
 import com.example.campusguide.ui.viewmodels.UserLocationViewModel
-import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -103,7 +89,6 @@ fun POIScreen(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val accessibilityState = LocalAccessibilityState.current
 
     val userLocationViewModel: UserLocationViewModel = viewModel()
 
@@ -112,7 +97,7 @@ fun POIScreen(
 
     var selectedCampus by rememberSaveable { mutableStateOf(getSavedCampus(context)) }
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
-    var controlsVisible = viewModel.controlsVisible
+    val controlsVisible = viewModel.controlsVisible
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -140,11 +125,6 @@ fun POIScreen(
     // Reserved for US-3.2: enables removing/updating markers when switching campuses
     val poiMarkerMap = remember { mutableMapOf<String, Marker>() }
     var selectedPOI by remember { mutableStateOf<OutsidePOI?>(null) }
-
-
-    val locationSettingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { }
 
     var routePolylineRef by remember {
         mutableStateOf<Polyline?>(null)
@@ -370,8 +350,6 @@ fun POIScreen(
     val fusedLocationProviderClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
-    var locationCallback by remember { mutableStateOf<LocationCallback?>(null) }
-
 
     Box(modifier = Modifier
         .fillMaxSize()
