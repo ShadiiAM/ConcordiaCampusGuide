@@ -2,20 +2,13 @@ package com.example.campusguide.ui.screens
 
 import android.Manifest
 import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -45,7 +39,6 @@ import com.example.campusguide.data.OutsidePOI
 import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.AccessibleText
-import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.Campus
 import com.example.campusguide.ui.components.MapBottomSearchBar
 import com.example.campusguide.ui.components.MapControlsPanel
@@ -384,7 +377,7 @@ fun POIScreen(
                         googleMap?.clear()
                         poiMapView.onStop()
                         poiMapView.onDestroy()
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         // mapView was never fully initialized
                     }
                 }
@@ -534,9 +527,9 @@ fun POIScreen(
 private fun addPOIMarkersToMap(
     map: GoogleMap,
     context: android.content.Context,
-    defaultOrigin: com.google.android.gms.maps.model.LatLng,
+    defaultOrigin: LatLng,
     poiFilters: POIFilterValues,
-    poiMarkerMap: MutableMap<String, com.google.android.gms.maps.model.Marker>,
+    poiMarkerMap: MutableMap<String, Marker>,
 ): Boolean {
     var poiMarkersDrawnOnMap = 0
     ALL_POI.forEach { poi ->

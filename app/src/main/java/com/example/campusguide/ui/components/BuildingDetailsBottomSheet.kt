@@ -135,7 +135,6 @@ fun BuildingDetailsBottomSheet(
                                                 color = when (openStatus) {
                                                     OpenStatus.OPEN -> Color(0xFF4CAF50)
                                                     OpenStatus.CLOSED -> Color(0xFF9D2115)
-                                                    else -> Color.Transparent
                                                 },
                                                 shape = RoundedCornerShape(4.dp)
                                             )
@@ -144,7 +143,6 @@ fun BuildingDetailsBottomSheet(
                                                 contentDescription = when (openStatus) {
                                                     OpenStatus.OPEN -> "Currently open"
                                                     OpenStatus.CLOSED -> "Currently closed"
-                                                    else -> ""
                                                 }
                                             }
                                     ) {
@@ -152,7 +150,6 @@ fun BuildingDetailsBottomSheet(
                                             text = when (openStatus) {
                                                 OpenStatus.OPEN -> "Open"
                                                 OpenStatus.CLOSED -> "Closed"
-                                                else -> ""
                                             },
                                             baseFontSizeSp = 12f,
                                             forceFontWeight = FontWeight.Bold,

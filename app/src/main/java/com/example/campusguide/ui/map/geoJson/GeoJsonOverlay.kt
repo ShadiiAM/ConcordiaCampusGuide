@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
  */
 class GeoJsonOverlay(
     private val context: Context,
-    @RawRes private val geoJsonRawRes: Int? = null,
+    @param:RawRes private val geoJsonRawRes: Int? = null,
     private val idPropertyName: String = "id" // fallback to feature "id" field
 ) {
     private var map: GoogleMap? = null
@@ -302,7 +302,7 @@ class GeoJsonOverlay(
         val strokeColor = strokeHex?.let { safeParse(it) }?.let { GeoJsonColorUtils.withOpacity(it, strokeOpacity) }
         val fillColor = fillHex?.let { safeParse(it) }?.let { GeoJsonColorUtils.withOpacity(it, fillOpacity) }
 
-        val markerHex = props.optString("marker-color", null)
+        val markerHex = GeoJsonColorUtils.stringOrNull(props.opt("marker-color"))
         val markerColor = markerHex?.takeIf { it.isNotBlank() }?.let { safeParse(it) }
 
         val markerSize = props.optString("marker-size", "medium")
