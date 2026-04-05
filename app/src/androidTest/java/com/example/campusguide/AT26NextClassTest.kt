@@ -62,7 +62,7 @@ class AT26NextClassTest {
         composeTestRule.onNodeWithText("Daily Schedule").assertIsDisplayed()
 
         // --- Criteria 3: With a tracked course, navigates to the right day ---
-        addCourse(term = "2244", subject = "SOEN", catalog = "390", section = "UU")
+        addCourse(term = "2244", subject = "SOEN", catalog = "390", section = "Q QC")
         val added = composeTestRule.onAllNodesWithText("Successfully added course").fetchSemanticsNodes().isNotEmpty()
                 || composeTestRule.onAllNodesWithText("This course is already being tracked.").fetchSemanticsNodes().isNotEmpty()
         Thread.sleep(STEP_DELAY_MS)

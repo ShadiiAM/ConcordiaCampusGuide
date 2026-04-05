@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -670,6 +671,12 @@ fun ConcordiaCampusGuideApp() {
 
 
                                     }
+                                    AppDestinations.ACCESSIBILITY ->{
+                                        AccessibilityScreen(
+                                            onBackClick = { currentDestination.value =
+                                                AppDestinations.MAP }
+                                        )
+                                    }
 
                                 }
                             }
@@ -831,6 +838,7 @@ enum class AppDestinations(
     MAP("Map", AppIcon.Vector(Icons.Default.Place)),
     CALENDAR("Calendar", AppIcon.Drawable(R.drawable.ic_calendar)),
     POI("POI", AppIcon.Drawable(R.drawable.poi_icon)),
+    ACCESSIBILITY("Settings", AppIcon.Vector(Icons.Default.Settings)),
 }
 
 
