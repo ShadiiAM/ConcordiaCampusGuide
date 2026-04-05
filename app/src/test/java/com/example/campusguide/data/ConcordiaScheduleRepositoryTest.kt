@@ -9,7 +9,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ConcordiaScheduleRepositoryTest {
+class FConcordiaScheduleRepositoryTest {
 
     private val apiService: ConcordiaApiService = mock()
     private val repository = ConcordiaScheduleRepository(apiService)

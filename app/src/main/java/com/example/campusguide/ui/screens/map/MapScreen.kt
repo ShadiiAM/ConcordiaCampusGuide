@@ -1522,7 +1522,7 @@ fun MapScreen(
                         indoorBuildingCode = null
                     }
                 )
-                } // end if (!isRouteShowing || showIndoorView)
+                }
             }
         }
 
@@ -1530,8 +1530,6 @@ fun MapScreen(
         if (showIndoorView && isIndoorOutdoorFlow) {
             val destCode = indoorFlowEndNode?.buildingCode?.uppercase()
             if (destCode != null) {
-                // Use a dedicated ViewModel so it never shares state with the
-                // regular IndoorMapScreen that may already be on screen.
                 val indoorOverlayVm = viewModel<IndoorNavigationViewModel>(
                     key = "indoor-nav-overlay-${destCode}"
                 )
