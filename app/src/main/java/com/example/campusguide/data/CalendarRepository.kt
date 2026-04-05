@@ -59,7 +59,7 @@ class CalendarRepositoryImpl(private val client: OkHttpClient = OkHttpClient()) 
                 throw IOException("Server Error: ${response.code}")
             }
             
-            val body = response.body?.string() ?: return@withContext emptyList()
+            val body = response.body?.string()?.takeIf { it.isNotBlank() } ?: return@withContext emptyList()
             val results = json.decodeFromString<List<Course>>(body)
             
             results.filter {
