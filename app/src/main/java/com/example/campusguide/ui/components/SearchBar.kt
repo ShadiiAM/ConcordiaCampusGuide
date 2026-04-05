@@ -58,10 +58,14 @@ import com.example.campusguide.data.CampusBuilding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.Indoor
 import com.example.campusguide.data.ShuttleStop
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 
 @Composable
 fun <T> SearchBarWithProfile(
@@ -79,6 +83,8 @@ fun <T> SearchBarWithProfile(
     showProfile: Boolean = true,
     onFocusChange: (Boolean) -> Unit = {},
 ) {
+    val firebaseAnalytics = Firebase.analytics
+
     val textFocusRequester = focusRequester ?: remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
 
@@ -100,7 +106,11 @@ fun <T> SearchBarWithProfile(
                     imageVector = Icons.Default.Search,
                     contentDescription = "Search",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.clickable { onSearchSubmit(searchQuery) }
+                    modifier = Modifier.clickable { onSearchSubmit(searchQuery)
+                        firebaseAnalytics.logEvent("search_bar_submit_search", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_submit_search")
+
+                    }
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -129,6 +139,11 @@ fun <T> SearchBarWithProfile(
                             .onFocusChanged { focusState ->
                                 isFocused = focusState.isFocused
                                 onFocusChange(isFocused)
+                                if(isFocused){
+                                    firebaseAnalytics.logEvent("search_bar_focused", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_focused")
+                                }
+
                             },
                         textStyle = TextStyle(
                             color = MaterialTheme.colorScheme.onSurface,
@@ -138,8 +153,16 @@ fun <T> SearchBarWithProfile(
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions = KeyboardActions(
-                            onSearch = { onSearchSubmit(searchQuery) },
-                            onDone = { onSearchSubmit(searchQuery) }
+                            onSearch = { onSearchSubmit(searchQuery)
+                                firebaseAnalytics.logEvent("search_bar_submit_search", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_submit_search")
+
+                                       },
+                            onDone = { onSearchSubmit(searchQuery)
+
+                                firebaseAnalytics.logEvent("search_bar_submit_search", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_submit_search")
+                            }
                         )
                     )
                 }
@@ -153,7 +176,12 @@ fun <T> SearchBarWithProfile(
                             .size(32.dp)
                             .clip(CircleShape)
                             .background(Color(0xFFD4C4E8))
-                            .clickable(onClick = onProfileClick)
+                            .clickable(onClick = {onProfileClick()
+
+                                firebaseAnalytics.logEvent("search_bar_profile_click", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("search_bar_profile_click")
+
+                            })
                             .testTag("UserProfile"),
                         contentAlignment = Alignment.Center
                     ) {

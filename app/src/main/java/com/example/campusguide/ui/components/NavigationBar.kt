@@ -13,10 +13,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.campusguide.AppDestinations
 import com.example.campusguide.AppIcon
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
-
-
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 
 @Composable
@@ -27,6 +28,8 @@ fun NavigationBar(
     },
     content: (@Composable (Modifier) -> Unit)? = null
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
     NavigationSuiteScaffold(
         containerColor = Color.White,
         navigationSuiteItems = {
@@ -47,7 +50,11 @@ fun NavigationBar(
                     },
                     label = { AccessibleText(it.label, baseFontSizeSp = 14f) },
                     selected = it == currentDestination.value,
-                    onClick = { onDestinationSelected(it) }
+                    onClick = { onDestinationSelected(it)
+                        firebaseAnalytics.logEvent("navigation_bar_to_$it", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("navigation_bar_to_$it")
+
+                    }
                 )
             }
         }

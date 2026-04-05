@@ -18,9 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.POIFilterValues
 import com.example.campusguide.data.POIType
 import com.example.campusguide.ui.accessibility.AccessibleText
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 @Composable
 fun POIFilterTags(
@@ -34,7 +37,7 @@ fun POIFilterTags(
     onPOIDistanceClick: (Float) -> Unit,
 
     ) {
-
+    val firebaseAnalytics = Firebase.analytics
     Column(modifier = modifier) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             for (type in POIType.entries) {
@@ -43,9 +46,19 @@ fun POIFilterTags(
 
                 Surface(
                     onClick = {
-                        if (type in poiFilters.categoriesIncluded) onPOITagDismiss(type) else onPOITagSelect(
-                            type
-                        )
+                        if (type in poiFilters.categoriesIncluded) {
+                            onPOITagDismiss(type)
+                            firebaseAnalytics.logEvent("poi_filters_deselect_$type", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("poi_filters_deselect_$type")
+
+                        }else {
+
+                            firebaseAnalytics.logEvent("poi_filters_select_$type", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("poi_filters_select_$type")
+
+                            onPOITagSelect(type)
+
+                        }
                     },
                     selected = type in poiFilters.categoriesIncluded,
                     shape = RoundedCornerShape(8.dp),
@@ -69,6 +82,9 @@ fun POIFilterTags(
             Surface(
                 onClick = {
                     onPOIRatingClick(poiFilters.rating)
+                    firebaseAnalytics.logEvent("poi_filter_ratings_${poiFilters.rating}", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("poi_filter_ratings_${poiFilters.rating}")
+
                 },
                 shape = RoundedCornerShape(8.dp),
                 color = if (poiFilters.rating > 0.0) Color.Yellow
@@ -98,6 +114,9 @@ fun POIFilterTags(
             Surface(
                 onClick = {
                     onPOIDistanceClick(poiFilters.distanceLimit)
+                    firebaseAnalytics.logEvent("poi_filter_distance_${poiFilters.distanceLimit}", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("poi_filter_distance_${poiFilters.distanceLimit}")
+
                 },
                 shape = RoundedCornerShape(8.dp),
                 color = if (poiFilters.distanceLimit > 0.0) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)

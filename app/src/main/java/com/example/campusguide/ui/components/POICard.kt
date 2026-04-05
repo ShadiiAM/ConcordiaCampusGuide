@@ -90,7 +90,11 @@ fun POICard(
     }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {onDismiss()
+            firebaseAnalytics.logEvent("poi_card_dismiss", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("poi_card_dismiss")
+
+        },
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -172,6 +176,9 @@ fun POICard(
                         onClick = {
                             onDismiss()
                             onDirectionsClick()
+                            firebaseAnalytics.logEvent("poi_card_directions_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("poi_card_directions_click")
+
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = iconDetails.first,

@@ -56,11 +56,6 @@ fun ProfileScreen(
 
     val firebaseAnalytics = Firebase.analytics
 
-    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-        param(FirebaseAnalytics.Param.SCREEN_NAME, "ProfileScreen")
-        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenProfileActivity")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("ProfileScreen")
 
     LaunchedEffect(Unit) {
         Clarity.setCurrentScreenName("ProfileScreen")
@@ -77,7 +72,13 @@ fun ProfileScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = {
+                        firebaseAnalytics.logEvent("profile_screen_back", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("profile_screen_back")
+
+                        onBackClick()
+
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -97,7 +98,13 @@ fun ProfileScreen(
                 initial = "A",
                 name = "Jane Doe",
                 subtitle = "Student",
-                onClick = onProfileClick
+                onClick = {
+                    firebaseAnalytics.logEvent("profile_screen_profile_click", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("profile_screen_profile_click")
+
+                    onProfileClick()
+
+                }
             )
 
             HorizontalDivider(
@@ -107,7 +114,11 @@ fun ProfileScreen(
 
             // Accessibility Section
             AccessibilityItem(
-                onClick = onAccessibilityClick
+                onClick ={
+                    firebaseAnalytics.logEvent("profile_screen_accessibility_click", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("profile_screen_accessibility_click")
+
+                    onAccessibilityClick()}
             )
         }
     }

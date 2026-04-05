@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.screens.map.moveDown
 import com.example.campusguide.ui.screens.map.moveLeft
 import com.example.campusguide.ui.screens.map.moveRight
@@ -39,6 +40,8 @@ import com.example.campusguide.ui.screens.map.zoomIn
 import com.example.campusguide.ui.screens.map.zoomOut
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.GoogleMap
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 @Composable
 fun BoxScope.MapBottomSearchBar(
@@ -85,6 +88,7 @@ fun BoxScope.MapControlsPanel(
     onToggleControls: () -> Unit,
 ) {
     val context = LocalContext.current
+    val firebaseAnalytics = Firebase.analytics
     if (controlsVisible) {
         Column(
             modifier = Modifier
@@ -96,7 +100,11 @@ fun BoxScope.MapControlsPanel(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             IconButton(
-                onClick = { zoomIn(googleMap) },
+                onClick = { zoomIn(googleMap)
+                    firebaseAnalytics.logEvent("map_controls_zoom_in", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_zoom_in")
+
+                },
                 modifier = Modifier.size(50.dp)
             ) {
                 Icon(
@@ -112,7 +120,11 @@ fun BoxScope.MapControlsPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { moveLeft(googleMap) },
+                    onClick = { moveLeft(googleMap)
+
+                        firebaseAnalytics.logEvent("map_controls_move_left", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_move_left")
+                              },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -128,7 +140,11 @@ fun BoxScope.MapControlsPanel(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IconButton(
-                        onClick = { moveUp(googleMap) },
+                        onClick = { moveUp(googleMap)
+                            firebaseAnalytics.logEvent("map_controls_move_up", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_move_up")
+
+                        },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -140,7 +156,11 @@ fun BoxScope.MapControlsPanel(
                     }
 
                     IconButton(
-                        onClick = { recenter(googleMap, fusedLocationProviderClient, context) },
+                        onClick = { recenter(googleMap, fusedLocationProviderClient, context)
+                            firebaseAnalytics.logEvent("map_controls_recenter", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_recenter")
+
+                        },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -152,7 +172,11 @@ fun BoxScope.MapControlsPanel(
                     }
 
                     IconButton(
-                        onClick = { moveDown(googleMap) },
+                        onClick = { moveDown(googleMap)
+                            firebaseAnalytics.logEvent("map_controls_move_down", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_move_down")
+
+                        },
                         modifier = Modifier.size(50.dp)
                     ) {
                         Icon(
@@ -165,7 +189,11 @@ fun BoxScope.MapControlsPanel(
                 }
 
                 IconButton(
-                    onClick = { moveRight(googleMap) },
+                    onClick = { moveRight(googleMap)
+                        firebaseAnalytics.logEvent("map_controls_move_right", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_move_right")
+
+                    },
                     modifier = Modifier.size(50.dp)
                 ) {
                     Icon(
@@ -178,7 +206,12 @@ fun BoxScope.MapControlsPanel(
             }
 
             IconButton(
-                onClick = { zoomOut(googleMap) },
+                onClick = { zoomOut(googleMap)
+
+                    firebaseAnalytics.logEvent("map_controls_zoom_out", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_zoom_out")
+
+                },
                 modifier = Modifier.size(50.dp)
             ) {
                 Icon(
@@ -192,7 +225,11 @@ fun BoxScope.MapControlsPanel(
             Spacer(modifier = Modifier.height(8.dp))
 
             IconButton(
-                onClick = onToggleControls,
+                onClick = {onToggleControls()
+                    firebaseAnalytics.logEvent("map_controls_toggle_controls_off", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_toggle_controls_off")
+
+                },
                 modifier = Modifier.size(50.dp)
             ) {
                 Icon(
@@ -205,7 +242,14 @@ fun BoxScope.MapControlsPanel(
         }
     } else {
         IconButton(
-            onClick = onToggleControls,
+            onClick = {
+
+                onToggleControls()
+
+                firebaseAnalytics.logEvent("map_controls_toggle_controls_on", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("map_controls_toggle_controls_on")
+
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 60.dp)

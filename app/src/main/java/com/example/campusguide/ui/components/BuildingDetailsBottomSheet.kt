@@ -92,16 +92,15 @@ fun BuildingDetailsBottomSheet(
 
     val firebaseAnalytics = Firebase.analytics
 
-    firebaseAnalytics.logEvent("BuildingDetailsBottomSheetAppeared") {
-        param("component_name", "BuildingDetailsBottomSheet")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("BuildingDetailsBottomSheetAppeared")
-
-
     var isExpanded by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            firebaseAnalytics.logEvent("building_details_sheet_dismiss", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("building_details_sheet_dismiss")
+
+            onDismiss()
+                           },
         modifier = Modifier.semantics {
             contentDescription = "Building details for ${buildingInfo.buildingName ?: buildingInfo.buildingCode}"
         }
@@ -208,7 +207,11 @@ fun BuildingDetailsBottomSheet(
                 }
 
                 IconButton(
-                    onClick = onDismiss,
+                    onClick = {
+                        firebaseAnalytics.logEvent("building_details_sheet_dismiss", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("building_details_sheet_dismiss")
+
+                        onDismiss()},
                     modifier = Modifier.semantics {
                         contentDescription = "Close building details"
                     }
@@ -222,7 +225,11 @@ fun BuildingDetailsBottomSheet(
             // Directions Button
             if (onDirectionsClick != null) {
                 Button(
-                    onClick = onDirectionsClick,
+                    onClick = {
+                        firebaseAnalytics.logEvent("building_details_sheet_directions_click", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("building_details_sheet_directions_click")
+
+                        onDirectionsClick()},
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics {
@@ -247,7 +254,11 @@ fun BuildingDetailsBottomSheet(
             val hasIndoorMap = IndoorGraphRegistry.hasIndoorMap(buildingInfo.buildingCode)
             if (hasIndoorMap && onExploreIndoors != null) {
                 Button(
-                    onClick = onExploreIndoors,
+                    onClick = {
+                        firebaseAnalytics.logEvent("building_details_sheet_explore_indoors", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("building_details_sheet_explore_indoors")
+
+                        onExploreIndoors()},
                     modifier = Modifier
                         .fillMaxWidth()
                         .semantics {
@@ -270,7 +281,12 @@ fun BuildingDetailsBottomSheet(
 
             // Expand/Collapse Button
             Button(
-                onClick = { isExpanded = !isExpanded },
+                onClick = {
+                    firebaseAnalytics.logEvent("building_details_sheet_expand_${!isExpanded}", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("building_details_sheet_expand_${!isExpanded}")
+
+
+                    isExpanded = !isExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
                     .semantics {

@@ -75,11 +75,6 @@ fun DirectionsTopBar(
 
     val firebaseAnalytics = Firebase.analytics
 
-    firebaseAnalytics.logEvent("DirectionsTopBarAppeared") {
-        param("component_name", "DirectionsTopBar")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("DirectionsTopBarAppeared")
-
 
     val currentSteps = route.legs.firstOrNull()
 
@@ -111,7 +106,14 @@ fun DirectionsTopBar(
                     contentDescription = if (showStepDetails) "Back to summary" else "Back to search",
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable(onClick = handleBack)
+                        .clickable(onClick = {
+
+                            firebaseAnalytics.logEvent("directions_top_bar_back_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_back_click")
+
+                            handleBack()
+
+                        })
                         .padding(top = 2.dp)
                 )
                 Spacer(Modifier.width(12.dp))
@@ -120,7 +122,13 @@ fun DirectionsTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = if (onOriginClick != null) {
                             Modifier
-                                .clickable(onClick = onOriginClick)
+                                .clickable(onClick = {
+
+                                    firebaseAnalytics.logEvent("directions_top_bar_on_origin_click", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_on_origin_click")
+
+                                    onOriginClick()
+                                })
                                 .semantics { contentDescription = "Change start position" }
                         } else {
                             Modifier
@@ -163,7 +171,11 @@ fun DirectionsTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = if (onDestinationClick != null) {
                             Modifier
-                                .clickable(onClick = onDestinationClick)
+                                .clickable(onClick = {onDestinationClick()
+                                    firebaseAnalytics.logEvent("directions_top_bar_on_destination_click", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_on_destination_click")
+
+                                })
                                 .semantics { contentDescription = "Change destination" }
                         } else {
                             Modifier
@@ -201,7 +213,13 @@ fun DirectionsTopBar(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .size(20.dp)
-                            .clickable(onClick = handleBack)
+                            .clickable(onClick = {
+                                firebaseAnalytics.logEvent("directions_top_bar_back_click", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_back_click")
+
+                                handleBack()
+
+                            })
                     )
                 }
             }
@@ -277,7 +295,11 @@ fun DirectionsTopBar(
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(if (isSelected) purple else MaterialTheme.colorScheme.surfaceVariant)
-                                .clickable { onModeSelected(mode) }
+                                .clickable {
+                                    firebaseAnalytics.logEvent("directions_top_bar_mode_change_$mode", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_mode_change_$mode")
+
+                                    onModeSelected(mode) }
                                 .semantics { contentDescription = mode.contentDescription },
                             contentAlignment = Alignment.Center,
                         ) {
@@ -374,7 +396,12 @@ fun DirectionsTopBar(
                                 .width(174.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(100.dp))
-                                .clickable { showStepDetails = true }
+                                .clickable { showStepDetails = true
+
+                                    firebaseAnalytics.logEvent("directions_top_bar_show_steps", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_show_steps")
+
+                                }
                                 .semantics { contentDescription = "View route details" },
                         ) {
                             Row(
@@ -414,7 +441,11 @@ fun DirectionsTopBar(
                             .width(174.dp)
                             .height(40.dp)
                             .clip(RoundedCornerShape(100.dp))
-                            .clickable { showStepDetails = false }
+                            .clickable { showStepDetails = false
+                                firebaseAnalytics.logEvent("directions_top_bar_hide_steps", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_hide_steps")
+
+                            }
                             .semantics { contentDescription = "Hide route details" },
                     ) {
                         Row(
@@ -535,7 +566,12 @@ fun DirectionsTopBar(
                         color = MaterialTheme.colorScheme.surfaceVariant,
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .clickable(onClick = onCancelClick)
+                            .clickable(onClick = {
+
+                                firebaseAnalytics.logEvent("directions_top_bar_cancel", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_cancel")
+
+                                onCancelClick()})
                             .testTag("CancelButton")
                     ) {
                         Text(cancelLabel, modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
@@ -548,7 +584,12 @@ fun DirectionsTopBar(
                             color = purple,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
-                                .clickable(enabled = !isLoadingRoute && goEnabled, onClick = onGoClick)
+                                .clickable(enabled = !isLoadingRoute && goEnabled, onClick = {
+                                    firebaseAnalytics.logEvent("directions_top_bar_go", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("directions_top_bar_go")
+
+
+                                    onGoClick()})
                                 .semantics { contentDescription = "Start navigation" }
                         ) {
                             Text(

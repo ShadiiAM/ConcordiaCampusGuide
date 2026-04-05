@@ -103,11 +103,7 @@ fun POIScreen(
 
     val firebaseAnalytics = Firebase.analytics
 
-    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-        param(FirebaseAnalytics.Param.SCREEN_NAME, "POIScreen")
-        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenPOIActivity")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("POIScreen")
+
     LaunchedEffect(Unit) {
         Clarity.setCurrentScreenName("POIScreen")
     }

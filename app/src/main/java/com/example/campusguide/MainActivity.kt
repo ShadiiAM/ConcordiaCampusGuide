@@ -266,30 +266,15 @@ fun ConcordiaCampusGuideApp() {
         showAccessibility -> {
             AccessibilityScreen(
                 onBackClick = { showAccessibility = false
-                    firebaseAnalytics.logEvent("back_from_accessibility", null)
-                    UsabilityTrackerIRLUsers.userInteractionRecord("back_from_accessibility")
-
                 }
             )
         }
 
         showProfile -> {
             ProfileScreen(
-                onBackClick = { showProfile = false
-                    firebaseAnalytics.logEvent("back_from_profile", null)
-                    UsabilityTrackerIRLUsers.userInteractionRecord("back_from_profile")
-
-                },
-                onProfileClick = { /* handle profile details */
-                    firebaseAnalytics.logEvent("dead_profile_click", null)
-                    UsabilityTrackerIRLUsers.userInteractionRecord("dead_profile_click")
-
-                },
-                onAccessibilityClick = { showAccessibility = true
-                    firebaseAnalytics.logEvent("to_accessibility_click", null)
-                    UsabilityTrackerIRLUsers.userInteractionRecord("to_accessibility_click")
-
-                }
+                onBackClick = { showProfile = false },
+                onProfileClick = { /* handle profile details */ },
+                onAccessibilityClick = { showAccessibility = true }
             )
         }
 

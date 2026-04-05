@@ -12,14 +12,21 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.shuttle.ShuttleSchedule
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 @Composable
 fun ShuttleScheduleDialog(onDismiss: () -> Unit) {
     val scrollState = rememberScrollState()
-
+    val firebaseAnalytics = Firebase.analytics
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {onDismiss()
+
+            firebaseAnalytics.logEvent("shuttle_stop_schedule_dismiss", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_schedule_dismiss")
+        },
         title = {
             Text("Shuttle schedule", fontWeight = FontWeight.Normal, fontSize = 18.sp)
         },
@@ -74,7 +81,13 @@ fun ShuttleScheduleDialog(onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            TextButton(onClick = {
+                onDismiss()
+                firebaseAnalytics.logEvent("shuttle_stop_schedule_dismiss", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_schedule_dismiss")
+
+
+            }) { Text("Close") }
         },
         shape = RoundedCornerShape(28.dp),
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh

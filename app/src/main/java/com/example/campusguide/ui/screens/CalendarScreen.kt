@@ -13,15 +13,11 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -31,8 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
-import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
-import com.example.campusguide.ui.theme.PurpleGrey80
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -42,14 +36,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusguide.R
 import com.example.campusguide.ServiceLocator
 import com.example.campusguide.data.Course
-import com.example.campusguide.ui.accessibility.AccessibleText
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.theme.success
 import com.example.campusguide.ui.viewmodels.CalendarError
 import com.example.campusguide.ui.viewmodels.CalendarUiState
 import com.example.campusguide.ui.viewmodels.CalendarViewModel
 import com.example.campusguide.ui.viewmodels.NextCourseResult
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
@@ -69,11 +61,7 @@ fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
         )
     }
     val firebaseAnalytics = Firebase.analytics
-    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-        param(FirebaseAnalytics.Param.SCREEN_NAME, "CalendarScreen")
-        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenCalendarActivity")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("CalendarScreen")
+
     
     LaunchedEffect(Unit) {
         Clarity.setCurrentScreenName("CalendarScreen")
@@ -90,7 +78,8 @@ fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
     ) {
         CalendarHeader(
             selectedTab = viewModel.selectedTab,
-            onTabSelected = { viewModel.selectedTab = it }
+            onTabSelected = { viewModel.selectedTab = it
+            }
         )
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -99,23 +88,40 @@ fun CalendarScreen(onDirectionsToCourse: (Course) -> Unit = {}) {
                     date = viewModel.selectedDate,
                     coursesForDay = viewModel.coursesForSelectedDay,
                     nextUpcoming = viewModel.nextUpcomingCourse,
-                    onIncrementDate = { viewModel.incrementDate(it) },
-                    onFindNextClass = { viewModel.jumpToNextClass() },
+                    onIncrementDate = { viewModel.incrementDate(it)
+                    },
+                    onFindNextClass = { viewModel.jumpToNextClass()
+                        firebaseAnalytics.logEvent("calendar_find_next_class", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("calendar_find_next_class")
+
+                                      },
                     onDirectionsToCourse = onDirectionsToCourse
                 )
                 CalendarTab.COURSE_LIST -> CourseListView(
                     courses = uiState.trackedCourses,
                     isRefreshing = uiState.isRefreshing,
                     refreshError = uiState.refreshError,
-                    onRemoveCourse = { viewModel.removeCourse(it) },
-                    onRefresh = { viewModel.refreshSchedules() }
+                    onRemoveCourse = { viewModel.removeCourse(it)
+                        firebaseAnalytics.logEvent("calendar_remove_course", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("calendar_remove_course")
+
+                    },
+                    onRefresh = { viewModel.refreshSchedules()
+                        firebaseAnalytics.logEvent("calendar_course_list_refresh", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("calendar_course_list_refresh")
+
+                    }
                 )
                 CalendarTab.ADD_COURSE -> AddCourseView(
                     uiState = uiState,
                     onInputUpdate = { term, sub, cat, sec ->
                         viewModel.updateInput(term, sub, cat, sec)
                     },
-                    onAddCourse = { viewModel.addCourse() }
+                    onAddCourse = { viewModel.addCourse()
+                        firebaseAnalytics.logEvent("calendar_add_course", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("calendar_add_course")
+
+                    }
                 )
             }
 
@@ -135,6 +141,8 @@ private fun DailyScheduleView(
     onFindNextClass: () -> Unit,
     onDirectionsToCourse: (Course) -> Unit = {}
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
     val sortedCourses = remember(coursesForDay) {
         coursesForDay.sortedBy { it.startTime }
     }
@@ -158,7 +166,11 @@ private fun DailyScheduleView(
                         CourseCard(
                             course = course,
                             isUpcoming = isHighlighted,
-                            onActionClick = { onDirectionsToCourse(course) }
+                            onActionClick = { onDirectionsToCourse(course)
+                                firebaseAnalytics.logEvent("calendar_get_directions_to_course", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("calendar_get_directions_to_course")
+
+                            }
                         )
                     }
                 }
@@ -437,6 +449,7 @@ private fun CourseCardActionButton(
     isConfirmingAction: Boolean,
     onActionClick: () -> Unit
 ) {
+    val firebaseAnalytics = Firebase.analytics
     val colorScheme = MaterialTheme.colorScheme
     val containerColor = if (showRemoveAction && isConfirmingAction) colorScheme.error else colorScheme.secondaryContainer
     val contentColor = if (showRemoveAction && isConfirmingAction) colorScheme.onError else colorScheme.onSecondaryContainer
@@ -446,7 +459,12 @@ private fun CourseCardActionButton(
         else -> stringResource(R.string.calendar_remove_course)
     }
     Button(
-        onClick = onActionClick,
+        onClick = {
+            onActionClick()
+            firebaseAnalytics.logEvent("calendar_course_card_action_button", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("calendar_course_card_action_button")
+
+                  },
         colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.height(32.dp),
@@ -484,12 +502,18 @@ fun LabeledTextField(label: String, placeholder: String, value: String, onValueC
 
 @Composable
 private fun CalendarHeader(selectedTab: CalendarTab, onTabSelected: (CalendarTab) -> Unit) {
+    val firebaseAnalytics = Firebase.analytics
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
             CalendarTab.entries.forEach { tab ->
-                TabButton(text = stringResource(tab.labelResId), isSelected = selectedTab == tab, onClick = { onTabSelected(tab) })
+                TabButton(text = stringResource(tab.labelResId), isSelected = selectedTab == tab, onClick = {
+
+                    onTabSelected(tab)
+                    firebaseAnalytics.logEvent("calendar_tab_$tab", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("calendar_tab_$tab")
+                })
             }
         }
     }
@@ -507,11 +531,16 @@ private fun TabButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun DateSelector(date: Calendar, onIncrementDate: (Int) -> Unit) {
+
+    val firebaseAnalytics = Firebase.analytics
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 16.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { onIncrementDate(-1) }) { 
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Prev Day") 
+        IconButton(onClick = { onIncrementDate(-1)
+            firebaseAnalytics.logEvent("calendar_decrement_date", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("calendar_decrement_date")
+        }) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Prev Day")
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             val dayOfWeek = date.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
@@ -526,8 +555,13 @@ private fun DateSelector(date: Calendar, onIncrementDate: (Int) -> Unit) {
                 .height(1.dp)
                 .background(MaterialTheme.colorScheme.onSurface))
         }
-        IconButton(onClick = { onIncrementDate(1) }) { 
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Day") 
+        IconButton(onClick = { onIncrementDate(1)
+            firebaseAnalytics.logEvent("calendar_increment_date", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("calendar_increment_date")
+        }) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Day")
+
+
         }
     }
 }

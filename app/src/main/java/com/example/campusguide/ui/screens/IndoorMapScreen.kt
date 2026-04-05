@@ -106,11 +106,7 @@ fun IndoorMapScreen(
     providedViewModel: IndoorNavigationViewModel? = null,
 ) {
     val firebaseAnalytics = Firebase.analytics
-    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-        param(FirebaseAnalytics.Param.SCREEN_NAME, "IndoorMapScreen")
-        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenIndoorMapActivity")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("IndoorMapScreen")
+
     LaunchedEffect(Unit) {
         Clarity.setCurrentScreenName("IndoorMapScreen")
     }

@@ -19,6 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.UsabilityTrackerIRLUsers
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 /** Shared bottom card container used by directions and indoor routing confirmations. */
 @Composable
@@ -27,6 +30,7 @@ fun BottomCard(
     bottomPadding: Dp = 16.dp,
     content: @Composable () -> Unit,
 ) {
+    val firebaseAnalytics = Firebase.analytics
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomCenter
@@ -48,7 +52,12 @@ fun BottomCard(
             ) {
                 if (onDismiss != null) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
-                        IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
+                        IconButton(onClick = {
+                            firebaseAnalytics.logEvent("bottom_card_indoor_dismiss", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("bottom_card_indoor_dismiss")
+
+                            onDismiss()}
+                            , modifier = Modifier.size(24.dp)) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = "Close"

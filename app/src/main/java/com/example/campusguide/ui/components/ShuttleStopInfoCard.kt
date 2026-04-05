@@ -41,16 +41,11 @@ fun ShuttleStopInfoCard(
 ) {
 
     val firebaseAnalytics = Firebase.analytics
-
-    firebaseAnalytics.logEvent("ShuttleStopInfoCardAppeared") {
-        param("component_name", "ShuttleStopInfoCard")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("ShuttleStopInfoCardAppeared")
-
     var showSchedule by remember { mutableStateOf(false) }
 
     if (showSchedule) {
-        ShuttleScheduleDialog(onDismiss = { showSchedule = false })
+        ShuttleScheduleDialog(onDismiss = {
+            showSchedule = false })
         return
     }
     var nextDepText: String
@@ -71,7 +66,12 @@ fun ShuttleStopInfoCard(
         }
     }
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            onDismiss()
+            firebaseAnalytics.logEvent("shuttle_stop_info_card_dismiss", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_info_card_dismiss")
+
+        },
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -142,6 +142,10 @@ fun ShuttleStopInfoCard(
                         onClick = {
                             onDismiss()
                             onDirectionsClick()
+
+                            firebaseAnalytics.logEvent("shuttle_stop_info_card_directions_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_info_card_directions_click")
+
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -153,13 +157,22 @@ fun ShuttleStopInfoCard(
                 }
                 if (isOperational) {
                     Button(
-                        onClick = { showSchedule = true },
+                        onClick = { showSchedule = true
+                            firebaseAnalytics.logEvent("shuttle_stop_info_card_show_schedule", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_info_card_show_schedule")
+                                  },
                         colors = ButtonDefaults.buttonColors(containerColor = ShuttleBlue)
                     ) {
                         Text("View schedule")
                     }
                 }
-                TextButton(onClick = onDismiss) { Text("OK") }
+                TextButton(onClick = {
+                    onDismiss()
+                    firebaseAnalytics.logEvent("shuttle_stop_info_card_dismiss", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_info_card_dismiss")
+
+                }
+                ) { Text("OK") }
             }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,

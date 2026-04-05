@@ -55,9 +55,7 @@ import com.example.campusguide.ui.accessibility.ColorBlindMode
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.theme.ConcordiaCampusGuideTheme
 import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
-import com.google.firebase.analytics.logEvent
 import com.microsoft.clarity.Clarity
 import kotlinx.coroutines.launch
 
@@ -67,12 +65,7 @@ fun AccessibilityScreen(
     onBackClick: () -> Unit = {}
 ) {
     val firebaseAnalytics = Firebase.analytics
-
-    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-        param(FirebaseAnalytics.Param.SCREEN_NAME, "AccessibilityScreen")
-        param(FirebaseAnalytics.Param.SCREEN_CLASS, "ScreenAccessibilityActivity")
-    }
-    UsabilityTrackerIRLUsers.userInteractionRecord("AccessibilityScreen")
+    
     LaunchedEffect(Unit) {
         Clarity.setCurrentScreenName("AccessibilityScreen")
     }
@@ -103,7 +96,12 @@ fun AccessibilityScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = {
+                        firebaseAnalytics.logEvent("accessibility_back", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_back")
+
+                        onBackClick()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"

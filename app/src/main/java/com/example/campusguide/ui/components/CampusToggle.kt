@@ -23,7 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.ui.accessibility.AccessibleText
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
 
 enum class Campus {
     SGW,
@@ -37,6 +40,7 @@ fun CampusToggle(
     modifier: Modifier = Modifier,
     showIcon: Boolean = true
 ) {
+    val firebaseAnalytics = Firebase.analytics
     Row(
         horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically,
@@ -85,7 +89,11 @@ fun CampusToggle(
                     MaterialTheme.colorScheme.onSecondaryContainer
             ),
             selected = selectedCampus == Campus.LOYOLA,
-            onClick = { onCampusSelected(Campus.LOYOLA) },
+            onClick = {
+                firebaseAnalytics.logEvent("campus_toggle_loyola_click", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("campus_toggle_loyola_click")
+
+                onCampusSelected(Campus.LOYOLA) },
             modifier = Modifier.weight(weight = 0.5f)
         )
 
@@ -128,7 +136,11 @@ fun CampusToggle(
                     MaterialTheme.colorScheme.onSecondaryContainer
             ),
             selected = selectedCampus == Campus.SGW,
-            onClick = { onCampusSelected(Campus.SGW) },
+            onClick = {
+                firebaseAnalytics.logEvent("campus_toggle_sgw_click", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("campus_toggle_sgw_click")
+
+                onCampusSelected(Campus.SGW) },
             modifier = Modifier.weight(weight = 0.5f)
         )
     }
