@@ -1057,40 +1057,40 @@
     },
     {
       "id": "H-9-998",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-3",
       "x": 267.59,
       "y": 332.57,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-985",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-2",
       "x": 716.47,
       "y": 718.6,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-975",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-4",
       "x": 298.1,
       "y": 718.6,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
     },
     {
       "id": "H-9-990",
-      "label": "STAIRCASE",
+      "label": "EMERGENCY-STAIR-1",
       "x": 720.27,
       "y": 291.35,
-      "type": "STAIRCASE",
+      "type": "POI",
       "floor": 9,
       "buildingCode": "H",
       "description": null
