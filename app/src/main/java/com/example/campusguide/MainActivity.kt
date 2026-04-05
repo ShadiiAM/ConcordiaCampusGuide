@@ -352,14 +352,11 @@ fun ConcordiaCampusGuideApp() {
                                                     null
                                                 },
                                                 onDestinationClick = {
-                                                    directionsEditMode =
-
-                                                        when {
-                                                        mapViewmodel.openIndoorBuildingCode != null && directionsEditMode == DirectionsEditMode.INDOOR_DESTINATION -> null
-                                                        mapViewmodel.openIndoorBuildingCode != null -> DirectionsEditMode.INDOOR_DESTINATION
-                                                        directionsEditMode == DirectionsEditMode.OUTDOOR_DESTINATION  && !mapViewmodel.searchVanish -> null
-                                                        else -> DirectionsEditMode.OUTDOOR_DESTINATION
-                                                    }
+                                                    directionsEditMode = nextDirectionsEditMode(
+                                                        hasIndoorOverlay = mapViewmodel.openIndoorBuildingCode != null,
+                                                        currentMode = directionsEditMode,
+                                                        searchVanish = mapViewmodel.searchVanish,
+                                                    )
                                                     directionsDestinationSuggestions = emptyList()
                                                     indoorDirectionsQuery = ""
                                                     indoorDirectionsSuggestions = emptyList()
@@ -405,20 +402,10 @@ fun ConcordiaCampusGuideApp() {
                                                             singleLine = true,
                                                             modifier = Modifier.fillMaxWidth(),
                                                             label = {
-                                                                Text(
-                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
-                                                                        "Search start classroom"
-                                                                    else
-                                                                        "Search destination classroom"
-                                                                )
+                                                                Text(indoorSearchFieldLabel(directionsEditMode))
                                                             },
                                                             placeholder = {
-                                                                Text(
-                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN)
-                                                                        "e.g. H.937"
-                                                                    else
-                                                                        "e.g. H.831"
-                                                                )
+                                                                Text(indoorSearchFieldPlaceholder(directionsEditMode))
                                                             }
                                                         )
 
@@ -437,37 +424,11 @@ fun ConcordiaCampusGuideApp() {
                                                                             modifier = Modifier
                                                                                 .fillMaxWidth()
                                                                                 .clickable {
-                                                                                    val pickedNode = suggestion.node
-                                                                                    val pickedBuildingCode = pickedNode.buildingCode.uppercase()
-
-                                                                                    if (directionsEditMode == DirectionsEditMode.INDOOR_ORIGIN) {
-                                                                                        mapViewmodel.pendingIndoorStart = pickedNode
-                                                                                        val existingDest = mapViewmodel.pendingIndoorDestination
-                                                                                        if (existingDest != null && !existingDest.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
-                                                                                            mapViewmodel.indoorOutdoorRouteRequest =
-                                                                                                IndoorOutdoorRouteRequest(
-                                                                                                    startNode = pickedNode,
-                                                                                                    destinationNode = existingDest,
-                                                                                                )
-                                                                                            mapViewmodel.openIndoorBuildingCode = null
-                                                                                        } else {
-                                                                                            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
-                                                                                            mapViewmodel.indoorSetStartTrigger = pickedNode
-                                                                                        }
-                                                                                    } else {
-                                                                                        mapViewmodel.pendingIndoorDestination = pickedNode
-                                                                                        val existingStart = mapViewmodel.pendingIndoorStart
-                                                                                        if (existingStart != null && !existingStart.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
-                                                                                            mapViewmodel.indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
-                                                                                                startNode = existingStart,
-                                                                                                destinationNode = pickedNode,
-                                                                                            )
-                                                                                            mapViewmodel.openIndoorBuildingCode = null
-                                                                                        } else {
-                                                                                            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
-                                                                                            mapViewmodel.indoorSetDestTrigger = pickedNode
-                                                                                        }
-                                                                                    }
+                                                                                    applyIndoorSuggestionSelection(
+                                                                                        selected = suggestion,
+                                                                                        editMode = directionsEditMode,
+                                                                                        mapViewmodel = mapViewmodel,
+                                                                                    )
 
                                                                                     currentDestination.value = AppDestinations.MAP
                                                                                     directionsEditMode = null
@@ -526,37 +487,15 @@ fun ConcordiaCampusGuideApp() {
                                     AppDestinations.CALENDAR -> {
                                         CalendarScreen(
                                             onDirectionsToCourse = { course ->
-                                                val indoorResults = if (course.room.isNotBlank() && course.buildingCode.isNotBlank()) {
-                                                    IndoorRoomSearchService.search(
-                                                        query = course.room,
-                                                        scope = IndoorRoomSearchService.Scope.Building,
-                                                        buildingCode = course.buildingCode,
-                                                        limit = 1
-                                                    )
-                                                } else emptyList()
-
-                                                if (indoorResults.isNotEmpty()) {
-                                                    val result = indoorResults.first()
-                                                    mapViewmodel.openIndoorBuildingCode = result.buildingCode.uppercase()
-                                                    mapViewmodel.pendingIndoorDestination = result.node
-                                                    mapViewmodel.indoorSetDestTrigger = result.node
-                                                    currentDestination.value = AppDestinations.MAP
-                                                } else {
-                                                    val building = ALL_SUGGESTIONS
-                                                        .filterIsInstance<CampusBuilding>()
-                                                        .firstOrNull {
-                                                            it.buildingCode.equals(
-                                                                course.buildingCode,
-                                                                ignoreCase = true
-                                                            )
-                                                        }
-                                                    if (building != null) {
+                                                handleCalendarDirectionsRequest(
+                                                    course = course,
+                                                    mapViewmodel = mapViewmodel,
+                                                    onNavigateToMap = { currentDestination.value = AppDestinations.MAP },
+                                                    onBuildingFallback = { building ->
                                                         topBarDirectionsDestinationBuilding = building
-                                                        currentDestination.value = AppDestinations.MAP
-                                                    } else {
-                                                        unknownBuildingCourse = course
-                                                    }
-                                                }
+                                                    },
+                                                    onUnknownBuilding = { unknownBuildingCourse = it },
+                                                )
                                             }
                                         )
                                     }
@@ -793,6 +732,113 @@ private fun SharedDirectionsTopBar(
         onDestinationClick = onDestinationClick,
         extraContent = extraContent,
     )
+}
+
+private fun nextDirectionsEditMode(
+    hasIndoorOverlay: Boolean,
+    currentMode: DirectionsEditMode?,
+    searchVanish: Boolean,
+): DirectionsEditMode? {
+    return when {
+        hasIndoorOverlay && currentMode == DirectionsEditMode.INDOOR_DESTINATION -> null
+        hasIndoorOverlay -> DirectionsEditMode.INDOOR_DESTINATION
+        currentMode == DirectionsEditMode.OUTDOOR_DESTINATION && !searchVanish -> null
+        else -> DirectionsEditMode.OUTDOOR_DESTINATION
+    }
+}
+
+private fun indoorSearchFieldLabel(mode: DirectionsEditMode?): String {
+    return if (mode == DirectionsEditMode.INDOOR_ORIGIN) {
+        "Search start classroom"
+    } else {
+        "Search destination classroom"
+    }
+}
+
+private fun indoorSearchFieldPlaceholder(mode: DirectionsEditMode?): String {
+    return if (mode == DirectionsEditMode.INDOOR_ORIGIN) {
+        "e.g. H.937"
+    } else {
+        "e.g. H.831"
+    }
+}
+
+private fun applyIndoorSuggestionSelection(
+    selected: IndoorRoomSearchService.Result,
+    editMode: DirectionsEditMode?,
+    mapViewmodel: MapSearchViewModel,
+) {
+    val pickedNode = selected.node
+    val pickedBuildingCode = pickedNode.buildingCode.uppercase()
+
+    if (editMode == DirectionsEditMode.INDOOR_ORIGIN) {
+        mapViewmodel.pendingIndoorStart = pickedNode
+        val existingDest = mapViewmodel.pendingIndoorDestination
+        if (existingDest != null && !existingDest.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
+            mapViewmodel.indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
+                startNode = pickedNode,
+                destinationNode = existingDest,
+            )
+            mapViewmodel.openIndoorBuildingCode = null
+        } else {
+            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
+            mapViewmodel.indoorSetStartTrigger = pickedNode
+        }
+    } else {
+        mapViewmodel.pendingIndoorDestination = pickedNode
+        val existingStart = mapViewmodel.pendingIndoorStart
+        if (existingStart != null && !existingStart.buildingCode.equals(pickedNode.buildingCode, ignoreCase = true)) {
+            mapViewmodel.indoorOutdoorRouteRequest = IndoorOutdoorRouteRequest(
+                startNode = existingStart,
+                destinationNode = pickedNode,
+            )
+            mapViewmodel.openIndoorBuildingCode = null
+        } else {
+            mapViewmodel.openIndoorBuildingCode = pickedBuildingCode
+            mapViewmodel.indoorSetDestTrigger = pickedNode
+        }
+    }
+}
+
+private fun handleCalendarDirectionsRequest(
+    course: Course,
+    mapViewmodel: MapSearchViewModel,
+    onNavigateToMap: () -> Unit,
+    onBuildingFallback: (CampusBuilding) -> Unit,
+    onUnknownBuilding: (Course) -> Unit,
+) {
+    val indoorResults = if (course.room.isNotBlank() && course.buildingCode.isNotBlank()) {
+        IndoorRoomSearchService.search(
+            query = course.room,
+            scope = IndoorRoomSearchService.Scope.Building,
+            buildingCode = course.buildingCode,
+            limit = 1,
+        )
+    } else {
+        emptyList()
+    }
+
+    if (indoorResults.isNotEmpty()) {
+        val result = indoorResults.first()
+        mapViewmodel.openIndoorBuildingCode = result.buildingCode.uppercase()
+        mapViewmodel.pendingIndoorDestination = result.node
+        mapViewmodel.indoorSetDestTrigger = result.node
+        onNavigateToMap()
+        return
+    }
+
+    val building = ALL_SUGGESTIONS
+        .filterIsInstance<CampusBuilding>()
+        .firstOrNull {
+            it.buildingCode.equals(course.buildingCode, ignoreCase = true)
+        }
+
+    if (building != null) {
+        onBuildingFallback(building)
+        onNavigateToMap()
+    } else {
+        onUnknownBuilding(course)
+    }
 }
 
 sealed class AppIcon {
