@@ -1,5 +1,7 @@
 package com.example.campusguide.ui.screens
 
+import android.graphics.Paint as AndroidPaint
+import android.graphics.Typeface
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -30,7 +32,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -101,7 +105,7 @@ fun IndoorMapScreen(
 ) {
     val clearVersion = maxOf(resetVersion, clearTrigger)
     val viewModel = providedViewModel ?: viewModel<IndoorNavigationViewModel>(
-        key = "indoor-nav-$clearVersion",
+        key = "indoor-nav-${buildingCode.uppercase()}",
     )
     val accessibilityState = LocalAccessibilityState.current
 
@@ -1125,16 +1129,23 @@ private fun DrawScope.drawPoiIcon(
         }
 
         label.startsWith("BATHROOM") -> {
-            val headR  = radius * 0.28f
-            val headCy = cy - radius * 0.36f
-            drawCircle(color = fill, radius = headR, center = Offset(cx, headCy))
-            val bodyPath = Path().apply {
-                moveTo(cx,                  cy - radius * 0.05f)
-                lineTo(cx - radius * 0.32f, cy + radius * 0.54f)
-                lineTo(cx + radius * 0.32f, cy + radius * 0.54f)
-                close()
+            val bgRadius = radius * 0.55f
+            drawCircle(color = fill, radius = bgRadius, center = Offset(cx, cy))
+            val textSize = bgRadius * 0.9f
+            drawIntoCanvas { canvas ->
+                canvas.nativeCanvas.drawText(
+                    "WC",
+                    cx,
+                    cy + textSize * 0.38f,
+                    AndroidPaint().apply {
+                        color = android.graphics.Color.WHITE
+                        textAlign = AndroidPaint.Align.CENTER
+                        this.textSize = textSize
+                        typeface = Typeface.DEFAULT_BOLD
+                        isAntiAlias = true
+                    }
+                )
             }
-            drawPath(path = bodyPath, color = fill)
         }
 
         label == "HIVE-CAFE" -> {
@@ -1168,6 +1179,7 @@ private fun DrawScope.drawPoiIcon(
                 )
             }
         }
+
         label == "SITTING-AREA" -> {
             val seatW = radius * 1.35f
             val seatH = radius * 0.24f

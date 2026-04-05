@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.draw.clip
@@ -78,6 +79,7 @@ import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.MapMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
 import com.example.campusguide.ui.viewmodels.ControlsViewModel
+import com.example.campusguide.ui.viewmodels.IndoorNavigationViewModel
 import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.accessibility.LocalAccessibilityState
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
@@ -119,6 +121,10 @@ fun MapScreen(
     viewModel: ControlsViewModel = viewModel<ControlsViewModel>(),
     originPickTrigger: Int = 0,
     myLocationTrigger: Int = 0,
+    showIndoorView: Boolean = false,
+    onShowIndoorViewChange: (Boolean) -> Unit = {},
+    onCancelDirections: () -> Unit = {},
+    onIndoorEndBuildingCode: (String?) -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -317,16 +323,15 @@ fun MapScreen(
         topBarOriginOverride = startNode.label
         topBarDestinationOverride = destinationNode.label
         isIndoorOutdoorFlow = true
+        onShowIndoorViewChange(false)
         indoorFlowStartNode = startNode
         indoorFlowEndNode = destinationNode
+        onIndoorEndBuildingCode(destinationNode.buildingCode.uppercase())
 
         val startAccess = findAccessNode(startNode.buildingCode)
         val endAccess = findAccessNode(destinationNode.buildingCode)
         indoorFlowStartAccessNode = startAccess
         indoorFlowEndAccessNode = endAccess
-
-        val startIndoorOk = startAccess != null && hasIndoorLegPath(startNode, startAccess, accessibilityState)
-        val endIndoorOk = endAccess != null && hasIndoorLegPath(endAccess, destinationNode, accessibilityState)
 
         val plannedLegs = buildList {
             add("Indoor leg 1: ${startNode.label} → ${startAccess?.label ?: "building access point"}")
@@ -334,24 +339,12 @@ fun MapScreen(
             add("Indoor leg 2: ${endAccess?.label ?: "building access point"} → ${destinationNode.label}")
         }
 
-        val fallbackParts = mutableListOf<String>()
-        if (!startIndoorOk) {
-            fallbackParts.add("Start indoor leg unavailable")
-        }
-        if (!endIndoorOk) {
-            fallbackParts.add("Destination indoor leg unavailable")
-        }
-
         val outdoorOrigin = resolveBuildingLatLng(startBuilding)
         val outdoorDestination = resolveBuildingLatLng(endBuilding)
 
         legLabels = plannedLegs
-        indoorOutdoorFallbackParts = fallbackParts
-        legFallbackMessage = if (fallbackParts.isEmpty()) {
-            null
-        } else {
-            "${fallbackParts.joinToString(". ")}. Outdoor leg will fallback to destination building if needed."
-        }
+        indoorOutdoorFallbackParts = emptyList()
+        legFallbackMessage = null
 
         val hit = BuildingHit(
             id = endBuilding.buildingCode,
@@ -497,19 +490,25 @@ fun MapScreen(
 
 
 
-        suppressIndoorStateUpdates = true
+        val wasIndoorOutdoor = isIndoorOutdoorFlow
+        val keepBuildingCode = if (wasIndoorOutdoor) indoorFlowEndNode?.buildingCode?.uppercase() else null
+        val wasIndoor = indoorBuildingCode != null
+        suppressIndoorStateUpdates = !wasIndoor
         routeRequestGeneration++
         routePolylineRef?.remove()
         routePolylineRef = null
         onIndoorTriggerConsumed()
-        onIndoorOverlayChanged(null)
+        if (!wasIndoor) {
+            onIndoorOverlayChanged(null)
+            indoorBuildingCode = null
+        }
         onIndoorTopCardActiveChanged(false)
-        indoorBuildingCode = null
         selectedBuildingInfo = null
         indoorDirectionsState = null
         latestIndoorOriginNode = null
         latestIndoorDestinationNode = null
         isIndoorOutdoorFlow = false
+        onShowIndoorViewChange(false)
         indoorOutdoorFallbackParts = emptyList()
         indoorFlowStartNode = null
         indoorFlowStartAccessNode = null
@@ -532,6 +531,10 @@ fun MapScreen(
         searchMarker?.remove()
         searchMarker = null
 
+        if (keepBuildingCode != null) {
+            indoorBuildingCode = keepBuildingCode
+            onIndoorOverlayChanged(keepBuildingCode)
+        }
     }
 
 // Handle origin pick mode trigger from top bar
@@ -669,6 +672,7 @@ fun MapScreen(
                         showTravelModes = true,
                         goLabel = "Go",
                         cancelLabel = "Cancel",
+                        isIndoorOutdoorRoute = isIndoorOutdoorFlow,
                     )
                 )
             }
@@ -779,8 +783,13 @@ fun MapScreen(
         onTopBarBuildingConsumed()
     }
 
-    LaunchedEffect(topBarDirectionsDestinationBuilding) {
+    LaunchedEffect(topBarDirectionsDestinationBuilding, sgwAttached, loyAttached) {
         val building = topBarDirectionsDestinationBuilding ?: return@LaunchedEffect
+        val attached = when (building.campus) {
+            Campus.SGW    -> sgwAttached
+            Campus.LOYOLA -> loyAttached
+        }
+        if (!attached) return@LaunchedEffect
         val latLng = resolveBuildingLatLng(building)
 
         destinationBuilding = building
@@ -1437,11 +1446,16 @@ fun MapScreen(
                                 !hasIncompleteMapTapPairTrigger &&
                                 (indoorSetStartTrigger != null || indoorSetDestTrigger != null))
 
+            val isRouteShowing = isIndoorOutdoorFlow &&
+                    directionsUiState.step is DirectionsStep.ShowingRoute
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .zIndex(10f)
             ) {
+                // Hide indoor map when user picks outdoor view during a route
+                if (!isRouteShowing || showIndoorView) {
                 IndoorMapScreen(
                     buildingCode = code,
                     // Respond to top search actions while indoors are open
@@ -1504,6 +1518,41 @@ fun MapScreen(
                         indoorBuildingCode = null
                     }
                 )
+                } // end if (!isRouteShowing || showIndoorView)
+            }
+        }
+
+        // Indoor view overlay for cross-building indoor routes
+        if (showIndoorView && isIndoorOutdoorFlow) {
+            val destCode = indoorFlowEndNode?.buildingCode?.uppercase()
+            if (destCode != null) {
+                // Use a dedicated ViewModel so it never shares state with the
+                // regular IndoorMapScreen that may already be on screen.
+                val indoorOverlayVm = viewModel<IndoorNavigationViewModel>(
+                    key = "indoor-nav-overlay-${destCode}"
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(10f)
+                ) {
+                        val destFloor = indoorFlowEndNode?.floor
+                    val transferStart = if (destFloor != null) {
+                        val graph = IndoorGraphRegistry.get(destCode, destFloor)
+                        graph?.nodes?.firstOrNull { it.type == IndoorNodeType.ELEVATOR }
+                            ?: graph?.nodes?.firstOrNull { it.type == IndoorNodeType.ESCALATOR }
+                            ?: graph?.nodes?.firstOrNull { it.type == IndoorNodeType.STAIRCASE }
+                            ?: graph?.nodes?.firstOrNull { it.type == IndoorNodeType.ENTRY }
+                    } else null
+                    IndoorMapScreen(
+                        buildingCode = destCode,
+                        focusNode = indoorFlowEndNode,
+                        setStartNode = transferStart,
+                        setDestNode = if (transferStart != null) indoorFlowEndNode else null,
+                        providedViewModel = indoorOverlayVm,
+                        onClose = { onShowIndoorViewChange(false) }
+                    )
+                }
             }
         }
     }

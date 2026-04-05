@@ -69,6 +69,10 @@ fun DirectionsTopBar(
     goEnabled: Boolean = true,
     showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    showIndoorOutdoorToggle: Boolean = false,
+    isShowingIndoorView: Boolean = false,
+    onIndoorViewClick: () -> Unit = {},
+    onOutdoorViewClick: () -> Unit = {},
 ) {
     val currentSteps = route.legs.firstOrNull()
 
@@ -349,18 +353,40 @@ fun DirectionsTopBar(
                     }
                 }
 
-                // "View route details" tonal button — only when steps are available
+                // "View route details" tonal button, only when steps are available
                 if (currentSteps != null && currentSteps.steps.isNotEmpty()) {
                     Spacer(Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = if (showIndoorOutdoorToggle) Arrangement.SpaceBetween else Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (showIndoorOutdoorToggle) {
+                            Surface(
+                                shape = RoundedCornerShape(100.dp),
+                                color = if (isShowingIndoorView) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .clip(RoundedCornerShape(100.dp))
+                                    .clickable(onClick = onIndoorViewClick),
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 14.dp),
+                                ) {
+                                    Text(
+                                        text = "Indoor",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = if (isShowingIndoorView) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
                         Surface(
                             shape = RoundedCornerShape(100.dp),
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             modifier = Modifier
-                                .width(174.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(100.dp))
                                 .clickable { showStepDetails = true }
@@ -382,6 +408,28 @@ fun DirectionsTopBar(
                                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                     modifier = Modifier.size(20.dp),
                                 )
+                            }
+                        }
+                        if (showIndoorOutdoorToggle) {
+                            Surface(
+                                shape = RoundedCornerShape(100.dp),
+                                color = if (!isShowingIndoorView) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier
+                                    .height(40.dp)
+                                    .clip(RoundedCornerShape(100.dp))
+                                    .clickable(onClick = onOutdoorViewClick),
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(horizontal = 14.dp),
+                                ) {
+                                    Text(
+                                        text = "Outdoor",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = if (!isShowingIndoorView) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     }

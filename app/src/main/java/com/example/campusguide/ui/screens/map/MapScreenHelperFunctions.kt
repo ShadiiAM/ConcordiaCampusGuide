@@ -355,5 +355,6 @@ data class DirectionsTopBarState(
     val cancelLabel: String = "Cancel",
     val indoorOriginNode: IndoorNode? = null,
     val indoorDestinationNode: IndoorNode? = null,
+    val isIndoorOutdoorRoute: Boolean = false,
 )
 
