@@ -24,8 +24,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -173,6 +176,8 @@ fun MapScreen(
     var mapTapSetStartNodeTrigger by remember { mutableStateOf<IndoorNode?>(null) }
     var mapTapSetDestNodeTrigger by remember { mutableStateOf<IndoorNode?>(null) }
     var indoorTriggerVersion by remember { mutableIntStateOf(0) }
+
+    var currentBuildingName by remember { mutableStateOf<String?>(null) }
 
     // Shuttle state (US-3.1)
     val shuttleTracker = remember { ShuttleTracker() }
@@ -858,7 +863,8 @@ fun MapScreen(
                         sgwOverlay,
                         loyOverlay,
                         userLocationViewModel,
-                        ) { callback ->
+                        onBuildingDetected = { name -> currentBuildingName = name },
+                    ) { callback ->
                         locationCallback = callback
                     }
                 }
@@ -1250,8 +1256,8 @@ fun MapScreen(
                                     map,
                                     sgwOverlay,
                                     loyOverlay,
-                                    userLocationViewModel
-
+                                    userLocationViewModel,
+                                    onBuildingDetected = { name -> currentBuildingName = name },
                                 ) { callback ->
                                     locationCallback = callback
                                 }
@@ -1304,6 +1310,16 @@ fun MapScreen(
             }
         )
 
+
+        // Building banner — shown when user is inside a campus building
+        currentBuildingName?.let { name ->
+            BuildingLocationBanner(
+                buildingName = name,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 72.dp)
+            )
+        }
 
         // Campus Toggle + round search shortcut button (same row)
         MapBottomSearchBar(
@@ -1509,4 +1525,35 @@ fun MapScreen(
     }
 }
 
+@Composable
+private fun BuildingLocationBanner(
+    buildingName: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.semantics { contentDescription = "You are in $buildingName" },
+        shape = RoundedCornerShape(50),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
+        shadowElevation = 4.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = Color(0xFFbc4949),
+                modifier = Modifier.size(16.dp)
+            )
+            Text(
+                text = buildingName,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+    }
+}
 
