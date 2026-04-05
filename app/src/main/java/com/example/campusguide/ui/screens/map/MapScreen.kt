@@ -1140,6 +1140,9 @@ fun MapScreen(
                         // GeoJsonOverlay uses polygon listeners, not marker listeners — safe to set here.
                         @Suppress("PotentialBehaviorOverride")
                         map.setOnMarkerClickListener { marker -> // NOSONAR
+                            firebaseAnalytics.logEvent("shuttle_stop_marker_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_marker_click")
+
                             val stop = marker.tag as? ShuttleStop
                             if (stop != null) {
                                 selectedShuttleStop = stop
@@ -1151,6 +1154,11 @@ fun MapScreen(
 
                         // Set up polygon click listener
                         map.setOnPolygonClickListener { polygon ->
+
+                            firebaseAnalytics.logEvent("building_polygon_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("building_polygon_click")
+
+
                             val overlayAndFeature = listOfNotNull(sgwOverlay, loyOverlay)
                                 .firstNotNullOfOrNull { overlay ->
                                     overlay.getPolygonId(polygon)
@@ -1344,6 +1352,9 @@ fun MapScreen(
 
         // Building Details Bottom Sheet
         selectedBuildingInfo?.let { info ->
+            firebaseAnalytics.logEvent("building_polygon_click", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("building_polygon_click")
+
             BuildingDetailsBottomSheet(
                 buildingInfo = info,
                 onDismiss = { selectedBuildingInfo = null },
@@ -1389,6 +1400,9 @@ fun MapScreen(
 
         // Shuttle stop info card (US-3.1)
         selectedShuttleStop?.let { stop ->
+            firebaseAnalytics.logEvent("shuttle_stop_marker_click", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_stop_marker_click")
+
             ShuttleStopInfoCard(
                 stop = stop,
                 isOperational = shuttleTracker.isOperational(),
@@ -1423,6 +1437,9 @@ fun MapScreen(
 
         // Indoor map overlay (US-5.1 – US-5.6)
         indoorBuildingCode?.let { code ->
+            firebaseAnalytics.logEvent("indoor_building_code_click", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_building_code_click")
+
             val hasAnyMapTapPairTrigger =
                 mapTapSetStartNodeTrigger != null || mapTapSetDestNodeTrigger != null
             val hasCompleteMapTapPairTrigger =

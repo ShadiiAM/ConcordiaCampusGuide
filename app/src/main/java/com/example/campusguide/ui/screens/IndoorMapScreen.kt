@@ -365,6 +365,8 @@ fun IndoorMapScreen(
     }
 
     poiInfoNode?.let { node ->
+        firebaseAnalytics.logEvent("indoor_poi_click", null)
+        UsabilityTrackerIRLUsers.userInteractionRecord("indoor_poi_click")
         PoiInfoPopup(
             node = node,
             onDismiss = { poiInfoNode = null },
@@ -501,6 +503,7 @@ private fun FloorPicker(
     selectedFloor: Int,
     onFloorSelect: (Int) -> Unit
 ) {
+    val firebaseAnalytics = Firebase.analytics
     // Build a full contiguous range from min..max and mark which floors are implemented.
     // Exclude floor 0 from the UI (there is no ground/0 floor in our indoor maps).
     val minFloor = floors.minOrNull() ?: selectedFloor
@@ -573,7 +576,12 @@ private fun FloorPicker(
                             .background(color = backgroundColor, shape = RoundedCornerShape(12.dp))
                             .padding(8.dp)
                             .then(
-                                if (isImplemented) Modifier.clickable { onFloorSelect(floor) }
+                                if (isImplemented) Modifier.clickable {
+                                    firebaseAnalytics.logEvent("indoor_floor_picker_click", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("indoor_floor_picker_click")
+
+                                    onFloorSelect(floor)
+                                }
                                 else Modifier
                             )
                     ) {
@@ -606,6 +614,8 @@ private fun FloorMapContent(
     onNodeTapped: (IndoorNode) -> Unit,
     onNodeLongPress: (IndoorNode) -> Unit
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
     // Zoom / pan state
     var scale  by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -673,6 +683,13 @@ private fun FloorMapContent(
                         // Ignore hallway nodes — they should not be tappable
                         if (hit != null && hit.type != IndoorNodeType.HALLWAY) {
                             latestOnNodeTapped(hit)
+                            firebaseAnalytics.logEvent("indoor_node_tapped", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_node_tapped")
+
+                        }else{
+                            firebaseAnalytics.logEvent("indoor_map_tapped_no_node", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_map_tapped_no_node")
+
                         }
                     },
                     onLongPress = { tapOffset ->
@@ -681,6 +698,14 @@ private fun FloorMapContent(
                         // Ignore hallway nodes for long-press info as well
                         if (hit != null && hit.type != IndoorNodeType.HALLWAY) {
                             latestOnNodeLongPress(hit)
+                            firebaseAnalytics.logEvent("indoor_map_long_press_node", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_map_long_press_node")
+
+                        }
+                        else{
+                            firebaseAnalytics.logEvent("indoor_map_long_press_no_node", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_map_long_press_no_node")
+
                         }
                     }
                 )
@@ -819,7 +844,11 @@ private fun FloorMapContent(
                                 .semantics {
                                     contentDescription = "POI: ${poiDisplayName(node.label)}"
                                 }
-                                .clickable { latestOnNodeTapped(node) }
+                                .clickable { latestOnNodeTapped(node)
+                                    firebaseAnalytics.logEvent("indoor_map_node_tap", null)
+                                    UsabilityTrackerIRLUsers.userInteractionRecord("indoor_map_node_tap")
+
+                                }
                         )
                     }
                 }
@@ -897,6 +926,8 @@ private fun DrawScope.drawPathLines(
 // ─── Node info dialog ─────────────────────────────────────────────────────────
 @Composable
 private fun NodeInfoDialog(node: IndoorNode, onDismiss: () -> Unit) {
+
+    val firebaseAnalytics = Firebase.analytics
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(node.label, fontWeight = FontWeight.Bold) },
@@ -908,7 +939,12 @@ private fun NodeInfoDialog(node: IndoorNode, onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            TextButton(onClick = {
+                onDismiss()
+                firebaseAnalytics.logEvent("indoor_node_info_dialog_dismiss", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("indoor_node_info_dialog_dismiss")
+
+            }) { Text("Close") }
         }
     )
 }
@@ -920,6 +956,7 @@ private fun PoiInfoPopup(
     onSetAsOrigin: () -> Unit,
     onSetAsDestination: () -> Unit
 ) {
+    val firebaseAnalytics = Firebase.analytics
     val details = node.description ?: poiInferredDescription(node.label)
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -940,10 +977,21 @@ private fun PoiInfoPopup(
         },
         confirmButton = {
             Row {
-                TextButton(onClick = onSetAsOrigin) {
+                TextButton(onClick ={
+                    firebaseAnalytics.logEvent("indoor_node_pop_up_set_origin", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("indoor_node_pop_up_set_origin")
+
+                    onSetAsOrigin()
+
+                }) {
                     Text("Set as Start", color = Color.White)
                 }
-                TextButton(onClick = onSetAsDestination) {
+                TextButton(onClick = {
+                    firebaseAnalytics.logEvent("indoor_node_pop_up_set_destination", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("indoor_node_pop_up_set_destination")
+
+                    onSetAsDestination()
+                }) {
                     Text("Set as Destination", color = Color.White)
                 }
             }

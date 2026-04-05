@@ -182,6 +182,7 @@ fun ConcordiaCampusGuideApp() {
 
 
     var currentDestination = remember { mutableStateOf(AppDestinations.MAP) }
+    val firebaseAnalytics = Firebase.analytics
 
 
 
@@ -214,6 +215,9 @@ fun ConcordiaCampusGuideApp() {
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                 )
             )
+            firebaseAnalytics.logEvent("location_permission_prompt", null)
+            UsabilityTrackerIRLUsers.userInteractionRecord("location_permission_prompt")
+
         }
     }
 
@@ -261,15 +265,31 @@ fun ConcordiaCampusGuideApp() {
     when {
         showAccessibility -> {
             AccessibilityScreen(
-                onBackClick = { showAccessibility = false }
+                onBackClick = { showAccessibility = false
+                    firebaseAnalytics.logEvent("back_from_accessibility", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("back_from_accessibility")
+
+                }
             )
         }
 
         showProfile -> {
             ProfileScreen(
-                onBackClick = { showProfile = false },
-                onProfileClick = { /* handle profile details */ },
-                onAccessibilityClick = { showAccessibility = true }
+                onBackClick = { showProfile = false
+                    firebaseAnalytics.logEvent("back_from_profile", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("back_from_profile")
+
+                },
+                onProfileClick = { /* handle profile details */
+                    firebaseAnalytics.logEvent("dead_profile_click", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("dead_profile_click")
+
+                },
+                onAccessibilityClick = { showAccessibility = true
+                    firebaseAnalytics.logEvent("to_accessibility_click", null)
+                    UsabilityTrackerIRLUsers.userInteractionRecord("to_accessibility_click")
+
+                }
             )
         }
 

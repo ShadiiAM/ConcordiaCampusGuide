@@ -483,6 +483,8 @@ fun POIScreen(
             }
 
             selectedPOI?.let { poi ->
+                firebaseAnalytics.logEvent("poi_marker_click", null)
+                UsabilityTrackerIRLUsers.userInteractionRecord("poi_marker_click")
                 POICard(
                     poi = poi,
                     onDismiss = { selectedPOI = null },

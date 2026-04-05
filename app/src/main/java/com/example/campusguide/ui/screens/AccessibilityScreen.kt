@@ -169,6 +169,9 @@ fun AccessibilityScreen(
                     ) {
                         IconButton(
                             onClick = {
+                                firebaseAnalytics.logEvent("accessibility_decrease_text_size", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_decrease_text_size")
+
                                 accessibilityState.decreaseTextSize()
                                 persist()
                             },
@@ -183,6 +186,9 @@ fun AccessibilityScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
                             onClick = {
+                                firebaseAnalytics.logEvent("accessibility_increase_text_size", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_increase_text_size")
+
                                 accessibilityState.increaseTextSize()
                                 persist()
                             },
@@ -236,6 +242,9 @@ fun AccessibilityScreen(
                             .background(boxColor)
                             .semantics { contentDescription = "Colorblind Cycle" }
                             .clickable {
+                                firebaseAnalytics.logEvent("accessibility_colorblind_cycle_click", null)
+                                UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_colorblind_cycle_click")
+
                                 accessibilityState.cycleColorBlindMode()
                                 persist()
                             },
@@ -270,6 +279,10 @@ fun AccessibilityScreen(
                         modifier = Modifier.testTag("boldenText"),
                         checked = accessibilityState.isBoldEnabled,
                         onCheckedChange = { checked ->
+
+                            firebaseAnalytics.logEvent("accessibility_bold_text_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_bold_text_click")
+
                             accessibilityState.setBold(checked)
                             persist()
                         },
@@ -331,6 +344,10 @@ fun AccessibilityScreen(
                     Switch(
                         checked = accessibilityState.avoidStairs,
                         onCheckedChange = { checked ->
+
+                            firebaseAnalytics.logEvent("accessibility_avoid_stairs_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_avoid_stairs_click")
+
                             accessibilityState.updateAvoidStairs(checked)
                             persist()
                         },
@@ -359,6 +376,10 @@ fun AccessibilityScreen(
                     Switch(
                         checked = accessibilityState.avoidEscalators,
                         onCheckedChange = { checked ->
+
+                            firebaseAnalytics.logEvent("accessibility_avoid_escalators_click", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("accessibility_avoid_escalators_click")
+
                             accessibilityState.updateAvoidEscalators(checked)
                             persist()
                         },

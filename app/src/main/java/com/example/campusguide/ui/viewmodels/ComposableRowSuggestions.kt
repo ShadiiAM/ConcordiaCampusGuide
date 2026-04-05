@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusguide.R
+import com.example.campusguide.UsabilityTrackerIRLUsers
 import com.example.campusguide.data.CampusBuilding
 import com.example.campusguide.data.Indoor
 import com.example.campusguide.data.OutsidePOI
@@ -40,6 +41,9 @@ import com.example.campusguide.data.Suggestion
 import com.example.campusguide.ui.components.getPOIColorAndDrawable
 import com.example.campusguide.ui.shuttle.NearestShuttleStopFinder
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 
 @Composable
 fun BuildingRow(
@@ -52,6 +56,8 @@ fun BuildingRow(
     onIndoorSetAsStart: (Indoor) -> Unit,
     onIndoorSetAsDestination: (Indoor) -> Unit,
 ) {
+
+    val firebaseAnalytics = Firebase.analytics
     when (suggestion) {
         is CampusBuilding -> {
             Row(
@@ -60,6 +66,9 @@ fun BuildingRow(
                     .testTag(suggestion.buildingName)
                     .clickable {
                         onSuggestionSelected(suggestion)
+                        firebaseAnalytics.logEvent("building_suggestion_selected", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("building_suggestion_selected")
+
                     }
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -102,6 +111,8 @@ fun BuildingRow(
                     .testTag(suggestion.id)
                     .clickable {
                         onSuggestionSelected(suggestion)
+                        firebaseAnalytics.logEvent("shuttle_suggestion_selected", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("shuttle_suggestion_selected")
                     }
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -153,6 +164,9 @@ fun BuildingRow(
                     .fillMaxWidth()
                     .clickable {
                         onSuggestionSelected(suggestion)
+                        firebaseAnalytics.logEvent("indoor_suggestion_selected", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("indoor_suggestion_selected")
+
                     }
                     .padding(horizontal = 16.dp, vertical = 10.dp)
                     .semantics {
@@ -178,11 +192,16 @@ fun BuildingRow(
                     ) {
                         TextButton(onClick = {
                             onIndoorSetAsStart(suggestion)
+                            firebaseAnalytics.logEvent("indoor_set_as_start", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_set_as_start")
+
                         }) {
                             Text("Set as start")
                         }
                         TextButton(onClick = {
                             onIndoorSetAsDestination(suggestion)
+                            firebaseAnalytics.logEvent("indoor_set_as_destination", null)
+                            UsabilityTrackerIRLUsers.userInteractionRecord("indoor_set_as_destination")
                         }) {
                             Text("Set as destination")
                         }
@@ -204,6 +223,8 @@ fun BuildingRow(
                     .testTag(suggestion.name)
                     .clickable {
                         onSuggestionSelected(suggestion)
+                        firebaseAnalytics.logEvent("poi_set_as_destination", null)
+                        UsabilityTrackerIRLUsers.userInteractionRecord("poi_set_as_destination")
                     }
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
