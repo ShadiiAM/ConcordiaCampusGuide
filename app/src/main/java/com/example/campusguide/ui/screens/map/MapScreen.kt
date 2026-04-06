@@ -68,7 +68,9 @@ import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.directions.isCrossCampusRoute
 import com.example.campusguide.data.ShuttleStop
+import com.example.campusguide.indoor.IndoorGraphRegistry
 import com.example.campusguide.indoor.IndoorNode
+import com.example.campusguide.indoor.IndoorNodeType
 import com.example.campusguide.ui.components.ShuttleStopInfoCard
 import com.example.campusguide.ui.map.geoJson.MapMarkerFactory
 import com.example.campusguide.ui.shuttle.ShuttleTracker
