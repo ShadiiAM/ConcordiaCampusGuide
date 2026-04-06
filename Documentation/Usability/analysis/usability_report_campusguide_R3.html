@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGuide — Usability Testing Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg:#0d0f14; --surface:#13161e; --surface2:#1c2030; --border:#252a3a;
+    --text:#e8eaf2; --muted:#6b7394; --accent:#f0c060;
+    --pass:#5ae88c; --fail:#e8665a; --partial:#e88c5a;
+    --t1:#a05ae8; --t2:#5ab4e8; --t3:#5ae88c; --t4:#e88c5a; --t5:#e8665a; --t6:#e85aab;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  canvas{touch-action:pan-y;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;}
+
+  header{padding:20px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .header-left h1{font-family:'Fraunces',serif;font-weight:300;font-size:24px;letter-spacing:-1px;line-height:1.1;}
+  .header-left h1 em{font-style:italic;color:var(--accent);}
+  .header-meta{font-size:11px;color:var(--muted);margin-top:10px;letter-spacing:.08em;text-transform:uppercase;}
+  .task-pill{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border:1px solid;margin-right:4px;}
+  .t1{color:var(--t1);border-color:var(--t1);}
+  .t2{color:var(--t2);border-color:var(--t2);}
+  .t3{color:var(--t3);border-color:var(--t3);}
+  .t4{color:var(--t4);border-color:var(--t4);}
+  .t5{color:var(--t5);border-color:var(--t5);}
+  .t6{color:var(--t6);border-color:var(--t6);}
+
+  nav{display:flex;padding:0 48px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  nav button{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:16px 20px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+  nav button.active{color:var(--accent);border-bottom-color:var(--accent);}
+  nav button:hover:not(.active){color:var(--text);}
+
+  main{padding:20px 48px;}
+  .section{display:none;} .section.active{display:block;}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:16px;}
+  .kpi{background:var(--surface);padding:14px 18px;}
+  .kpi-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .kpi-value{font-family:'Fraunces',serif;font-size:22px;font-weight:700;line-height:1;}
+  .kpi-unit{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .chart-full{margin-bottom:16px;}
+  @media(max-width:900px){.chart-row{grid-template-columns:1fr;}header,nav,main{padding-left:24px;padding-right:24px;}}
+
+  .panel{background:var(--surface);border:1px solid var(--border);padding:16px;}
+  .panel-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+  .panel-title span{background:var(--surface2);padding:3px 10px;font-size:10px;color:var(--muted);}
+
+  .heatmap-grid{display:grid;gap:4px;}
+  .heatmap-row{display:grid;gap:4px;align-items:center;}
+  .heatmap-cell{height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .cell-val{font-family:'Fraunces',serif;font-size:12px;font-weight:700;line-height:1.2;}
+  .cell-lbl{font-size:8px;letter-spacing:.04em;text-transform:uppercase;opacity:.65;margin-top:2px;text-align:center;padding:0 2px;}
+  .heatmap-label{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .heatmap-header{display:grid;gap:4px;margin-bottom:6px;}
+  .heatmap-header-cell{text-align:center;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px;}
+
+  .legend{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+  .legend-dot{width:10px;height:10px;border-radius:50%;}
+
+  .persona-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .persona-table th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 12px 10px 0;border-bottom:1px solid var(--border);font-weight:400;}
+  .persona-table td{padding:11px 12px 11px 0;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .persona-table tr:last-child td{border-bottom:none;}
+  .persona-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;}
+
+  .finding-list{display:flex;flex-direction:column;gap:12px;}
+  .finding-item{background:var(--surface2);border:1px solid var(--border);border-left:3px solid transparent;padding:16px 20px;}
+  .finding-item.f-critical{border-left-color:var(--fail);}
+  .finding-item.f-high{border-left-color:var(--partial);}
+  .finding-item.f-medium{border-left-color:var(--accent);}
+  .finding-item.f-positive{border-left-color:var(--pass);}
+  .finding-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
+  .finding-id{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--muted);min-width:36px;}
+  .finding-title{font-size:13px;color:var(--text);flex:1;}
+  .finding-sev{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border:1px solid;}
+  .sev-critical{color:var(--fail);border-color:var(--fail);}
+  .sev-high{color:var(--partial);border-color:var(--partial);}
+  .sev-medium{color:var(--accent);border-color:var(--accent);}
+  .sev-positive{color:var(--pass);border-color:var(--pass);}
+  .finding-desc{font-size:12px;color:var(--muted);line-height:1.7;padding-left:48px;}
+  .finding-desc strong{color:var(--text);}
+
+  .score-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .score-row:last-child{border-bottom:none;}
+  .score-name{width:130px;font-size:12px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .score-bar-bg{flex:1;height:7px;background:var(--surface2);}
+  .score-bar-fill{height:100%;}
+  .score-val{font-family:'Fraunces',serif;font-size:16px;font-weight:700;min-width:32px;text-align:right;}
+  .score-comment{font-size:10px;color:var(--muted);flex:1;max-width:320px;line-height:1.5;}
+
+  .insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .insight-card{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--border);padding:20px;}
+  .insight-icon{font-size:20px;margin-bottom:12px;}
+  .insight-title{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+  .insight-text{font-size:12px;color:var(--muted);line-height:1.7;}
+  .insight-text strong{color:var(--text);}
+
+  .task-overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px;}
+  .task-card{background:var(--surface);border:1px solid var(--border);padding:16px;}
+  .task-card-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .task-card-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .task-user-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);}
+  .task-user-row:last-child{border-bottom:none;}
+  .task-user-name{font-size:11px;width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .task-user-bar-bg{flex:1;height:5px;background:var(--surface2);}
+  .task-user-bar-fill{height:100%;}
+  .task-user-rating{font-size:9px;letter-spacing:.06em;text-transform:uppercase;min-width:44px;text-align:right;}
+
+  .user-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;overflow:hidden;}
+  .user-card-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+  .user-card-sub{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+  .user-card-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;}
+  .user-card-row:last-child{border-bottom:none;}
+  .user-card-label{color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-size:10px;flex-shrink:0;margin-right:8px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>CampusGuide <em>Usability</em><br>Report</h1>
+    <div class="header-meta">8 participants · 6 tasks · com.example.campusguide · April 5–6 2026</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <span class="task-pill t1">T1 Accessibility</span>
+    <span class="task-pill t2">T2 Add Course</span>
+    <span class="task-pill t3">T3 Course Directions</span>
+    <span class="task-pill t4">T4 POI Filter</span>
+    <span class="task-pill t5">T5 POI Directions</span>
+    <span class="task-pill t6">T6 Indoor POI</span>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('overview',event)">Overview</button>
+  <button onclick="showSection('bytask',event)">By Task</button>
+  <button onclick="showSection('participants',event)">Participants</button>
+  <button onclick="showSection('survey',event)">Survey</button>
+  <button onclick="showSection('findings',event)">Findings</button>
+  <button onclick="showSection('recommendations',event)">Recommendations</button>
+</nav>
+
+<main>
+
+<div class="section active" id="overview">
+  <div class="kpi-grid" id="kpiGrid"></div>
+  <div class="task-overview-grid" id="taskOverviewGrid"></div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">Task pass rates <span>% of 8 participants</span></div>
+      <canvas id="passRateChart" style="max-height:200px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Satisfaction scores <span>/5 post-session survey</span></div>
+      <canvas id="satisfactionChart" style="max-height:200px"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="bytask">
+  <div class="chart-full">
+    <div class="panel">
+      <div class="panel-title">Task outcome heatmap — per participant per task <span>green=pass · amber=partial · red=fail</span></div>
+      <div class="heatmap-header" id="taskHeatHeader"></div>
+      <div class="heatmap-grid" id="taskHeatGrid"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pass)"></div>Pass</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--partial)"></div>Partial</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--fail)"></div>Fail</div>
+      </div>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">T2 — Add course time per participant <span>seconds</span></div>
+      <canvas id="t2timeChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">All tasks — full pass rate comparison <span>% full pass only</span></div>
+      <canvas id="allTasksChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">T3 — Course directions outcome <span>n=8</span></div>
+      <canvas id="t3outcomeChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">T6 — Indoor POI outcome <span>worst performing task</span></div>
+      <canvas id="t6outcomeChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="participants">
+  <div class="kpi-grid" id="popKpiGrid"></div>
+  <div class="chart-full">
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Participant Profiles</div>
+    <div id="userCardGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div>
+  </div>
+  <div class="chart-row" style="margin-top:16px;">
+    <div class="panel">
+      <div class="panel-title">Campus familiarity <span>n=8</span></div>
+      <canvas id="campusChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Tech level <span>n=8</span></div>
+      <canvas id="techChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">Age distribution <span>n=8</span></div>
+      <canvas id="ageChart" style="max-height:180px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Accessibility needs <span>n=8</span></div>
+      <canvas id="accessChart" style="max-height:180px"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="survey">
+  <div class="panel chart-full" style="margin-bottom:16px;">
+    <div class="panel-title">Satisfaction scores with comments</div>
+    <div id="scoreRows"></div>
+  </div>
+  <div class="chart-row">
+    <div class="panel">
+      <div class="panel-title">Biggest UI pain point <span>self-reported</span></div>
+      <canvas id="painChart" style="max-height:200px"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Most difficult task <span>self-reported</span></div>
+      <canvas id="hardestChart" style="max-height:200px"></canvas>
+    </div>
+  </div>
+  <div class="panel chart-full">
+    <div class="panel-title">Full survey data</div>
+    <div style="overflow-x:auto;"><table class="persona-table" id="surveyTable"></table></div>
+  </div>
+</div>
+
+<div class="section" id="findings">
+  <div class="finding-list" id="findingList"></div>
+</div>
+
+<div class="section" id="recommendations">
+  <div class="insight-grid" id="recGrid"></div>
+</div>
+
+</main>
+
+<script>
+Chart.defaults.color='#6b7394';
+Chart.defaults.borderColor='#252a3a';
+Chart.defaults.font.family="'DM Mono',monospace";
+Chart.defaults.font.size=11;
+
+const participants=[
+  {key:'ELLIOT',name:'Elliot Buffet',session:'Usability 1',color:'#e8665a',
+   campus:'Both campuses',tech:'Inexperienced',age:'21–30',access:'—',score:4,
+   comment:"Couldn't understand navigation methods. Had to end early.",
+   tasks:{t1:'partial',t2:'pass',t3:'fail',t4:'fail',t5:'fail',t6:'fail'},
+   notes:{t1:'Via nav bar; no profile path used',t2:'25 s',t3:'Never reached daily schedule or get-directions',
+          t4:'Cycled ratings; no ≥4★ marker found',t5:'Cancelled directions twice',t6:'Session ended before indoor map'},
+   t2time:25},
+  {key:'STEVEN',name:'Steven',session:'Usability 2',color:'#5ab4e8',
+   campus:'Visited a couple times',tech:'Regular user',age:'21–30',access:'Not very tech-savvy',score:4,
+   comment:"Did not struggle much with anything.",
+   tasks:{t1:'fail',t2:'pass',t3:'fail',t4:'partial',t5:'pass',t6:'fail'},
+   notes:{t1:'Never visited accessibility screen',t2:'37+33+14 s (3 attempts)',
+          t3:'Triggered directions independently, not from calendar',t4:'Filtered to 3.0; did not reach 4+',
+          t5:'4.5 s after finding card',t6:'Session ended before indoor map'},
+   t2time:84},
+  {key:'ANON',name:'Anonymous',session:'Usability 3',color:'#a05ae8',
+   campus:'SGW only',tech:'Regular user',age:'21–30',access:'ADHD',score:5,
+   comment:"Why does indoor POI have a separate way to reach it instead of appearing on the main map?",
+   tasks:{t1:'pass',t2:'pass',t3:'pass',t4:'fail',t5:'pass',t6:'pass'},
+   notes:{t1:'Profile → accessibility; stairs + text size',t2:'22 s',
+          t3:'Find next class → get directions completed',t4:'Cycled ratings 3× full loops',
+          t5:'POI card → directions → go',t6:'Floor picker → map node → destination set'},
+   t2time:22},
+  {key:'SONIA',name:'Sonia Jacob',session:'Mac — Tester 1',color:'#e85aab',
+   campus:'SGW only',tech:'Regular user',age:'21–30',access:'Movement — crutches (ACL)',score:5,
+   comment:"Could not find Hive Cafe. Make stars easier to read — I didn't know tapping increases them.",
+   tasks:{t1:'pass',t2:'pass',t3:'pass',t4:'pass',t5:'pass',t6:'pass'},
+   notes:{t1:'Avoid stairs + increase text + back; clean',t2:'51 s',
+          t3:'Find next class → directions → go',t4:'Cycled 0→3 then clicked marker at 11.8 s',
+          t5:'Walk → go; 1.2 s',t6:'Floor picker → node → destination set'},
+   t2time:51},
+  {key:'ADRIANNE',name:'Adrianne Rafael',session:'Mac — Tester 2',color:'#5ae88c',
+   campus:'SGW only',tech:'Regular user',age:'21–30',access:'None',score:4,
+   comment:'"Find next class" and "Add course" are confusing — could mean the same thing. Rename to "What is my next class?"',
+   tasks:{t1:'pass',t2:'pass',t3:'partial',t4:'pass',t5:'pass',t6:'partial'},
+   notes:{t1:'Avoid stairs + text size; no back recorded',t2:'17 s (fastest)',
+          t3:'find_next_class tapped 5× before get_directions',t4:'Filter → marker → directions',
+          t5:'Walk → go; 1.2 s',t6:'Floor picker; node tapped; destination not confirmed'},
+   t2time:17},
+  {key:'TONHU',name:'To Nhu Nguyen',session:'Mac — Tester 3',color:'#e88c5a',
+   campus:'Visited a couple times',tech:'Regular user',age:'41–50',access:'None',score:3,
+   comment:"Many blue dots with no cues — don't know what I'm looking at. Info should pop up on hover.",
+   tasks:{t1:'pass',t2:'pass',t3:'pass',t4:'pass',t5:'pass',t6:'partial'},
+   notes:{t1:'Avoid stairs + text size; no back recorded',t2:'27 s',
+          t3:'Find next class → get directions → transit → go',t4:'Filter applied + marker clicked',
+          t5:'Walk → go; 4.6 s',t6:'Floor picker; 39 s hesitation on node'},
+   t2time:27},
+  {key:'ANHTHI',name:'Anh Thi Mac',session:'Mac — Tester 4',color:'#5ae8d4',
+   campus:'Visited a couple times',tech:'Generally good',age:'21–30',access:'None',score:3,
+   comment:"Rating >4 reads <4 on app. Hive coffee not visible — tried searching, nothing appeared.",
+   tasks:{t1:'pass',t2:'pass',t3:'partial',t4:'pass',t5:'pass',t6:'pass'},
+   notes:{t1:'Avoid stairs + text size + back; clean',t2:'27 s',
+          t3:'directions_go from daily schedule — find_next_class not used',t4:'25 s wait before marker click',
+          t5:'POI card → go (27 s hesitation)',t6:'Extensive indoor exploration; poi_click confirmed'},
+   t2time:27},
+  {key:'THIEN',name:'Thien Mac',session:'Mac — Tester 5',color:'#f0c060',
+   campus:'Both campuses',tech:'Regular user',age:'51–60',access:'Visual — needs large text',score:5,
+   comment:"Hard to distinguish the coffee icon — same colour as the dots. Use coloured icons.",
+   tasks:{t1:'pass',t2:'pass',t3:'partial',t4:'pass',t5:'pass',t6:'partial'},
+   notes:{t1:'Avoid stairs + text size + back; clean',t2:'26 s',
+          t3:'Daily schedule → directions_go without find_next_class',t4:'Filter + marker (4.5 s)',
+          t5:'Walk → go → back; 3.9 s',t6:'Floor picker; node tapped; no destination confirmation'},
+   t2time:26},
+];
+
+const taskKeys=['t1','t2','t3','t4','t5','t6'];
+const taskLabels={t1:'T1 Accessibility',t2:'T2 Add Course',t3:'T3 Course Directions',t4:'T4 POI Filter ≥4★',t5:'T5 POI Directions',t6:'T6 Indoor POI'};
+const taskColors={t1:'#a05ae8',t2:'#5ab4e8',t3:'#5ae88c',t4:'#e88c5a',t5:'#e8665a',t6:'#e85aab'};
+
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+[
+  {label:'Participants',value:'8',unit:'2 session groups',c:'var(--text)'},
+  {label:'Avg satisfaction',value:'4.1 / 5',unit:'post-session survey',c:'var(--accent)'},
+  {label:'Perfect pass rate',value:'T2 — 100%',unit:'Add course — all 8 passed',c:'var(--pass)'},
+  {label:'Lowest pass rate',value:'T6 — 25%',unit:'Indoor POI — 3 fail · 3 partial',c:'var(--fail)'},
+  {label:'Avg add-course time',value:'28 s',unit:'range 17–84 s (Steven 3 attempts)',c:'var(--t2)'},
+  {label:'Survey #1 pain point',value:'Indoor nav',unit:'6 of 8 respondents',c:'var(--t6)'},
+].forEach(k=>{
+  const d=document.createElement('div'); d.className='kpi';
+  d.innerHTML=`<div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.c}">${k.value}</div><div class="kpi-unit">${k.unit}</div>`;
+  document.getElementById('kpiGrid').appendChild(d);
+});
+
+// ── TASK OVERVIEW CARDS ───────────────────────────────────────────────────────
+taskKeys.forEach(tk=>{
+  const card=document.createElement('div'); card.className='task-card';
+  const pc=participants.filter(p=>p.tasks[tk]==='pass').length;
+  const ac=participants.filter(p=>p.tasks[tk]==='partial').length;
+  const fc=participants.filter(p=>p.tasks[tk]==='fail').length;
+  card.innerHTML=`<div class="task-card-title"><div class="task-card-dot" style="background:${taskColors[tk]}"></div><span style="color:${taskColors[tk]}">${taskLabels[tk]}</span></div>
+  ${participants.map(p=>{
+    const o=p.tasks[tk],c=o==='pass'?'var(--pass)':o==='partial'?'var(--partial)':'var(--fail)';
+    return `<div class="task-user-row">
+      <div class="task-user-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${p.color};margin-right:6px;vertical-align:middle"></span>${p.name.split(' ')[0]}</div>
+      <div class="task-user-bar-bg"><div class="task-user-bar-fill" style="width:${o==='pass'?100:o==='partial'?50:5}%;background:${c}88"></div></div>
+      <div class="task-user-rating" style="color:${c}">${o}</div></div>`;
+  }).join('')}
+  <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:14px;font-size:10px;">
+    <span style="color:var(--pass)">${pc} pass</span><span style="color:var(--partial)">${ac} partial</span><span style="color:var(--fail)">${fc} fail</span>
+  </div>`;
+  document.getElementById('taskOverviewGrid').appendChild(card);
+});
+
+// ── OVERVIEW CHARTS ───────────────────────────────────────────────────────────
+new Chart('passRateChart',{type:'bar',data:{labels:taskKeys.map(tk=>taskLabels[tk]),datasets:[
+  {label:'Pass',data:taskKeys.map(tk=>Math.round(participants.filter(p=>p.tasks[tk]==='pass').length/8*100)),backgroundColor:'#5ae88c88',borderColor:'#5ae88c',borderWidth:1},
+  {label:'Partial',data:taskKeys.map(tk=>Math.round(participants.filter(p=>p.tasks[tk]==='partial').length/8*100)),backgroundColor:'#e88c5a88',borderColor:'#e88c5a',borderWidth:1},
+  {label:'Fail',data:taskKeys.map(tk=>Math.round(participants.filter(p=>p.tasks[tk]==='fail').length/8*100)),backgroundColor:'#e8665a88',borderColor:'#e8665a',borderWidth:1},
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{boxWidth:10,padding:12,color:'#6b7394',font:{size:10}}}},
+  scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9},maxRotation:20}},y:{stacked:true,max:100,title:{display:true,text:'%',color:'#6b7394'},grid:{color:'#252a3a'}}}}});
+
+new Chart('satisfactionChart',{type:'bar',data:{labels:participants.map(p=>p.name.split(' ')[0]),datasets:[{label:'Score/5',data:participants.map(p=>p.score),backgroundColor:participants.map(p=>p.color+'99'),borderColor:participants.map(p=>p.color),borderWidth:1}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{min:0,max:5,title:{display:true,text:'Score /5',color:'#6b7394'},grid:{color:'#252a3a'}}}}});
+
+// ── BY TASK ───────────────────────────────────────────────────────────────────
+// Heatmap
+const hTpl=`150px repeat(6,1fr)`;
+const hHead=document.getElementById('taskHeatHeader');
+hHead.style.gridTemplateColumns=hTpl;
+hHead.innerHTML=`<div></div>`+taskKeys.map(tk=>`<div class="heatmap-header-cell" style="color:${taskColors[tk]}">${taskLabels[tk]}</div>`).join('');
+participants.forEach(p=>{
+  const row=document.createElement('div'); row.className='heatmap-row'; row.style.gridTemplateColumns=hTpl;
+  const lbl=document.createElement('div'); lbl.className='heatmap-label';
+  lbl.innerHTML=`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:8px;vertical-align:middle"></span>${p.name.split(' ')[0]}`;
+  row.appendChild(lbl);
+  taskKeys.forEach(tk=>{
+    const o=p.tasks[tk];
+    const bg=o==='pass'?'#1a3028':o==='partial'?'#2a2810':'#2e1a1a';
+    const tc=o==='pass'?'#5ae88c':o==='partial'?'#f0c060':'#e8665a';
+    const cell=document.createElement('div'); cell.className='heatmap-cell'; cell.style.background=bg;
+    cell.title=`${p.name} · ${taskLabels[tk]}: ${o}`;
+    const note=p.notes[tk].length>22?p.notes[tk].slice(0,22)+'…':p.notes[tk];
+    cell.innerHTML=`<div class="cell-val" style="color:${tc}">${o}</div><div class="cell-lbl" style="color:${tc}">${note}</div>`;
+    row.appendChild(cell);
+  });
+  document.getElementById('taskHeatGrid').appendChild(row);
+});
+
+new Chart('t2timeChart',{type:'bar',data:{labels:participants.map(p=>p.name.split(' ')[0]),datasets:[{label:'Seconds',data:participants.map(p=>p.t2time),backgroundColor:participants.map(p=>p.color+'99'),borderColor:participants.map(p=>p.color),borderWidth:1}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{title:{display:true,text:'Seconds',color:'#6b7394'},grid:{color:'#252a3a'}}}}});
+
+new Chart('allTasksChart',{type:'bar',data:{labels:taskKeys.map(tk=>taskLabels[tk]),datasets:[{label:'% Pass',data:taskKeys.map(tk=>Math.round(participants.filter(p=>p.tasks[tk]==='pass').length/8*100)),backgroundColor:taskKeys.map(tk=>taskColors[tk]+'88'),borderColor:taskKeys.map(tk=>taskColors[tk]),borderWidth:1}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:20}},y:{min:0,max:100,title:{display:true,text:'% Full Pass',color:'#6b7394'},grid:{color:'#252a3a'}}}}});
+
+const donutOpts=(data,labels,colors)=>({type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0d0f14',borderWidth:3}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#6b7394',boxWidth:12,padding:12,font:{size:10}}}},cutout:'62%'}});
+
+const mk=(tk)=>[participants.filter(p=>p.tasks[tk]==='pass').length,participants.filter(p=>p.tasks[tk]==='partial').length,participants.filter(p=>p.tasks[tk]==='fail').length];
+const [t3p,t3a,t3f]=mk('t3'); new Chart('t3outcomeChart',donutOpts([t3p,t3a,t3f],[`Pass (${t3p})`,`Partial (${t3a})`,`Fail (${t3f})`],['#5ae88c','#e88c5a','#e8665a']));
+const [t6p,t6a,t6f]=mk('t6'); new Chart('t6outcomeChart',donutOpts([t6p,t6a,t6f],[`Pass (${t6p})`,`Partial (${t6a})`,`Fail (${t6f})`],['#5ae88c','#e88c5a','#e8665a']));
+
+// ── PARTICIPANTS ──────────────────────────────────────────────────────────────
+[{label:'Participants',value:'8',unit:'2 session groups'},
+ {label:'Age range',value:'21–60s',unit:'Thien Mac oldest at 51–60'},
+ {label:'With accessibility needs',value:'3',unit:'Sonia (crutches) · Thien (vision) · Anon (ADHD)'},
+ {label:'Campus unfamiliar',value:'4',unit:'Steven · Anon · To Nhu · Adrianne'},
+ {label:'Tech — regular or above',value:'7',unit:'Anh Thi generally good; all others regular'},
+ {label:'Session groups',value:'2',unit:'Hossam group · Mac group'},
+].forEach(k=>{
+  const d=document.createElement('div'); d.className='kpi';
+  d.innerHTML=`<div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-unit">${k.unit}</div>`;
+  document.getElementById('popKpiGrid').appendChild(d);
+});
+
+participants.forEach(p=>{
+  const pc=taskKeys.filter(tk=>p.tasks[tk]==='pass').length;
+  const ac=taskKeys.filter(tk=>p.tasks[tk]==='partial').length;
+  const sc=p.score>=4?'var(--pass)':p.score>=3?'var(--accent)':'var(--fail)';
+  const card=document.createElement('div'); card.className='user-card';
+  card.innerHTML=`<div style="position:absolute;top:0;left:0;right:0;height:3px;background:${p.color}"></div>
+    <div class="user-card-name" style="color:${p.color}">${p.name}</div>
+    <div class="user-card-sub">${p.session}</div>
+    <div class="user-card-row"><span class="user-card-label">Campus</span><span style="text-align:right;max-width:60%">${p.campus}</span></div>
+    <div class="user-card-row"><span class="user-card-label">Tech</span><span>${p.tech}</span></div>
+    <div class="user-card-row"><span class="user-card-label">Age</span><span>${p.age}</span></div>
+    <div class="user-card-row"><span class="user-card-label">Accessibility</span><span style="text-align:right;max-width:60%">${p.access}</span></div>
+    <div class="user-card-row"><span class="user-card-label">Tasks</span><span><span style="color:var(--pass)">${pc} pass</span> · <span style="color:var(--partial)">${ac} partial</span></span></div>
+    <div style="margin-top:14px;"><div style="font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Satisfaction</div>
+    <div style="font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:${sc}">${p.score}<span style="font-size:14px;color:var(--muted)">/5</span></div></div>
+    <div style="margin-top:12px;padding:10px 12px;background:var(--surface2);border-left:2px solid ${p.color};font-size:11px;color:var(--muted);line-height:1.6;">"${p.comment}"</div>`;
+  document.getElementById('userCardGrid').appendChild(card);
+});
+
+new Chart('campusChart',donutOpts([2,3,2,1],['Both campuses (2)','SGW only (3)','Visited 1–2× (2)','Unknown (1)'],['#5ae88c','#5ab4e8','#f0c060','#6b7394']));
+new Chart('techChart',{type:'bar',data:{labels:['Inexperienced','Regular user','Generally good'],datasets:[{label:'Users',data:[1,6,1],backgroundColor:['#e8665a','#5ab4e8','#5ae88c'],borderWidth:0}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#252a3a'},ticks:{stepSize:1},title:{display:true,text:'# Users',color:'#6b7394'}}}}});
+new Chart('ageChart',{type:'bar',data:{labels:['21–30 (5)','41–50 (1)','51–60 (2)'],datasets:[{label:'Users',data:[5,1,2],backgroundColor:['#5ab4e8','#e88c5a','#a05ae8'],borderWidth:0}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#252a3a'},ticks:{stepSize:1},title:{display:true,text:'# Users',color:'#6b7394'}}}}});
+new Chart('accessChart',donutOpts([5,1,1,1],['None (5)','Movement—crutches (1)','Visual—large text (1)','ADHD (1)'],['#6b7394','#e85aab','#5ae8d4','#a05ae8']));
+
+// ── SURVEY ────────────────────────────────────────────────────────────────────
+participants.forEach(p=>{
+  const row=document.createElement('div'); row.className='score-row';
+  row.innerHTML=`<div class="score-name"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block;flex-shrink:0"></span>${p.name.split(' ')[0]}</div>
+    <div class="score-bar-bg"><div class="score-bar-fill" style="width:${p.score/5*100}%;background:${p.color}"></div></div>
+    <div class="score-val" style="color:${p.color}">${p.score}</div>
+    <div class="score-comment">${p.comment}</div>`;
+  document.getElementById('scoreRows').appendChild(row);
+});
+
+new Chart('painChart',donutOpts([6,2],['Indoor navigation (6)','Did not struggle (2)'],['#e8665a','#5ae88c']));
+new Chart('hardestChart',{type:'bar',data:{labels:['T6 Indoor POI','T3 Directions','T4 POI Filter','T2 Add Course','—'],
+  datasets:[{label:'Respondents',data:[6,1,1,1,2],backgroundColor:['#e85aab88','#5ae88c88','#e88c5a88','#5ab4e888','#6b739488'],borderColor:['#e85aab','#5ae88c','#e88c5a','#5ab4e8','#6b7394'],borderWidth:1}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:20}},y:{grid:{color:'#252a3a'},ticks:{stepSize:1},title:{display:true,text:'# Respondents',color:'#6b7394'}}}}});
+
+const hardestMap={ELLIOT:'Other (ended early)',STEVEN:'—',ANON:'T6 — Indoor POI',SONIA:'T4 — POI Filter ≥4★',ADRIANNE:'T2 — Add Course',TONHU:'T6 — Indoor POI',ANHTHI:'T6 — Indoor POI',THIEN:'T6 — Indoor POI'};
+const painMap={ELLIOT:'Navigation display',STEVEN:'Did not struggle',ANON:'Did not struggle',SONIA:'Indoor navigation',ADRIANNE:'Indoor navigation',TONHU:'Indoor navigation',ANHTHI:'Indoor navigation',THIEN:'Indoor navigation'};
+const st=document.getElementById('surveyTable');
+st.innerHTML=`<tr><th>Name</th><th>Campus</th><th>Tech</th><th>Age</th><th>Accessibility</th><th style="color:var(--accent)">Score</th><th>Pain point</th><th>Hardest task</th></tr>`;
+participants.forEach(p=>{
+  const sc=p.score>=4?'var(--pass)':p.score>=3?'var(--accent)':'var(--fail)';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><span class="persona-dot" style="background:${p.color}"></span>${p.name}</td>
+    <td style="color:var(--muted);font-size:11px">${p.campus}</td><td style="color:var(--muted);font-size:11px">${p.tech}</td>
+    <td style="color:var(--muted)">${p.age}</td><td style="color:var(--muted);font-size:11px">${p.access}</td>
+    <td><span style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:${sc}">${p.score}/5</span></td>
+    <td style="font-size:11px">${painMap[p.key]}</td><td style="font-size:11px">${hardestMap[p.key]}</td>`;
+  st.appendChild(tr);
+});
+
+// ── FINDINGS ──────────────────────────────────────────────────────────────────
+[
+  {id:'F1',cls:'f-critical',sev:'Critical',sevcls:'sev-critical',task:'t6',
+   title:'T6 — Indoor POI selection is severely unintuitive',
+   desc:`Only <strong>2 of 8</strong> participants completed T6. <strong>6 of 8</strong> survey respondents named indoor navigation as their biggest pain point. The Hive Cafe icon is <strong>the same blue colour as generic room nodes</strong> — invisible to users. Anh Thi Mac searched for "Hive" and found nothing. Adrianne said the icon <strong>"looked like cake."</strong> Three participants reached the floor picker and tapped nodes but never triggered the final <code style="background:var(--surface2);padding:1px 5px;font-size:10px">indoor_poi_click → set_destination</code> step.`},
+  {id:'F2',cls:'f-critical',sev:'Critical',sevcls:'sev-critical',task:'t3',
+   title:'T3 — Calendar → course directions flow is misunderstood',
+   desc:`Only <strong>3 of 8</strong> cleanly completed T3. Survey response from Adrianne directly explains why: <strong>"Find next class" and "Add course" feel interchangeable</strong> — she thought "Find next class" was how you add a course. One session hit <code style="background:var(--surface2);padding:1px 5px;font-size:10px">calendar_find_next_class</code> five times consecutively. She suggested renaming it <strong>"What is my next class?"</strong>`},
+  {id:'F3',cls:'f-high',sev:'High',sevcls:'sev-high',task:'t4',
+   title:'T4 — Rating filter is ambiguous in both direction and interaction model',
+   desc:`The filter was read as <strong>"below 4 stars" rather than "above 4 stars"</strong> (Anh Thi Mac). Multiple participants cycled 0→1→2→3→4 repeatedly — they expected a threshold, not a discrete equality picker. Sonia Jacob noted she <strong>"did not know tapping stars would increase them."</strong> Both directionality and interaction model need a redesign.`},
+  {id:'F4',cls:'f-high',sev:'High',sevcls:'sev-high',task:'t2',
+   title:'T2 — Add course form triggers multiple re-submissions',
+   desc:`All 8 passed T2, but <strong>Steven triggered calendar_add_course three times</strong> (37 s + 33 s + 14 s = 84 s total). Times ranged from 17 to 84 seconds. The multi-attempt pattern matches validation errors appearing only on submit rather than on field blur. The form also lacks helper text for term code and section formats.`},
+  {id:'F5',cls:'f-medium',sev:'Medium',sevcls:'sev-medium',task:'t1',
+   title:'T1 — Accessibility screen entry point is inconsistent',
+   desc:`Participants used at least two entry paths (nav bar vs. profile screen). Steven never visited the accessibility screen at all. Elliot reached it via a non-standard path. No single, clearly labelled entry point produced one full fail and one partial across 8 participants.`},
+  {id:'F6',cls:'f-positive',sev:'Positive',sevcls:'sev-positive',task:null,
+   title:'T2 + T5 — Add course and POI directions are strong reference flows',
+   desc:`T2 achieved <strong>100% pass rate</strong>. T5 (POI directions) scored 75% with fast, confident completions. The directions top-bar (mode toggle + go button) was understood by nearly everyone. Sonia Jacob <strong>specifically praised the avoid-stairs option</strong> as a crutches user — validating its real-world impact. These flows should anchor the redesign of weaker tasks.`},
+].forEach(f=>{
+  const item=document.createElement('div'); item.className=`finding-item ${f.cls}`;
+  const tc=f.task?`t${f.task.slice(1)}`:'';
+  item.innerHTML=`<div class="finding-header">
+    <div class="finding-id">${f.id}</div>
+    <div class="finding-title">${f.title}</div>
+    ${f.task?`<span class="task-pill ${tc}" style="font-size:9px;padding:2px 8px">${f.task.toUpperCase()}</span>`:''}
+    <div class="finding-sev ${f.sevcls}">${f.sev}</div>
+  </div>
+  <div class="finding-desc">${f.desc}</div>`;
+  document.getElementById('findingList').appendChild(item);
+});
+
+// ── RECOMMENDATIONS ───────────────────────────────────────────────────────────
+[
+  {icon:'🔵',title:'Redesign indoor POI icon system',priority:'high',
+   text:`Give named POIs (e.g. Hive Cafe) <strong>distinct coloured icons</strong> that visually contrast with the blue room nodes. Add visible labels on tap and surface a "Set as destination" bottom sheet. Make indoor POIs searchable from the main search bar. This addresses the #1 reported pain point (6 of 8 respondents).`},
+  {icon:'📅',title:'Rename and clarify calendar CTA',priority:'high',
+   text:`Rename "Find next class" to <strong>"What is my next class?"</strong> or similar. Surface a clear "Get directions" button on each course card in the daily schedule — independent of the find-next-class flow. This directly addresses Adrianne's verbatim feedback and T3's 37% pass rate.`},
+  {icon:'⭐',title:'Replace rating filter with threshold toggle',priority:'medium',
+   text:`Replace the 0–4 step-picker with a <strong>"4+ stars" chip or minimum-rating slider</strong>. Ensure visual language makes directionality obvious ("show me at least this many stars"). This addresses both the misread direction issue (Anh Thi) and the tapping-interaction confusion (Sonia).`},
+  {icon:'📝',title:'Add inline form validation to add-course',priority:'medium',
+   text:`Surface per-field validation on blur, not only on submission. Add helper text for term code (e.g. "e.g. 2244 for Winter 2024") and section fields. Consider pre-populating the current term code to reduce friction for the most common case.`},
+  {icon:'🔵',title:'Address indoor map visual density',priority:'medium',
+   text:`<strong>"Many blue dots with no cues"</strong> (To Nhu Nguyen). Add hover/tap states to all indoor nodes so users can identify rooms. Consider a label layer that expands on zoom. This is a separate concern from icon colour — both need addressing.`},
+  {icon:'⚙️',title:'Consolidate accessibility entry point',priority:'low',
+   text:`Confirm a single, clearly labelled entry point for accessibility settings. If both the nav bar and profile screen routes are intentional, label them consistently. Verify back-button behaviour works correctly regardless of entry path.`},
+].forEach(r=>{
+  const card=document.createElement('div'); card.className='insight-card';
+  const bc=r.priority==='high'?'var(--fail)':r.priority==='medium'?'var(--accent)':'var(--pass)';
+  card.style.borderLeftColor=bc; card.style.borderLeftWidth='3px';
+  const pri=r.priority==='high'?'HIGH':r.priority==='medium'?'MEDIUM':'LOW';
+  const pc=r.priority==='high'?'var(--fail)':r.priority==='medium'?'var(--accent)':'var(--pass)';
+  card.innerHTML=`<div class="insight-icon">${r.icon}</div>
+    <div class="insight-title">${r.title} <span style="color:${pc};font-size:9px">[${pri}]</span></div>
+    <div class="insight-text">${r.text}</div>`;
+  document.getElementById('recGrid').appendChild(card);
+});
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function showSection(id,e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  const y=window.scrollY;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(e) e.target.classList.add('active');
+  window.scrollTo(0,y);
+}
+</script>
+</body>
+</html>
