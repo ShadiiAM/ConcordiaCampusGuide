@@ -1118,6 +1118,7 @@ private fun DrawScope.drawPoiIcon(
         }
 
         label == "HIVE-CAFE" -> {
+            val fill = Color(0xFFFF69B4)
             val cupW = radius * 1.0f
             val cupH = radius * 0.62f
             val cupLeft = cx - cupW / 2f
