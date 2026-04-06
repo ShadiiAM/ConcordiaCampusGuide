@@ -2,6 +2,7 @@ package com.example.campusguide.ui
 
 import com.example.campusguide.ui.directions.TravelMode
 import com.example.campusguide.ui.screens.map.DirectionsTopBarState
+import com.example.campusguide.ui.screens.map.IndoorViewMode
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -323,5 +324,28 @@ class DirectionsTopBarStateTest {
     @Test
     fun `mixed case instruction is handled`() {
         assertEquals("left", classifyDirection("TURN LEFT onto Main St"))
+    }
+
+    @Test
+    fun `indoorViewMode is OUTDOOR by default`() {
+        val state = DirectionsTopBarState(active = true)
+        assertEquals(IndoorViewMode.OUTDOOR, state.indoorViewMode)
+    }
+
+    @Test
+    fun `indoorViewMode can be updated to START_INDOOR`() {
+        val state = DirectionsTopBarState(
+            active = true,
+            indoorViewMode = IndoorViewMode.START_INDOOR
+        )
+        assertEquals(IndoorViewMode.START_INDOOR, state.indoorViewMode)
+    }
+
+    @Test
+    fun `state with indoorViewMode can be copied`() {
+        val state = DirectionsTopBarState(active = true, indoorViewMode = IndoorViewMode.START_INDOOR)
+        val updated = state.copy(indoorViewMode = IndoorViewMode.DESTINATION_INDOOR)
+
+        assertEquals(IndoorViewMode.DESTINATION_INDOOR, updated.indoorViewMode)
     }
 }

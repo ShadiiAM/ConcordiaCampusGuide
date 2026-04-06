@@ -37,6 +37,7 @@ import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.screens.map.IndoorViewMode
 import com.example.campusguide.ui.shuttle.DepartureResult
 
 
@@ -67,9 +68,8 @@ fun DirectionsTopBar(
     showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
     showIndoorOutdoorToggle: Boolean = false,
-    isShowingIndoorView: Boolean = false,
-    onIndoorViewClick: () -> Unit = {},
-    onOutdoorViewClick: () -> Unit = {},
+    currentViewMode: IndoorViewMode = IndoorViewMode.OUTDOOR,
+    onViewModeChange: (IndoorViewMode) -> Unit = {},
 ) {
     val currentSteps = route.legs.firstOrNull()
 
@@ -353,30 +353,42 @@ fun DirectionsTopBar(
                 // "View route details" tonal button, only when steps are available
                 if (currentSteps != null && currentSteps.steps.isNotEmpty()) {
                     Spacer(Modifier.height(10.dp))
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (showIndoorOutdoorToggle) Arrangement.SpaceBetween else Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (showIndoorOutdoorToggle) {
-                            Surface(
-                                shape = RoundedCornerShape(100.dp),
-                                color = if (isShowingIndoorView) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier
-                                    .height(40.dp)
-                                    .clip(RoundedCornerShape(100.dp))
-                                    .clickable(onClick = onIndoorViewClick),
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 14.dp),
-                                ) {
-                                    Text(
-                                        text = "Indoor",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = if (isShowingIndoorView) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                                IndoorViewMode.entries.forEach { mode ->
+                                    val isSelected = mode == currentViewMode
+                                    Surface(
+                                        shape = RoundedCornerShape(100.dp),
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        modifier = Modifier
+                                            .height(36.dp)
+                                            .clip(RoundedCornerShape(100.dp))
+                                            .clickable { onViewModeChange(mode) },
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.padding(horizontal = 12.dp),
+                                        ) {
+                                            Text(
+                                                text = when (mode) {
+                                                    IndoorViewMode.OUTDOOR -> "Outdoor"
+                                                    IndoorViewMode.START_INDOOR -> "Start Indoor"
+                                                    IndoorViewMode.DESTINATION_INDOOR -> "Dest Indoor"
+                                                },
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -405,28 +417,6 @@ fun DirectionsTopBar(
                                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                     modifier = Modifier.size(20.dp),
                                 )
-                            }
-                        }
-                        if (showIndoorOutdoorToggle) {
-                            Surface(
-                                shape = RoundedCornerShape(100.dp),
-                                color = if (!isShowingIndoorView) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                                modifier = Modifier
-                                    .height(40.dp)
-                                    .clip(RoundedCornerShape(100.dp))
-                                    .clickable(onClick = onOutdoorViewClick),
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 14.dp),
-                                ) {
-                                    Text(
-                                        text = "Outdoor",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = if (!isShowingIndoorView) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
                             }
                         }
                     }
