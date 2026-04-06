@@ -80,7 +80,7 @@ fun POIFilterTags(
                     modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
                 ) {
                     AccessibleText(
-                        text = poiFilters.rating.toInt().toString() + " ",
+                        text = "At least " + poiFilters.rating.toInt().toString() ,
                         baseFontSizeSp = 14f,
                         modifier = Modifier.padding(start = 6.dp)
                     )
@@ -89,11 +89,6 @@ fun POIFilterTags(
                         contentDescription = "rating_POI_filter",
                         modifier = Modifier.size(18.dp),
                         tint = Color(0xFF000000)
-                    )
-                    AccessibleText(
-                        text = "+",
-                        baseFontSizeSp = 14f,
-                        modifier = Modifier.padding(start = 6.dp)
                     )
                 }
             }
