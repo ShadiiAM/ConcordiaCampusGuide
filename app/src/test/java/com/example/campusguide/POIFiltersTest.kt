@@ -113,13 +113,13 @@ class POIFiltersTest {
     @Test
     fun `POIFilterTags shows 0 rating when inactive`() {
         setFilters(filters = POIFilterValues(rating = 0.0))
-        composeTestRule.onNodeWithText("0 <").assertIsDisplayed()
+        composeTestRule.onNodeWithText("At least 0").assertIsDisplayed()
     }
 
     @Test
     fun `POIFilterTags shows active rating value`() {
         setFilters(filters = POIFilterValues(rating = 3.0))
-        composeTestRule.onNodeWithText("3 <").assertIsDisplayed()
+        composeTestRule.onNodeWithText("At least 3").assertIsDisplayed()
     }
 
     @Test
@@ -146,13 +146,13 @@ class POIFiltersTest {
     @Test
     fun `POIFilterTags shows distance in metres when less than 1000m`() {
         setFilters(filters = POIFilterValues(distanceLimit = 500.0f))
-        composeTestRule.onNodeWithText("500 m >").assertIsDisplayed()
+        composeTestRule.onNodeWithText("500 m").assertIsDisplayed()
     }
 
     @Test
     fun `POIFilterTags shows distance in km when exactly divisible by 1000`() {
         setFilters(filters = POIFilterValues(distanceLimit = 2000.0f))
-        composeTestRule.onNodeWithText("2 km >").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Less than 2 km away").assertIsDisplayed()
     }
 
     @Test
@@ -188,12 +188,12 @@ class POIFiltersTest {
             }
         }
 
-        composeTestRule.onNodeWithText("0 <").assertIsDisplayed()
+        composeTestRule.onNodeWithText("At least 0").assertIsDisplayed()
 
         filters = POIFilterValues(rating = 4.0)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("4 <").assertIsDisplayed()
+        composeTestRule.onNodeWithText("At least 4").assertIsDisplayed()
     }
 
     @Test
@@ -217,6 +217,6 @@ class POIFiltersTest {
         filters = POIFilterValues(distanceLimit = 1000.0f)
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("1 km >").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Less than 1 km away").assertIsDisplayed()
     }
 }

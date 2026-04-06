@@ -37,6 +37,7 @@ import com.example.campusguide.AppIcon
 import com.example.campusguide.R
 import com.example.campusguide.ui.directions.RouteResult
 import com.example.campusguide.ui.directions.TravelMode
+import com.example.campusguide.ui.screens.map.IndoorViewMode
 import com.example.campusguide.ui.shuttle.DepartureResult
 
 
@@ -66,6 +67,9 @@ fun DirectionsTopBar(
     goEnabled: Boolean = true,
     showCloseIcon: Boolean = true,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    showIndoorOutdoorToggle: Boolean = false,
+    currentViewMode: IndoorViewMode = IndoorViewMode.OUTDOOR,
+    onViewModeChange: (IndoorViewMode) -> Unit = {},
 ) {
     val currentSteps = route.legs.firstOrNull()
 
@@ -346,18 +350,52 @@ fun DirectionsTopBar(
                     }
                 }
 
-                // "View route details" tonal button — only when steps are available
+                // "View route details" tonal button, only when steps are available
                 if (currentSteps != null && currentSteps.steps.isNotEmpty()) {
                     Spacer(Modifier.height(10.dp))
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        if (showIndoorOutdoorToggle) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IndoorViewMode.entries.forEach { mode ->
+                                    val isSelected = mode == currentViewMode
+                                    Surface(
+                                        shape = RoundedCornerShape(100.dp),
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                        modifier = Modifier
+                                            .height(36.dp)
+                                            .clip(RoundedCornerShape(100.dp))
+                                            .clickable { onViewModeChange(mode) },
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.padding(horizontal = 12.dp),
+                                        ) {
+                                            Text(
+                                                text = when (mode) {
+                                                    IndoorViewMode.OUTDOOR -> "Outdoor"
+                                                    IndoorViewMode.START_INDOOR -> "Start Indoor"
+                                                    IndoorViewMode.DESTINATION_INDOOR -> "Dest Indoor"
+                                                },
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         Surface(
                             shape = RoundedCornerShape(100.dp),
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             modifier = Modifier
-                                .width(174.dp)
                                 .height(40.dp)
                                 .clip(RoundedCornerShape(100.dp))
                                 .clickable { showStepDetails = true }

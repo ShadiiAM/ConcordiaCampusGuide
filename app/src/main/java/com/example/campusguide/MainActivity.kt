@@ -93,6 +93,7 @@ import com.example.campusguide.ui.components.POIFilterTags
 import com.example.campusguide.ui.components.ignoreFocusClearOnTouch
 import com.example.campusguide.ui.directions.IndoorOutdoorRouteRequest
 import com.example.campusguide.ui.screens.POIScreen
+import com.example.campusguide.ui.screens.map.IndoorViewMode
 import com.example.campusguide.ui.viewmodels.BuildingRow
 
 class MainActivity : ComponentActivity() {
@@ -146,6 +147,8 @@ fun ConcordiaCampusGuideApp() {
     var indoorDirectionsQuery by rememberSaveable { mutableStateOf("") }
     var indoorDirectionsSuggestions by remember { mutableStateOf<List<IndoorRoomSearchService.Result>>(emptyList()) }
     var topBarDirectionsDestinationBuilding by remember { mutableStateOf<CampusBuilding?>(null) }
+    var indoorEndBuildingCode by remember { mutableStateOf<String?>(null) }
+    val isIndoorOutdoorRoute = directionsTopBarState.isIndoorOutdoorRoute
     var poiFilterValues by remember { mutableStateOf(POIFilterValues()) }
     var isSearchFocused by remember { mutableStateOf(false) }
 
@@ -170,6 +173,7 @@ fun ConcordiaCampusGuideApp() {
     val clearDirectionsAndIndoorState = {
         directionsTopBarState = DirectionsTopBarState(active = false)
         mapViewmodel.openIndoorBuildingCode = null
+        indoorEndBuildingCode = null
         mapViewmodel.indoorTopCardActive = false
         mapViewmodel.indoorFocusNodeTrigger = null
         mapViewmodel.indoorSetStartTrigger = null
@@ -181,6 +185,23 @@ fun ConcordiaCampusGuideApp() {
         directionsDestinationSuggestions = emptyList()
         indoorDirectionsQuery = ""
         indoorDirectionsSuggestions = emptyList()
+    }
+
+    val clearDirectionsKeepIndoor = { buildingCode: String ->
+        directionsTopBarState = DirectionsTopBarState(active = false)
+        indoorEndBuildingCode = null
+        mapViewmodel.indoorTopCardActive = false
+        mapViewmodel.indoorFocusNodeTrigger = null
+        mapViewmodel.indoorSetStartTrigger = null
+        mapViewmodel.indoorSetDestTrigger = null
+        mapViewmodel.pendingIndoorStart = null
+        mapViewmodel.pendingIndoorDestination = null
+        mapViewmodel.indoorOutdoorRouteRequest = null
+        directionsEditMode = null
+        directionsDestinationSuggestions = emptyList()
+        indoorDirectionsQuery = ""
+        indoorDirectionsSuggestions = emptyList()
+        mapViewmodel.openIndoorBuildingCode = buildingCode
     }
 
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -208,10 +229,6 @@ fun ConcordiaCampusGuideApp() {
         }
     }
 
-    LaunchedEffect(directionsCancelTrigger) {
-        if (directionsCancelTrigger == 0) return@LaunchedEffect
-        clearDirectionsAndIndoorState()
-    }
 
     LaunchedEffect(directionsTopBarState.indoorOriginNode, directionsTopBarState.indoorDestinationNode) {
         if (directionsTopBarState.indoorOriginNode != null) {
@@ -305,9 +322,9 @@ fun ConcordiaCampusGuideApp() {
                                             },
                                             onDirectionsTopBarState = { state ->
                                                 directionsTopBarState = state
-                                            },  // ← add
-                                            directionsGoTrigger = directionsGoTrigger,                              // ← add
-                                            directionsCancelTrigger = directionsCancelTrigger,                      // ← add
+                                            },
+                                            directionsGoTrigger = directionsGoTrigger,
+                                            directionsCancelTrigger = directionsCancelTrigger,
                                             onIndoorOverlayChanged = { mapViewmodel.openIndoorBuildingCode = it },
                                             requestedIndoorBuildingCode = mapViewmodel.openIndoorBuildingCode,
                                             indoorOutdoorRouteRequest = mapViewmodel.indoorOutdoorRouteRequest,
@@ -330,6 +347,16 @@ fun ConcordiaCampusGuideApp() {
                                                 mapViewmodel.indoorTopCardActive = active
                                             },
                                             hasExistingDestinationSelection = preservedIndoorDestination != null,
+                                            indoorViewMode = directionsTopBarState.indoorViewMode,
+                                            onIndoorViewModeChange = { mode ->
+                                                directionsTopBarState = directionsTopBarState.copy(indoorViewMode = mode)
+                                            },
+                                            onCancelDirections = {
+                                                directionsCancelTrigger++
+                                                topBarTravelMode = TravelMode.DRIVE
+                                                clearDirectionsAndIndoorState()
+                                            },
+                                            onIndoorEndBuildingCode = { indoorEndBuildingCode = it },
                                         )
 
                                         if (directionsTopBarState.active) {
@@ -339,7 +366,12 @@ fun ConcordiaCampusGuideApp() {
                                                 onCancelOrBackClick = {
                                                     directionsCancelTrigger++
                                                     topBarTravelMode = TravelMode.DRIVE
-                                                    clearDirectionsAndIndoorState()
+                                                    val building = indoorEndBuildingCode ?: mapViewmodel.openIndoorBuildingCode
+                                                    if (building != null) {
+                                                        clearDirectionsKeepIndoor(building)
+                                                    } else {
+                                                        clearDirectionsAndIndoorState()
+                                                    }
                                                 },
                                                 onModeSelected = { mode -> topBarTravelMode = mode },
                                                 onOriginClick = if (mapViewmodel.openIndoorBuildingCode != null) {
@@ -362,6 +394,9 @@ fun ConcordiaCampusGuideApp() {
                                                     indoorDirectionsQuery = ""
                                                     indoorDirectionsSuggestions = emptyList()
                                                     mapViewmodel.searchVanish = false
+                                                },
+                                                onIndoorViewModeChange = { mode ->
+                                                    directionsTopBarState = directionsTopBarState.copy(indoorViewMode = mode)
                                                 },
                                                 extraContent = {
 
@@ -467,6 +502,7 @@ fun ConcordiaCampusGuideApp() {
                                                         )
                                                     }
                                                 },
+                                                showIndoorOutdoorToggle = isIndoorOutdoorRoute,
                                             )
                                         } else{
 
@@ -506,7 +542,7 @@ fun ConcordiaCampusGuideApp() {
                                             onDirectionsTopBarState = { state ->
                                                 directionsTopBarState = state
                                             },
-                                            directionsGoTrigger = directionsGoTrigger,                              // ← add
+                                            directionsGoTrigger = directionsGoTrigger,
                                             directionsCancelTrigger = directionsCancelTrigger,
                                             topBarTravelMode = topBarTravelMode,
                                             onBottomSearchClick = {
@@ -531,9 +567,18 @@ fun ConcordiaCampusGuideApp() {
                                                 onCancelOrBackClick = {
                                                     directionsCancelTrigger++
                                                     topBarTravelMode = TravelMode.DRIVE
-                                                    clearDirectionsAndIndoorState()
+                                                    val building = indoorEndBuildingCode ?: mapViewmodel.openIndoorBuildingCode
+                                                    if (building != null) {
+                                                        clearDirectionsKeepIndoor(building)
+                                                    } else {
+                                                        clearDirectionsAndIndoorState()
+                                                    }
                                                 },
                                                 onModeSelected = { mode -> topBarTravelMode = mode },
+                                                showIndoorOutdoorToggle = isIndoorOutdoorRoute,
+                                                onIndoorViewModeChange = { mode ->
+                                                    directionsTopBarState = directionsTopBarState.copy(indoorViewMode = mode)
+                                                },
                                             )
                                         }else{
 
@@ -712,6 +757,8 @@ private fun SharedDirectionsTopBar(
     onOriginClick: (() -> Unit)? = null,
     onDestinationClick: (() -> Unit)? = null,
     extraContent: (@Composable ColumnScope.() -> Unit)? = null,
+    showIndoorOutdoorToggle: Boolean = false,
+    onIndoorViewModeChange: (IndoorViewMode) -> Unit = {},
 ) {
     DirectionsTopBar(
         modifier = Modifier.padding(top = 35.dp, start = 8.dp, end = 8.dp)
@@ -723,7 +770,7 @@ private fun SharedDirectionsTopBar(
         onModeSelected = onModeSelected,
         routeSummary = state.routeSummary,
         errorMessage = state.errorMessage,
-        showActions = state.showActions,
+        showActions = state.active && state.routeSummary == null && state.errorMessage == null,
         isLoadingRoute = state.isLoadingRoute,
         showTravelModes = state.showTravelModes,
         goEnabled = state.goEnabled,
@@ -738,6 +785,9 @@ private fun SharedDirectionsTopBar(
         onOriginClick = onOriginClick,
         onDestinationClick = onDestinationClick,
         extraContent = extraContent,
+        showIndoorOutdoorToggle = showIndoorOutdoorToggle,
+        currentViewMode = state.indoorViewMode,
+        onViewModeChange = onIndoorViewModeChange,
     )
 }
 

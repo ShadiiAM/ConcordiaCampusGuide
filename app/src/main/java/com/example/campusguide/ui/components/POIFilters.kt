@@ -79,16 +79,16 @@ fun POIFilterTags(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(vertical = 6.dp, horizontal = 12.dp)
                 ) {
+                    AccessibleText(
+                        text = "At least " + poiFilters.rating.toInt().toString() ,
+                        baseFontSizeSp = 14f,
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
                     Icon(
                         painter = painterResource(R.drawable.rating_star),
                         contentDescription = "rating_POI_filter",
                         modifier = Modifier.size(18.dp),
                         tint = Color(0xFF000000)
-                    )
-                    AccessibleText(
-                        text = poiFilters.rating.toInt().toString() + " <",
-                        baseFontSizeSp = 14f,
-                        modifier = Modifier.padding(start = 6.dp)
                     )
                 }
             }
@@ -116,8 +116,8 @@ fun POIFilterTags(
                     )
                     AccessibleText(
                         text = when {
-                            poiFilters.distanceLimit < 1000.0f -> "${poiFilters.distanceLimit.toInt()} m >"
-                            poiFilters.distanceLimit % 1000.0f == 0.0f -> "${(poiFilters.distanceLimit / 1000).toInt()} km >"
+                            poiFilters.distanceLimit < 1000.0f -> "${poiFilters.distanceLimit.toInt()} m"
+                            poiFilters.distanceLimit % 1000.0f == 0.0f -> "Less than ${(poiFilters.distanceLimit / 1000).toInt()} km away"
                             else -> "shouldn't reach here"
                         },
                         baseFontSizeSp = 14f,

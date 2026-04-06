@@ -328,6 +328,11 @@ fun hasIndoorLegPath(from: IndoorNode, to: IndoorNode, accessibilityState: Acces
     }
 }
 
+enum class IndoorViewMode {
+    START_INDOOR,
+    OUTDOOR,
+    DESTINATION_INDOOR
+}
 
 data class DirectionsTopBarState(
     val active: Boolean,
@@ -354,5 +359,6 @@ data class DirectionsTopBarState(
     val cancelLabel: String = "Cancel",
     val indoorOriginNode: IndoorNode? = null,
     val indoorDestinationNode: IndoorNode? = null,
+    val isIndoorOutdoorRoute: Boolean = false,
+    val indoorViewMode: IndoorViewMode = IndoorViewMode.OUTDOOR,
 )
-
